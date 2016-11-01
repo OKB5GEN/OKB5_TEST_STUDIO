@@ -9,7 +9,7 @@
 #include "qapplication.h"
 #include "synchapi.h"
 #include "comport.h"
-#include "WDMTMKv2.cpp"
+#include "WDMTMKv2.cpp" // This is some kind of shit to include cpp files
 
 HANDLE hEvent, hEvent1;
 int hTmk,flag_ch,ch_cur=0;
