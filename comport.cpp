@@ -5,11 +5,9 @@
 #include "qapplication.h"
 #include "synchapi.h"
 
-
 COMPortSender::COMPortSender(QObject *parent):
     QObject(parent)
 {
-
 }
 
 COMPortSender::~COMPortSender()
@@ -37,9 +35,10 @@ COMPortSender::~COMPortSender()
 
 void COMPortSender::createPorts()
 {
-    m_com4 = createPort("com4");
+    // TODO: The order of ports creation possibly important!
     m_com5 = createPort("com5");
     m_com6 = createPort("com6");
+    m_com4 = createPort("com4");
     m_com8 = createPort("com8");
 }
 
@@ -60,7 +59,7 @@ QSerialPort * COMPortSender::createPort(const QString& name)
 
 QByteArray COMPortSender::send(QSerialPort * port, QByteArray data)
 {
-    port->QIODevice::write(ba);
+    port->QIODevice::write(data);
     port->waitForBytesWritten(-1);
 
     QByteArray readData = port->readAll();
@@ -75,19 +74,29 @@ QByteArray COMPortSender::send(QSerialPort * port, QByteArray data)
 
 void COMPortSender::startPower()
 {
-    Remote_ON();
+    // PowerON
+    QByteArray buffer1(7, 0);
+    buffer1[0] = 0xf1;
+    buffer1[1] = 0x00;
+    buffer1[2] = 0x36;
+    buffer1[3] = 0x10;
+    buffer1[4] = 0x10;
+    buffer1[5] = 0x01;
+    buffer1[6] = 0x47;
+    QByteArray readData11 = send(m_com6, buffer1);
+    QByteArray readData21 = send(m_com5, buffer1);
 
-    ba.resize(7);
-    ba[0] = 0xf1;//power off
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x01;
-    ba[4] = 0x00;
-    ba[5] = 0x01;
-    ba[6] = 0x28;
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power off
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x00;
+    buffer[5] = 0x01;
+    buffer[6] = 0x28;
 
-    QByteArray readData1 = send(m_com5, ba);
-    QByteArray readData2 = send(m_com6, ba);
+    QByteArray readData1 = send(m_com5, buffer);
+    QByteArray readData2 = send(m_com6, buffer);
 
     setUIcom5(0.5);
     setUIcom6(0.5);
@@ -95,64 +104,64 @@ void COMPortSender::startPower()
 
 int COMPortSender::stm_on_com6(int y,int x)
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x0b;
-    ba[2] = y;
-    ba[3] = x;
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x0b;
+    buffer[2] = y;
+    buffer[3] = x;
 
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray readData1 = send(m_com4, buffer);
     return readData1[3];
 }
 
 int COMPortSender::stm_on_mko(int x, int y)
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x0e;
-    ba[2] = x;
-    ba[3] = y;
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x0e;
+    buffer[2] = x;
+    buffer[3] = y;
 
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray readData1 = send(m_com4, buffer);
     return readData1[3];
 }
 
-int COMPortSender::ctm_check_fuse(int fuse)
+int COMPortSender::stm_check_fuse(int fuse)
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x0c;
-    ba[2] = fuse;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x0c;
+    buffer[2] = fuse;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com4, buffer);
     return readData1[3];
 }
 
 int COMPortSender::stm_on_com5(int y, int x)
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x0b;
-    ba[2] = y;
-    ba[3] = x;
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x0b;
+    buffer[2] = y;
+    buffer[3] = x;
+    QByteArray readData1 = send(m_com4, buffer);
     return readData1[3];
 }
 
 int COMPortSender::tech_send(int com, int x, int y)
 {
-    ba.resize(4);
-    ba[0] = 0x56;
-    ba[1] = com;
-    ba[2] = x;
-    ba[3] = y;
-    QByteArray readData1 = send(m_com8, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x56;
+    buffer[1] = com;
+    buffer[2] = x;
+    buffer[3] = y;
+    QByteArray readData1 = send(m_com8, buffer);
     return readData1[3];
 }
 
 int COMPortSender::tech_read(int x)
 {
-    if(flag_res_tech == 1)
+    if(m_flag_res_tech == 1)
     {
         int y = 0;
         if(x == 1)
@@ -164,17 +173,17 @@ int COMPortSender::tech_read(int x)
             y = 19;
         }
 
-        ba.resize(4);
-        ba[0] = 0x56;
-        ba[1] = y;
-        ba[2] = 0x00;
-        ba[3] = 0x00;
-        QByteArray readData2 = send(m_com8, ba);
+        QByteArray buffer(4, 0);
+        buffer[0] = 0x56;
+        buffer[1] = y;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData2 = send(m_com8, buffer);
 
         uint8_t uu1,uu2;
-        uu1=readData2[2];
-        uu2=readData2[3];
-        double uu=(uu1<<8) | uu2;
+        uu1 = readData2[2];
+        uu2 = readData2[3];
+        double uu = (uu1 << 8) | uu2;
         return uu;
     }
 
@@ -194,14 +203,14 @@ QString COMPortSender::tech_read_buf(int x,int len)
     }
 
     QString result;
+    QByteArray buffer(4, 0);
     for(int i = 0; i < len; i++)
     {
-        ba.resize(4);
-        ba[0] = 0x56;
-        ba[1] = y;
-        ba[2] = 0x00;
-        ba[3] = 0x00;
-        QByteArray readData2 = send(m_com8, ba);
+        buffer[0] = 0x56;
+        buffer[1] = y;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData2 = send(m_com8, buffer);
 
         if(readData2.at(2) == 1)
         {
@@ -221,22 +230,22 @@ QString COMPortSender::tech_read_buf(int x,int len)
     return result;
 }
 
-double COMPortSender::ctm_data_ch(int ch)
+double COMPortSender::stm_data_ch(int ch)
 {
-    if (flag_res_stm==1)
+    if (m_flag_res_stm == 1)
     {
-        ba.resize(4);
-        ba[0] = 0x22;
-        ba[1] = 0x0d;
-        ba[2] = ch;
-        ba[3] = 0x00;
+        QByteArray buffer(4, 0);
+        buffer[0] = 0x22;
+        buffer[1] = 0x0d;
+        buffer[2] = ch;
+        buffer[3] = 0x00;
 
-        QByteArray readData1 = send(m_com4, ba);
+        QByteArray readData1 = send(m_com4, buffer);
 
-        uint8_t uu1,uu2;
-        uu1=readData1[2];
-        uu2=readData1[3];
-        double res=(uu1<<8) | uu2;
+        uint8_t uu1, uu2;
+        uu1 = readData1[2];
+        uu2 = readData1[3];
+        double res = (uu1 << 8) | uu2;
         return res;
     }
 
@@ -245,350 +254,345 @@ double COMPortSender::ctm_data_ch(int ch)
 
 void COMPortSender::Reset_error_com6()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x0a;
-    ba[4] = 0x0a;
-    ba[5] = 0x01;
-    ba[6] = 0x3b;
-    QByteArray readData1 = send(m_com6, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x0a;
+    buffer[4] = 0x0a;
+    buffer[5] = 0x01;
+    buffer[6] = 0x3b;
+    QByteArray readData1 = send(m_com6, buffer);
 }
 
 void COMPortSender::Reset_error_com5()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x0a;
-    ba[4] = 0x0a;
-    ba[5] = 0x01;
-    ba[6] = 0x3b;
-    QByteArray readData1 = send(m_com5, ba);
-}
-
-void COMPortSender::Remote_ON()
-{
-    ba.resize(7);
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x10;
-    ba[4] = 0x10;
-    ba[5] = 0x01;
-    ba[6] = 0x47;
-    QByteArray readData1 = send(m_com6, ba);
-    QByteArray readData2 = send(m_com5, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x0a;
+    buffer[4] = 0x0a;
+    buffer[5] = 0x01;
+    buffer[6] = 0x3b;
+    QByteArray readData1 = send(m_com5, buffer);
 }
 
 void COMPortSender::Remote_OFF()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x10;
-    ba[4] = 0x00;
-    ba[5] = 0x01;
-    ba[6] = 0x37;
-    QByteArray readData1 = send(m_com6, ba);
-    QByteArray readData2 = send(m_com5, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x10;
+    buffer[4] = 0x00;
+    buffer[5] = 0x01;
+    buffer[6] = 0x37;
+    QByteArray readData1 = send(m_com6, buffer);
+    QByteArray readData2 = send(m_com5, buffer);
 }
 
 void COMPortSender::com6ON()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;//power on
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x01;
-    ba[4] = 0x01;
-    ba[5] = 0x01;
-    ba[6] = 0x29;
-    QByteArray readData1 = send(m_com6, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power on
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x01;
+    buffer[5] = 0x01;
+    buffer[6] = 0x29;
+    QByteArray readData1 = send(m_com6, buffer);
 }
 
 void COMPortSender::com6OFF()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;//power off
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x01;
-    ba[4] = 0x00;
-    ba[5] = 0x01;
-    ba[6] = 0x28;
-    QByteArray readData1 = send(m_com6, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power off
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x00;
+    buffer[5] = 0x01;
+    buffer[6] = 0x28;
+    QByteArray readData1 = send(m_com6, buffer);
 }
 
 void COMPortSender::com5ON()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;//power on
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x01;
-    ba[4] = 0x01;
-    ba[5] = 0x01;
-    ba[6] = 0x29;
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power on
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x01;
+    buffer[5] = 0x01;
+    buffer[6] = 0x29;
 
-    QByteArray readData1 = send(m_com5, ba);
+    QByteArray readData1 = send(m_com5, buffer);
 }
 
 void COMPortSender::com5OFF()
 {
-    ba.resize(7);
-    ba[0] = 0xf1;//power off
-    ba[1] = 0x00;
-    ba[2] = 0x36;
-    ba[3] = 0x01;
-    ba[4] = 0x00;
-    ba[5] = 0x01;
-    ba[6] = 0x28;
-    QByteArray readData1 = send(m_com5, ba);
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power off
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x00;
+    buffer[5] = 0x01;
+    buffer[6] = 0x28;
+    QByteArray readData1 = send(m_com5, buffer);
 }
 
 int COMPortSender::readcom5U()
 {
-    ba.resize(5);
-    ba[0] = 0x75;
-    ba[1] = 0x00;
-    ba[2] = 0x47;
-    ba[3] = 0x00;
-    ba[4] = 0xbc;
+    QByteArray buffer(5, 0);
+    buffer[0] = 0x75;
+    buffer[1] = 0x00;
+    buffer[2] = 0x47;
+    buffer[3] = 0x00;
+    buffer[4] = 0xbc;
 
-    QByteArray readData = send(m_com5, ba);
+    QByteArray readData = send(m_com5, buffer);
 
-    uint8_t uu1,uu2;
-    er2=(readData[4]>>4);
-    uu1=readData[5];
-    uu2=readData[6];
-    double uu=(uu1<<8) | uu2;
-    uu=uu*42/(256);
-    uu1=readData[7];
-    uu2=readData[8];
-    ii2=(uu1<<8) | uu2;
-    ii2=ii2*10/(256);
+    uint8_t uu1, uu2;
+    m_er2 = (readData[4] >> 4);
+    uu1 = readData[5];
+    uu2 = readData[6];
+    double uu = (uu1 << 8) | uu2;
+    uu = uu * 42 /(256);
+    uu1 = readData[7];
+    uu2 = readData[8];
+    m_ii2 = (uu1 << 8) | uu2;
+    m_ii2 = m_ii2 * 10 / 256;
     return uu;
 }
 
 int COMPortSender::readcom5I()
 {
-    return ii1;
+    return m_ii1;
 }
 
 int COMPortSender::readerr4I()
 {
-    return er2;
+    return m_er2;
 }
 
 int COMPortSender::readerr11I()
 {
-    return er1;
+    return m_er1;
 }
 
 int COMPortSender::readcom6U()
 {
-    ba.resize(5);
-    ba[0] = 0x75;
-    ba[1] = 0x00;
-    ba[2] = 0x47;
-    ba[3] = 0x00;
-    ba[4] = 0xbc;
-    QByteArray readData = send(m_com6, ba);
-    uint8_t uu1,uu2;
-    er1=(readData[4]>>4);
-    uu1=readData[5];
-    uu2=readData[6];
-    double uu=(uu1<<8) | uu2;
-    uu=uu*42/(256);
-    uu1=readData[7];
-    uu2=readData[8];
-    ii1=(uu1<<8) | uu2;
-    ii1=ii1*10/(256);
+    QByteArray buffer(5, 0);
+    buffer[0] = 0x75;
+    buffer[1] = 0x00;
+    buffer[2] = 0x47;
+    buffer[3] = 0x00;
+    buffer[4] = 0xbc;
+    QByteArray readData = send(m_com6, buffer);
+    uint8_t uu1, uu2;
+    m_er1 = (readData[4] >> 4);
+    uu1 = readData[5];
+    uu2 = readData[6];
+    double uu = (uu1 << 8) | uu2;
+    uu = uu * 42 /(256);
+    uu1 = readData[7];
+    uu2 = readData[8];
+    m_ii1 = (uu1 << 8) | uu2;
+    m_ii1 = m_ii1 * 10 / 256;
     return uu;
 }
 
 int COMPortSender::readcom6I()
 {
-    return ii1;
+    return m_ii1;
 }
 
 void COMPortSender::setUIcom5(double u)
 {
-    ba.resize(7);
-    uint32_t valU = (u*25600)/42;//U
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x32;
-    ba[3] = ( valU >> 8 ) & 0xFF;
-    ba[4] = valU & 0xFF;
-    uint16_t sum=0;
-    for(int i=0;i<5;i++)
+    QByteArray buffer(7, 0);
+    uint32_t valU = (u * 25600) / 42;//U
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x32;
+    buffer[3] = (valU >> 8) & 0xFF;
+    buffer[4] = valU & 0xFF;
+    uint16_t sum = 0;
+    for(int i = 0; i < 5; i++)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
     }
 
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
+    buffer[5] =((sum >> 8) & 0xFF);
+    buffer[6] = (sum  & 0xFF);
 
-    QByteArray readData = send(m_com5, ba);
+    QByteArray readData = send(m_com5, buffer);
 
-    uint32_t vali = (155*25600/u)/10;//I
-    if(vali>25600)vali=25600;
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x33;
-    ba[3] = ( vali >> 8 ) & 0xFF;
-    ba[4] = vali & 0xFF;
-    sum=0;
-    for(int i=0;i<5;i++)
+    uint32_t vali = (155 * 25600 / u) / 10;//I
+    if(vali > 25600)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        vali = 25600;
     }
 
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
-    QByteArray readData1 = send(m_com5, ba);
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x33;
+    buffer[3] = (vali >> 8) & 0xFF;
+    buffer[4] = vali & 0xFF;
+    sum = 0;
+    for(int i = 0; i < 5; i++)
+    {
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
+    }
+
+    buffer[5] =((sum >> 8) & 0xFF);
+    buffer[6] = (sum  & 0xFF);
+    QByteArray readData1 = send(m_com5, buffer);
 }
 
 void COMPortSender::setUIcom6(double u)
 {
-    uint16_t sum=0;
-    uint32_t valU = (u*25600)/42;//U
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x32;
-    ba[3] = ( valU >> 8 ) & 0xFF;
-    ba[4] = valU & 0xFF;
+    QByteArray buffer(7, 0);
+    uint16_t sum = 0;
+    uint32_t valU = (u * 25600) / 42;//U
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x32;
+    buffer[3] = (valU >> 8) & 0xFF;
+    buffer[4] = valU & 0xFF;
 
-    for(int i=0;i<5;i++)
+    for(int i = 0; i < 5; i++)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
     }
 
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
+    buffer[5] = ((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
 
-    QByteArray readData1 = send(m_com6, ba);
+    QByteArray readData1 = send(m_com6, buffer);
 
-    uint32_t vali = (155*25600/u)/10;//I
-    if(vali>25600)vali=25600;
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x33;
-    ba[3] = ( vali >> 8 ) & 0xFF;
-    ba[4] = vali & 0xFF;
-    sum=0;
-    for(int i=0;i<5;i++)
+    uint32_t vali = (155 * 25600 / u) / 10;//I
+    if (vali > 25600)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        vali = 25600;
     }
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
 
-    QByteArray readData2 = send(m_com6, ba);
-    ba.resize(7);
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x33;
+    buffer[3] = (vali >> 8) & 0xFF;
+    buffer[4] = vali & 0xFF;
+    sum = 0;
+    for(int i = 0; i < 5; i++)
+    {
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
+    }
+
+    buffer[5] = ((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
+
+    QByteArray readData2 = send(m_com6, buffer);
 }
 
-void COMPortSender::setoverUIcom5(double u,double ii)
+void COMPortSender::setoverUIcom5(double u, double ii)
 {
-    ba.resize(7);
-    uint32_t valU = (u*25600)/42;//U
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x26;
-    ba[3] = ( valU >> 8 ) & 0xFF;
-    ba[4] = valU & 0xFF;
-    uint16_t sum=0;
-    for(int i=0;i<5;i++)
+    QByteArray buffer(7, 0);
+    uint32_t valU = (u * 25600) / 42;//U
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x26;
+    buffer[3] = (valU >> 8) & 0xFF;
+    buffer[4] = valU & 0xFF;
+    uint16_t sum = 0;
+    for(int i = 0; i < 5; i++)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
-    }
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
-    QByteArray readData = send(m_com5, ba);
-
-    uint32_t vali = (ii*25600)/10;//I
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x27;
-    ba[3] = ( vali >> 8 ) & 0xFF;
-    ba[4] = vali & 0xFF;
-    sum=0;
-
-    for(int i=0;i<5;i++)
-    {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
     }
 
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
+    buffer[5] = ((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
+    QByteArray readData = send(m_com5, buffer);
 
-    QByteArray readData1 = send(m_com5, ba);
+    uint32_t vali = (ii * 25600) / 10;//I
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x27;
+    buffer[3] = (vali >> 8) & 0xFF;
+    buffer[4] = vali & 0xFF;
+    sum = 0;
+
+    for(int i = 0; i < 5; i++)
+    {
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
+    }
+
+    buffer[5] =((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
+
+    QByteArray readData1 = send(m_com5, buffer);
 }
 
 void COMPortSender::setoverUIcom6(double u,double ii)
 {
-    ba.resize(7);
-    uint32_t valU = ((u+0.1)*25600)/42;//U
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x26;
-    ba[3] = ( valU >> 8 ) & 0xFF;
-    ba[4] = valU & 0xFF;
-    uint16_t sum=0;
-    for(int i=0;i<5;i++)
+    QByteArray buffer(7, 0);
+    uint32_t valU = ((u + 0.1) * 25600) / 42;//U
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x26;
+    buffer[3] = (valU >> 8) & 0xFF;
+    buffer[4] = valU & 0xFF;
+    uint16_t sum = 0;
+    for(int i = 0; i < 5; i++)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
     }
 
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
+    buffer[5] =((sum >> 8) & 0xFF);
+    buffer[6] = (sum  & 0xFF);
 
-    QByteArray readData1 = send(m_com6, ba);
-    uint32_t vali = (ii*25600)/10;//I
-    ba[0] = 0xf1;
-    ba[1] = 0x00;
-    ba[2] = 0x27;
-    ba[3] = ( vali >> 8 ) & 0xFF;
-    ba[4] = vali & 0xFF;
-    sum=0;
-    for(int i=0;i<5;i++)
+    QByteArray readData1 = send(m_com6, buffer);
+    uint32_t vali = (ii * 25600) / 10;//I
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = 0x27;
+    buffer[3] = (vali >> 8) & 0xFF;
+    buffer[4] = vali & 0xFF;
+    sum = 0;
+    for(int i = 0; i < 5; i++)
     {
-        uint8_t s=ba[i];
-        sum=(sum+s)& 0xFFFF;
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
     }
-    ba[5] =(( sum >> 8 ) & 0xFF);
-    ba[6] =  (sum  & 0xFF);
-    QByteArray readData2 = send(m_com6, ba);
+
+    buffer[5] =((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
+    QByteArray readData2 = send(m_com6, buffer);
 }
 
 int COMPortSender::id_stm()
 {
-    ba.resize(4);
-    ba[0] = 0xff;
-    ba[1] = 0x01;
-    ba[2] = 0x00;
-    ba[3] = 0x01;
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0xff;
+    buffer[1] = 0x01;
+    buffer[2] = 0x00;
+    buffer[3] = 0x01;
+    QByteArray readData1 = send(m_com4, buffer);
 
-    ba.resize(4);
-    ba[0] = 0xff;
-    ba[1] = 0x01;
-    ba[2] = 0x00;
-    ba[3] = 0x02;
-
-    QByteArray readData2 = send(m_com4, ba);
+    buffer[0] = 0xff;
+    buffer[1] = 0x01;
+    buffer[2] = 0x00;
+    buffer[3] = 0x02;
+    QByteArray readData2 = send(m_com4, buffer);
 
     if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
     {
@@ -602,20 +606,19 @@ int COMPortSender::id_stm()
 
 int COMPortSender::id_tech()
 {
-    ba.resize(4);
-    ba[0] = 0xff;
-    ba[1] = 0x01;
-    ba[2] = 0x00;
-    ba[3] = 0x01;
-    QByteArray readData1 = send(m_com8, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0xff;
+    buffer[1] = 0x01;
+    buffer[2] = 0x00;
+    buffer[3] = 0x01;
+    QByteArray readData1 = send(m_com8, buffer);
 
-    ba.resize(4);
-    ba[0] = 0xff;
-    ba[1] = 0x01;
-    ba[2] = 0x00;
-    ba[3] = 0x02;
+    buffer[0] = 0xff;
+    buffer[1] = 0x01;
+    buffer[2] = 0x00;
+    buffer[3] = 0x02;
 
-    QByteArray readData2 = send(m_com8, ba);
+    QByteArray readData2 = send(m_com8, buffer);
 
     if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
     {
@@ -629,15 +632,15 @@ int COMPortSender::id_tech()
 
 QString COMPortSender::req_stm()
 {
-    if(flag_res_stm == 1)
+    if(m_flag_res_stm == 1)
     {
         QString res;
-        ba.resize(4);
-        ba[0] = 0x22;
-        ba[1] = 0x02;
-        ba[2] = 0x00;
-        ba[3] = 0x00;
-        QByteArray readData1 = send(m_com4, ba);
+        QByteArray buffer(4, 0);
+        buffer[0] = 0x22;
+        buffer[1] = 0x02;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData1 = send(m_com4, buffer);
         uint8_t x=readData1[2];
         uint8_t z1, z2, z3;
         res="";
@@ -660,16 +663,16 @@ QString COMPortSender::req_stm()
 
 QString COMPortSender::req_tech()
 {
-    if(flag_res_tech==1)
+    if(m_flag_res_tech==1)
     {
         QString res;
-        ba.resize(4);
-        ba[0] = 0x56;
-        ba[1] = 0x02;
-        ba[2] = 0x00;
-        ba[3] = 0x00;
+        QByteArray buffer(4, 0);
+        buffer[0] = 0x56;
+        buffer[1] = 0x02;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
 
-        QByteArray readData1 = send(m_com8, ba);
+        QByteArray readData1 = send(m_com8, buffer);
         uint8_t x=readData1[2];
         uint8_t z1, z2, z3;
         z1=x>>7;
@@ -692,35 +695,35 @@ QString COMPortSender::req_tech()
 
 int COMPortSender::res_err_stm()
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x03;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x03;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com4, buffer);
     return readData1[3];
 }
 
 int COMPortSender::res_err_tech()
 {
-    ba.resize(4);
-    ba[0] = 0x56;
-    ba[1] = 0x03;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com8, ba);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x56;
+    buffer[1] = 0x03;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com8, buffer);
     return readData1[3];
 }
 
 int COMPortSender::res_stm()
 {
-    flag_res_stm = 0;
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x04;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com4, ba);
+    m_flag_res_stm = 0;
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x04;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com4, buffer);
 
     if (m_com4 != Q_NULLPTR && m_com4->isOpen())
     {
@@ -729,7 +732,7 @@ int COMPortSender::res_stm()
         m_com4 = Q_NULLPTR;
     }
 
-    for(int i = 0; i < 300; i++)
+    for(int i = 0; i < 300; i++) // i guess there is some sort of govnomagics
     {
         Sleep(10);
         QApplication::processEvents();
@@ -737,19 +740,19 @@ int COMPortSender::res_stm()
 
     m_com4 = createPort("com4");
 
-    flag_res_stm = 1;
+    m_flag_res_stm = 1;
     return readData1[3];
 }
 
 int COMPortSender::res_tech()
 {
-    flag_res_tech = 0;
-    ba.resize(4);
-    ba[0] = 0x56;
-    ba[1] = 0x04;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com8, ba);
+    m_flag_res_tech = 0;
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x56;
+    buffer[1] = 0x04;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com8, buffer);
 
     if (m_com8 != Q_NULLPTR && m_com8->isOpen())
     {
@@ -758,37 +761,37 @@ int COMPortSender::res_tech()
         m_com8 = Q_NULLPTR;
     }
 
-    for(int i = 0; i < 400; i++)
+    for(int i = 0; i < 400; i++) // i guess there is some sort of govnomagics
     {
         Sleep(10);
         QApplication::processEvents();
     }
 
     m_com8 = createPort("com8");
-    flag_res_tech = 1;
+    m_flag_res_tech = 1;
     return readData1[3];
 }
 
 int COMPortSender::fw_stm()
 {
-    ba.resize(4);
-    ba[0] = 0x22;
-    ba[1] = 0x06;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x22;
+    buffer[1] = 0x06;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
 
-    QByteArray readData1 = send(m_com4, ba);
+    QByteArray readData1 = send(m_com4, buffer);
     return (readData1[2] * 10 + readData1[3]);
 }
 
 int COMPortSender::fw_tech()
 {
-    ba.resize(4);
-    ba[0] = 0x56;
-    ba[1] = 0x06;
-    ba[2] = 0x00;
-    ba[3] = 0x00;
-    QByteArray readData1 = send(m_com8, ba);
-    return (readData1[2]*10+readData1[3]);
+    QByteArray buffer(4, 0);
+    buffer[0] = 0x56;
+    buffer[1] = 0x06;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(m_com8, buffer);
+    return (readData1[2] * 10 + readData1[3]);
 }
 

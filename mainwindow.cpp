@@ -148,7 +148,7 @@ void MainWindow::startcondition()
 
 int MainWindow::simpltst1(int z)
 {
-    if(z==0)
+    if(z == 0)
     {
         ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: black;");
         TestOutStr += "Тест пройден успешно!\n";
@@ -224,69 +224,79 @@ void MainWindow::MKO_cm_data(QString data)
     zcd = "";
     cdh = "";
     cdd = "";
-    int ct=0;
-    signed short a;
-    if (list1[0]!="")
+    int ct = 0;
+    short a;
+    if (list1[0] != "")
     {
-        for(int i=0;i<21;i++)
+        for(int i = 0; i < 21; i++)
         {
             int z=list1[i].toInt();
             ncd += "CД ";
             ncd += QString::number(i);
             zcd = list2[i];
             cdh += "0x";
-            if (i<10 && i!=1 && i!=6)
+            if (i < 10 && i != 1 && i != 6)
             {
-                a=z;
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(a) ;
+                a = z;
+                cdh += QString::number(z, 16);
+                cdd += QString::number(a);
             }
-            if(i==10||i==11)
+
+            if (i == 10 || i == 11)
             {
-                z=z*180/65536;
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(z) ;
+                z = z * 180 / 65536;
+                cdh += QString::number(z,16);
+                cdd += QString::number(z);
             }
-            if(i==12)
+
+            if (i == 12)
             {
-                i=i+5;
+                i = i + 5;
                 ncd +=" - СД " + QString::number(i);
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(z) ;
+                cdh += QString::number(z, 16);
+                cdd += QString::number(z);
             }
-            if(i==18||i==20)
+
+            if (i == 18 || i == 20)
             {
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(z) ;
+                cdh += QString::number(z, 16);
+                cdd += QString::number(z);
             }
-            if(i==19)
+
+            if (i == 19)
             {
-                WORD y=z;
-                y=y<<3;
-                y=y>>15;
-                if(y==1)
+                WORD y = z;
+                y = y << 3;
+                y = y >> 15;
+                if (y == 1)
                 {
-                    y=z;
-                    y=y<<4;
-                    y=y>>4;
-                    z=y;
+                    y = z;
+                    y = y << 4;
+                    y = y >> 4;
+                    z = y;
                 }
-                else z=0xFFFF;
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(z) ;
+                else
+                {
+                    z = 0xFFFF;
+                }
+
+                cdh += QString::number(z, 16);
+                cdd += QString::number(z);
             }
-            if (i==1||i==6)
+
+            if (i ==1||i==6)
             {
 
-                ncd +=" - СД " + QString::number(i+1);
-                int f=list1[i].toInt()<<16;
-                signed int k=f+list1[i+1].toInt();
-                z=f+list1[i+1].toInt();
+                ncd += " - СД " + QString::number(i + 1);
+                int f = list1[i].toInt() << 16;
+                int k = f + list1[i + 1].toInt();
+                z = f + list1[i + 1].toInt();
                 i++;
-                cdh += QString::number(z,16) ;
-                cdd += QString::number(k) ;
+                cdh += QString::number(z, 16);
+                cdd += QString::number(k);
             }
-            add_string_table_MKO(ct,ncd,zcd,cdh,cdd);
+
+            add_string_table_MKO(ct, ncd, zcd, cdh, cdd);
             ct++;
             ncd = "";
             zcd = "";
@@ -295,76 +305,81 @@ void MainWindow::MKO_cm_data(QString data)
         }
     }
 
-    if(flag_mko_osn+flag_mko_rez==3)
+    if(flag_mko_osn + flag_mko_rez == 3)
     {
-        if (list1[0]!="")
+        if (list1[0] != "")
         {
-            add_string_table_MKO(ct,"----------- ","'РЕЗЕРВНЫЙ ПОЛУКОМПЛЕКТ'","---------- ","----------- ");
+            add_string_table_MKO(ct, "----------- ", "'РЕЗЕРВНЫЙ ПОЛУКОМПЛЕКТ'", "---------- ", "----------- ");
             ct++;
-            for(int i=0;i<21;i++)
+
+            for(int i = 0; i < 21; i++)
             {
-                int z=list1[i+21].toInt();
+                int z = list1[i + 21].toInt();
                 ncd += "CД ";
                 ncd += QString::number(i);
                 zcd = list2[i];
                 cdh += "0x";
-                if (i<10 && i!=1 && i!=6)
+                if (i < 10 && i != 1 && i != 6)
                 {
-                    a=z;
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(a) ;
+                    a = z;
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(a);
                 }
-                if(i==10||i==11)
+
+                if(i == 10 || i == 11)
                 {
-                    z=z*180/65536;
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(z) ;
+                    z = z * 180 / 65536;
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(z);
                 }
-                if(i==12)
+
+                if(i == 12)
                 {
-                    i=i+5;
-                    ncd +=" - СД " + QString::number(i);
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(z) ;
+                    i = i + 5;
+                    ncd += " - СД " + QString::number(i);
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(z);
                 }
-                if(i==18||i==20)
+
+                if(i == 18 || i == 20)
                 {
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(z) ;
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(z);
                 }
-                if(i==19)
+
+                if(i == 19)
                 {
-                    WORD y=z;
-                    y=y<<3;
-                    y=y>>15;
-                    if(y==1)
+                    WORD y = z;
+                    y = y << 3;
+                    y = y >> 15;
+                    if(y == 1)
                     {
-                        y=z;
-                        y=y<<4;
-                        y=y>>4;
-                        z=y;
+                        y = z;
+                        y = y << 4;
+                        y = y >> 4;
+                        z = y;
                     }
                     else
                     {
-                        z=0xFFFF;
+                        z = 0xFFFF;
                     }
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(z) ;
+
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(z);
                 }
 
                 if (i == 1 || i == 6)
                 {
-
-                    ncd +=" - СД " + QString::number(i+1);
-                    int f=list1[i+21].toInt()<<16;
-                    signed int k=f+list1[i+22].toInt();
-                    z=f+list1[i+22].toInt();
+                    ncd += " - СД " + QString::number(i + 1);
+                    int f = list1[i + 21].toInt() << 16;
+                    int k = f + list1[i + 22].toInt();
+                    z = f + list1[i + 22].toInt();
                     i++;
-                    cdh += QString::number(z,16) ;
-                    cdd += QString::number(k) ;
+                    cdh += QString::number(z, 16);
+                    cdd += QString::number(k);
                 }
 
-                add_string_table_MKO(ct,ncd,zcd,cdh,cdd);
+                add_string_table_MKO(ct, ncd, zcd, cdh, cdd);
                 ct++;
                 ncd = "";
                 zcd = "";
@@ -393,7 +408,7 @@ void MainWindow::on_pushButton_start_com6_clicked()
 
 void MainWindow::on_pushButton_start_com5_clicked()
 {
-    if(flag_rem2==0)
+    if(flag_rem2 == 0)
     {
         flag_rem2 = 1;
         m_COMPortSender->com5ON();
@@ -412,26 +427,26 @@ void MainWindow::paintvalue()
     double u1, u2, i1, i2;
     int er1, er2;
     ui->tech_error->setText("");
-    u1=m_COMPortSender->readcom6U();
-    i1=m_COMPortSender->readcom6I();
-    u2=m_COMPortSender->readcom5U();
-    i2=m_COMPortSender->readcom5I();
-    er1=m_COMPortSender->readerr11I();
-    er2=m_COMPortSender->readerr4I();
+    u1 = m_COMPortSender->readcom6U();
+    i1 = m_COMPortSender->readcom6I();
+    u2 = m_COMPortSender->readcom5U();
+    i2 = m_COMPortSender->readcom5I();
+    er1 = m_COMPortSender->readerr11I();
+    er2 = m_COMPortSender->readerr4I();
     ui->err1->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
     ui->err2->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
-    if(er1!=0)
+    if(er1 != 0)
     {
         ui->err1->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
-        flag_rem1=0;
+        flag_rem1 = 0;
         ui->pushButton_start_com6->setChecked(false);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 
-    if(er2!=0)
+    if(er2 != 0)
     {
         ui->err2->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
-        flag_rem2=0;
+        flag_rem2 = 0;
         ui->pushButton_start_com5->setChecked(false);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
@@ -445,15 +460,15 @@ void MainWindow::paintvalue()
     if(er2==4) ui->err2->setText("Overpower protection!");
     if(er2==8) ui->err2->setText("Overtemperature protection!");
 
-    ui->U1out->setText(QString::number(u1/100));
-    ui->U2out->setText(QString::number(u2/100));
-    if(k>500)
+    ui->U1out->setText(QString::number(u1 / 100));
+    ui->U2out->setText(QString::number(u2 / 100));
+    if(k > 500) // wtf?
     {
-        k=0;
+        k = 0;
     }
 
-    dat[k]=i1/100;
-    dat1[k]=i2/100;
+    dat[k] = i1 / 100;
+    dat1[k] = i2 / 100;
     k++;
     plot_point();
 }
@@ -461,14 +476,14 @@ void MainWindow::paintvalue()
 void MainWindow::statusRS ()
 {
     int len1 = m_COMPortSender->tech_read(1);
-    if(len1!=0)
+    if(len1 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech= m_COMPortSender->tech_read_buf(1,len1);
+        result_tech= m_COMPortSender->tech_read_buf(1, len1);
         QString buf;
         QStringList list2 = result_tech.split(" ");
         int s=list2.size ();
-        for(int i=0; i<s-1;i++)
+        for(int i = 0; i < s - 1; i++)
         {
             if(list2[i]=="em")
             {
@@ -497,11 +512,11 @@ void MainWindow::statusCAN ()
     if(len2 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech= m_COMPortSender->tech_read_buf(2,len2);
+        result_tech = m_COMPortSender->tech_read_buf(2,len2);
         QString buf;
         QStringList list3 = result_tech.split(" ");
         int s=list3.size ();
-        for(int i=0; i<s-1;i++)
+        for(int i = 0; i < s - 1; i++)
         {
             if(list3[i]=="em")
             {
@@ -538,7 +553,7 @@ void MainWindow::statusM()
 }
 void MainWindow::status_OTD (QString data)
 {
-    if(data!="")
+    if(data != "")
     {
         ui->error_mod->setText (data);
     }
@@ -552,7 +567,7 @@ void MainWindow::plot_point()
     QVector<double> x(N), y(N),z(N); //Массивы координат точек
     double tra,tra1;
     int i=0;
-    for (double X=0; X<b; X++)//Пробегаем по всем точкам
+    for (double X = 0; X < b; X++)//Пробегаем по всем точкам
     {
         tra=dat[i];
         tra1=dat1[i];
@@ -568,7 +583,7 @@ void MainWindow::plot_point()
     ui->widget->addGraph();
     ui->widget->graph(1)->setPen(QPen(Qt::red));
     ui->widget->graph(1)->setData(x, z);
-    ui->widget->graph(0)->setName("I(БУН НА),A ");
+    ui->widget->graph(0)->setName("I(БУП НА),A ");
     ui->widget->graph(1)->setName("I(ПНА),A ");
     ui->widget->xAxis->setTickLabelFont(QFont(QFont().family(), 10));
     ui->widget->yAxis->setTickLabelFont(QFont(QFont().family(), 10));
@@ -590,9 +605,13 @@ void MainWindow::on_pushButton_U1_clicked()
     double ul1 = S3.toDouble();
     QString S4 = ui->setlimI1->text();
     double Il1 = S4.toDouble();
-    if(u1>ul1)u1=ul1;
+    if(u1 > ul1)
+    {
+        u1 = ul1;
+    }
+
     ui->setU1->setText(QString::number(u1));
-    m_COMPortSender->setoverUIcom6(ul1,Il1);
+    m_COMPortSender->setoverUIcom6(ul1, Il1);
     m_COMPortSender->setUIcom6(u1);
 }
 
@@ -604,9 +623,13 @@ void MainWindow::on_pushButton_U2_clicked()
     double ul1 = S3.toDouble();
     QString S4 = ui->setlimI2->text();
     double Il1 = S4.toDouble();
-    if(u1>ul1)u1=ul1;
+    if(u1 > ul1)
+    {
+        u1 = ul1;
+    }
+
     ui->setU2->setText(QString::number(u1));
-    m_COMPortSender->setoverUIcom5(ul1,Il1);
+    m_COMPortSender->setoverUIcom5(ul1, Il1);
     m_COMPortSender->setUIcom5(u1);
 }
 
@@ -624,12 +647,12 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    if(m_COMPortSender->stm_on_com6(1,1)==1&&flag_con1==0)
+    if(m_COMPortSender->stm_on_com6(1, 1) == 1 && flag_con1 == 0)
     {
         flag_con1=1;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com6(1,0)==1&&flag_con1==1)
+    else if(m_COMPortSender->stm_on_com6(1, 0) == 1 && flag_con1 == 1)
     {
         flag_con1=0;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -637,12 +660,12 @@ void MainWindow::on_pushButton_4_clicked()
 }
 void MainWindow::on_pushButton_7_clicked()
 {
-    if(m_COMPortSender->stm_on_com6(2,1) ==1 && flag_con3 == 0)
+    if(m_COMPortSender->stm_on_com6(2,1) == 1 && flag_con3 == 0)
     {
         flag_con3=1;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com6(2,0) == 1 && flag_con3 == 1)
+    else if(m_COMPortSender->stm_on_com6(2, 0) == 1 && flag_con3 == 1)
     {
         flag_con3=0;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -650,40 +673,40 @@ void MainWindow::on_pushButton_7_clicked()
 }
 void MainWindow::on_pushButton_5_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(4,1) == 1 && flag_con2 == 0)
+    if(m_COMPortSender->stm_on_com5(4, 1) == 1 && flag_con2 == 0)
     {
-        flag_con2=1;
+        flag_con2 = 1;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(4,0) == 1 && flag_con2 == 1)
+    else if(m_COMPortSender->stm_on_com5(4, 0) == 1 && flag_con2 == 1)
     {
-        flag_con2=0;
+        flag_con2 = 0;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(5,1) == 1 && flag_con4 == 0)
+    if(m_COMPortSender->stm_on_com5(5, 1) == 1 && flag_con4 == 0)
     {
-        flag_con4=1;
+        flag_con4 = 1;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(5,0) == 1 && flag_con4 == 1)
+    else if(m_COMPortSender->stm_on_com5(5, 0) == 1 && flag_con4 == 1)
     {
-        flag_con4=0;
+        flag_con4 = 0;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
 
 void MainWindow::on_pushButton_10_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(6,1) == 1 && flag_con5 == 0)
+    if(m_COMPortSender->stm_on_com5(6, 1) == 1 && flag_con5 == 0)
     {
         flag_con5=1;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(6,0) == 1 && flag_con5 == 1)
+    else if(m_COMPortSender->stm_on_com5(6, 0) == 1 && flag_con5 == 1)
     {
         flag_con5=0;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -692,97 +715,97 @@ void MainWindow::on_pushButton_10_clicked()
 
 void MainWindow::on_pushButton_ctm_ch_0_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(0)/10000;
+    double res = m_COMPortSender->stm_data_ch(0)/10000;
     ui->lineEdit_ctm_ch_0->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_1_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(1)/10000;
+    double res = m_COMPortSender->stm_data_ch(1)/10000;
     ui->lineEdit_ctm_ch_1->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_2_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(2)/10000;
+    double res = m_COMPortSender->stm_data_ch(2)/10000;
     ui->lineEdit_ctm_ch_2->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_3_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(3)/10000;
+    double res = m_COMPortSender->stm_data_ch(3)/10000;
     ui->lineEdit_ctm_ch_3->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_4_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(4)/10000;
+    double res = m_COMPortSender->stm_data_ch(4)/10000;
     ui->lineEdit_ctm_ch_4->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_5_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(5)/10000;
+    double res = m_COMPortSender->stm_data_ch(5)/10000;
     ui->lineEdit_ctm_ch_5->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_6_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(6)/10000;
+    double res = m_COMPortSender->stm_data_ch(6)/10000;
     ui->lineEdit_ctm_ch_6->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_7_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(7)/10000;
+    double res = m_COMPortSender->stm_data_ch(7)/10000;
     ui->lineEdit_ctm_ch_7->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_8_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(8)/10000;
+    double res = m_COMPortSender->stm_data_ch(8)/10000;
     ui->lineEdit_ctm_ch_8->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_9_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(9)/10000;
+    double res = m_COMPortSender->stm_data_ch(9)/10000;
     ui->lineEdit_ctm_ch_9->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_10_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(10)/10000;
+    double res = m_COMPortSender->stm_data_ch(10)/10000;
     ui->lineEdit_ctm_ch_10->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_11_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(11)/10000;
+    double res = m_COMPortSender->stm_data_ch(11)/10000;
     ui->lineEdit_ctm_ch_11->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_12_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(12)/10000;
+    double res = m_COMPortSender->stm_data_ch(12)/10000;
     ui->lineEdit_ctm_ch_12->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_13_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(13)/10000;
+    double res = m_COMPortSender->stm_data_ch(13)/10000;
     ui->lineEdit_ctm_ch_13->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_14_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(14)/10000;
+    double res = m_COMPortSender->stm_data_ch(14)/10000;
     ui->lineEdit_ctm_ch_14->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_15_clicked()
 {
-    double res = m_COMPortSender->ctm_data_ch(15)/10000;
+    double res = m_COMPortSender->stm_data_ch(15)/10000;
     if(res >= 0.5)
     {
         ui->pushButton_ctm_ch_15->setText ("Разъединена");
@@ -797,7 +820,7 @@ void MainWindow::on_pushButton_ctm_ch_15_clicked()
 
 void MainWindow::on_pushButton_check_fuse_1_clicked()
 {
-    int cf = m_COMPortSender->ctm_check_fuse(1);
+    int cf = m_COMPortSender->stm_check_fuse(1);
     if (cf==0 )
         ui->lineEdit_fuse_1->setText(" Исправен");
     else if ( cf==1 )
@@ -808,7 +831,7 @@ void MainWindow::on_pushButton_check_fuse_1_clicked()
 
 void MainWindow::on_pushButton_check_fuse_2_clicked()
 {
-    int cf = m_COMPortSender->ctm_check_fuse(2);
+    int cf = m_COMPortSender->stm_check_fuse(2);
     if (cf ==0)
         ui->lineEdit_fuse_2->setText(" Исправен");
     else if ( cf==1 )
