@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "WDMTMKv2.cpp"
-#include <QtSerialPort/QtSerialPort>
+//#include <QtSerialPort/QtSerialPort>
 #include "myclass.h"
 #include "OTD.h"
 #include "MKO.h"
@@ -29,21 +28,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    startcondition(); // Ivan Semenchuk: uncomment to work with real device
+    m_COMPortSender = new COMPortSender(this);
+
+    //startcondition(); // Ivan Semenchuk: uncomment to work with real device
 }
 
 MainWindow::~MainWindow()
 {
-    COMClose5_6 ();
-    COMClose4 ();
-    COMClose8 ();
     delete ui;
 }
 void MainWindow::startcondition()
 {
-    COMConnector5_6();
-    COMConnector4();
-    COMConnector8();
+    m_COMPortSender->createPorts();
+    m_COMPortSender->startPower();
 
     ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -93,8 +90,8 @@ void MainWindow::startcondition()
     ui->tableWidget_2->setShowGrid(true);
     ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-    stm_on_mko(1,0);
-    stm_on_mko(2,0);
+    m_COMPortSender->stm_on_mko(1,0);
+    m_COMPortSender->stm_on_mko(2,0);
 
     myMKO->moveToThread(threadMKO);
     connect(myMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
@@ -126,7 +123,7 @@ void MainWindow::startcondition()
     connect(my, SIGNAL(send5()), this, SLOT(statusM()));
     connect(thread, SIGNAL(started()), my, SLOT(doWork()));
     thread->start();
-    startpower();
+    //startpower(); // Ivan Semenchyk: what for to do it twice?
 
     ui->setU1->setText(QString::number(0.5));
     ui->setU2->setText(QString::number(0.5));
@@ -135,21 +132,31 @@ void MainWindow::startcondition()
     ui->setlimI1->setText(QString::number(0.5));
     ui->setlimI2->setText(QString::number(0.5));
     ui->error_mod->setStyleSheet("font: 25 16pt GOST type A;" "color: red;");
-    if(id_stm()!=1) error_m+= " Модуль СТМ установлен не в свой слот!";
-    if(id_tech()!=1) error_m+= " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
+    if(m_COMPortSender->id_stm() != 1)
+    {
+        error_m += " Модуль СТМ установлен не в свой слот!";
+    }
+
+    if(m_COMPortSender->id_tech() != 1)
+    {
+        error_m += " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
+    }
+
     ui->error_mod->setText (error_m);
     error_m="";
 }
 
 int MainWindow::simpltst1(int z)
 {
-    if(z==0){
+    if(z==0)
+    {
         ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: black;");
         TestOutStr += "Тест пройден успешно!\n";
         ui->label_MKO->setText(TestOutStr);
         TestOutStr = "";
     }
-    else{
+    else
+    {
         ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: red;");
         TestOutStr1 += "Ошибка! Тест провален с ";
         TestOutStr1 += QString::number(z);
@@ -157,14 +164,19 @@ int MainWindow::simpltst1(int z)
         ui->label_MKO->setText(TestOutStr1);
         TestOutStr1 = "";
     }
+
     return z ;
 }
 
 void MainWindow::delete_table_MKO()
 {
     int n = ui->tableWidget_2->rowCount();
-    for( int i = 0; i < n; i++ ) ui->tableWidget_2->removeRow( 0 );
+    for( int i = 0; i < n; i++ )
+    {
+        ui->tableWidget_2->removeRow( 0 );
+    }
 }
+
 int MainWindow::add_string_table_MKO(int n, QString text_data, QString comm_data, QString data_hex, QString data_dec)
 {
     ui->tableWidget_2->insertRow(n);
@@ -181,6 +193,7 @@ void MainWindow::MKO_data(QString data)
     ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: black;");
     ui->label_MKO->setText(data);
 }
+
 void MainWindow::MKO_cm_data(QString data)
 {
     QStringList list1 = data.split(" ");
@@ -213,38 +226,46 @@ void MainWindow::MKO_cm_data(QString data)
     cdd = "";
     int ct=0;
     signed short a;
-    if (list1[0]!=""){
-        for(int i=0;i<21;i++){
+    if (list1[0]!="")
+    {
+        for(int i=0;i<21;i++)
+        {
             int z=list1[i].toInt();
             ncd += "CД ";
             ncd += QString::number(i);
             zcd = list2[i];
             cdh += "0x";
-            if (i<10 && i!=1 && i!=6){
+            if (i<10 && i!=1 && i!=6)
+            {
                 a=z;
                 cdh += QString::number(z,16) ;
                 cdd += QString::number(a) ;
             }
-            if(i==10||i==11){
+            if(i==10||i==11)
+            {
                 z=z*180/65536;
                 cdh += QString::number(z,16) ;
                 cdd += QString::number(z) ;
             }
-            if(i==12){
+            if(i==12)
+            {
                 i=i+5;
                 ncd +=" - СД " + QString::number(i);
                 cdh += QString::number(z,16) ;
                 cdd += QString::number(z) ;
             }
-            if(i==18||i==20){
+            if(i==18||i==20)
+            {
                 cdh += QString::number(z,16) ;
                 cdd += QString::number(z) ;
             }
-            if(i==19){
+            if(i==19)
+            {
                 WORD y=z;
                 y=y<<3;
                 y=y>>15;
-                if(y==1){
+                if(y==1)
+                {
                     y=z;
                     y=y<<4;
                     y=y>>4;
@@ -254,7 +275,8 @@ void MainWindow::MKO_cm_data(QString data)
                 cdh += QString::number(z,16) ;
                 cdd += QString::number(z) ;
             }
-            if (i==1||i==6){
+            if (i==1||i==6)
+            {
 
                 ncd +=" - СД " + QString::number(i+1);
                 int f=list1[i].toInt()<<16;
@@ -272,52 +294,66 @@ void MainWindow::MKO_cm_data(QString data)
             cdd = "";
         }
     }
-    if(flag_mko_osn+flag_mko_rez==3){
-        if (list1[0]!=""){
 
+    if(flag_mko_osn+flag_mko_rez==3)
+    {
+        if (list1[0]!="")
+        {
             add_string_table_MKO(ct,"----------- ","'РЕЗЕРВНЫЙ ПОЛУКОМПЛЕКТ'","---------- ","----------- ");
             ct++;
-            for(int i=0;i<21;i++){
+            for(int i=0;i<21;i++)
+            {
                 int z=list1[i+21].toInt();
                 ncd += "CД ";
                 ncd += QString::number(i);
                 zcd = list2[i];
                 cdh += "0x";
-                if (i<10 && i!=1 && i!=6){
+                if (i<10 && i!=1 && i!=6)
+                {
                     a=z;
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(a) ;
                 }
-                if(i==10||i==11){
+                if(i==10||i==11)
+                {
                     z=z*180/65536;
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(z) ;
                 }
-                if(i==12){
+                if(i==12)
+                {
                     i=i+5;
                     ncd +=" - СД " + QString::number(i);
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(z) ;
                 }
-                if(i==18||i==20){
+                if(i==18||i==20)
+                {
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(z) ;
                 }
-                if(i==19){
+                if(i==19)
+                {
                     WORD y=z;
                     y=y<<3;
                     y=y>>15;
-                    if(y==1){
+                    if(y==1)
+                    {
                         y=z;
                         y=y<<4;
                         y=y>>4;
                         z=y;
                     }
-                    else z=0xFFFF;
+                    else
+                    {
+                        z=0xFFFF;
+                    }
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(z) ;
                 }
-                if (i==1||i==6){
+
+                if (i == 1 || i == 6)
+                {
 
                     ncd +=" - СД " + QString::number(i+1);
                     int f=list1[i+21].toInt()<<16;
@@ -327,6 +363,7 @@ void MainWindow::MKO_cm_data(QString data)
                     cdh += QString::number(z,16) ;
                     cdd += QString::number(k) ;
                 }
+
                 add_string_table_MKO(ct,ncd,zcd,cdh,cdd);
                 ct++;
                 ncd = "";
@@ -340,28 +377,32 @@ void MainWindow::MKO_cm_data(QString data)
 
 void MainWindow::on_pushButton_start_com6_clicked()
 {
-    if(flag_rem1==0){
-        flag_rem1=1;
-        com6ON();
+    if(flag_rem1 == 0)
+    {
+        flag_rem1 = 1;
+        m_COMPortSender->com6ON();
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else{
+    else
+    {
         flag_rem1=0;
-        com6OFF();
+        m_COMPortSender->com6OFF();
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
 
 void MainWindow::on_pushButton_start_com5_clicked()
 {
-    if(flag_rem2==0){
-        flag_rem2=1;
-        com5ON();
+    if(flag_rem2==0)
+    {
+        flag_rem2 = 1;
+        m_COMPortSender->com5ON();
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else{
-        flag_rem2=0;
-        com5OFF();
+    else
+    {
+        flag_rem2 = 0;
+        m_COMPortSender->com5OFF();
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
@@ -371,26 +412,30 @@ void MainWindow::paintvalue()
     double u1, u2, i1, i2;
     int er1, er2;
     ui->tech_error->setText("");
-    u1=readcom6U();
-    i1=readcom6I();
-    u2=readcom5U();
-    i2=readcom5I();
-    er1=readerr11I();
-    er2=readerr4I();
+    u1=m_COMPortSender->readcom6U();
+    i1=m_COMPortSender->readcom6I();
+    u2=m_COMPortSender->readcom5U();
+    i2=m_COMPortSender->readcom5I();
+    er1=m_COMPortSender->readerr11I();
+    er2=m_COMPortSender->readerr4I();
     ui->err1->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
     ui->err2->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
-    if(er1!=0){
+    if(er1!=0)
+    {
         ui->err1->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         flag_rem1=0;
         ui->pushButton_start_com6->setChecked(false);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
-    if(er2!=0){
+
+    if(er2!=0)
+    {
         ui->err2->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         flag_rem2=0;
         ui->pushButton_start_com5->setChecked(false);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
+
     if(er1==1) ui->err1->setText("Overvoltage protection!");
     if(er1==2) ui->err1->setText("Overcurrent protection!");
     if(er1==4) ui->err1->setText("Overpower protection!");
@@ -399,10 +444,14 @@ void MainWindow::paintvalue()
     if(er2==2) ui->err2->setText("Overcurrent protection!");
     if(er2==4) ui->err2->setText("Overpower protection!");
     if(er2==8) ui->err2->setText("Overtemperature protection!");
+
     ui->U1out->setText(QString::number(u1/100));
     ui->U2out->setText(QString::number(u2/100));
     if(k>500)
+    {
         k=0;
+    }
+
     dat[k]=i1/100;
     dat1[k]=i2/100;
     k++;
@@ -411,23 +460,28 @@ void MainWindow::paintvalue()
 
 void MainWindow::statusRS ()
 {
-    int len1=tech_read(1);
-    if(len1!=0){
+    int len1 = m_COMPortSender->tech_read(1);
+    if(len1!=0)
+    {
         ui->tech_error->setText(" ");
-        result_tech= tech_read_buf(1,len1);
+        result_tech= m_COMPortSender->tech_read_buf(1,len1);
         QString buf;
         QStringList list2 = result_tech.split(" ");
         int s=list2.size ();
-        for(int i=0; i<s-1;i++){
-            if(list2[i]=="em"){
+        for(int i=0; i<s-1;i++)
+        {
+            if(list2[i]=="em")
+            {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер пуст");
             }
-            if(list2[i]=="uu"){
+            if(list2[i]=="uu")
+            {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер переполнен");
             }
-            else{
+            else
+            {
                 buf+="0x";
                 char hex = list2[i].toInt();
                 buf+=QString::number(hex,16);
@@ -439,23 +493,28 @@ void MainWindow::statusRS ()
 }
 void MainWindow::statusCAN ()
 {
-    int len2=tech_read(2);
-    if(len2!=0){
+    int len2 = m_COMPortSender->tech_read(2);
+    if(len2 != 0)
+    {
         ui->tech_error->setText(" ");
-        result_tech= tech_read_buf(2,len2);
+        result_tech= m_COMPortSender->tech_read_buf(2,len2);
         QString buf;
         QStringList list3 = result_tech.split(" ");
         int s=list3.size ();
-        for(int i=0; i<s-1;i++){
-            if(list3[i]=="em"){
+        for(int i=0; i<s-1;i++)
+        {
+            if(list3[i]=="em")
+            {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер пуст");
             }
-            if(list3[i]=="uu"){
+            if(list3[i]=="uu")
+            {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер переполнен");
             }
-            else{
+            else
+            {
                 buf+="0x";
                 char hex = list3[i].toInt();
                 buf+=QString::number(hex,16);
@@ -465,12 +524,12 @@ void MainWindow::statusCAN ()
         }
     }
 }
-void MainWindow::statusM ()
+void MainWindow::statusM()
 {
     QString res;
     on_pushButton_ctm_ch_15_clicked();
-    res+=req_stm();
-    res+=req_tech();
+    res += m_COMPortSender->req_stm();
+    res += m_COMPortSender->req_tech();
     connect(this, SIGNAL( OTD_req()), myOTD, SLOT(OTD_req()));
     emit OTD_req();
     disconnect(this, SIGNAL( OTD_req()), myOTD, SLOT(OTD_req()));
@@ -479,7 +538,8 @@ void MainWindow::statusM ()
 }
 void MainWindow::status_OTD (QString data)
 {
-    if(data!=""){
+    if(data!="")
+    {
         ui->error_mod->setText (data);
     }
 }
@@ -532,8 +592,8 @@ void MainWindow::on_pushButton_U1_clicked()
     double Il1 = S4.toDouble();
     if(u1>ul1)u1=ul1;
     ui->setU1->setText(QString::number(u1));
-    setoverUIcom6(ul1,Il1);
-    setUIcom6(u1);
+    m_COMPortSender->setoverUIcom6(ul1,Il1);
+    m_COMPortSender->setUIcom6(u1);
 }
 
 void MainWindow::on_pushButton_U2_clicked()
@@ -546,30 +606,30 @@ void MainWindow::on_pushButton_U2_clicked()
     double Il1 = S4.toDouble();
     if(u1>ul1)u1=ul1;
     ui->setU2->setText(QString::number(u1));
-    setoverUIcom5(ul1,Il1);
-    setUIcom5(u1);
+    m_COMPortSender->setoverUIcom5(ul1,Il1);
+    m_COMPortSender->setUIcom5(u1);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    Reset_error_com6();
+    m_COMPortSender->Reset_error_com6();
     ui->err1->setText(" ");
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    Reset_error_com5();
+    m_COMPortSender->Reset_error_com5();
     ui->err2->setText(" ");
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    if(stm_on_com6(1,1)==1&&flag_con1==0)
+    if(m_COMPortSender->stm_on_com6(1,1)==1&&flag_con1==0)
     {
         flag_con1=1;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(stm_on_com6(1,0)==1&&flag_con1==1)
+    else if(m_COMPortSender->stm_on_com6(1,0)==1&&flag_con1==1)
     {
         flag_con1=0;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -577,12 +637,12 @@ void MainWindow::on_pushButton_4_clicked()
 }
 void MainWindow::on_pushButton_7_clicked()
 {
-    if(stm_on_com6(2,1)==1&&flag_con3==0)
+    if(m_COMPortSender->stm_on_com6(2,1) ==1 && flag_con3 == 0)
     {
         flag_con3=1;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(stm_on_com6(2,0)==1&&flag_con3==1)
+    else if(m_COMPortSender->stm_on_com6(2,0) == 1 && flag_con3 == 1)
     {
         flag_con3=0;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -590,12 +650,12 @@ void MainWindow::on_pushButton_7_clicked()
 }
 void MainWindow::on_pushButton_5_clicked()
 {
-    if(stm_on_com5(4,1)==1&&flag_con2==0)
+    if(m_COMPortSender->stm_on_com5(4,1) == 1 && flag_con2 == 0)
     {
         flag_con2=1;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(stm_on_com5(4,0)==1&&flag_con2==1)
+    else if(m_COMPortSender->stm_on_com5(4,0) == 1 && flag_con2 == 1)
     {
         flag_con2=0;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -604,12 +664,12 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    if(stm_on_com5(5,1)==1&&flag_con4==0)
+    if(m_COMPortSender->stm_on_com5(5,1) == 1 && flag_con4 == 0)
     {
         flag_con4=1;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(stm_on_com5(5,0)==1&&flag_con4==1)
+    else if(m_COMPortSender->stm_on_com5(5,0) == 1 && flag_con4 == 1)
     {
         flag_con4=0;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -618,12 +678,12 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_pushButton_10_clicked()
 {
-    if(stm_on_com5(6,1)==1&&flag_con5==0)
+    if(m_COMPortSender->stm_on_com5(6,1) == 1 && flag_con5 == 0)
     {
         flag_con5=1;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(stm_on_com5(6,0)==1&&flag_con5==1)
+    else if(m_COMPortSender->stm_on_com5(6,0) == 1 && flag_con5 == 1)
     {
         flag_con5=0;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -632,100 +692,104 @@ void MainWindow::on_pushButton_10_clicked()
 
 void MainWindow::on_pushButton_ctm_ch_0_clicked()
 {
-    double res = ctm_data_ch(0)/10000;
+    double res = m_COMPortSender->ctm_data_ch(0)/10000;
     ui->lineEdit_ctm_ch_0->setText(QString::number(res));
 }
+
 void MainWindow::on_pushButton_ctm_ch_1_clicked()
 {
-    double res = ctm_data_ch(1)/10000;
+    double res = m_COMPortSender->ctm_data_ch(1)/10000;
     ui->lineEdit_ctm_ch_1->setText(QString::number(res));
 }
+
 void MainWindow::on_pushButton_ctm_ch_2_clicked()
 {
-    double res = ctm_data_ch(2)/10000;
+    double res = m_COMPortSender->ctm_data_ch(2)/10000;
     ui->lineEdit_ctm_ch_2->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_3_clicked()
 {
-    double res = ctm_data_ch(3)/10000;
+    double res = m_COMPortSender->ctm_data_ch(3)/10000;
     ui->lineEdit_ctm_ch_3->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_4_clicked()
 {
-    double res = ctm_data_ch(4)/10000;
+    double res = m_COMPortSender->ctm_data_ch(4)/10000;
     ui->lineEdit_ctm_ch_4->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_5_clicked()
 {
-    double res = ctm_data_ch(5)/10000;
+    double res = m_COMPortSender->ctm_data_ch(5)/10000;
     ui->lineEdit_ctm_ch_5->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_6_clicked()
 {
-    double res = ctm_data_ch(6)/10000;
+    double res = m_COMPortSender->ctm_data_ch(6)/10000;
     ui->lineEdit_ctm_ch_6->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_7_clicked()
 {
-    double res = ctm_data_ch(7)/10000;
+    double res = m_COMPortSender->ctm_data_ch(7)/10000;
     ui->lineEdit_ctm_ch_7->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_8_clicked()
 {
-    double res = ctm_data_ch(8)/10000;
+    double res = m_COMPortSender->ctm_data_ch(8)/10000;
     ui->lineEdit_ctm_ch_8->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_9_clicked()
 {
-    double res = ctm_data_ch(9)/10000;
+    double res = m_COMPortSender->ctm_data_ch(9)/10000;
     ui->lineEdit_ctm_ch_9->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_10_clicked()
 {
-    double res = ctm_data_ch(10)/10000;
+    double res = m_COMPortSender->ctm_data_ch(10)/10000;
     ui->lineEdit_ctm_ch_10->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_11_clicked()
 {
-    double res = ctm_data_ch(11)/10000;
+    double res = m_COMPortSender->ctm_data_ch(11)/10000;
     ui->lineEdit_ctm_ch_11->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_12_clicked()
 {
-    double res = ctm_data_ch(12)/10000;
+    double res = m_COMPortSender->ctm_data_ch(12)/10000;
     ui->lineEdit_ctm_ch_12->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_13_clicked()
 {
-    double res = ctm_data_ch(13)/10000;
+    double res = m_COMPortSender->ctm_data_ch(13)/10000;
     ui->lineEdit_ctm_ch_13->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_14_clicked()
 {
-    double res = ctm_data_ch(14)/10000;
+    double res = m_COMPortSender->ctm_data_ch(14)/10000;
     ui->lineEdit_ctm_ch_14->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_15_clicked()
 {
-    double res = ctm_data_ch(15)/10000;
-    if(res>=0.5){
+    double res = m_COMPortSender->ctm_data_ch(15)/10000;
+    if(res >= 0.5)
+    {
         ui->pushButton_ctm_ch_15->setText ("Разъединена");
         ui->pushButton_ctm_ch_15->setStyleSheet(QString::fromUtf8("background-color: rgb(250, 24, 0);"));
     }
-    else if(res>=0 && res<0.51 && req_stm()==""){
+    else if(res >= 0 && res < 0.51 && m_COMPortSender->req_stm()=="")
+    {
         ui->pushButton_ctm_ch_15->setText ("Соединена");
         ui->pushButton_ctm_ch_15->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 230, 0);"));
     }
@@ -733,22 +797,30 @@ void MainWindow::on_pushButton_ctm_ch_15_clicked()
 
 void MainWindow::on_pushButton_check_fuse_1_clicked()
 {
-    int cf = ctm_check_fuse(1);
-    if (cf==0 )ui->lineEdit_fuse_1->setText(" Исправен");
-    else if ( cf==1 )ui->lineEdit_fuse_1->setText(" Неисправен");
-    else if ( cf==2 )ui->lineEdit_fuse_1->setText(" Ошибка");
+    int cf = m_COMPortSender->ctm_check_fuse(1);
+    if (cf==0 )
+        ui->lineEdit_fuse_1->setText(" Исправен");
+    else if ( cf==1 )
+        ui->lineEdit_fuse_1->setText(" Неисправен");
+    else if ( cf==2 )
+        ui->lineEdit_fuse_1->setText(" Ошибка");
 }
+
 void MainWindow::on_pushButton_check_fuse_2_clicked()
 {
-    int cf = ctm_check_fuse(2);
-    if (cf==0 )ui->lineEdit_fuse_2->setText(" Исправен");
-    else if ( cf==1 )ui->lineEdit_fuse_2->setText(" Неисправен");
-    else if ( cf==2 )ui->lineEdit_fuse_2->setText(" Ошибка");
+    int cf = m_COMPortSender->ctm_check_fuse(2);
+    if (cf ==0)
+        ui->lineEdit_fuse_2->setText(" Исправен");
+    else if ( cf==1 )
+        ui->lineEdit_fuse_2->setText(" Неисправен");
+    else if ( cf==2 )
+        ui->lineEdit_fuse_2->setText(" Ошибка");
 }
 
 void MainWindow::on_pushButton_tech_fd_clicked()
 {
-    if(tech_send(36,0,0)!=1){
+    if(m_COMPortSender->tech_send(36,0,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке режима работы!");
     }
@@ -756,7 +828,8 @@ void MainWindow::on_pushButton_tech_fd_clicked()
 
 void MainWindow::on_pushButton_tech_hd_clicked()
 {
-    if(tech_send(36,1,0)!=1){
+    if(m_COMPortSender->tech_send(36,1,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке режима работы!");
     }
@@ -765,7 +838,8 @@ void MainWindow::on_pushButton_tech_hd_clicked()
 void MainWindow::on_tech_set_speed_clicked()
 {
     int sp= ui->baudRateBox_tech->currentIndex();
-    if(tech_send(37,sp,0)!=1){
+    if(m_COMPortSender->tech_send(37,sp,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке скорости работы!");
     }
@@ -789,22 +863,27 @@ void MainWindow::on_pushButton_send_tech_clicked()
     s=s-cou;
     int x =( s >> 8 ) & 0xFF;
     int y = s & 0xFF;
-    tech_send(22,x,y) ;
+    m_COMPortSender->tech_send(22,x,y) ;
     bool ok;
     int ersend;
     int hex;
-    for (int i = 0;  i< s; i++) {
-        if (list1[i]!=""){
+    for (int i = 0;  i< s; i++)
+    {
+        if (list1[i]!="")
+        {
             hex = list1[i].toInt(&ok, 16);
-            if(ok==1 && hex<256){
+            if(ok==1 && hex<256)
+            {
                 ui->tech_error->setText("");
-                ersend=tech_send(23,hex,0);
-                if(ersend==2) {
+                ersend = m_COMPortSender->tech_send(23,hex,0);
+                if(ersend==2)
+                {
                     ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                     ui->tech_error->setText(" Oшибка при формировании посылки данных!");
                 }
             }
-            else{
+            else
+            {
                 i=s;
                 ersend=2;
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -812,9 +891,12 @@ void MainWindow::on_pushButton_send_tech_clicked()
             }
         }
     }
-    if(ersend==1){
-        ersend=tech_send(24,0,0);
-        if(ersend!=1) {
+
+    if(ersend==1)
+    {
+        ersend = m_COMPortSender->tech_send(24,0,0);
+        if(ersend!=1)
+        {
             ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
             ui->tech_error->setText(" Oшибка при передаче посылки данных!");
         }
@@ -823,7 +905,8 @@ void MainWindow::on_pushButton_send_tech_clicked()
 
 void MainWindow::on_tech_clear_out_3_clicked()
 {
-    if(tech_send(27,1,0)!=1){
+    if(m_COMPortSender->tech_send(27,1,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
     }
@@ -831,7 +914,8 @@ void MainWindow::on_tech_clear_out_3_clicked()
 
 void MainWindow::on_tech_clear_in_3_clicked()
 {
-    if(tech_send(27,2,0)!=1){
+    if(m_COMPortSender->tech_send(27,2,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
     }
@@ -839,7 +923,8 @@ void MainWindow::on_tech_clear_in_3_clicked()
 
 void MainWindow::on_tech_clear_buf_3_clicked()
 {
-    if(tech_send(27,3,0)!=1){
+    if(m_COMPortSender->tech_send(27,3,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буферов!");
     }
@@ -847,7 +932,8 @@ void MainWindow::on_tech_clear_buf_3_clicked()
 
 void MainWindow::on_tech_clear_out_4_clicked()
 {
-    if(tech_send(21,1,0)!=1){
+    if(m_COMPortSender->tech_send(21,1,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
     }
@@ -855,7 +941,8 @@ void MainWindow::on_tech_clear_out_4_clicked()
 
 void MainWindow::on_tech_clear_in_4_clicked()
 {
-    if(tech_send(21,2,0)!=1){
+    if(m_COMPortSender->tech_send(21,2,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
     }
@@ -863,7 +950,8 @@ void MainWindow::on_tech_clear_in_4_clicked()
 
 void MainWindow::on_tech_clear_buf_4_clicked()
 {
-    if(tech_send(21,3,0)!=1){
+    if(m_COMPortSender->tech_send(21,3,0)!=1)
+    {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буферов!");
     }
@@ -887,22 +975,27 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
     s=s-cou;
     int x =( s >> 8 ) & 0xFF;
     int y = s & 0xFF;
-    tech_send(16,x,y) ;
+    m_COMPortSender->tech_send(16,x,y) ;
     bool ok;
     int ersend;
     int hex;
-    for (int i = 0;  i< s; i++) {
-        if (list1[i]!=""){
+    for (int i = 0;  i< s; i++)
+    {
+        if (list1[i]!="")
+        {
             hex = list1[i].toInt(&ok, 16);
-            if(ok==1 && hex<256){
+            if(ok==1 && hex<256)
+            {
                 ui->tech_error->setText("");
-                ersend=tech_send(17,hex,0);
-                if(ersend==2) {
+                ersend = m_COMPortSender->tech_send(17,hex,0);
+                if(ersend==2)
+                {
                     ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                     ui->tech_error->setText(" Oшибка при формировании посылки данных!");
                 }
             }
-            else{
+            else
+            {
                 i=s;
                 ersend=2;
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -910,9 +1003,12 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
             }
         }
     }
-    if(ersend==1){
-        ersend=tech_send(18,0,0);
-        if(ersend!=1) {
+
+    if(ersend==1)
+    {
+        ersend = m_COMPortSender->tech_send(18,0,0);
+        if(ersend!=1)
+        {
             ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
             ui->tech_error->setText(" Oшибка при передаче посылки данных!");
         }
@@ -921,33 +1017,43 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
 
 void MainWindow::on_res_err_stm_clicked()
 {
-    if(res_err_stm()!=1)ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    if(m_COMPortSender->res_err_stm() != 1)
+    {
+        ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    }
 }
+
 void MainWindow::on_res_err_otd_clicked()
 {
     connect(this, SIGNAL( OTD_err()), myOTD, SLOT(err_res_OTD()));
     emit OTD_err();
     disconnect(this, SIGNAL( OTD_res()), myOTD, SLOT(err_res_OTD()));
 }
+
 void MainWindow::OTD_err_res(int x)
 {
-    if(x!=1)ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    if(x != 1)
+    {
+        ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    }
 }
-
 
 void MainWindow::on_res_err_tech_clicked()
 {
-    if(res_err_tech()!=1)ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    if(m_COMPortSender->res_err_tech()!=1)
+        ui->error_mod->setText(" Не удалось сбросить ошибку!");
 }
 
 void MainWindow::on_pushButton_res_stm_clicked()
 {
-    if(res_stm()!=1)ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    if(m_COMPortSender->res_stm()!=1)
+        ui->error_mod->setText(" Не удалось провести перезагрузку!");
 }
 
 void MainWindow::on_pushButton_res_tech_clicked()
 {
-    if(res_tech()!=1)ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    if(m_COMPortSender->res_tech()!=1)
+        ui->error_mod->setText(" Не удалось провести перезагрузку!");
 }
 void MainWindow::on_pushButton_res_otd_clicked()
 {
@@ -957,7 +1063,8 @@ void MainWindow::on_pushButton_res_otd_clicked()
 }
 void MainWindow::OTD_res_st(int x)
 {
-    if(x!=1)ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    if(x!=1)
+        ui->error_mod->setText(" Не удалось провести перезагрузку!");
 }
 void MainWindow::OTD_id()
 {
@@ -965,28 +1072,35 @@ void MainWindow::OTD_id()
 }
 void MainWindow::on_pushButton_6_clicked()
 {
-    double v=fw_stm();
-    if(v==2)ui->error_mod->setText(" Не удалось узнать версию прошивки!");
-    else ui->lineEdit->setText (QString::number(v/10));
+    double v = m_COMPortSender->fw_stm();
+    if(v==2)
+        ui->error_mod->setText(" Не удалось узнать версию прошивки!");
+    else
+        ui->lineEdit->setText (QString::number(v/10));
 }
 
 void MainWindow::on_pushButton_9_clicked()
 {
-    double v=fw_tech();
-    if(v==2)ui->error_mod->setText(" Не удалось узнать версию прошивки!");
-    else ui->lineEdit_4->setText (QString::number(v/10));
+    double v = m_COMPortSender->fw_tech();
+    if(v==2)
+        ui->error_mod->setText(" Не удалось узнать версию прошивки!");
+    else
+        ui->lineEdit_4->setText (QString::number(v/10));
 }
+
 void MainWindow::on_pushButton_13_clicked()
 {
     connect(this, SIGNAL( OTD_sfw()), myOTD, SLOT(OTD_fw()));
     emit OTD_sfw();
     disconnect(this, SIGNAL( OTD_sfw()), myOTD, SLOT(OTD_fw()));
 }
+
 void MainWindow::OTD_fw(double x)
 {
     if(x==2)ui->error_mod->setText(" Не удалось узнать версию прошивки!");
     else ui->lineEdit_5->setText (QString::number(x/10));
 }
+
 void MainWindow::OTDPTdata(double x,double y)
 {
     x=x/100;
@@ -1026,6 +1140,7 @@ void MainWindow::on_OTD_reset_2_clicked()
     emit OTD_reset2();
     disconnect(this, SIGNAL( OTD_reset2()), myOTD, SLOT(OTDres2()));
 }
+
 void MainWindow::OTDerror(QString err)
 {
     ui->OTDerror->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -1044,13 +1159,13 @@ void MainWindow::on_OTD_meas_2_clicked()
     connect(this, SIGNAL( OTD_meas2()), myOTD, SLOT(OTDmeas2()));
     emit OTD_meas2();
     disconnect(this, SIGNAL( OTD_meas2()), myOTD, SLOT(OTDmeas2()));
-
 }
 
 void MainWindow::OTDtm1(QString temp)
 {
     ui->OTDtm1->setText(temp);
 }
+
 void MainWindow::OTDtm2(QString temp)
 {
     ui->OTDtm2->setText(temp);
@@ -1157,7 +1272,7 @@ void MainWindow::on_pushButton_12_clicked()
 
 void MainWindow::MKO_change_ch(int x, int y)
 {
-    stm_on_mko(x,y);
+    m_COMPortSender->stm_on_mko(x,y);
 }
 
 void MainWindow::on_MKO_avt_clicked()
@@ -1168,14 +1283,16 @@ void MainWindow::on_MKO_avt_clicked()
     int u2 = S2.toInt();
     QString S3 = ui->lineEdit_period->text();
     int u3 = S3.toInt();
-    if(flag_mko_auto==0){
+    if(flag_mko_auto==0)
+    {
         flag_mko_auto=1;
         ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
         connect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
         emit MKO_auto(flag_mko_auto,u3,u1,u2);
         disconnect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
     }
-    else if(flag_mko_auto==1){
+    else if(flag_mko_auto==1)
+    {
         flag_mko_auto=0;
         ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
         connect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
@@ -1188,14 +1305,16 @@ void MainWindow::on_OTD_avt_2_clicked()
 {
     QString S3 = ui->lineEdit_period_OTD->text();
     int u3 = S3.toInt();
-    if(flag_otd_auto==0){
+    if(flag_otd_auto==0)
+    {
         flag_otd_auto=1;
         ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
         connect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));
         emit OTD_auto(flag_otd_auto,u3*1000);
         disconnect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));
     }
-    else if(flag_otd_auto==1){
+    else if(flag_otd_auto==1)
+    {
         flag_otd_auto=0;
         ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
         connect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));

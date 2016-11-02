@@ -149,7 +149,7 @@ void OTD::OTDres1()
     QByteArray readData1 = com7->readAll();
     while (com7->waitForReadyRead(500))
         readData1.append(com7->readAll());
-    if(readData1[3]==2)emit err_OTD("Ошибка при перезагрузке!");
+    if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
 }
 void OTD::OTDres2()
 {
@@ -163,7 +163,7 @@ void OTD::OTDres2()
     QByteArray readData1 = com7->readAll();
     while (com7->waitForReadyRead(500))
         readData1.append(com7->readAll());
-    if(readData1[3]==2)emit err_OTD("Ошибка при перезагрузке!");
+    if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
     else emit err_OTD("");
 }
 void OTD::OTDmeas1()
@@ -179,7 +179,7 @@ void OTD::OTDmeas1()
     QByteArray readData1 = com7->readAll();
     while (com7->waitForReadyRead(500))
         readData1.append(com7->readAll());
-    if(readData1[3]==2)emit err_OTD("Ошибка при запуске измерений 1-й линии!");
+    if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 1-й линии!");
     OTDtm1();
 }
 void OTD::OTDmeas2()
@@ -195,7 +195,7 @@ void OTD::OTDmeas2()
     QByteArray readData1 = com7->readAll();
     while (com7->waitForReadyRead(500))
         readData1.append(com7->readAll());
-    if(readData1[3]==2)emit err_OTD("Ошибка при запуске измерений 2-й линии!");
+    if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 2-й линии!");
     OTDtm2();
 }
 void OTD::OTDtemper()
@@ -236,7 +236,7 @@ void OTD::OTDtemper()
         data+= "\n";
     }
     data+="\n";
-    if(readData0[3]==2)data+="Ошибка при считывании датчиков 1-й оси\n";
+    if(readData0.at(3)==2)data+="Ошибка при считывании датчиков 1-й оси\n";
 
     data+="Кол-во датчиков DS1820 по оси 2: ";
     bw.resize(4);
@@ -272,7 +272,7 @@ void OTD::OTDtemper()
         }
         data+= "\n";
     }
-    if(readData3[3]==2)data+="Ошибка при считывании датчиков 2-й оси\n";
+    if(readData3.at(3)==2)data+="Ошибка при считывании датчиков 2-й оси\n";
     emit temp_OTD(data);
 
 }

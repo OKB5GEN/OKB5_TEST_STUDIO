@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 
+class COMPortSender;
+
 namespace Ui {
 class MainWindow;
 }
@@ -133,11 +135,9 @@ signals:
     void MKO_ch(int x);
     void MKO_auto(int x,int y,int adr1, int adr2);
 
-
-
-
 private:
     Ui::MainWindow *ui;
+    COMPortSender * m_COMPortSender;
 };
 
 #endif // MAINWINDOW_H

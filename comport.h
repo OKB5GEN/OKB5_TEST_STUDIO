@@ -1,77 +1,79 @@
-#ifndef comport
-#define comport
+#ifndef COMPORT_H
+#define COMPORT_H
 
 #include <QObject>
 #include <QString>
+#include <QtSerialPort/QtSerialPort>
 
+class COMPortSender : public QObject
+{
+    Q_OBJECT
 
-void startpower();
-void COMConnector5_6();
-void COMConnector4();
-void COMConnector8();
-int stm_on_com6(int y,int x);
-int stm_on_com5(int y,int x);
-int stm_on_mko(int y,int x);
+public:
+    COMPortSender(QObject *parent = Q_NULLPTR);
+    virtual ~COMPortSender();
 
-double ctm_data_ch(int ch);
-int ctm_check_fuse(int fuse);
+    void createPorts();
 
-int tech_send(int com, int x, int y);
-int tech_read(int x);
-QString tech_read_buf(int x,int len);
-void Remote_ON();
-void Remote_OFF();
-void Reset_error_com6();
-void Reset_error_com5();
-int readerr4I();
-int readerr11I();
-void com6ON();
-void com6OFF();
-void com5ON();
-void com5OFF();
-int readcom5U();
-int readcom5I();
-int readcom6U();
-int readcom6I();
-void setUIcom5(double u);
-void setUIcom6(double u);
-void setoverUIcom5(double u,double ii);
-void setoverUIcom6(double u,double ii);
-void COMClose5_6();
+    //TODO check the necessity for public
+    void startPower();
+    int id_stm();
+    int id_tech();
+    int stm_on_mko(int y,int x);
+    void Reset_error_com6();
+    void Reset_error_com5();
+    int readerr4I();
+    int readerr11I();
+    void com6ON();
+    void com6OFF();
+    void com5ON();
+    void com5OFF();
+    int readcom5U();
+    int readcom5I();
+    int readcom6U();
+    int readcom6I();
+    void setUIcom5(double u);
+    void setUIcom6(double u);
+    void setoverUIcom5(double u,double ii);
+    void setoverUIcom6(double u,double ii);
+    QString req_stm();
+    QString req_tech();
+    int res_err_stm();
+    int res_err_tech();
+    int res_stm();
+    int res_tech();
+    int fw_stm();
+    int fw_tech();
 
-void COMClose4();
-void COMClose8();
+    int stm_on_com6(int y,int x);
+    int stm_on_com5(int y,int x);
 
-int id_stm();
+    double ctm_data_ch(int ch);
+    int ctm_check_fuse(int fuse);
 
+    int tech_send(int com, int x, int y);
+    int tech_read(int x);
+    QString tech_read_buf(int x,int len);
 
-int id_tech();
-QString req_stm();
+private:
+    QSerialPort* createPort(const QString& name);
 
+    QSerialPort* m_com4 = Q_NULLPTR; // CTM Module port
+    QSerialPort* m_com5 = Q_NULLPTR; // Power module port
+    QSerialPort* m_com6 = Q_NULLPTR; // Power module port
+    QSerialPort* m_com8 = Q_NULLPTR; // Tech module port
 
-QString req_tech();
-int res_err_stm();
+    //TODO Refactor
+    int flag_rem;
+    QByteArray ba;
+    double ii1,ii2;
+    uint8_t er1,er2;
+    int flag_res_tech=1, flag_res_stm=1;
 
+    //QVector<QSerialPort*> m_ports;
 
-int res_err_tech();
-int res_stm();
-
-
-int res_tech();
-int fw_stm();
-
-
-int fw_tech();
-
-/*void COMCloseOTD();
-void COMConnectorOTD();
-int OTDPT();
-QString OTDtemper();
-void OTDres1();
-void OTDres2();
-void OTDmeas1();
-void OTDmeas2();
-void OTDtm1();
-void OTDtm2();*/
+    void Remote_ON();
+    void Remote_OFF();
+};
 
 #endif
