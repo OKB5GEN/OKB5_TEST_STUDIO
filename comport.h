@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QMap>
 #include <QtSerialPort/QtSerialPort>
 
 class COMPortSender : public QObject
@@ -10,12 +11,18 @@ class COMPortSender : public QObject
     Q_OBJECT
 
 public:
-    enum PortID
+    enum ModuleID
     {
-        STM,    // STM Module
-        TECH,   // Tech Module
-        POW_BUP,// Antenna drive control power unit
-        POW_PNA // Antenna drive power unit
+        STM,             // STM Module
+        TECH,            // Tech Module
+        POW_ANT_DRV_CTRL,// Antenna drive control power unit
+        POW_ANT_DRV      // Antenna drive power unit
+    };
+
+    enum PowerState
+    {
+        POWER_ON,
+        POWER_OFF
     };
 
     COMPortSender(QObject *parent = Q_NULLPTR);
@@ -23,27 +30,22 @@ public:
 
     void createPorts();
 
+    void resetError(ModuleID id);
+    void setPowerState(ModuleID id, PowerState state);
+    void setVoltageAndCurrent(ModuleID id, double voltage);
+    void setMaxVoltageAndCurrent(ModuleID id, double voltage, double current);
+
     //TODO check the necessity for public and method names
     void startPower();
     int id_stm();
     int id_tech();
 
-    void Reset_error_com6();
-    void Reset_error_com5();
     int readerr4I();
     int readerr11I();
-    void com6ON();
-    void com6OFF();
-    void com5ON();
-    void com5OFF();
     int readcom5U();
     int readcom5I();
     int readcom6U();
     int readcom6I();
-    void setUIcom5(double u);
-    void setUIcom6(double u);
-    void setoverUIcom5(double u, double ii);
-    void setoverUIcom6(double u, double ii);
     QString req_stm();
     QString req_tech();
     int res_err_stm();
@@ -69,12 +71,13 @@ private:
 
     QByteArray send(QSerialPort * port, QByteArray data); // returns response
 
-    //TODO Refactor
-    QSerialPort* m_com4 = Q_NULLPTR; // CTM Module port
-    QSerialPort* m_com5 = Q_NULLPTR; // Power module port
-    QSerialPort* m_com6 = Q_NULLPTR; // Power module port
-    QSerialPort* m_com8 = Q_NULLPTR; // Tech module port
+    QSerialPort* getPort(ModuleID id);
 
+
+    QMap<ModuleID, QSerialPort*> m_ports;
+
+
+    //TODO Refactor
     double m_ii1;
     double m_ii2;
     uint8_t m_er1;

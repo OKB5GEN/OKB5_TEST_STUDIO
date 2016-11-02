@@ -30,14 +30,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     m_COMPortSender = new COMPortSender(this);
 
-    //startcondition(); // Ivan Semenchuk: uncomment to work with real device
+    startCondition(); // Ivan Semenchuk: uncomment to work with real device
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-void MainWindow::startcondition()
+void MainWindow::startCondition()
 {
     m_COMPortSender->createPorts();
     m_COMPortSender->startPower();
@@ -395,13 +395,13 @@ void MainWindow::on_pushButton_start_com6_clicked()
     if(flag_rem1 == 0)
     {
         flag_rem1 = 1;
-        m_COMPortSender->com6ON();
+        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV_CTRL, COMPortSender::POWER_ON);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
     else
     {
-        flag_rem1=0;
-        m_COMPortSender->com6OFF();
+        flag_rem1 = 0;
+        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV_CTRL, COMPortSender::POWER_OFF);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
@@ -411,13 +411,13 @@ void MainWindow::on_pushButton_start_com5_clicked()
     if(flag_rem2 == 0)
     {
         flag_rem2 = 1;
-        m_COMPortSender->com5ON();
+        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV, COMPortSender::POWER_ON);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
     else
     {
         flag_rem2 = 0;
-        m_COMPortSender->com5OFF();
+        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV, COMPortSender::POWER_OFF);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
@@ -611,8 +611,8 @@ void MainWindow::on_pushButton_U1_clicked()
     }
 
     ui->setU1->setText(QString::number(u1));
-    m_COMPortSender->setoverUIcom6(ul1, Il1);
-    m_COMPortSender->setUIcom6(u1);
+    m_COMPortSender->setMaxVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, ul1, Il1);
+    m_COMPortSender->setVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, u1);
 }
 
 void MainWindow::on_pushButton_U2_clicked()
@@ -629,19 +629,19 @@ void MainWindow::on_pushButton_U2_clicked()
     }
 
     ui->setU2->setText(QString::number(u1));
-    m_COMPortSender->setoverUIcom5(ul1, Il1);
-    m_COMPortSender->setUIcom5(u1);
+    m_COMPortSender->setMaxVoltageAndCurrent(COMPortSender::POW_ANT_DRV, ul1, Il1);
+    m_COMPortSender->setVoltageAndCurrent(COMPortSender::POW_ANT_DRV, u1);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    m_COMPortSender->Reset_error_com6();
+    m_COMPortSender->resetError(COMPortSender::POW_ANT_DRV);
     ui->err1->setText(" ");
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    m_COMPortSender->Reset_error_com5();
+    m_COMPortSender->resetError(COMPortSender::POW_ANT_DRV_CTRL);
     ui->err2->setText(" ");
 }
 
