@@ -58,9 +58,25 @@ QSerialPort * COMPortSender::createPort(const QString& name)
     //m_ports.push_back(port);
 }
 
+QByteArray COMPortSender::send(QSerialPort * port, QByteArray data)
+{
+    port->QIODevice::write(ba);
+    port->waitForBytesWritten(-1);
+
+    QByteArray readData = port->readAll();
+
+    while (port->waitForReadyRead(100))
+    {
+        readData.append(port->readAll());
+    }
+
+    return readData;
+}
+
 void COMPortSender::startPower()
 {
     Remote_ON();
+
     ba.resize(7);
     ba[0] = 0xf1;//power off
     ba[1] = 0x00;
@@ -70,23 +86,8 @@ void COMPortSender::startPower()
     ba[5] = 0x01;
     ba[6] = 0x28;
 
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com5->readAll();
-
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData1.append(m_com5->readAll());
-    }
-
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com6->readAll();
-
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData2.append(m_com6->readAll());
-    }
+    QByteArray readData1 = send(m_com5, ba);
+    QByteArray readData2 = send(m_com6, ba);
 
     setUIcom5(0.5);
     setUIcom6(0.5);
@@ -99,16 +100,11 @@ int COMPortSender::stm_on_com6(int y,int x)
     ba[1] = 0x0b;
     ba[2] = y;
     ba[3] = x;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
 
+    QByteArray readData1 = send(m_com4, ba);
     return readData1[3];
 }
+
 int COMPortSender::stm_on_mko(int x, int y)
 {
     ba.resize(4);
@@ -116,13 +112,8 @@ int COMPortSender::stm_on_mko(int x, int y)
     ba[1] = 0x0e;
     ba[2] = x;
     ba[3] = y;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
+
+    QByteArray readData1 = send(m_com4, ba);
     return readData1[3];
 }
 
@@ -133,14 +124,7 @@ int COMPortSender::ctm_check_fuse(int fuse)
     ba[1] = 0x0c;
     ba[2] = fuse;
     ba[3] = 0x00;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
-
+    QByteArray readData1 = send(m_com4, ba);
     return readData1[3];
 }
 
@@ -151,14 +135,7 @@ int COMPortSender::stm_on_com5(int y, int x)
     ba[1] = 0x0b;
     ba[2] = y;
     ba[3] = x;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
-
+    QByteArray readData1 = send(m_com4, ba);
     return readData1[3];
 }
 
@@ -169,15 +146,8 @@ int COMPortSender::tech_send(int com, int x, int y)
     ba[1] = com;
     ba[2] = x;
     ba[3] = y;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData2.append(m_com8->readAll());
-    }
-
-    return readData2[3];
+    QByteArray readData1 = send(m_com8, ba);
+    return readData1[3];
 }
 
 int COMPortSender::tech_read(int x)
@@ -199,13 +169,7 @@ int COMPortSender::tech_read(int x)
         ba[1] = y;
         ba[2] = 0x00;
         ba[3] = 0x00;
-        m_com8->QIODevice::write(ba);
-        m_com8->waitForBytesWritten(-1);
-        QByteArray readData2 = m_com8->readAll();
-        while (m_com8->waitForReadyRead(100))
-        {
-            readData2.append(m_com8->readAll());
-        }
+        QByteArray readData2 = send(m_com8, ba);
 
         uint8_t uu1,uu2;
         uu1=readData2[2];
@@ -220,13 +184,13 @@ int COMPortSender::tech_read(int x)
 QString COMPortSender::tech_read_buf(int x,int len)
 {
     int y = 0;
-    if(x==1)
+    if(x == 1)
     {
-        y=26;
+        y = 26;
     }
     else
     {
-        y=20;
+        y = 20;
     }
 
     QString result;
@@ -237,13 +201,7 @@ QString COMPortSender::tech_read_buf(int x,int len)
         ba[1] = y;
         ba[2] = 0x00;
         ba[3] = 0x00;
-        m_com8->QIODevice::write(ba);
-        m_com8->waitForBytesWritten(-1);
-        QByteArray readData2 = m_com8->readAll();
-        while (m_com8->waitForReadyRead(100))
-        {
-            readData2.append(m_com8->readAll());
-        }
+        QByteArray readData2 = send(m_com8, ba);
 
         if(readData2.at(2) == 1)
         {
@@ -272,13 +230,8 @@ double COMPortSender::ctm_data_ch(int ch)
         ba[1] = 0x0d;
         ba[2] = ch;
         ba[3] = 0x00;
-        m_com4->QIODevice::write(ba);
-        m_com4->waitForBytesWritten(-1);
-        QByteArray readData1 = m_com4->readAll();
-        while (m_com4->waitForReadyRead(100))
-        {
-            readData1.append(m_com4->readAll());
-        }
+
+        QByteArray readData1 = send(m_com4, ba);
 
         uint8_t uu1,uu2;
         uu1=readData1[2];
@@ -300,11 +253,7 @@ void COMPortSender::Reset_error_com6()
     ba[4] = 0x0a;
     ba[5] = 0x01;
     ba[6] = 0x3b;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-        readData1.append(m_com6->readAll());
+    QByteArray readData1 = send(m_com6, ba);
 }
 
 void COMPortSender::Reset_error_com5()
@@ -317,13 +266,7 @@ void COMPortSender::Reset_error_com5()
     ba[4] = 0x0a;
     ba[5] = 0x01;
     ba[6] = 0x3b;
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData2.append(m_com5->readAll());
-    }
+    QByteArray readData1 = send(m_com5, ba);
 }
 
 void COMPortSender::Remote_ON()
@@ -336,21 +279,8 @@ void COMPortSender::Remote_ON()
     ba[4] = 0x10;
     ba[5] = 0x01;
     ba[6] = 0x47;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
-
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData2.append(m_com5->readAll());
-    }
+    QByteArray readData1 = send(m_com6, ba);
+    QByteArray readData2 = send(m_com5, ba);
 }
 
 void COMPortSender::Remote_OFF()
@@ -363,22 +293,10 @@ void COMPortSender::Remote_OFF()
     ba[4] = 0x00;
     ba[5] = 0x01;
     ba[6] = 0x37;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
-
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData2.append(m_com5->readAll());
-    }
+    QByteArray readData1 = send(m_com6, ba);
+    QByteArray readData2 = send(m_com5, ba);
 }
+
 void COMPortSender::com6ON()
 {
     ba.resize(7);
@@ -389,13 +307,7 @@ void COMPortSender::com6ON()
     ba[4] = 0x01;
     ba[5] = 0x01;
     ba[6] = 0x29;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
+    QByteArray readData1 = send(m_com6, ba);
 }
 
 void COMPortSender::com6OFF()
@@ -408,14 +320,9 @@ void COMPortSender::com6OFF()
     ba[4] = 0x00;
     ba[5] = 0x01;
     ba[6] = 0x28;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
+    QByteArray readData1 = send(m_com6, ba);
 }
+
 void COMPortSender::com5ON()
 {
     ba.resize(7);
@@ -426,13 +333,8 @@ void COMPortSender::com5ON()
     ba[4] = 0x01;
     ba[5] = 0x01;
     ba[6] = 0x29;
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData2.append(m_com5->readAll());
-    }
+
+    QByteArray readData1 = send(m_com5, ba);
 }
 
 void COMPortSender::com5OFF()
@@ -445,14 +347,9 @@ void COMPortSender::com5OFF()
     ba[4] = 0x00;
     ba[5] = 0x01;
     ba[6] = 0x28;
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData2.append(m_com5->readAll());
-    }
+    QByteArray readData1 = send(m_com5, ba);
 }
+
 int COMPortSender::readcom5U()
 {
     ba.resize(5);
@@ -461,13 +358,8 @@ int COMPortSender::readcom5U()
     ba[2] = 0x47;
     ba[3] = 0x00;
     ba[4] = 0xbc;
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData.append(m_com5->readAll());
-    }
+
+    QByteArray readData = send(m_com5, ba);
 
     uint8_t uu1,uu2;
     er2=(readData[4]>>4);
@@ -505,14 +397,7 @@ int COMPortSender::readcom6U()
     ba[2] = 0x47;
     ba[3] = 0x00;
     ba[4] = 0xbc;
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData.append(m_com6->readAll());
-    }
-
+    QByteArray readData = send(m_com6, ba);
     uint8_t uu1,uu2;
     er1=(readData[4]>>4);
     uu1=readData[5];
@@ -549,13 +434,8 @@ void COMPortSender::setUIcom5(double u)
 
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData.append(m_com5->readAll());
-    }
+
+    QByteArray readData = send(m_com5, ba);
 
     uint32_t vali = (155*25600/u)/10;//I
     if(vali>25600)vali=25600;
@@ -573,13 +453,7 @@ void COMPortSender::setUIcom5(double u)
 
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData1.append(m_com5->readAll());
-    }
+    QByteArray readData1 = send(m_com5, ba);
 }
 
 void COMPortSender::setUIcom6(double u)
@@ -600,13 +474,8 @@ void COMPortSender::setUIcom6(double u)
 
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
+
+    QByteArray readData1 = send(m_com6, ba);
 
     uint32_t vali = (155*25600/u)/10;//I
     if(vali>25600)vali=25600;
@@ -623,14 +492,8 @@ void COMPortSender::setUIcom6(double u)
     }
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData2.append(m_com6->readAll());
-    }
 
+    QByteArray readData2 = send(m_com6, ba);
     ba.resize(7);
 }
 
@@ -651,13 +514,7 @@ void COMPortSender::setoverUIcom5(double u,double ii)
     }
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData.append(m_com5->readAll());
-    }
+    QByteArray readData = send(m_com5, ba);
 
     uint32_t vali = (ii*25600)/10;//I
     ba[0] = 0xf1;
@@ -666,20 +523,17 @@ void COMPortSender::setoverUIcom5(double u,double ii)
     ba[3] = ( vali >> 8 ) & 0xFF;
     ba[4] = vali & 0xFF;
     sum=0;
+
     for(int i=0;i<5;i++)
     {
         uint8_t s=ba[i];
         sum=(sum+s)& 0xFFFF;
     }
+
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com5->QIODevice::write(ba);
-    m_com5->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com5->readAll();
-    while (m_com5->waitForReadyRead(100))
-    {
-        readData1.append(m_com5->readAll());
-    }
+
+    QByteArray readData1 = send(m_com5, ba);
 }
 
 void COMPortSender::setoverUIcom6(double u,double ii)
@@ -697,16 +551,11 @@ void COMPortSender::setoverUIcom6(double u,double ii)
         uint8_t s=ba[i];
         sum=(sum+s)& 0xFFFF;
     }
+
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData1.append(m_com6->readAll());
-    }
 
+    QByteArray readData1 = send(m_com6, ba);
     uint32_t vali = (ii*25600)/10;//I
     ba[0] = 0xf1;
     ba[1] = 0x00;
@@ -721,14 +570,9 @@ void COMPortSender::setoverUIcom6(double u,double ii)
     }
     ba[5] =(( sum >> 8 ) & 0xFF);
     ba[6] =  (sum  & 0xFF);
-    m_com6->QIODevice::write(ba);
-    m_com6->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com6->readAll();
-    while (m_com6->waitForReadyRead(100))
-    {
-        readData2.append(m_com6->readAll());
-    }
+    QByteArray readData2 = send(m_com6, ba);
 }
+
 int COMPortSender::id_stm()
 {
     ba.resize(4);
@@ -736,28 +580,17 @@ int COMPortSender::id_stm()
     ba[1] = 0x01;
     ba[2] = 0x00;
     ba[3] = 0x01;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
+    QByteArray readData1 = send(m_com4, ba);
 
     ba.resize(4);
     ba[0] = 0xff;
     ba[1] = 0x01;
     ba[2] = 0x00;
     ba[3] = 0x02;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData2.append(m_com4->readAll());
-    }
 
-    if(readData1[2]==readData2[2]&&readData1[3]==readData2[3])
+    QByteArray readData2 = send(m_com4, ba);
+
+    if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
     {
         return 1;
     }
@@ -766,7 +599,6 @@ int COMPortSender::id_stm()
         return 0;
     }
 }
-
 
 int COMPortSender::id_tech()
 {
@@ -775,28 +607,17 @@ int COMPortSender::id_tech()
     ba[1] = 0x01;
     ba[2] = 0x00;
     ba[3] = 0x01;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData1.append(m_com8->readAll());
-    }
+    QByteArray readData1 = send(m_com8, ba);
 
     ba.resize(4);
     ba[0] = 0xff;
     ba[1] = 0x01;
     ba[2] = 0x00;
     ba[3] = 0x02;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData2 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData2.append(m_com8->readAll());
-    }
 
-    if(readData1[2]==readData2[2]&&readData1[3]==readData2[3])
+    QByteArray readData2 = send(m_com8, ba);
+
+    if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
     {
         return 1;
     }
@@ -805,9 +626,10 @@ int COMPortSender::id_tech()
         return 0;
     }
 }
+
 QString COMPortSender::req_stm()
 {
-    if(flag_res_stm==1)
+    if(flag_res_stm == 1)
     {
         QString res;
         ba.resize(4);
@@ -815,11 +637,7 @@ QString COMPortSender::req_stm()
         ba[1] = 0x02;
         ba[2] = 0x00;
         ba[3] = 0x00;
-        m_com4->QIODevice::write(ba);
-        m_com4->waitForBytesWritten(-1);
-        QByteArray readData1 = m_com4->readAll();
-        while (m_com4->waitForReadyRead(100))
-            readData1.append(m_com4->readAll());
+        QByteArray readData1 = send(m_com4, ba);
         uint8_t x=readData1[2];
         uint8_t z1, z2, z3;
         res="";
@@ -850,13 +668,8 @@ QString COMPortSender::req_tech()
         ba[1] = 0x02;
         ba[2] = 0x00;
         ba[3] = 0x00;
-        m_com8->QIODevice::write(ba);
-        m_com8->waitForBytesWritten(-1);
-        QByteArray readData1 = m_com8->readAll();
-        while (m_com8->waitForReadyRead(100))
-        {
-            readData1.append(m_com8->readAll());
-        }
+
+        QByteArray readData1 = send(m_com8, ba);
         uint8_t x=readData1[2];
         uint8_t z1, z2, z3;
         z1=x>>7;
@@ -864,11 +677,11 @@ QString COMPortSender::req_tech()
         z2=z2>>7;
         z3=x<<2;
         z3=z3>>7;
-        if(z1==0)
+        if(z1 == 0)
             res+=" Технол. модуль не готов к работе! \n";
-        if(z2==1)
+        if(z2 == 1)
             res+=" Ошибки у Технол. модуля! \n";
-        if(z3==1)
+        if(z3 == 1)
             res+=" Модуль Технол. после перезагрузки! \n";
         if(readData1.at(3)==0x10)
             res+=" Потеря байта из-за переполнения буфера RS485! \n";
@@ -876,6 +689,7 @@ QString COMPortSender::req_tech()
     }
     return "";
 }
+
 int COMPortSender::res_err_stm()
 {
     ba.resize(4);
@@ -883,13 +697,7 @@ int COMPortSender::res_err_stm()
     ba[1] = 0x03;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
+    QByteArray readData1 = send(m_com4, ba);
     return readData1[3];
 }
 
@@ -900,31 +708,19 @@ int COMPortSender::res_err_tech()
     ba[1] = 0x03;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData1.append(m_com8->readAll());
-    }
+    QByteArray readData1 = send(m_com8, ba);
     return readData1[3];
 }
 
 int COMPortSender::res_stm()
 {
-    flag_res_stm=0;
+    flag_res_stm = 0;
     ba.resize(4);
     ba[0] = 0x22;
     ba[1] = 0x04;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
+    QByteArray readData1 = send(m_com4, ba);
 
     if (m_com4 != Q_NULLPTR && m_com4->isOpen())
     {
@@ -941,25 +737,19 @@ int COMPortSender::res_stm()
 
     m_com4 = createPort("com4");
 
-    flag_res_stm=1;
+    flag_res_stm = 1;
     return readData1[3];
 }
 
 int COMPortSender::res_tech()
 {
-    flag_res_tech=0;
+    flag_res_tech = 0;
     ba.resize(4);
     ba[0] = 0x56;
     ba[1] = 0x04;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData1.append(m_com8->readAll());
-    }
+    QByteArray readData1 = send(m_com8, ba);
 
     if (m_com8 != Q_NULLPTR && m_com8->isOpen())
     {
@@ -986,14 +776,9 @@ int COMPortSender::fw_stm()
     ba[1] = 0x06;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com4->QIODevice::write(ba);
-    m_com4->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com4->readAll();
-    while (m_com4->waitForReadyRead(100))
-    {
-        readData1.append(m_com4->readAll());
-    }
-    return (readData1[2]*10+readData1[3]);
+
+    QByteArray readData1 = send(m_com4, ba);
+    return (readData1[2] * 10 + readData1[3]);
 }
 
 int COMPortSender::fw_tech()
@@ -1003,13 +788,7 @@ int COMPortSender::fw_tech()
     ba[1] = 0x06;
     ba[2] = 0x00;
     ba[3] = 0x00;
-    m_com8->QIODevice::write(ba);
-    m_com8->waitForBytesWritten(-1);
-    QByteArray readData1 = m_com8->readAll();
-    while (m_com8->waitForReadyRead(100))
-    {
-        readData1.append(m_com8->readAll());
-    }
+    QByteArray readData1 = send(m_com8, ba);
     return (readData1[2]*10+readData1[3]);
 }
 

@@ -58,6 +58,8 @@ public:
 private:
     QSerialPort* createPort(const QString& name);
 
+    QByteArray send(QSerialPort * port, QByteArray data); // returns response
+
     QSerialPort* m_com4 = Q_NULLPTR; // CTM Module port
     QSerialPort* m_com5 = Q_NULLPTR; // Power module port
     QSerialPort* m_com6 = Q_NULLPTR; // Power module port
