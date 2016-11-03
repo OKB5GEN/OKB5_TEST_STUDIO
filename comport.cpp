@@ -10,6 +10,9 @@ namespace
     static const uint8_t MAX_VOLTAGE = 42; // volts
     static const uint8_t MAX_CURRENT = 10; // ampers
     static const uint8_t MAX_POWER = 155; // watts actually 160, but for safety purposes reduced to 155
+
+    static const uint8_t STM_DEFAULT_ADDR = 0x22;
+    static const uint8_t TECH_DEFAULT_ADDR = 0x56;
 }
 
 COMPortSender::COMPortSender(QObject *parent):
@@ -19,11 +22,11 @@ COMPortSender::COMPortSender(QObject *parent):
 
 COMPortSender::~COMPortSender()
 {
-    foreach (QSerialPort * port, m_ports)
+    foreach (ModuleInfo info, m_modules)
     {
-        if (port->isOpen())
+        if (info.port->isOpen())
         {
-            port->close();
+            info.port->close();
         }
     }
 }
@@ -31,10 +34,37 @@ COMPortSender::~COMPortSender()
 void COMPortSender::createPorts()
 {
     // TODO: The order of ports creation possibly important!
-    m_ports[POW_ANT_DRV] = createPort("com5");
-    m_ports[POW_ANT_DRV_CTRL] = createPort("com6");
-    m_ports[STM] = createPort("com4");
-    m_ports[TECH] = createPort("com8");
+    {
+        COMPortSender::ModuleInfo info;
+        info.port = createPort("6");
+        info.state = true;
+        info.address = 0xFF;
+        m_modules[POW_ANT_DRV] = info;
+    }
+
+    {
+        COMPortSender::ModuleInfo info;
+        info.port = createPort("5");
+        info.state = true;
+        info.address = 0xFF;
+        m_modules[POW_ANT_DRV_CTRL] = info;
+    }
+
+    {
+        COMPortSender::ModuleInfo info;
+        info.port = createPort("4");
+        info.state = true;
+        info.address = STM_DEFAULT_ADDR;
+        m_modules[STM] = info;
+    }
+
+    {
+        COMPortSender::ModuleInfo info;
+        info.port = createPort("8");
+        info.state = true;
+        info.address = TECH_DEFAULT_ADDR;
+        m_modules[TECH] = info;
+    }
 }
 
 QSerialPort * COMPortSender::createPort(const QString& name)
@@ -101,8 +131,8 @@ void COMPortSender::startPower()
 int COMPortSender::setPowerChannelState(int channel, PowerState state)
 {
     QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x0b;
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = POWER_CHANNEL_CTRL;
     buffer[2] = channel;
     buffer[3] = (state == POWER_ON) ? 1 : 0;
 
@@ -113,8 +143,8 @@ int COMPortSender::setPowerChannelState(int channel, PowerState state)
 int COMPortSender::stm_on_mko(int x, int y)
 {
     QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x0e;
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = SET_MKO_PWR_CHANNEL_STATE;
     buffer[2] = x;
     buffer[3] = y;
 
@@ -125,8 +155,8 @@ int COMPortSender::stm_on_mko(int x, int y)
 int COMPortSender::stm_check_fuse(int fuse)
 {
     QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x0c;
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = GET_PWR_MODULE_FUSE_STATE;
     buffer[2] = fuse;
     buffer[3] = 0x00;
     QByteArray readData1 = send(getPort(STM), buffer);
@@ -136,7 +166,7 @@ int COMPortSender::stm_check_fuse(int fuse)
 int COMPortSender::tech_send(int com, int x, int y)
 {
     QByteArray buffer(4, 0);
-    buffer[0] = 0x56;
+    buffer[0] = TECH_DEFAULT_ADDR;
     buffer[1] = com;
     buffer[2] = x;
     buffer[3] = y;
@@ -146,22 +176,21 @@ int COMPortSender::tech_send(int com, int x, int y)
 
 int COMPortSender::tech_read(int x)
 {
-    if(m_TECHActive)
+    if(isActive(TECH))
     {
-        //TODO remove magic numbers
-        int y = 0;
+        uint8_t command = 0;
         if(x == 1)
         {
-            y = 25; // Команда проверки есть ли данные пришедшие по RS485 ( Модуль технологический  RS485 интерфейс )
+            command = CHECK_RECV_DATA_RS485;
         }
         else
         {
-            y = 19; // Команда проверки есть ли данные пришедшие по CAN ( Модуль технологический  CAN интерфейс )
+            command = CHECK_RECV_DATA_CAN;
         }
 
         QByteArray buffer(4, 0);
-        buffer[0] = 0x56;
-        buffer[1] = y;
+        buffer[0] = TECH_DEFAULT_ADDR;
+        buffer[1] = command;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
         QByteArray readData2 = send(getPort(TECH), buffer);
@@ -176,25 +205,24 @@ int COMPortSender::tech_read(int x)
     return 0;
 }
 
-QString COMPortSender::tech_read_buf(int x,int len)
+QString COMPortSender::tech_read_buf(int x, int len)
 {
-    //TODO remove magic numbers
-    int y = 0;
+    uint8_t command = 0;
     if(x == 1)
     {
-        y = 26; // Команда получения  данных полученных по RS485 (Модуль технологический  RS485 интерфейс)
+        command = RECV_DATA_RS485;
     }
     else
     {
-        y = 20; // Команда получения  данных полученных по CAN (Модуль технологический  CAN интерфейс)
+        command = RECV_DATA_CAN;
     }
 
     QString result;
     QByteArray buffer(4, 0);
     for(int i = 0; i < len; i++)
     {
-        buffer[0] = 0x56;
-        buffer[1] = y;
+        buffer[0] = TECH_DEFAULT_ADDR;
+        buffer[1] = command;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
         QByteArray readData2 = send(getPort(TECH), buffer);
@@ -219,11 +247,11 @@ QString COMPortSender::tech_read_buf(int x,int len)
 
 double COMPortSender::stm_data_ch(int ch)
 {
-    if (m_STMActive)
+    if (isActive(STM))
     {
         QByteArray buffer(4, 0);
-        buffer[0] = 0x22;
-        buffer[1] = 0x0d;
+        buffer[0] = STM_DEFAULT_ADDR;
+        buffer[1] = GET_CHANNEL_TELEMETRY;
         buffer[2] = ch;
         buffer[3] = 0x00;
 
@@ -241,25 +269,62 @@ double COMPortSender::stm_data_ch(int ch)
 
 QSerialPort* COMPortSender::getPort(ModuleID id)
 {
-    QSerialPort* port = m_ports.value(id, Q_NULLPTR);
+    QSerialPort* port = m_modules.value(id, ModuleInfo()).port;
     Q_ASSERT(port != Q_NULLPTR);
     return port;
 }
 
-void COMPortSender::resetError(ModuleID id)
+int COMPortSender::resetError(ModuleID id)
 {
     QSerialPort * port = getPort(id);
-    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+    QByteArray buffer;
 
-    QByteArray buffer(7, 0);
-    buffer[0] = 0xf1;
-    buffer[1] = 0x00;
-    buffer[2] = 0x36;
-    buffer[3] = 0x0a;
-    buffer[4] = 0x0a;
-    buffer[5] = 0x01;
-    buffer[6] = 0x3b;
+    switch (id)
+    {
+    case POW_ANT_DRV_CTRL:
+    case POW_ANT_DRV:
+        {
+            buffer.resize(7);
+            buffer[0] = 0xf1;
+            buffer[1] = 0x00;
+            buffer[2] = 0x36;
+            buffer[3] = 0x0a;
+            buffer[4] = 0x0a;
+            buffer[5] = 0x01;
+            buffer[6] = 0x3b;
+        }
+        break;
+
+    case STM:
+        {
+            buffer.resize(4);
+            buffer[0] = STM_DEFAULT_ADDR;
+            buffer[1] = RESET_ERROR;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+        }
+        break;
+
+    case TECH:
+        {
+            buffer.resize(4);
+            buffer[0] = TECH_DEFAULT_ADDR;
+            buffer[1] = RESET_ERROR;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+        }
+        break;
+    default:
+        break;
+    }
+
     QByteArray readData = send(port, buffer);
+    if (readData.size() > 3)
+    {
+        return readData[3];
+    }
+
+    return 0;
 }
 
 void COMPortSender::setPowerState(ModuleID id, PowerState state)
@@ -402,11 +467,11 @@ int COMPortSender::id_tech()
 
 QString COMPortSender::req_stm()
 {
-    if (m_STMActive)
+    if (isActive(STM))
     {
         QString res;
         QByteArray buffer(4, 0);
-        buffer[0] = 0x22;
+        buffer[0] = STM_DEFAULT_ADDR;
         buffer[1] = 0x02;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
@@ -432,11 +497,11 @@ QString COMPortSender::req_stm()
 
 QString COMPortSender::req_tech()
 {
-    if(m_TECHActive)
+    if(isActive(TECH))
     {
         QString res;
         QByteArray buffer(4, 0);
-        buffer[0] = 0x56;
+        buffer[0] = TECH_DEFAULT_ADDR;
         buffer[1] = 0x02;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
@@ -463,103 +528,82 @@ QString COMPortSender::req_tech()
     return "";
 }
 
-int COMPortSender::res_err_stm()
+int COMPortSender::softResetModule(ModuleID id)
 {
-    QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x03;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-    QByteArray readData1 = send(getPort(STM), buffer);
-    return readData1[3];
-}
+    Q_ASSERT(id == STM || id == TECH);
 
-int COMPortSender::res_err_tech()
-{
-    QByteArray buffer(4, 0);
-    buffer[0] = 0x56;
-    buffer[1] = 0x03;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-    QByteArray readData1 = send(getPort(TECH), buffer);
-    return readData1[3];
-}
+    setActive(id, false);
 
-int COMPortSender::res_stm()
-{
-    m_STMActive = false;
+    uint8_t moduleAddr = STM_DEFAULT_ADDR;
+    if (id == TECH)
+    {
+        moduleAddr = TECH_DEFAULT_ADDR;
+    }
+
     QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x04;
+    buffer[0] = moduleAddr;
+    buffer[1] = SOFT_RESET;
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    QSerialPort * port = getPort(STM);
+    QSerialPort * port = getPort(id);
     QByteArray readData1 = send(port, buffer);
 
-    port->close();
-    port->deleteLater();
-    m_ports[STM] = Q_NULLPTR;
+    resetPort(id);
+    setActive(id, true);
 
-    for(int i = 0; i < 500; i++) // i guess there is some sort of govnomagics
+    return readData1[3];
+}
+
+void COMPortSender::resetPort(ModuleID id)
+{
+    ModuleInfo info = m_modules.take(id);
+
+    info.port->close();
+    info.port->deleteLater();
+    info.port = Q_NULLPTR;
+
+    for(int i = 0; i < 500; i++) // i guess some sort of govnomagics here "freeze app for 5 seconds to restore COM port with module after reset"
     {
         Sleep(10);
         QApplication::processEvents();
     }
 
-    m_ports[STM] = createPort("com4");
-
-    m_STMActive = true;
-    return readData1[3];
+    info.port = createPort("");
+    m_modules[id] = info;
 }
 
-int COMPortSender::res_tech()
+bool COMPortSender::isActive(ModuleID id) const
 {
-    m_TECHActive = false;
-    QByteArray buffer(4, 0);
-    buffer[0] = 0x56;
-    buffer[1] = 0x04;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
+    return m_modules.value(id, ModuleInfo()).state;
+}
 
-    QSerialPort * port = getPort(TECH);
-    QByteArray readData1 = send(port, buffer);
+void COMPortSender::setActive(ModuleID id, bool state)
+{
+    ModuleInfo info = m_modules.take(id);
+    info.state = state;
+    m_modules[id] = info;
+}
 
-    port->close();
-    port->deleteLater();
-    m_ports[TECH] = Q_NULLPTR;
+int COMPortSender::getSoftwareVersion(ModuleID id)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == STM || id == TECH);
 
-    for(int i = 0; i < 500; i++) // i guess there is some sort of govnomagics
+    uint8_t moduleAddr = STM_DEFAULT_ADDR;
+    if (id == TECH)
     {
-        Sleep(10);
-        QApplication::processEvents();
+        moduleAddr = TECH_DEFAULT_ADDR;
     }
 
-    m_ports[TECH] = createPort("com8");
-    m_TECHActive = true;
-    return readData1[3];
-}
-
-int COMPortSender::fw_stm()
-{
     QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x06;
+    buffer[0] = moduleAddr;
+    buffer[1] = GET_SOWFTWARE_VER;
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    QByteArray readData1 = send(getPort(STM), buffer);
+    QByteArray readData1 = send(port, buffer);
     return (readData1[2] * 10 + readData1[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
 }
 
-int COMPortSender::fw_tech()
-{
-    QByteArray buffer(4, 0);
-    buffer[0] = 0x56;
-    buffer[1] = 0x06;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-    QByteArray readData1 = send(getPort(TECH), buffer);
-    return (readData1[2] * 10 + readData1[3]);// версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
-}
 

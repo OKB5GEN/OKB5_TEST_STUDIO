@@ -479,44 +479,45 @@ void MainWindow::statusRS()
     if(len1 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech= m_COMPortSender->tech_read_buf(1, len1);
+        result_tech = m_COMPortSender->tech_read_buf(1, len1);
         QString buf;
         QStringList list2 = result_tech.split(" ");
-        int s=list2.size ();
+        int s = list2.size();
         for(int i = 0; i < s - 1; i++)
         {
-            if(list2[i]=="em")
+            if(list2[i] == "em")
             {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер пуст");
             }
 
-            if(list2[i]=="uu")
+            if(list2[i] == "uu")
             {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер переполнен");
             }
             else
             {
-                buf+="0x";
+                buf += "0x";
                 char hex = list2[i].toInt();
-                buf+=QString::number(hex,16);
-                buf+="\n";
+                buf += QString::number(hex,16);
+                buf += "\n";
                 ui->tech_buf->setText(buf);
             }
         }
     }
 }
-void MainWindow::statusCAN ()
+
+void MainWindow::statusCAN()
 {
     int len2 = m_COMPortSender->tech_read(2);
     if(len2 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech = m_COMPortSender->tech_read_buf(2,len2);
+        result_tech = m_COMPortSender->tech_read_buf(2, len2);
         QString buf;
         QStringList list3 = result_tech.split(" ");
-        int s=list3.size ();
+        int s = list3.size ();
         for(int i = 0; i < s - 1; i++)
         {
             if(list3[i]=="em")
@@ -532,15 +533,16 @@ void MainWindow::statusCAN ()
             }
             else
             {
-                buf+="0x";
+                buf += "0x";
                 char hex = list3[i].toInt();
-                buf+=QString::number(hex,16);
-                buf+="\n";
+                buf += QString::number(hex, 16);
+                buf += "\n";
                 ui->tech_buf->setText(buf);
             }
         }
     }
 }
+
 void MainWindow::statusM()
 {
     QString res;
@@ -553,7 +555,8 @@ void MainWindow::statusM()
     ui->error_mod->setText (res);
 
 }
-void MainWindow::status_OTD (QString data)
+
+void MainWindow::status_OTD(QString data)
 {
     if(data != "")
     {
@@ -1042,7 +1045,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
 
 void MainWindow::on_res_err_stm_clicked()
 {
-    if(m_COMPortSender->res_err_stm() != 1)
+    if(m_COMPortSender->resetError(COMPortSender::STM) != 1)
     {
         ui->error_mod->setText(" Не удалось сбросить ошибку!");
     }
@@ -1065,52 +1068,72 @@ void MainWindow::OTD_err_res(int x)
 
 void MainWindow::on_res_err_tech_clicked()
 {
-    if(m_COMPortSender->res_err_tech()!=1)
+    if(m_COMPortSender->resetError(COMPortSender::TECH) != 1)
+    {
         ui->error_mod->setText(" Не удалось сбросить ошибку!");
+    }
 }
 
 void MainWindow::on_pushButton_res_stm_clicked()
 {
-    if(m_COMPortSender->res_stm()!=1)
+    if(m_COMPortSender->softResetModule(COMPortSender::STM) != 1)
+    {
         ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    }
 }
 
 void MainWindow::on_pushButton_res_tech_clicked()
 {
-    if(m_COMPortSender->res_tech()!=1)
+    if(m_COMPortSender->softResetModule(COMPortSender::TECH) != 1)
+    {
         ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    }
 }
+
 void MainWindow::on_pushButton_res_otd_clicked()
 {
     connect(this, SIGNAL( OTD_res()), myOTD, SLOT(res_OTD()));
     emit OTD_res();
     disconnect(this, SIGNAL( OTD_res()), myOTD, SLOT(res_OTD()));
 }
+
 void MainWindow::OTD_res_st(int x)
 {
     if(x!=1)
+    {
         ui->error_mod->setText(" Не удалось провести перезагрузку!");
+    }
 }
+
 void MainWindow::OTD_id()
 {
     ui->error_mod->setText(" Модуль ОТД установлен не в свой слот!");
 }
+
 void MainWindow::on_pushButton_6_clicked()
 {
-    double v = m_COMPortSender->fw_stm();
-    if(v==2)
+    double v = m_COMPortSender->getSoftwareVersion(COMPortSender::STM);
+    if(v == 2)
+    {
         ui->error_mod->setText(" Не удалось узнать версию прошивки!");
+    }
     else
-        ui->lineEdit->setText (QString::number(v/10));
+    {
+        ui->lineEdit->setText(QString::number(v / 10));
+    }
 }
 
 void MainWindow::on_pushButton_9_clicked()
 {
-    double v = m_COMPortSender->fw_tech();
-    if(v==2)
+    double v = m_COMPortSender->getSoftwareVersion(COMPortSender::TECH);
+    if(v == 2)
+    {
         ui->error_mod->setText(" Не удалось узнать версию прошивки!");
+    }
     else
-        ui->lineEdit_4->setText (QString::number(v/10));
+    {
+        ui->lineEdit_4->setText (QString::number(v / 10));
+    }
 }
 
 void MainWindow::on_pushButton_13_clicked()
@@ -1122,19 +1145,25 @@ void MainWindow::on_pushButton_13_clicked()
 
 void MainWindow::OTD_fw(double x)
 {
-    if(x==2)ui->error_mod->setText(" Не удалось узнать версию прошивки!");
-    else ui->lineEdit_5->setText (QString::number(x/10));
+    if (x == 2)
+    {
+        ui->error_mod->setText(" Не удалось узнать версию прошивки!");
+    }
+    else
+    {
+        ui->lineEdit_5->setText (QString::number(x/10));
+    }
 }
 
 void MainWindow::OTDPTdata(double x,double y)
 {
-    x=x/100;
-    y=y/100;
+    x = x / 100;
+    y = y / 100;
     ui->OTDerror->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
-    if(x==-256)ui->OTDerror->setText("Ошибка измерения датчика");
-    if(y==-256)ui->OTDerror->setText("Ошибка измерения датчика");
-    if(x>1790)ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-    if(y>1790)ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+    if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+    if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
     ui->OTDPT1->setText(QString::number(x));
     ui->OTDPT2->setText(QString::number(y));
 }
@@ -1239,16 +1268,19 @@ void MainWindow::on_MKO_osn_clicked()
 
 void MainWindow::on_MKO_rez_clicked()
 {
-    if(flag_mko_rez==0){
-        flag_mko_rez=2;
+    if(flag_mko_rez == 0)
+    {
+        flag_mko_rez = 2;
         ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(flag_mko_rez==2){
-        flag_mko_rez=0;
+    else if(flag_mko_rez == 2)
+    {
+        flag_mko_rez = 0;
         ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
+
     connect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
-    emit MKO_ch(flag_mko_osn+flag_mko_rez);
+    emit MKO_ch(flag_mko_osn + flag_mko_rez);
     disconnect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
 }
 
@@ -1259,7 +1291,7 @@ void MainWindow::on_MKO_test_clicked()
     QString S2 = ui->lineEdit_Addr_3->text();
     int u2 = S2.toInt();
     connect(this, SIGNAL( MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
-    emit MKO_ts(flag_mko_osn+flag_mko_rez,u1,u2);
+    emit MKO_ts(flag_mko_osn + flag_mko_rez,u1,u2);
     disconnect(this, SIGNAL( MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
 }
 
@@ -1294,7 +1326,6 @@ void MainWindow::on_pushButton_12_clicked()
     disconnect(this, SIGNAL( MKO_cm_r(int,int,int)), myMKO, SLOT(MKO_rc_cm(int,int,int)));
 }
 
-
 void MainWindow::MKO_change_ch(int x, int y)
 {
     m_COMPortSender->stm_on_mko(x,y);
@@ -1308,17 +1339,17 @@ void MainWindow::on_MKO_avt_clicked()
     int u2 = S2.toInt();
     QString S3 = ui->lineEdit_period->text();
     int u3 = S3.toInt();
-    if(flag_mko_auto==0)
+    if(flag_mko_auto == 0)
     {
-        flag_mko_auto=1;
+        flag_mko_auto = 1;
         ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
         connect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
         emit MKO_auto(flag_mko_auto,u3,u1,u2);
         disconnect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
     }
-    else if(flag_mko_auto==1)
+    else if(flag_mko_auto == 1)
     {
-        flag_mko_auto=0;
+        flag_mko_auto = 0;
         ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
         connect(this, SIGNAL( MKO_auto(int,int,int,int)), myMKO, SLOT(MKO_avt(int,int,int,int)));
         emit MKO_auto(flag_mko_auto,u3,u1,u2);
@@ -1330,17 +1361,17 @@ void MainWindow::on_OTD_avt_2_clicked()
 {
     QString S3 = ui->lineEdit_period_OTD->text();
     int u3 = S3.toInt();
-    if(flag_otd_auto==0)
+    if(flag_otd_auto == 0)
     {
-        flag_otd_auto=1;
+        flag_otd_auto = 1;
         ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
         connect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));
         emit OTD_auto(flag_otd_auto,u3*1000);
         disconnect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));
     }
-    else if(flag_otd_auto==1)
+    else if(flag_otd_auto == 1)
     {
-        flag_otd_auto=0;
+        flag_otd_auto = 0;
         ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
         connect(this, SIGNAL( OTD_auto(int,int)), myOTD, SLOT(OTD_avt(int,int)));
         emit OTD_auto(flag_otd_auto,u3);

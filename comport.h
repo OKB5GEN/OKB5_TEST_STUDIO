@@ -38,6 +38,7 @@ public:
         RESET_ERROR                     = 0x03,
         SOFT_RESET                      = 0x04,
         //RESERVED_0x05 = 0x05,
+        GET_SOWFTWARE_VER               = 0x06,
         ECHO                            = 0x07,
         //RESERVED_0x08 = 0x08,
         //RESERVED_0x09 = 0x09,
@@ -82,12 +83,15 @@ public:
 
     void createPorts();
 
-    void resetError(ModuleID id);
+    int resetError(ModuleID id);
     void setPowerState(ModuleID id, PowerState state);
     void setVoltageAndCurrent(ModuleID id, double voltage);
     void setMaxVoltageAndCurrent(ModuleID id, double voltage, double current);
     int setPowerChannelState(int channel, PowerState state); // 1-3 POW_ANT_DRV_CTRL channels (1 and 2 used as main and reserve), 4-6 channels
     void getCurVoltageAndCurrent(ModuleID id, double& voltage, double& current, uint8_t& error);
+    int getSoftwareVersion(ModuleID id);
+
+    int softResetModule(ModuleID id);
 
     //TODO check the necessity for public and method names
     void startPower();
@@ -96,12 +100,6 @@ public:
 
     QString req_stm();
     QString req_tech();
-    int res_err_stm();
-    int res_err_tech();
-    int res_stm();
-    int res_tech();
-    int fw_stm();
-    int fw_tech();
 
     int stm_on_mko(int y, int x);
 
@@ -113,7 +111,7 @@ public:
     QString tech_read_buf(int x, int len);
 
 private:
-    enum ValueID
+    enum ValueID // TODO Power unit documentation
     {
         MAX_VOLTAGE_VAL = 0x26,
         MAX_CURRENT_VAL = 0x27,
@@ -121,17 +119,25 @@ private:
         CUR_CURRENT_VAL = 0x33
     };
 
-    void setPowerValue(uint8_t valueID, double value, double maxValue, QSerialPort * port);
+    struct ModuleInfo
+    {
+        QSerialPort * port;
+        bool state; // true/false - module active/inactive
+        uint8_t address; // default module address
+    };
 
+    void setPowerValue(uint8_t valueID, double value, double maxValue, QSerialPort * port);
     QSerialPort* createPort(const QString& name);
     QByteArray send(QSerialPort * port, QByteArray data); // returns response
+
+    void setActive(ModuleID id, bool state);
+    void resetPort(ModuleID id);
+
     QSerialPort* getPort(ModuleID id);
+    bool isActive(ModuleID id) const;
+    uint8_t getAddress(ModuleID id) const;
 
-    QMap<ModuleID, QSerialPort*> m_ports;
-
-    //TODO Refactor: possibly it would be better to have map<module_id, module_state(active/incative)>
-    bool m_TECHActive = true;
-    bool m_STMActive = true;
+    QMap<ModuleID, ModuleInfo> m_modules;
 };
 
 #endif
