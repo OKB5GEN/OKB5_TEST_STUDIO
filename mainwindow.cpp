@@ -425,14 +425,12 @@ void MainWindow::on_pushButton_start_com5_clicked()
 void MainWindow::paintvalue()
 {
     double u1, u2, i1, i2;
-    int er1, er2;
+    uint8_t er1, er2;
+
     ui->tech_error->setText("");
-    u1 = m_COMPortSender->readcom6U();
-    i1 = m_COMPortSender->readcom6I();
-    u2 = m_COMPortSender->readcom5U();
-    i2 = m_COMPortSender->readcom5I();
-    er1 = m_COMPortSender->readerr11I();
-    er2 = m_COMPortSender->readerr4I();
+    m_COMPortSender->getCurVoltageAndCurrent(COMPortSender::POW_ANT_DRV, u1, i1, er1);
+    m_COMPortSender->getCurVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, u2, i2, er2);
+
     ui->err1->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
     ui->err2->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
     if(er1 != 0)
@@ -455,6 +453,7 @@ void MainWindow::paintvalue()
     if(er1==2) ui->err1->setText("Overcurrent protection!");
     if(er1==4) ui->err1->setText("Overpower protection!");
     if(er1==8) ui->err1->setText("Overtemperature protection!");
+
     if(er2==1) ui->err2->setText("Overvoltage protection!");
     if(er2==2) ui->err2->setText("Overcurrent protection!");
     if(er2==4) ui->err2->setText("Overpower protection!");
@@ -462,6 +461,7 @@ void MainWindow::paintvalue()
 
     ui->U1out->setText(QString::number(u1 / 100));
     ui->U2out->setText(QString::number(u2 / 100));
+
     if(k > 500) // wtf?
     {
         k = 0;
@@ -473,7 +473,7 @@ void MainWindow::paintvalue()
     plot_point();
 }
 
-void MainWindow::statusRS ()
+void MainWindow::statusRS()
 {
     int len1 = m_COMPortSender->tech_read(1);
     if(len1 != 0)
@@ -490,6 +490,7 @@ void MainWindow::statusRS ()
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер пуст");
             }
+
             if(list2[i]=="uu")
             {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -523,6 +524,7 @@ void MainWindow::statusCAN ()
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
                 ui->tech_error->setText(" Буфер пуст");
             }
+
             if(list3[i]=="uu")
             {
                 ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -647,38 +649,38 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    if(m_COMPortSender->stm_on_com6(1, 1) == 1 && flag_con1 == 0)
+    if(m_COMPortSender->setPowerChannelState(1, COMPortSender::POWER_ON) == 1 && flag_con1 == 0)
     {
-        flag_con1=1;
+        flag_con1 = 1;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com6(1, 0) == 1 && flag_con1 == 1)
+    else if(m_COMPortSender->setPowerChannelState(1, COMPortSender::POWER_OFF) == 1 && flag_con1 == 1)
     {
-        flag_con1=0;
+        flag_con1 = 0;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
 void MainWindow::on_pushButton_7_clicked()
 {
-    if(m_COMPortSender->stm_on_com6(2,1) == 1 && flag_con3 == 0)
+    if(m_COMPortSender->setPowerChannelState(2, COMPortSender::POWER_ON) == 1 && flag_con3 == 0)
     {
-        flag_con3=1;
+        flag_con3 = 1;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com6(2, 0) == 1 && flag_con3 == 1)
+    else if(m_COMPortSender->setPowerChannelState(2, COMPortSender::POWER_OFF) == 1 && flag_con3 == 1)
     {
-        flag_con3=0;
+        flag_con3 = 0;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
 void MainWindow::on_pushButton_5_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(4, 1) == 1 && flag_con2 == 0)
+    if(m_COMPortSender->setPowerChannelState(4, COMPortSender::POWER_ON) == 1 && flag_con2 == 0)
     {
         flag_con2 = 1;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(4, 0) == 1 && flag_con2 == 1)
+    else if(m_COMPortSender->setPowerChannelState(4, COMPortSender::POWER_OFF) == 1 && flag_con2 == 1)
     {
         flag_con2 = 0;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -687,12 +689,12 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(5, 1) == 1 && flag_con4 == 0)
+    if(m_COMPortSender->setPowerChannelState(5, COMPortSender::POWER_ON) == 1 && flag_con4 == 0)
     {
         flag_con4 = 1;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(5, 0) == 1 && flag_con4 == 1)
+    else if(m_COMPortSender->setPowerChannelState(5, COMPortSender::POWER_OFF) == 1 && flag_con4 == 1)
     {
         flag_con4 = 0;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -701,14 +703,14 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_pushButton_10_clicked()
 {
-    if(m_COMPortSender->stm_on_com5(6, 1) == 1 && flag_con5 == 0)
+    if(m_COMPortSender->setPowerChannelState(6, COMPortSender::POWER_ON) == 1 && flag_con5 == 0)
     {
-        flag_con5=1;
+        flag_con5 = 1;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->stm_on_com5(6, 0) == 1 && flag_con5 == 1)
+    else if(m_COMPortSender->setPowerChannelState(6, COMPortSender::POWER_OFF) == 1 && flag_con5 == 1)
     {
-        flag_con5=0;
+        flag_con5 = 0;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }

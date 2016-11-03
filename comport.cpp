@@ -9,7 +9,7 @@ namespace
 {
     static const uint8_t MAX_VOLTAGE = 42; // volts
     static const uint8_t MAX_CURRENT = 10; // ampers
-    static const uint8_t MAX_POWER = 155; // watts
+    static const uint8_t MAX_POWER = 155; // watts actually 160, but for safety purposes reduced to 155
 }
 
 COMPortSender::COMPortSender(QObject *parent):
@@ -98,13 +98,13 @@ void COMPortSender::startPower()
     setVoltageAndCurrent(POW_ANT_DRV_CTRL, 0.5);
 }
 
-int COMPortSender::stm_on_com6(int y,int x)
+int COMPortSender::setPowerChannelState(int channel, PowerState state)
 {
     QByteArray buffer(4, 0);
     buffer[0] = 0x22;
     buffer[1] = 0x0b;
-    buffer[2] = y;
-    buffer[3] = x;
+    buffer[2] = channel;
+    buffer[3] = (state == POWER_ON) ? 1 : 0;
 
     QByteArray readData1 = send(getPort(STM), buffer);
     return readData1[3];
@@ -133,17 +133,6 @@ int COMPortSender::stm_check_fuse(int fuse)
     return readData1[3];
 }
 
-int COMPortSender::stm_on_com5(int y, int x)
-{
-    QByteArray buffer(4, 0);
-    buffer[0] = 0x22;
-    buffer[1] = 0x0b;
-    buffer[2] = y;
-    buffer[3] = x;
-    QByteArray readData1 = send(getPort(STM), buffer);
-    return readData1[3];
-}
-
 int COMPortSender::tech_send(int com, int x, int y)
 {
     QByteArray buffer(4, 0);
@@ -157,7 +146,7 @@ int COMPortSender::tech_send(int com, int x, int y)
 
 int COMPortSender::tech_read(int x)
 {
-    if(m_flag_res_tech == 1)
+    if(m_TECHActive)
     {
         //TODO remove magic numbers
         int y = 0;
@@ -212,16 +201,16 @@ QString COMPortSender::tech_read_buf(int x,int len)
 
         if(readData2.at(2) == 1)
         {
-            result+="em ";
+            result += "em ";
         }
 
         if(readData2.at(2) == 2)
         {
-            result+="uu ";
+            result += "uu ";
         }
 
-        result+=readData2[3];
-        result+=" ";
+        result += readData2[3];
+        result += " ";
         QApplication::processEvents();
     }
 
@@ -230,7 +219,7 @@ QString COMPortSender::tech_read_buf(int x,int len)
 
 double COMPortSender::stm_data_ch(int ch)
 {
-    if (m_flag_res_stm == 1)
+    if (m_STMActive)
     {
         QByteArray buffer(4, 0);
         buffer[0] = 0x22;
@@ -289,67 +278,21 @@ void COMPortSender::setPowerState(ModuleID id, PowerState state)
     QByteArray readData1 = send(port, buffer);
 }
 
-void COMPortSender::setVoltageAndCurrent(ModuleID id, double voltage)
+void COMPortSender::setPowerValue(uint8_t valueID, double value, double maxValue, QSerialPort * port)
 {
-    QSerialPort * port = getPort(id);
-    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
-
-    // set voltage
     QByteArray buffer(7, 0);
-    uint32_t valU = (voltage * 0xFF * 100) / MAX_VOLTAGE;
-    buffer[0] = 0xf1;
-    buffer[1] = 0x00;
-    buffer[2] = 0x32;
-    buffer[3] = (valU >> 8) & 0xFF;
-    buffer[4] = valU & 0xFF;
-    uint16_t sum = 0;
-    for(int i = 0; i < 5; i++)
+    uint32_t val = uint32_t((value * 256 * 100) / maxValue);
+
+    if(val > (256 * 100))
     {
-        uint8_t s = buffer[i];
-        sum = (sum + s) & 0xFFFF;
-    }
-
-    buffer[5] =((sum >> 8) & 0xFF);
-    buffer[6] = (sum  & 0xFF);
-
-    QByteArray readData = send(port, buffer);
-
-    // set current depending on max device power and voltage
-    uint32_t vali = (MAX_POWER * 0xFF * 100 / voltage) / MAX_CURRENT;
-    if(vali > (0xFF * 100))
-    {
-        vali = (0xFF * 100);
+        val = (256 * 100);
     }
 
     buffer[0] = 0xf1;
     buffer[1] = 0x00;
-    buffer[2] = 0x33;
-    buffer[3] = (vali >> 8) & 0xFF;
-    buffer[4] = vali & 0xFF;
-    sum = 0;
-    for(int i = 0; i < 5; i++)
-    {
-        uint8_t s = buffer[i];
-        sum = (sum + s) & 0xFFFF;
-    }
-
-    buffer[5] =((sum >> 8) & 0xFF);
-    buffer[6] = (sum  & 0xFF);
-    QByteArray readData1 = send(port, buffer);
-}
-
-void COMPortSender::setMaxVoltageAndCurrent(ModuleID id, double voltage, double current)
-{
-    QSerialPort * port = getPort(id);
-    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
-
-    QByteArray buffer(7, 0);
-    uint32_t valU = (voltage * (0xFF * 100)) / MAX_VOLTAGE;//U
-    buffer[0] = 0xf1;
-    buffer[1] = 0x00;
-    buffer[2] = 0x26;
-    buffer[3] = (valU >> 8) & 0xFF;
-    buffer[4] = valU & 0xFF;
+    buffer[2] = valueID;
+    buffer[3] = (val >> 8) & 0xFF;
+    buffer[4] = val & 0xFF;
     uint16_t sum = 0;
     for(int i = 0; i < 5; i++)
     {
@@ -360,30 +303,33 @@ void COMPortSender::setMaxVoltageAndCurrent(ModuleID id, double voltage, double 
     buffer[5] = ((sum >> 8) & 0xFF);
     buffer[6] = (sum & 0xFF);
     QByteArray readData = send(port, buffer);
-
-    uint32_t vali = (current * (0xFF * 100)) / MAX_CURRENT;//I
-    buffer[0] = 0xf1;
-    buffer[1] = 0x00;
-    buffer[2] = 0x27;
-    buffer[3] = (vali >> 8) & 0xFF;
-    buffer[4] = vali & 0xFF;
-    sum = 0;
-
-    for(int i = 0; i < 5; i++)
-    {
-        uint8_t s = buffer[i];
-        sum = (sum + s) & 0xFFFF;
-    }
-
-    buffer[5] =((sum >> 8) & 0xFF);
-    buffer[6] = (sum & 0xFF);
-
-    QByteArray readData1 = send(port, buffer);
 }
 
-
-int COMPortSender::readcom5U()
+void COMPortSender::setMaxVoltageAndCurrent(ModuleID id, double voltage, double current)
 {
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    // TODO make constants
+    setPowerValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE, port);
+    setPowerValue(MAX_CURRENT_VAL, current, MAX_CURRENT, port);
+}
+
+void COMPortSender::setVoltageAndCurrent(ModuleID id, double voltage)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    // TODO make constants
+    setPowerValue(CUR_VOLTAGE_VAL, voltage, MAX_VOLTAGE, port);
+    setPowerValue(CUR_CURRENT_VAL, ((double)MAX_POWER) / voltage, MAX_CURRENT, port);
+}
+
+void COMPortSender::getCurVoltageAndCurrent(ModuleID id, double& voltage, double& current, uint8_t& error)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
     QByteArray buffer(5, 0);
     buffer[0] = 0x75;
     buffer[1] = 0x00;
@@ -391,64 +337,21 @@ int COMPortSender::readcom5U()
     buffer[3] = 0x00;
     buffer[4] = 0xbc;
 
-    QByteArray readData = send(getPort(POW_ANT_DRV), buffer);
+    QByteArray readData = send(port, buffer);
 
     uint8_t uu1, uu2;
-    m_er2 = (readData[4] >> 4);
+    error = (readData[4] >> 4);
+
     uu1 = readData[5];
     uu2 = readData[6];
-    double uu = (uu1 << 8) | uu2;
-    uu = uu * MAX_VOLTAGE / 0xFF; //
+    voltage = (uu1 << 8) | uu2;
+    voltage = voltage * MAX_VOLTAGE / 256;
+
     uu1 = readData[7];
     uu2 = readData[8];
-    m_ii2 = (uu1 << 8) | uu2;
-    m_ii2 = m_ii2 * MAX_CURRENT / 0xFF;
-    return uu;
+    current = (uu1 << 8) | uu2;
+    current = current * MAX_CURRENT / 256;
 }
-
-int COMPortSender::readcom5I()
-{
-    return m_ii1;
-}
-
-int COMPortSender::readerr4I()
-{
-    return m_er2;
-}
-
-int COMPortSender::readerr11I()
-{
-    return m_er1;
-}
-
-int COMPortSender::readcom6U()
-{
-    QByteArray buffer(5, 0);
-    buffer[0] = 0x75;
-    buffer[1] = 0x00;
-    buffer[2] = 0x47;
-    buffer[3] = 0x00;
-    buffer[4] = 0xbc;
-    QByteArray readData = send(getPort(POW_ANT_DRV_CTRL), buffer);
-    uint8_t uu1, uu2;
-    m_er1 = (readData[4] >> 4);
-    uu1 = readData[5];
-    uu2 = readData[6];
-    double uu = (uu1 << 8) | uu2;
-    uu = uu * MAX_VOLTAGE / 0xFF;
-    uu1 = readData[7];
-    uu2 = readData[8];
-    m_ii1 = (uu1 << 8) | uu2;
-    m_ii1 = m_ii1 * MAX_CURRENT / 0xFF;
-    return uu;
-}
-
-int COMPortSender::readcom6I()
-{
-    return m_ii1;
-}
-
-
 
 int COMPortSender::id_stm()
 {
@@ -469,10 +372,8 @@ int COMPortSender::id_stm()
     {
         return 1;
     }
-    else
-    {
-        return 0;
-    }
+
+    return 0;
 }
 
 int COMPortSender::id_tech()
@@ -491,19 +392,17 @@ int COMPortSender::id_tech()
 
     QByteArray readData2 = send(getPort(TECH), buffer);
 
-    if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
+    if (readData1[2] == readData2[2] && readData1[3] == readData2[3])
     {
         return 1;
     }
-    else
-    {
-        return 0;
-    }
+
+    return 0;
 }
 
 QString COMPortSender::req_stm()
 {
-    if(m_flag_res_stm == 1)
+    if (m_STMActive)
     {
         QString res;
         QByteArray buffer(4, 0);
@@ -512,20 +411,19 @@ QString COMPortSender::req_stm()
         buffer[2] = 0x00;
         buffer[3] = 0x00;
         QByteArray readData1 = send(getPort(STM), buffer);
-        uint8_t x=readData1[2];
+        uint8_t x = readData1[2];
         uint8_t z1, z2, z3;
-        res="";
-        z1=x>>7;
-        z2=x<<1;
-        z2=z2>>7;
-        z3=x<<2;
-        z3=z3>>7;
-        if(z1==0)
-            res+=" СТМ не готов к работе! \n";
-        if(z2==1)
-            res+=" Ошибки у модуля СТМ! \n";
-        if(z3==1)
-            res+=" Модуль СТМ после перезагрузки! \n";
+        z1 = x >> 7;
+        z2 = x << 1;
+        z2 = z2 >> 7;
+        z3 = x << 2;
+        z3 = z3 >> 7;
+        if(z1 == 0)
+            res += " СТМ не готов к работе! \n";
+        if(z2 == 1)
+            res += " Ошибки у модуля СТМ! \n";
+        if(z3 == 1)
+            res += " Модуль СТМ после перезагрузки! \n";
         return res;
     }
 
@@ -534,7 +432,7 @@ QString COMPortSender::req_stm()
 
 QString COMPortSender::req_tech()
 {
-    if(m_flag_res_tech==1)
+    if(m_TECHActive)
     {
         QString res;
         QByteArray buffer(4, 0);
@@ -544,23 +442,24 @@ QString COMPortSender::req_tech()
         buffer[3] = 0x00;
 
         QByteArray readData1 = send(getPort(TECH), buffer);
-        uint8_t x=readData1[2];
+        uint8_t x = readData1[2];
         uint8_t z1, z2, z3;
-        z1=x>>7;
-        z2=x<<1;
-        z2=z2>>7;
-        z3=x<<2;
-        z3=z3>>7;
+        z1 = x >> 7;
+        z2 = x << 1;
+        z2 = z2 >> 7;
+        z3 = x << 2;
+        z3 = z3 >> 7;
         if(z1 == 0)
-            res+=" Технол. модуль не готов к работе! \n";
+            res += " Технол. модуль не готов к работе! \n";
         if(z2 == 1)
-            res+=" Ошибки у Технол. модуля! \n";
+            res += " Ошибки у Технол. модуля! \n";
         if(z3 == 1)
-            res+=" Модуль Технол. после перезагрузки! \n";
+            res += " Модуль Технол. после перезагрузки! \n";
         if(readData1.at(3)==0x10)
-            res+=" Потеря байта из-за переполнения буфера RS485! \n";
+            res += " Потеря байта из-за переполнения буфера RS485! \n";
         return res;
     }
+
     return "";
 }
 
@@ -588,7 +487,7 @@ int COMPortSender::res_err_tech()
 
 int COMPortSender::res_stm()
 {
-    m_flag_res_stm = 0;
+    m_STMActive = false;
     QByteArray buffer(4, 0);
     buffer[0] = 0x22;
     buffer[1] = 0x04;
@@ -602,7 +501,7 @@ int COMPortSender::res_stm()
     port->deleteLater();
     m_ports[STM] = Q_NULLPTR;
 
-    for(int i = 0; i < 300; i++) // i guess there is some sort of govnomagics
+    for(int i = 0; i < 500; i++) // i guess there is some sort of govnomagics
     {
         Sleep(10);
         QApplication::processEvents();
@@ -610,13 +509,13 @@ int COMPortSender::res_stm()
 
     m_ports[STM] = createPort("com4");
 
-    m_flag_res_stm = 1;
+    m_STMActive = true;
     return readData1[3];
 }
 
 int COMPortSender::res_tech()
 {
-    m_flag_res_tech = 0;
+    m_TECHActive = false;
     QByteArray buffer(4, 0);
     buffer[0] = 0x56;
     buffer[1] = 0x04;
@@ -628,16 +527,16 @@ int COMPortSender::res_tech()
 
     port->close();
     port->deleteLater();
-    m_ports[STM] = Q_NULLPTR;
+    m_ports[TECH] = Q_NULLPTR;
 
-    for(int i = 0; i < 400; i++) // i guess there is some sort of govnomagics
+    for(int i = 0; i < 500; i++) // i guess there is some sort of govnomagics
     {
         Sleep(10);
         QApplication::processEvents();
     }
 
     m_ports[TECH] = createPort("com8");
-    m_flag_res_tech = 1;
+    m_TECHActive = true;
     return readData1[3];
 }
 
@@ -664,16 +563,3 @@ int COMPortSender::fw_tech()
     return (readData1[2] * 10 + readData1[3]);// версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
 }
 
-void COMPortSender::Remote_OFF()
-{
-    QByteArray buffer(7, 0);
-    buffer[0] = 0xf1;
-    buffer[1] = 0x00;
-    buffer[2] = 0x36;
-    buffer[3] = 0x10;
-    buffer[4] = 0x00;
-    buffer[5] = 0x01;
-    buffer[6] = 0x37;
-    QByteArray readData1 = send(getPort(POW_ANT_DRV_CTRL), buffer);
-    QByteArray readData2 = send(getPort(POW_ANT_DRV), buffer);
-}
