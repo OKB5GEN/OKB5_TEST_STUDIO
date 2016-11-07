@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QString>
 
+class QSerialPort;
+
 class OTD:public QObject
 {
     Q_OBJECT
@@ -52,6 +54,8 @@ signals:
 
 private:
     QString name;
+
+    QByteArray send(QSerialPort * port, QByteArray data, double readTimeout, double delayBeforeRecv = 0);
 };
 
 #endif

@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     myclass.cpp \
     comport.cpp \
     OTD.cpp \
-    MKO.cpp
+    MKO.cpp \
+    Sources/command.cpp \
+    Sources/commandscontroller.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -30,7 +32,9 @@ HEADERS  += mainwindow.h \
     comport.h \
     OTD.h \
     WDMTMKv2.h \
-    MKO.h
+    MKO.h \
+    Headers/command.h \
+    Headers/commandscontroller.h
 
 
 FORMS    += mainwindow.ui

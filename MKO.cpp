@@ -379,8 +379,10 @@ void MKO::pow_DY(int x, int adr)
         buf[1]=32;
         buf[2]=32;
     }
-    else     {
-        if(ch_cur!=2&&ch_cur==1){
+    else
+    {
+        if(ch_cur!=2&&ch_cur==1)
+        {
             stopMKO();
             Sleep(100);
             emit MKO_CTM(1,0);

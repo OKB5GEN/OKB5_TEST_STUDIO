@@ -23,6 +23,28 @@ OTD::OTD(QString s) : name(s)
 
 }
 
+QByteArray OTD::send(QSerialPort * port, QByteArray data, double readTimeout, double delayBeforeRecv /*= 0*/)
+{
+    QByteArray readData;
+    if (port->isOpen())
+    {
+        port->QIODevice::write(data);
+        port->waitForBytesWritten(-1);
+
+        if (delayBeforeRecv > 0)
+        {
+            Sleep(delayBeforeRecv);
+        }
+
+        readData = port->readAll();
+        while (port->waitForReadyRead(readTimeout))
+        {
+            readData.append(port->readAll());
+        }
+    }
+
+    return readData;
+}
 void OTD::COMConnectorOTD()
 {
     com7 = new QSerialPort("com7");
@@ -36,6 +58,7 @@ void OTD::COMConnectorOTD()
     OTDtemper();
 
 }
+
 void OTD::OTD_id()
 {
     bw.resize(4);
@@ -43,36 +66,30 @@ void OTD::OTD_id()
     bw[1] = 0x01;
     bw[2] = 0x00;
     bw[3] = 0x01;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(100))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 100);
 
     bw[0] = 0xff;
     bw[1] = 0x01;
     bw[2] = 0x00;
     bw[3] = 0x02;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    readData0 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData0.append(com7->readAll());
-    if(readData1[2]!=readData0[2] || readData1[3]!=readData0[3]) emit OTD_id1();
+
+    readData0 = send(com7, bw, 500);
+
+    if(readData1[2]!=readData0[2] || readData1[3]!=readData0[3])
+        emit OTD_id1();
 }
-void OTD::OTD_req(){
-    if(flag_otd==1){
+
+void OTD::OTD_req()
+{
+    if(flag_otd==1)
+    {
         QString res;
         bw.resize(4);
         bw[0] = 0x44;
         bw[1] = 0x02;
         bw[2] = 0x00;
         bw[3] = 0x00;
-        com7->QIODevice::write(bw);
-        com7->waitForBytesWritten(-1);
-        QByteArray readData1 = com7->readAll();
-        while (com7->waitForReadyRead(100))
-            readData1.append(com7->readAll());
+        QByteArray readData1 = send(com7, bw, 100);
         uint8_t x=readData1[2];
         uint8_t z1, z2, z3;
         res="";
@@ -94,11 +111,7 @@ void OTD::OTD_fw()
     bw[1] = 0x06;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(100))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 100);
     emit OTD_vfw(readData1[2]*10+readData1[3]);
 }
 void OTD::res_OTD()
@@ -109,13 +122,10 @@ void OTD::res_OTD()
     bw[1] = 0x04;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(100))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 100);
     COMCloseOTD();
-    for(int i=0;i<400;i++){
+    for(int i=0;i<400;i++)
+    {
         Sleep(10);
         QApplication::processEvents();
     }
@@ -130,11 +140,7 @@ void OTD::err_res_OTD()
     bw[1] = 0x03;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(100))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 100);
     emit OTD_err_res(readData1[3]);
 }
 void OTD::OTDres1()
@@ -144,11 +150,7 @@ void OTD::OTDres1()
     bw[1] = 0x26;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 500);
     if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
 }
 void OTD::OTDres2()
@@ -158,14 +160,11 @@ void OTD::OTDres2()
     bw[1] = 0x27;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 500);
     if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
     else emit err_OTD("");
 }
+
 void OTD::OTDmeas1()
 {
     bw.resize(4);
@@ -173,12 +172,7 @@ void OTD::OTDmeas1()
     bw[1] = 0x28;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    Sleep(2000);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 500, 2000);
     if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 1-й линии!");
     OTDtm1();
 }
@@ -189,12 +183,7 @@ void OTD::OTDmeas2()
     bw[1] = 0x29;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    Sleep(2000);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 500, 2000);
     if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 2-й линии!");
     OTDtm2();
 }
@@ -207,11 +196,7 @@ void OTD::OTDtemper()
     bw[1] = 0x1e;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    readData0 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData0.append(com7->readAll());
+    readData0 = send(com7, bw, 500);
     len1=readData0[2];
     data+=QString::number(len1);
     data+="\n";
@@ -226,11 +211,7 @@ void OTD::OTDtemper()
             bw[1] = 0x2a;
             bw[2] = j;
             bw[3] = k;
-            com7->QIODevice::write(bw);
-            com7->waitForBytesWritten(-1);
-            QByteArray readData3 = com7->readAll();
-            while (com7->waitForReadyRead(100))
-                readData3.append(com7->readAll());
+            QByteArray readData3 = send(com7, bw, 100);
             data+=QString::number(readData3[2],16);
         }
         data+= "\n";
@@ -244,11 +225,7 @@ void OTD::OTDtemper()
     bw[1] = 0x1d;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData3 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData3.append(com7->readAll());
+    QByteArray readData3 = send(com7, bw, 500);
     len2=readData3[2];
     data+=QString::number(len2);
     data+="\n";
@@ -263,11 +240,7 @@ void OTD::OTDtemper()
             bw[1] = 0x2a;
             bw[2] = j;
             bw[3] = k;
-            com7->QIODevice::write(bw);
-            com7->waitForBytesWritten(-1);
-            QByteArray readData4 = com7->readAll();
-            while (com7->waitForReadyRead(100))
-                readData4.append(com7->readAll());
+            QByteArray readData4 = send(com7, bw, 100);
             data+=QString::number(readData4[2],16);
         }
         data+= "\n";
@@ -279,7 +252,8 @@ void OTD::OTDtemper()
 void OTD::OTDtm1()
 {
     temp="";
-    for(int i=1;i<=len1;i++){
+    for(int i=1;i<=len1;i++)
+    {
         temp+=" Температура датчиков 1-й линии \n ";
         temp+=QString::number(i);
         temp+=" : ";
@@ -288,11 +262,7 @@ void OTD::OTDtm1()
         bw[1] = 0x1f;
         bw[2] = i;
         bw[3] = 0x00;
-        com7->QIODevice::write(bw);
-        com7->waitForBytesWritten(-1);
-        QByteArray readData1 = com7->readAll();
-        while (com7->waitForReadyRead(500))
-            readData1.append(com7->readAll());
+        QByteArray readData1 = send(com7, bw, 500);
         uint8_t uu1,uu2;
         uu1=readData1[2];
         uu2=readData1[3];
@@ -319,11 +289,7 @@ void OTD::OTDtm2()
         bw[1] = 0x20;
         bw[2] = i;
         bw[3] = 0x00;
-        com7->QIODevice::write(bw);
-        com7->waitForBytesWritten(-1);
-        QByteArray readData1 = com7->readAll();
-        while (com7->waitForReadyRead(500))
-            readData1.append(com7->readAll());
+        QByteArray readData1 = send(com7, bw, 500);
         uint8_t uu1,uu2;
         uu1=readData1[2];
         uu2=readData1[3];
@@ -345,11 +311,7 @@ void OTD::OTDPT()
     bw[1] = 0x1c;
     bw[2] = 0x01;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData1 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData1.append(com7->readAll());
+    QByteArray readData1 = send(com7, bw, 500);
     uint8_t uu1,uu2;
     uu1=readData1[2];
     uu2=readData1[3];
@@ -360,22 +322,18 @@ void OTD::OTDPT()
     bw[1] = 0x1c;
     bw[2] = 0x02;
     bw[3] = 0x00;
-    com7->QIODevice::write(bw);
-    com7->waitForBytesWritten(-1);
-    QByteArray readData2 = com7->readAll();
-    while (com7->waitForReadyRead(500))
-        readData2.append(com7->readAll());
+    QByteArray readData2 = send(com7, bw, 500);
     uu1=readData2[2];
     uu2=readData2[3];
     double uu3=(uu1<<8) | uu2;
     uu3=uu3/32-256;
     emit start_OTDPT(uu*100, uu3*100);
-
 }
 
 void OTD::OTD_avt(int x, int y)
 {
-    if(x==1){
+    if(x==1)
+    {
         MyTimerOTD = new QTimer;
         MyTimerOTD->start(y);
         QObject::connect(MyTimerOTD,SIGNAL(timeout()), this, SLOT( OTD_timer()));
