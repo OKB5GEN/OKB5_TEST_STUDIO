@@ -10,340 +10,408 @@
 #include <QtSerialPort/QtSerialPort>
 #include "synchapi.h"
 
-QSerialPort *com7;
-QByteArray bw;
-QString data,temp;
-QByteArray readData0;
-int len1=0, len2=0;
-QTimer *MyTimerOTD;
-int flag_otd=1;
-
-OTD::OTD(QString s) : name(s)
+OTD::OTD(QString s, QObject* parent) :
+    QObject(parent),
+    name(s)
 {
-
+    m_timer = new QTimer(this);
+    m_timer->setSingleShot(true);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(OTD_timer()));
 }
 
-QByteArray OTD::send(QSerialPort * port, QByteArray data, double readTimeout, double delayBeforeRecv /*= 0*/)
+QByteArray OTD::send(QByteArray data, double readTimeout, double delayBeforeRecv /*= 0*/)
 {
     QByteArray readData;
-    if (port->isOpen())
+    if (m_port && m_port->isOpen())
     {
-        port->QIODevice::write(data);
-        port->waitForBytesWritten(-1);
+        m_port->QIODevice::write(data);
+        m_port->waitForBytesWritten(-1);
 
         if (delayBeforeRecv > 0)
         {
             Sleep(delayBeforeRecv);
         }
 
-        readData = port->readAll();
-        while (port->waitForReadyRead(readTimeout))
+        readData = m_port->readAll();
+        while (m_port->waitForReadyRead(readTimeout))
         {
-            readData.append(port->readAll());
+            readData.append(m_port->readAll());
         }
     }
 
     return readData;
 }
+
 void OTD::COMConnectorOTD()
 {
-    com7 = new QSerialPort("com7");
-    com7->open(QIODevice::ReadWrite);
-    com7->setBaudRate(QSerialPort::Baud115200);
-    com7->setDataBits(QSerialPort::Data5);
-    com7->setParity(QSerialPort::OddParity);
-    com7->setStopBits(QSerialPort::OneStop);
-    com7->setFlowControl(QSerialPort::NoFlowControl);
+    m_port = new QSerialPort("com7");
+    m_port->open(QIODevice::ReadWrite);
+    m_port->setBaudRate(QSerialPort::Baud115200);
+    m_port->setDataBits(QSerialPort::Data5);
+    m_port->setParity(QSerialPort::OddParity);
+    m_port->setStopBits(QSerialPort::OneStop);
+    m_port->setFlowControl(QSerialPort::NoFlowControl);
+    m_isActive = true;
     OTD_id();
     OTDtemper();
-
 }
 
 void OTD::OTD_id()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0xff;
     bw[1] = 0x01;
     bw[2] = 0x00;
     bw[3] = 0x01;
-    QByteArray readData1 = send(com7, bw, 100);
+    QByteArray readData1 = send(bw, 100);
 
     bw[0] = 0xff;
     bw[1] = 0x01;
     bw[2] = 0x00;
     bw[3] = 0x02;
 
-    readData0 = send(com7, bw, 500);
+    QByteArray readData0 = send(bw, 500);
 
-    if(readData1[2]!=readData0[2] || readData1[3]!=readData0[3])
+    if(readData1[2] != readData0[2] || readData1[3] != readData0[3])
+    {
         emit OTD_id1();
+    }
 }
 
 void OTD::OTD_req()
 {
-    if(flag_otd==1)
+    if(m_isActive)
     {
         QString res;
-        bw.resize(4);
+        QByteArray bw(4, 0);
         bw[0] = 0x44;
         bw[1] = 0x02;
         bw[2] = 0x00;
         bw[3] = 0x00;
-        QByteArray readData1 = send(com7, bw, 100);
-        uint8_t x=readData1[2];
+        QByteArray readData1 = send(bw, 100);
+        uint8_t x = readData1[2];
         uint8_t z1, z2, z3;
-        res="";
-        z1=x>>7;
-        z2=x<<1;
-        z2=z2>>7;
-        z3=x<<2;
-        z3=z3>>7;
-        if(z1==0)res+=" ОТД не готов к работе! \n";
-        if(z2==1)res+=" Ошибки у модуля ОТД! \n";
-        if(z3==1)res+=" Модуль ОТД после перезагрузки! \n";
+        res = "";
+        z1 = x >> 7;
+        z2 = x << 1;
+        z2 = z2 >> 7;
+        z3 = x << 2;
+        z3 = z3 >> 7;
+        if (z1 == 0)
+        {
+            res += " ОТД не готов к работе! \n";
+        }
+
+        if (z2 == 1)
+        {
+            res += " Ошибки у модуля ОТД! \n";
+        }
+
+        if (z3 == 1)
+        {
+            res += " Модуль ОТД после перезагрузки! \n";
+        }
+
         emit OTD_reqr (res);
     }
 }
+
 void OTD::OTD_fw()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x06;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 100);
-    emit OTD_vfw(readData1[2]*10+readData1[3]);
+    QByteArray readData1 = send(bw, 100);
+    emit OTD_vfw(readData1[2] * 10 + readData1[3]);
 }
+
 void OTD::res_OTD()
 {
-    flag_otd=0;
-    bw.resize(4);
+    m_isActive = false;
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x04;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 100);
+    QByteArray readData1 = send(bw, 100);
     COMCloseOTD();
-    for(int i=0;i<400;i++)
+    for(int i = 0; i < 400; i++) // TODO Remove this shit
     {
         Sleep(10);
         QApplication::processEvents();
     }
+
     COMConnectorOTD();
-    flag_otd=1;
     emit OTD_res(readData1[3]);
 }
+
 void OTD::err_res_OTD()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x03;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 100);
+    QByteArray readData1 = send(bw, 100);
     emit OTD_err_res(readData1[3]);
 }
+
 void OTD::OTDres1()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x26;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 500);
-    if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
+    QByteArray readData1 = send(bw, 500);
+    if(readData1.at(3) == 2)
+    {
+        emit err_OTD("Ошибка при перезагрузке!");
+    }
 }
+
 void OTD::OTDres2()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x27;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 500);
-    if(readData1.at(3)==2)emit err_OTD("Ошибка при перезагрузке!");
-    else emit err_OTD("");
+    QByteArray readData1 = send(bw, 500);
+    if(readData1.at(3) == 2)
+    {
+        emit err_OTD("Ошибка при перезагрузке!");
+    }
+    else
+    {
+        emit err_OTD("");
+    }
 }
 
 void OTD::OTDmeas1()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x28;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 500, 2000);
-    if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 1-й линии!");
+    QByteArray readData1 = send(bw, 500, 2000);
+    if(readData1.at(3) == 2)
+    {
+        emit err_OTD("Ошибка при запуске измерений 1-й линии!");
+    }
+
     OTDtm1();
 }
+
 void OTD::OTDmeas2()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x29;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 500, 2000);
-    if(readData1.at(3)==2)emit err_OTD("Ошибка при запуске измерений 2-й линии!");
+    QByteArray readData1 = send(bw, 500, 2000);
+    if(readData1.at(3) == 2)
+    {
+        emit err_OTD("Ошибка при запуске измерений 2-й линии!");
+    }
+
     OTDtm2();
 }
+
 void OTD::OTDtemper()
 {
-    data="";
-    data+="Кол-во датчиков DS1820 по оси 1: ";
-    bw.resize(4);
+    QString data;
+    data += "Кол-во датчиков DS1820 по оси 1: ";
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x1e;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    readData0 = send(com7, bw, 500);
-    len1=readData0[2];
-    data+=QString::number(len1);
-    data+="\n";
-    data+="Адреса датчиков по оси 1: \n";
-    for(int j=1;j<=len1;j++)
+    QByteArray readData0 = send(bw, 500);
+    m_sensorsCntAxis1 = readData0[2];
+    data += QString::number(m_sensorsCntAxis1);
+    data += "\n";
+    data += "Адреса датчиков по оси 1: \n";
+
+    for(int j = 1; j <= m_sensorsCntAxis1; j++)
     {
-        data+=QString::number(j);
-        data+=" : ";
-        for(int k=0;k<8;k++)
+        data += QString::number(j);
+        data += " : ";
+        for(int k = 0; k < 8; k++)
         {
             bw[0] = 0x44;
             bw[1] = 0x2a;
             bw[2] = j;
             bw[3] = k;
-            QByteArray readData3 = send(com7, bw, 100);
-            data+=QString::number(readData3[2],16);
+            QByteArray readData3 = send(bw, 100);
+            data += QString::number(readData3[2], 16);
         }
-        data+= "\n";
-    }
-    data+="\n";
-    if(readData0.at(3)==2)data+="Ошибка при считывании датчиков 1-й оси\n";
 
-    data+="Кол-во датчиков DS1820 по оси 2: ";
-    bw.resize(4);
+        data += "\n";
+    }
+
+    data += "\n";
+    if(readData0.at(3) == 2)
+    {
+        data += "Ошибка при считывании датчиков 1-й оси\n";
+    }
+
+    data += "Кол-во датчиков DS1820 по оси 2: ";
     bw[0] = 0x44;
     bw[1] = 0x1d;
     bw[2] = 0x00;
     bw[3] = 0x00;
-    QByteArray readData3 = send(com7, bw, 500);
-    len2=readData3[2];
-    data+=QString::number(len2);
-    data+="\n";
-    data+="Адреса датчиков по оси 2: \n";
-    for(int j=1;j<=len2;j++)
+
+    QByteArray readData3 = send(bw, 500);
+    m_sensorsCntAxis2 = readData3[2];
+    data += QString::number(m_sensorsCntAxis2);
+    data += "\n";
+    data += "Адреса датчиков по оси 2: \n";
+    for(int j = 1; j <= m_sensorsCntAxis2; j++)
     {
-        data+=QString::number(j);
-        data+=" : ";
-        for(int k=0;k<8;k++)
+        data += QString::number(j);
+        data += " : ";
+        for(int k = 0; k < 8; k++)
         {
             bw[0] = 0x44;
             bw[1] = 0x2a;
             bw[2] = j;
             bw[3] = k;
-            QByteArray readData4 = send(com7, bw, 100);
-            data+=QString::number(readData4[2],16);
+            QByteArray readData4 = send(bw, 100);
+            data += QString::number(readData4[2], 16);
         }
-        data+= "\n";
-    }
-    if(readData3.at(3)==2)data+="Ошибка при считывании датчиков 2-й оси\n";
-    emit temp_OTD(data);
 
+        data += "\n";
+    }
+
+    if (readData3.at(3) == 2)
+    {
+        data += "Ошибка при считывании датчиков 2-й оси\n";
+    }
+
+    emit temp_OTD(data);
 }
+
 void OTD::OTDtm1()
 {
-    temp="";
-    for(int i=1;i<=len1;i++)
+    QString temp;
+    QByteArray bw(4, 0);
+    bw[0] = 0x44;
+    bw[1] = 0x1f;
+    bw[3] = 0x00;
+
+    for(int i = 1; i <= m_sensorsCntAxis1; i++)
     {
-        temp+=" Температура датчиков 1-й линии \n ";
-        temp+=QString::number(i);
-        temp+=" : ";
-        bw.resize(4);
-        bw[0] = 0x44;
-        bw[1] = 0x1f;
+        temp += " Температура датчиков 1-й линии \n ";
+        temp += QString::number(i);
+        temp += " : ";
         bw[2] = i;
-        bw[3] = 0x00;
-        QByteArray readData1 = send(com7, bw, 500);
-        uint8_t uu1,uu2;
-        uu1=readData1[2];
-        uu2=readData1[3];
-        double uu=(uu1<<8) | uu2;
-        uint8_t x=readData1[2],z;
-        z=x<<4;
-        z=z>>7;
-        if(z==0)uu=uu/16;
-        if(z==1)uu=(uu-4096)/16;
-        temp+=QString::number(uu);
-        temp+="\n";
+        QByteArray readData1 = send(bw, 500);
+        uint8_t uu1, uu2, z;
+        uu1 = readData1[2];
+        uu2 = readData1[3];
+        double uu = (uu1 << 8) | uu2;
+        uint8_t x = readData1[2];
+        z = x << 4;
+        z = z >> 7;
+        if (z == 0)
+        {
+            uu = uu / 16;
+        }
+
+        if (z == 1)
+        {
+            uu = (uu - 4096) / 16;
+        }
+
+        temp += QString::number(uu);
+        temp += "\n";
     }
+
     emit tm_OTD1(temp);
 }
+
 void OTD::OTDtm2()
 {
-    temp="";
-    for(int i=1;i<=len2;i++){
-        temp+=" Температура датчиков 2-й линии \n ";
-        temp+=QString::number(i);
-        temp+=" : ";
-        bw.resize(4);
-        bw[0] = 0x44;
-        bw[1] = 0x20;
+    QString temp;
+    QByteArray bw(4, 0);
+    bw[0] = 0x44;
+    bw[1] = 0x20;
+    bw[3] = 0x00;
+
+    for(int i = 1; i <= m_sensorsCntAxis2; i++)
+    {
+        temp += " Температура датчиков 2-й линии \n ";
+        temp += QString::number(i);
+        temp += " : ";
         bw[2] = i;
-        bw[3] = 0x00;
-        QByteArray readData1 = send(com7, bw, 500);
-        uint8_t uu1,uu2;
-        uu1=readData1[2];
-        uu2=readData1[3];
-        double uu=(uu1<<8) | uu2;
-        uint8_t x=readData1[2],z;
-        z=x<<4;
-        z=z>>7;
-        if(z==0)uu=uu/16;
-        if(z==1)uu=(uu-4096)/16;
-        temp+=QString::number(uu);
-        temp+="\n";
+        QByteArray readData1 = send(bw, 500);
+        uint8_t uu1, uu2, z;
+        uu1 = readData1[2];
+        uu2 = readData1[3];
+        double uu = (uu1 << 8) | uu2;
+        uint8_t x = readData1[2];
+        z = x << 4;
+        z = z >> 7;
+        if (z == 0)
+        {
+            uu = uu / 16;
+        }
+
+        if (z == 1)
+        {
+            uu = (uu - 4096) / 16;
+        }
+
+        temp += QString::number(uu);
+        temp += "\n";
     }
+
     emit tm_OTD2(temp);
 }
+
 void OTD::OTDPT()
 {
-    bw.resize(4);
+    QByteArray bw(4, 0);
     bw[0] = 0x44;
     bw[1] = 0x1c;
     bw[2] = 0x01;
     bw[3] = 0x00;
-    QByteArray readData1 = send(com7, bw, 500);
-    uint8_t uu1,uu2;
-    uu1=readData1[2];
-    uu2=readData1[3];
-    double uu=(uu1<<8) | uu2;
-    uu=uu/32-256;
+    QByteArray readData1 = send(bw, 500);
+    uint8_t uu1, uu2;
+    uu1 = readData1[2];
+    uu2 = readData1[3];
+    double uu = (uu1 << 8) | uu2;
+    uu = uu / 32 - 256;
 
     bw[0] = 0x44;
     bw[1] = 0x1c;
     bw[2] = 0x02;
     bw[3] = 0x00;
-    QByteArray readData2 = send(com7, bw, 500);
-    uu1=readData2[2];
-    uu2=readData2[3];
-    double uu3=(uu1<<8) | uu2;
-    uu3=uu3/32-256;
-    emit start_OTDPT(uu*100, uu3*100);
+    QByteArray readData2 = send(bw, 500);
+    uu1 = readData2[2];
+    uu2 = readData2[3];
+    double uu3 = (uu1 << 8) | uu2;
+    uu3 = uu3 / 32 - 256;
+    emit start_OTDPT(uu * 100, uu3 * 100);
 }
 
 void OTD::OTD_avt(int x, int y)
 {
-    if(x==1)
+    if(x == 1)
     {
-        MyTimerOTD = new QTimer;
-        MyTimerOTD->start(y);
-        QObject::connect(MyTimerOTD,SIGNAL(timeout()), this, SLOT( OTD_timer()));
+        m_timer->start(y);
     }
     else
     {
-        y=0;
-        QObject::disconnect(MyTimerOTD,SIGNAL(timeout()), this, SLOT( OTD_timer()));
+        y = 0;
     }
 }
+
 void OTD::OTD_timer()
 {
     OTDPT();
@@ -351,8 +419,12 @@ void OTD::OTD_timer()
     OTDmeas2();
 }
 
-void OTD:: COMCloseOTD(){
-    com7->close();
+void OTD::COMCloseOTD()
+{
+    if (m_port)
+    {
+        m_port->close();
+    }
 }
 
 void OTD::doWork()

@@ -3,8 +3,11 @@
 #include <QMainWindow>
 
 class COMPortSender;
+class OTD;
+class MKO;
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
 
@@ -138,6 +141,11 @@ signals:
 private:
     Ui::MainWindow *ui;
     COMPortSender * m_COMPortSender;
+
+    QThread *threadOTD;
+    OTD *myOTD;
+    QThread *threadMKO;
+    MKO *myMKO;
 };
 
 #endif // MAINWINDOW_H

@@ -5,13 +5,14 @@
 #include <QObject>
 #include <QString>
 
+class QTimer;
+
 class MKO:public QObject
 {
     Q_OBJECT
+
 public:
-    MKO(QString name);
-
-
+    MKO(QString name, QObject * parent);
 
 public slots:
     void startMKO();
@@ -29,16 +30,15 @@ public slots:
     void MKO_avt(int x,int y,int adr1, int adr2);
     void MKO_timer();
 
-
 signals:
     void test_MKO(int x);
     void start_MKO(QString x);
     void data_MKO(QString x);
     void MKO_CTM(int x, int y);
 
-
 private:
     QString name;
+    QTimer * m_timer;
 };
 
 #endif

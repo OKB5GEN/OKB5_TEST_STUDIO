@@ -5,14 +5,14 @@
 #include <QString>
 
 class QSerialPort;
+class QTimer;
 
 class OTD:public QObject
 {
     Q_OBJECT
+
 public:
-    OTD(QString name);
-
-
+    OTD(QString name, QObject* parent);
 
 public slots:
     void doWork();
@@ -34,8 +34,6 @@ public slots:
     void OTD_id();
     void OTD_req();
 
-
-
 signals:
     void start_OTD();
     void start_OTDPT(double x, double y);
@@ -49,13 +47,18 @@ signals:
     void OTD_id1();
     void OTD_reqr (QString res);
 
-
-
-
 private:
     QString name;
 
-    QByteArray send(QSerialPort * port, QByteArray data, double readTimeout, double delayBeforeRecv = 0);
+    QTimer * m_timer;
+
+    QByteArray send(QByteArray data, double readTimeout, double delayBeforeRecv = 0);
+    bool m_isActive = false;
+
+    int m_sensorsCntAxis1 = 0;
+    int m_sensorsCntAxis2 = 0;
+
+    QSerialPort * m_port = Q_NULLPTR;
 };
 
 #endif

@@ -17,18 +17,17 @@ WORD tx_data[4];
 QString TestOutStr,TestOutStr1,result_tech,error_m;
 QString ncd, zcd, cdh, cdd;
 
-QThread *threadOTD= new QThread;
-OTD *myOTD = new OTD("B");
-
-QThread *threadMKO= new QThread;
-MKO *myMKO = new MKO("B");
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     m_COMPortSender = new COMPortSender(this);
+
+    threadOTD = new QThread(this);
+    myOTD = new OTD("B", this);
+    threadMKO = new QThread(this);
+    myMKO = new MKO("B", this);
 
     startCondition(); // Ivan Semenchuk: uncomment to work with real device
 }
@@ -37,6 +36,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 void MainWindow::startCondition()
 {
     m_COMPortSender->createPorts();
