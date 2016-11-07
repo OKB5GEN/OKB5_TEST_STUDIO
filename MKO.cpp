@@ -216,7 +216,7 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
         ch_cur = 1;
 
         m_subAddr = 12;
-        receive(buf, 11, buff, 1, err);
+        err += receive(buf, 11);
 
         err += " Основной полукомплект прием массива: \n";
         m_addr = adr1;
@@ -263,7 +263,7 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
         ch_cur = 2;
 
         m_subAddr = 12;
-        receive(buf, 11, buff, 1, err);
+        err += receive(buf, 11);
 
         err += " Резервный полукомплект прием массива: \n";
         m_addr = adr2;
@@ -318,11 +318,11 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
         m_addr = adr1;
         err += " Основной полукомплект передача массива ось ψ: \n";
         m_subAddr = 1;
-        receive(buf, 6, buff, 1, err);
+        err += receive(buf, 6);
 
         err += " Основной полукомплект передача массива ось υ: \n";
         m_subAddr = 2;
-        receive(buf, 6, buff, 1, err);
+        err += receive(buf, 6);
 
         err += " Основной полукомплект прием массива ось ψ: \n";
         m_subAddr = 1;
@@ -362,10 +362,10 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
         m_addr = adr2;
         err += " Резервный полукомплект передача массива ось ψ: \n";
         m_subAddr = 1;
-        receive(buf, 6, buff, 1, err);
+        err += receive(buf, 6);
         err += " Резервный полукомплект передача массива ось υ: \n";
         m_subAddr = 2;
-        receive(buf, 6, buff, 1, err);
+        err += receive(buf, 6);
 
         m_addr = adr2;
         err += " Резервный полукомплект прием массива ось ψ: \n";
@@ -467,7 +467,7 @@ void MKO::pow_DY(int x, int adr)
         buf[2] = 64;
     }
 
-    receive(buf, 3, buff, 1, err1);
+    err1 += receive(buf, 3);
     emit start_MKO(err1);
 }
 
@@ -504,12 +504,12 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
     {
         err2 += " Основной полукомплект передача массива: \n";
         m_addr = adr1;
-        if(ch_cur != 1 && ch_cur == 2)
+        if(ch_cur == 2)
         {
             stopMKO();
             Sleep(100);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
+            emit MKO_CTM(2, 0);
+            emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
@@ -528,7 +528,9 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur=1;
+        ch_cur = 1;
+        m_subAddr = 12;
+        err2 += receive(buf1, 11);
     }
     else if (x == 2)
     {
@@ -558,13 +560,9 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur=2;
-    }
-
-    if (x == 1 || x == 2)
-    {
+        ch_cur = 2;
         m_subAddr = 12;
-        receive(buf1, 11, buff, 1, err2);
+        err2 += receive(buf1, 11);
     }
 
     if(x == 3)
@@ -632,11 +630,11 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         m_addr = adr1;
         err2 += " Основной полукомплект передача массива ось ψ: \n";
         m_subAddr = 1;
-        receive(buf2, 6, buff, 1, err2);
+        err2 += receive(buf2, 6);
 
         err2 += " Основной полукомплект передача массива ось υ: \n";
         m_subAddr = 2;
-        receive(buf3, 6, buff, 1, err2);
+        err2 += receive(buf3, 6);
 
         if (tmkselect(1) != 0 )
         {
@@ -647,11 +645,11 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         m_addr = adr2;
         err2 += " Резервный полукомплект передача массива ось ψ: \n";
         m_subAddr = 1;
-        receive(buf2, 6, buf1, 1, err2);
+        err2 += receive(buf2, 6);
 
         err2 += " Резервный полукомплект передача массива ось υ: \n";
         m_subAddr = 2;
-        receive(buf3, 6, buff, 1, err2);
+        err2 += receive(buf3, 6);
     }
 
     emit start_MKO(err2);
@@ -821,7 +819,7 @@ void MKO::send(uint16_t* buf, uint16_t len)
     bcgetblk(0, buf, len);
 }
 
-void MKO::receive(uint16_t* buf, uint16_t len, uint16_t* buf1, uint16_t len1, QString& error)
+QString MKO::receive(uint16_t* buf, uint16_t len)
 {
     uint16_t command = (m_addr << 11) + RT_RECEIVE + (m_subAddr << 5) + (len & NWORDS_MASK);
     bcdefbase(0);
@@ -829,6 +827,8 @@ void MKO::receive(uint16_t* buf, uint16_t len, uint16_t* buf1, uint16_t len1, QS
     bcputblk(1, buf, len);
     bcstartx(0, DATA_BC_RT | CX_BUS_0 | CX_STOP | CX_NOSIG);
     Sleep(100);
-    bcgetblk(0, buf1, len1);
-    error += OCcontrol(buf1[0]);
+
+    WORD buff[13]; // TODO: 13 - x3 why, is it enough? potential stack corruption may occur here
+    bcgetblk(0, buff, 1);
+    return OCcontrol(buff[0]);
 }

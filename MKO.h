@@ -37,7 +37,7 @@ signals:
 private:
     void send(uint16_t* buf, uint16_t len, QString& dat, QString& error);
     void send(uint16_t* buf, uint16_t len);
-    void receive(uint16_t* buf, uint16_t len, uint16_t* buf1, uint16_t len1, QString& error);
+    QString receive(uint16_t* buf, uint16_t len);
     QString name;
     QTimer * m_timer;
 
