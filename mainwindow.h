@@ -142,10 +142,27 @@ private:
     Ui::MainWindow *ui;
     COMPortSender * m_COMPortSender;
 
+    // TODO refactor
     QThread *threadOTD;
     OTD *myOTD;
     QThread *threadMKO;
     MKO *myMKO;
+
+    int m_mko_kits;
+
+    int flag_rem1 = 0;
+    int flag_rem2 = 0;
+    int flag_con1 = 0;
+    int flag_con2 = 0;
+    int k = 0;
+    int flag_con3 = 0;
+    int flag_con4 = 0;
+    int flag_con5 = 0;
+    int flag_mko_auto = 0;
+    int flag_otd_auto = 0;
+    int dat[1000]={0};
+    int dat1[1000]={0};
+
 };
 
 #endif // MAINWINDOW_H

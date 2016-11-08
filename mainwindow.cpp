@@ -1,25 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include <QtSerialPort/QtSerialPort>
 #include "myclass.h"
 #include "OTD.h"
 #include "MKO.h"
 #include "comport.h"
 
-int cErrors, fEventResult,strt;
-int flag_rem1=0,flag_rem2=0,flag_con1=0, flag_con2=0,k,flag_con3=0,flag_con4=0,flag_con5=0;
-int flag_mko_auto=0, flag_mko_osn=0,flag_mko_rez=0,flag_otd_auto=0;
-int dat[1000]={0},dat1[1000]={0};
-unsigned dwMRT;
-int er;
-uint16_t sum;
-WORD tx_data[4];
-QString TestOutStr,TestOutStr1,result_tech,error_m;
-QString ncd, zcd, cdh, cdd;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    m_mko_kits(MKO::NO_KIT)
 {
     ui->setupUi(this);
     m_COMPortSender = new COMPortSender(this);
@@ -29,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     threadMKO = new QThread(this);
     myMKO = new MKO("B", this);
 
-    startCondition(); // Ivan Semenchuk: uncomment to work with real device
+    //startCondition(); // Ivan Semenchuk: uncomment to work with real device
 }
 
 MainWindow::~MainWindow()
@@ -132,6 +121,8 @@ void MainWindow::startCondition()
     ui->setlimI1->setText(QString::number(0.5));
     ui->setlimI2->setText(QString::number(0.5));
     ui->error_mod->setStyleSheet("font: 25 16pt GOST type A;" "color: red;");
+
+    QString error_m;
     if(m_COMPortSender->id_stm() != 1)
     {
         error_m += " Модуль СТМ установлен не в свой слот!";
@@ -142,8 +133,7 @@ void MainWindow::startCondition()
         error_m += " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
     }
 
-    ui->error_mod->setText (error_m);
-    error_m="";
+    ui->error_mod->setText(error_m);
 }
 
 int MainWindow::simpltst1(int z)
@@ -151,18 +141,15 @@ int MainWindow::simpltst1(int z)
     if(z == 0)
     {
         ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: black;");
-        TestOutStr += "Тест пройден успешно!\n";
-        ui->label_MKO->setText(TestOutStr);
-        TestOutStr = "";
+        ui->label_MKO->setText("Тест пройден успешно!\n");
     }
     else
     {
         ui->label_MKO->setStyleSheet("font: 25 10pt GOST type A;" "color: red;");
-        TestOutStr1 += "Ошибка! Тест провален с ";
-        TestOutStr1 += QString::number(z);
-        TestOutStr1 += " ошибками. Перезагрузите программу!\n";
-        ui->label_MKO->setText(TestOutStr1);
-        TestOutStr1 = "";
+        QString TestOutStr = "Ошибка! Тест провален с ";
+        TestOutStr += QString::number(z);
+        TestOutStr += " ошибками. Перезагрузите программу!\n";
+        ui->label_MKO->setText(TestOutStr);
     }
 
     return z ;
@@ -196,6 +183,8 @@ void MainWindow::MKO_data(QString data)
 
 void MainWindow::MKO_cm_data(QString data)
 {
+    QString ncd, zcd, cdh, cdd;
+
     QStringList list1 = data.split(" ");
     QString list2[42];
     list2[0]+="Текущий режим работы ось ψ\n(от -32767 до +32767)";
@@ -305,7 +294,7 @@ void MainWindow::MKO_cm_data(QString data)
         }
     }
 
-    if(flag_mko_osn + flag_mko_rez == 3)
+    if(m_mko_kits == MKO::ALL_KITS)
     {
         if (list1[0] != "")
         {
@@ -479,7 +468,7 @@ void MainWindow::statusRS()
     if(len1 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech = m_COMPortSender->tech_read_buf(1, len1);
+        QString result_tech = m_COMPortSender->tech_read_buf(1, len1);
         QString buf;
         QStringList list2 = result_tech.split(" ");
         int s = list2.size();
@@ -514,7 +503,7 @@ void MainWindow::statusCAN()
     if(len2 != 0)
     {
         ui->tech_error->setText(" ");
-        result_tech = m_COMPortSender->tech_read_buf(2, len2);
+        QString result_tech = m_COMPortSender->tech_read_buf(2, len2);
         QString buf;
         QStringList list3 = result_tech.split(" ");
         int s = list3.size ();
@@ -567,20 +556,21 @@ void MainWindow::status_OTD(QString data)
 void MainWindow::plot_point()
 {
     double a = 0; //Начало интервала, где рисуем график по оси Ox
-    double b =  k; //Конец интервала, где рисуем график по оси Ox
-    int N=k+1; //Вычисляем количество точек, которые будем отрисовывать
+    double b = k; //Конец интервала, где рисуем график по оси Ox
+    int N = k + 1; //Вычисляем количество точек, которые будем отрисовывать
     QVector<double> x(N), y(N),z(N); //Массивы координат точек
     double tra,tra1;
     int i=0;
     for (double X = 0; X < b; X++)//Пробегаем по всем точкам
     {
-        tra=dat[i];
-        tra1=dat1[i];
-        x[i] = X*2;
+        tra = dat[i];
+        tra1 = dat1[i];
+        x[i] = X * 2;
         y[i] = tra;
         z[i] = tra1;
         i++;
     }
+
     ui->widget->clearGraphs();//Если нужно, то очищаем все графики
     ui->widget->addGraph();
     ui->widget->graph(0)->setData(x, y);
@@ -676,6 +666,7 @@ void MainWindow::on_pushButton_7_clicked()
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
+
 void MainWindow::on_pushButton_5_clicked()
 {
     if(m_COMPortSender->setPowerChannelState(4, COMPortSender::POWER_ON) == 1 && flag_con2 == 0)
@@ -1237,51 +1228,53 @@ void MainWindow::on_pow_DY_osn_clicked()
 {
     QString S1 = ui->lineEdit_Addr_2->text();
     int u1 = S1.toInt();
-    connect(this, SIGNAL( MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
-    emit MKO_DY(0,u1);
-    disconnect(this, SIGNAL( MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
+    connect(this, SIGNAL(MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
+    emit MKO_DY(MKO::MAIN_KIT, u1);
+    disconnect(this, SIGNAL(MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
 }
 
 void MainWindow::on_pow_DY_rez_clicked()
 {
     QString S2 = ui->lineEdit_Addr_3->text();
     int u2 = S2.toInt();
-    connect(this, SIGNAL( MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
-    emit MKO_DY(1,u2);
-    disconnect(this, SIGNAL( MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
+    connect(this, SIGNAL(MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
+    emit MKO_DY(MKO::RESERVE_KIT, u2);
+    disconnect(this, SIGNAL(MKO_DY(int, int)), myMKO, SLOT(pow_DY(int, int)));
 }
 
 void MainWindow::on_MKO_osn_clicked()
 {
-    if(flag_mko_osn==0){
-        flag_mko_osn=1;
+    m_mko_kits ^= MKO::MAIN_KIT;
+
+    if(m_mko_kits & MKO::MAIN_KIT)
+    {
         ui->MKO_osn->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(flag_mko_osn==1){
-        flag_mko_osn=0;
+    else
+    {
         ui->MKO_osn->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
-    connect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
-    emit MKO_ch(flag_mko_osn+flag_mko_rez);
-    disconnect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
+
+    connect(this, SIGNAL(MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
+    emit MKO_ch(m_mko_kits);
+    disconnect(this, SIGNAL(MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
 }
 
 void MainWindow::on_MKO_rez_clicked()
 {
-    if(flag_mko_rez == 0)
+    m_mko_kits ^= MKO::RESERVE_KIT;
+    if(m_mko_kits & MKO::RESERVE_KIT)
     {
-        flag_mko_rez = 2;
         ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(flag_mko_rez == 2)
+    else
     {
-        flag_mko_rez = 0;
         ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 
-    connect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
-    emit MKO_ch(flag_mko_osn + flag_mko_rez);
-    disconnect(this, SIGNAL( MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
+    connect(this, SIGNAL(MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
+    emit MKO_ch(m_mko_kits);
+    disconnect(this, SIGNAL(MKO_ch(int)), myMKO, SLOT(MKO_chan(int)));
 }
 
 void MainWindow::on_MKO_test_clicked()
@@ -1290,9 +1283,9 @@ void MainWindow::on_MKO_test_clicked()
     int u1 = S1.toInt();
     QString S2 = ui->lineEdit_Addr_3->text();
     int u2 = S2.toInt();
-    connect(this, SIGNAL( MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
-    emit MKO_ts(flag_mko_osn + flag_mko_rez,u1,u2);
-    disconnect(this, SIGNAL( MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
+    connect(this, SIGNAL(MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
+    emit MKO_ts(m_mko_kits, u1, u2);
+    disconnect(this, SIGNAL(MKO_ts(int,int,int)), myMKO, SLOT(MKO_start_test(int,int,int)));
 }
 
 void MainWindow::on_pushButton_11_clicked()
@@ -1310,9 +1303,9 @@ void MainWindow::on_pushButton_11_clicked()
     int u1 = S3.toInt();
     QString S2 = ui->lineEdit_Addr_3->text();
     int u2 = S2.toInt();
-    connect(this, SIGNAL( MKO_cm(int,QString, int,int)), myMKO, SLOT(MKO_tr_cm(int,QString,int,int)));
-    emit MKO_cm(flag_mko_osn+flag_mko_rez,S1,u1,u2);
-    disconnect(this, SIGNAL( MKO_cm(int,QString,int,int)), myMKO, SLOT(MKO_tr_cm(int,QString,int,int)));
+    connect(this, SIGNAL(MKO_cm(int,QString, int,int)), myMKO, SLOT(MKO_tr_cm(int,QString,int,int)));
+    emit MKO_cm(m_mko_kits, S1, u1, u2);
+    disconnect(this, SIGNAL(MKO_cm(int,QString,int,int)), myMKO, SLOT(MKO_tr_cm(int,QString,int,int)));
 }
 
 void MainWindow::on_pushButton_12_clicked()
@@ -1321,9 +1314,9 @@ void MainWindow::on_pushButton_12_clicked()
     int u1 = S1.toInt();
     QString S2 = ui->lineEdit_Addr_3->text();
     int u2 = S2.toInt();
-    connect(this, SIGNAL( MKO_cm_r(int,int,int)), myMKO, SLOT(MKO_rc_cm(int,int,int)));
-    emit MKO_cm_r(flag_mko_osn+flag_mko_rez,u1,u2);
-    disconnect(this, SIGNAL( MKO_cm_r(int,int,int)), myMKO, SLOT(MKO_rc_cm(int,int,int)));
+    connect(this, SIGNAL(MKO_cm_r(int,int,int)), myMKO, SLOT(MKO_rc_cm(int,int,int)));
+    emit MKO_cm_r(m_mko_kits, u1, u2);
+    disconnect(this, SIGNAL(MKO_cm_r(int,int,int)), myMKO, SLOT(MKO_rc_cm(int,int,int)));
 }
 
 void MainWindow::MKO_change_ch(int x, int y)

@@ -7,11 +7,19 @@
 
 class QTimer;
 
-class MKO:public QObject
+class MKO : public QObject
 {
     Q_OBJECT
 
 public:
+    enum KitID
+    {
+        NO_KIT      = 0x00,
+        MAIN_KIT    = 0x01,
+        RESERVE_KIT = 0x02,
+        ALL_KITS = MAIN_KIT | RESERVE_KIT
+    };
+
     MKO(QString name, QObject * parent);
 
 public slots:
@@ -20,12 +28,12 @@ public slots:
     void stopMKO();
     void stopMKO1();
     QString OCcontrol(WORD oc);
-    void pow_DY(int x, int y);
-    void MKO_start_test(int x, int adr1, int adr2);
-    void MKO_tr_cm(int x,QString cm, int adr1, int adr2);
-    void MKO_rc_cm(int x, int adr1, int adr2);
-    void MKO_chan(int x);
-    void MKO_avt(int x,int y,int adr1, int adr2);
+    void pow_DY(int kit, int adr);
+    void MKO_start_test(int kits, int adr1, int adr2);
+    void MKO_tr_cm(int kits, QString cm, int adr1, int adr2);
+    void MKO_rc_cm(int kits, int adr1, int adr2);
+    void MKO_chan(int kits);
+    void MKO_avt(int x, int y, int adr1, int adr2);
     void MKO_timer();
 
 signals:
@@ -41,8 +49,10 @@ private:
     QString name;
     QTimer * m_timer;
 
-    uint8_t m_addr;
-    uint8_t m_subAddr;
+    uint8_t m_addr; // variable module address
+    uint8_t m_subAddr; // constant module subaddress
+
+    KitID m_enabledKits = NO_KIT;
 };
 
 #endif

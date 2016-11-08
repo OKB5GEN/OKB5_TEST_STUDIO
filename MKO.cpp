@@ -12,7 +12,7 @@
 #include "WDMTMKv2.cpp"
 
 HANDLE hEvent, hEvent1;
-int flag_ch, ch_cur = 0;
+int flag_ch = 0;
 int addr1, addr2;
 
 
@@ -170,245 +170,252 @@ QString MKO::OCcontrol(WORD oc)
     return data1;
 }
 
-void MKO::MKO_start_test(int x, int adr1, int adr2)
+void MKO::MKO_start_test(int kits, int adr1, int adr2)
 {
     WORD buff[13];
     WORD buf[11];
-    QString err = "";
-    if (x == 0)
-    {
-        err += " Выберите полукомплект для проверки! \n";
-    }
-
     for(int i = 0; i < 11; i++)
     {
         buf[i] = 0;
     }
 
-    if (x == 1)
+    QString err;
+    switch (kits)
     {
-        err += " Основной полукомплект передача массива: \n";
-        m_addr = adr1;
-        if(ch_cur == 2)
+    case NO_KIT:
         {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 0);
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
+            err += " Выберите полукомплект для проверки! \n";
         }
-        else if(ch_cur == 0)
+        break;
+    case MAIN_KIT:
         {
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 3)
-        {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(2, 0);
-            Sleep(1100);
-            startMKO();
-        }
-
-        ch_cur = 1;
-
-        m_subAddr = 12;
-        err += receive(buf, 11);
-
-        err += " Основной полукомплект прием массива: \n";
-        m_addr = adr1;
-        send(buff, 12);
-
-        for(int i = 1; i < 12; i++)
-        {
-            if(buff[i] != 0)
+            err += " Основной полукомплект передача массива: \n";
+            m_addr = adr1;
+            if(m_enabledKits == RESERVE_KIT)
             {
-                err += "Ошибка! Тест провален!";
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
             }
-        }
-
-        err += OCcontrol(buff[0]);
-    }
-    else if (x == 2)
-    {
-        err += " Резервный полукомплект передача массива: \n";
-        m_addr = adr2;
-        if(ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 0)
-        {
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 3)
-        {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            Sleep(1100);
-            startMKO();
-        }
-
-        ch_cur = 2;
-
-        m_subAddr = 12;
-        err += receive(buf, 11);
-
-        err += " Резервный полукомплект прием массива: \n";
-        m_addr = adr2;
-        send(buff, 12);
-
-        for(int i = 1; i < 12; i++)
-        {
-            if(buff[i] != 0)
+            else if(m_enabledKits == NO_KIT)
             {
-                err += "Ошибка! Тест провален!";
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
             }
-        }
-
-        err += OCcontrol(buff[0]);
-    }
-    else if(x == 3)
-    {
-        if(ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if(ch_cur == 2)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if(ch_cur == 0)
-        {
-            emit MKO_CTM(1, 1);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        ch_cur = 3;
-        if (tmkselect(0) != 0)
-        {
-            err += "Ошибка! tmk0!\n";
-        }
-
-        bcreset();
-
-        m_addr = adr1;
-        err += " Основной полукомплект передача массива ось ψ: \n";
-        m_subAddr = 1;
-        err += receive(buf, 6);
-
-        err += " Основной полукомплект передача массива ось υ: \n";
-        m_subAddr = 2;
-        err += receive(buf, 6);
-
-        err += " Основной полукомплект прием массива ось ψ: \n";
-        m_subAddr = 1;
-        send(buff, 7);
-
-        for(int i = 1; i < 7; i++)
-        {
-            if (buff[i] != 0)
+            else if(m_enabledKits == ALL_KITS)
             {
-                err += "Ошибка! Тест провален!";
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                Sleep(1100);
+                startMKO();
             }
-        }
 
-        err += OCcontrol(buff[0]);
+            m_enabledKits = MAIN_KIT;
 
-        err += " Основной полукомплект прием массива ось υ: \n";
-        m_subAddr = 2;
-        send(buff, 7);
+            m_subAddr = 12;
+            err += receive(buf, 11);
 
-        for(int i = 1; i < 7; i++)
-        {
-            if (buff[i] != 0)
+            err += " Основной полукомплект прием массива: \n";
+            m_addr = adr1;
+            send(buff, 12);
+
+            for(int i = 1; i < 12; i++)
             {
-                err += "Ошибка! Тест провален!";
+                if(buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
             }
+
+            err += OCcontrol(buff[0]);
         }
-
-        err += OCcontrol(buff[0]);
-
-        if (tmkselect(1) != 0 )
+        break;
+    case RESERVE_KIT:
         {
-            err += "Ошибка! tmk1!\n";
-        }
-
-        bcreset();
-
-        m_addr = adr2;
-        err += " Резервный полукомплект передача массива ось ψ: \n";
-        m_subAddr = 1;
-        err += receive(buf, 6);
-        err += " Резервный полукомплект передача массива ось υ: \n";
-        m_subAddr = 2;
-        err += receive(buf, 6);
-
-        m_addr = adr2;
-        err += " Резервный полукомплект прием массива ось ψ: \n";
-        m_subAddr = 1;
-        send(buff, 7);
-        for(int i = 1; i < 7; i++)
-        {
-            if (buff[i] != 0)
+            err += " Резервный полукомплект передача массива: \n";
+            m_addr = adr2;
+            if(m_enabledKits == MAIN_KIT)
             {
-                err += "Ошибка! Тест провален!";
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
             }
-        }
-
-        err += OCcontrol(buff[0]);
-        err += " Резервный полукомплект прием массива ось υ: \n";
-        m_subAddr = 2;
-        send(buff, 7);
-        for(int i = 1; i < 7; i++)
-        {
-            if (buff[i] != 0)
+            else if(m_enabledKits == NO_KIT)
             {
-                err += "Ошибка! Тест провален!";
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
             }
-        }
+            else if(m_enabledKits == ALL_KITS)
+            {
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                Sleep(1100);
+                startMKO();
+            }
 
-        err += OCcontrol(buff[0]);
+            m_enabledKits = RESERVE_KIT;
+
+            m_subAddr = 12;
+            err += receive(buf, 11);
+
+            err += " Резервный полукомплект прием массива: \n";
+            m_addr = adr2;
+            send(buff, 12);
+
+            for(int i = 1; i < 12; i++)
+            {
+                if(buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
+            }
+
+            err += OCcontrol(buff[0]);
+        }
+        break;
+    case ALL_KITS:
+        {
+            if(m_enabledKits == MAIN_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if(m_enabledKits == RESERVE_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(1, 1);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            m_enabledKits = ALL_KITS;
+            if (tmkselect(0) != 0)
+            {
+                err += "Ошибка! tmk0!\n";
+            }
+
+            bcreset();
+
+            m_addr = adr1;
+            err += " Основной полукомплект передача массива ось ψ: \n";
+            m_subAddr = 1;
+            err += receive(buf, 6);
+
+            err += " Основной полукомплект передача массива ось υ: \n";
+            m_subAddr = 2;
+            err += receive(buf, 6);
+
+            err += " Основной полукомплект прием массива ось ψ: \n";
+            m_subAddr = 1;
+            send(buff, 7);
+
+            for(int i = 1; i < 7; i++)
+            {
+                if (buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
+            }
+
+            err += OCcontrol(buff[0]);
+
+            err += " Основной полукомплект прием массива ось υ: \n";
+            m_subAddr = 2;
+            send(buff, 7);
+
+            for(int i = 1; i < 7; i++)
+            {
+                if (buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
+            }
+
+            err += OCcontrol(buff[0]);
+
+            if (tmkselect(1) != 0 )
+            {
+                err += "Ошибка! tmk1!\n";
+            }
+
+            bcreset();
+
+            m_addr = adr2;
+            err += " Резервный полукомплект передача массива ось ψ: \n";
+            m_subAddr = 1;
+            err += receive(buf, 6);
+            err += " Резервный полукомплект передача массива ось υ: \n";
+            m_subAddr = 2;
+            err += receive(buf, 6);
+
+            m_addr = adr2;
+            err += " Резервный полукомплект прием массива ось ψ: \n";
+            m_subAddr = 1;
+            send(buff, 7);
+            for(int i = 1; i < 7; i++)
+            {
+                if (buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
+            }
+
+            err += OCcontrol(buff[0]);
+            err += " Резервный полукомплект прием массива ось υ: \n";
+            m_subAddr = 2;
+            send(buff, 7);
+            for(int i = 1; i < 7; i++)
+            {
+                if (buff[i] != 0)
+                {
+                    err += "Ошибка! Тест провален!";
+                }
+            }
+
+            err += OCcontrol(buff[0]);
+        }
+        break;
+    default:
+        break;
     }
 
     emit start_MKO(err);
 }
 
-void MKO::pow_DY(int x, int adr)
+void MKO::pow_DY(int kit, int adr)
 {
     QString err1 = "Питание ДУ:\n";
     WORD buf[3];
-    WORD buff[5];
     m_subAddr = 6;
     m_addr = adr;
     buf[0] = 0;
 
-    if (x == 0)
+    if (kit == MAIN_KIT)
     {
-        if(ch_cur == 2)
+        if(m_enabledKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -417,13 +424,13 @@ void MKO::pow_DY(int x, int adr)
             Sleep(1100);
             startMKO();
         }
-        else if(ch_cur == 0)
+        else if(m_enabledKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
-        else if(ch_cur == 3)
+        else if(m_enabledKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -432,13 +439,13 @@ void MKO::pow_DY(int x, int adr)
             startMKO();
         }
 
-        ch_cur = 1;
+        m_enabledKits = MAIN_KIT;
         buf[1] = 32;
         buf[2] = 32;
     }
-    else
+    else // reserve kit
     {
-        if (ch_cur == 1)
+        if (m_enabledKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -447,13 +454,13 @@ void MKO::pow_DY(int x, int adr)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (m_enabledKits == NO_KIT)
         {
             emit MKO_CTM(2, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (m_enabledKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -462,7 +469,7 @@ void MKO::pow_DY(int x, int adr)
             startMKO();
         }
 
-        ch_cur = 2;
+        m_enabledKits = RESERVE_KIT;
         buf[1] = 64;
         buf[2] = 64;
     }
@@ -471,16 +478,16 @@ void MKO::pow_DY(int x, int adr)
     emit start_MKO(err1);
 }
 
-void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
+void MKO::MKO_tr_cm(int kits, QString cm, int adr1, int adr2)
 {
-    QStringList list1 = cm.split(" ");
-    QString err2 = "";
-    if (x == 0)
+    if (kits == NO_KIT)
     {
-        err2 += " Выберите полукомплект для передачи массива! \n";
+        emit start_MKO(" Выберите полукомплект для передачи массива! \n");
+        return;
     }
 
-    WORD buff[13];
+    QStringList list1 = cm.split(" ");
+    QString err2 = "";
 
     WORD buf1[11];
     buf1[0] = list1[0].toInt();
@@ -500,294 +507,313 @@ void MKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         buf1[10] = buf1[10] + buf1[i];
     }
 
-    if (x == 1)
+    switch (kits)
     {
-        err2 += " Основной полукомплект передача массива: \n";
-        m_addr = adr1;
-        if(ch_cur == 2)
+    case MAIN_KIT:
         {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 0);
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
+            err2 += " Основной полукомплект передача массива: \n";
+            m_addr = adr1;
+            if(m_enabledKits == RESERVE_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == ALL_KITS)
+            {
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                Sleep(1100);
+                startMKO();
+            }
+
+            m_enabledKits = MAIN_KIT;
+            m_subAddr = 12;
+            err2 += receive(buf1, 11);
         }
-        else if(ch_cur == 0)
+        break;
+
+    case RESERVE_KIT:
         {
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
+            err2 += " Резервный полукомплект передача массива: \n";
+            m_addr = adr2;
+            if(m_enabledKits == MAIN_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == ALL_KITS)
+            {
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                Sleep(1100);
+                startMKO();
+            }
+
+            m_enabledKits = RESERVE_KIT;
+            m_subAddr = 12;
+            err2 += receive(buf1, 11);
         }
-        else if(ch_cur == 3)
+        break;
+
+    case ALL_KITS:
         {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(2, 0);
-            Sleep(1100);
-            startMKO();
+            WORD buf2[6];
+            WORD buf3[6];
+            buf2[0] = list1[0].toInt();
+            buf2[1] = list1[1].toInt() >> 16;
+            buf2[2] = list1[1].toInt();
+            buf2[3] = list1[2].toInt();
+            buf2[4] = list1[3].toInt();
+            buf2[5] = 0;
+
+            for (int j = 0; j < 5; j++)
+            {
+                buf2[5] = buf2[5] + buf2[j];
+            }
+
+            buf3[0] = list1[4].toInt();
+            buf3[1] = list1[5].toInt() >> 16;
+            buf3[2] = list1[5].toInt();
+            buf3[3] = list1[6].toInt();
+            buf3[4] = list1[7].toInt();
+            buf3[5] = 0;
+
+            for (int k = 0; k < 5; k++)
+            {
+                buf3[5] = buf3[5] + buf3[k];
+            }
+
+            if(m_enabledKits == MAIN_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if(m_enabledKits == RESERVE_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(1, 1);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            m_enabledKits = ALL_KITS;
+            if (tmkselect(0) != 0)
+            {
+                err2 += "Ошибка! tmk0!\n";
+            }
+
+            bcreset();
+
+            m_addr = adr1;
+            err2 += " Основной полукомплект передача массива ось ψ: \n";
+            m_subAddr = 1;
+            err2 += receive(buf2, 6);
+
+            err2 += " Основной полукомплект передача массива ось υ: \n";
+            m_subAddr = 2;
+            err2 += receive(buf3, 6);
+
+            if (tmkselect(1) != 0 )
+            {
+                err2 += "Ошибка! tmk1!\n";
+            }
+
+            bcreset();
+            m_addr = adr2;
+            err2 += " Резервный полукомплект передача массива ось ψ: \n";
+            m_subAddr = 1;
+            err2 += receive(buf2, 6);
+
+            err2 += " Резервный полукомплект передача массива ось υ: \n";
+            m_subAddr = 2;
+            err2 += receive(buf3, 6);
         }
-
-        ch_cur = 1;
-        m_subAddr = 12;
-        err2 += receive(buf1, 11);
-    }
-    else if (x == 2)
-    {
-        err2 += " Резервный полукомплект передача массива: \n";
-        m_addr = adr2;
-        if(ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 0)
-        {
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 3)
-        {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            Sleep(1100);
-            startMKO();
-        }
-
-        ch_cur = 2;
-        m_subAddr = 12;
-        err2 += receive(buf1, 11);
-    }
-
-    if(x == 3)
-    {
-        WORD buf2[6];
-        WORD buf3[6];
-        buf2[0] = list1[0].toInt();
-        buf2[1] = list1[1].toInt() >> 16;
-        buf2[2] = list1[1].toInt();
-        buf2[3] = list1[2].toInt();
-        buf2[4] = list1[3].toInt();
-        buf2[5] = 0;
-
-        for (int j = 0; j < 5; j++)
-        {
-            buf2[5] = buf2[5] + buf2[j];
-        }
-
-        buf3[0] = list1[4].toInt();
-        buf3[1] = list1[5].toInt() >> 16;
-        buf3[2] = list1[5].toInt();
-        buf3[3] = list1[6].toInt();
-        buf3[4] = list1[7].toInt();
-        buf3[5] = 0;
-
-        for (int k = 0; k < 5; k++)
-        {
-            buf3[5] = buf3[5] + buf3[k];
-        }
-
-        if(ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if(ch_cur == 2)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if(ch_cur == 0)
-        {
-            emit MKO_CTM(1, 1);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        ch_cur = 3;
-        if (tmkselect(0) != 0)
-        {
-            err2 += "Ошибка! tmk0!\n";
-        }
-
-        bcreset();
-
-        m_addr = adr1;
-        err2 += " Основной полукомплект передача массива ось ψ: \n";
-        m_subAddr = 1;
-        err2 += receive(buf2, 6);
-
-        err2 += " Основной полукомплект передача массива ось υ: \n";
-        m_subAddr = 2;
-        err2 += receive(buf3, 6);
-
-        if (tmkselect(1) != 0 )
-        {
-            err2 += "Ошибка! tmk1!\n";
-        }
-
-        bcreset();
-        m_addr = adr2;
-        err2 += " Резервный полукомплект передача массива ось ψ: \n";
-        m_subAddr = 1;
-        err2 += receive(buf2, 6);
-
-        err2 += " Резервный полукомплект передача массива ось υ: \n";
-        m_subAddr = 2;
-        err2 += receive(buf3, 6);
+        break;
+    default:
+        break;
     }
 
     emit start_MKO(err2);
 }
 
-void MKO::MKO_rc_cm(int x, int adr1, int adr2)
+void MKO::MKO_rc_cm(int kits, int adr1, int adr2)
 {
+    if (kits == NO_KIT)
+    {
+        emit data_MKO("");
+        emit start_MKO(" Выберите полукомплект для приема массива! \n");
+        return;
+    }
+
     QString data = "";
     QString err3 = "";
-    if (x == 0)
+
+    switch (kits)
     {
-        err3 += " Выберите полукомплект для приема массива! \n";
-    }
-
-    if (x == 1)
-    {
-        err3 += " Основной полукомплект прием массива: \n";
-        m_addr = adr1;
-        if(ch_cur == 2)
+    case MAIN_KIT:
         {
-            stopMKO();
+            err3 += " Основной полукомплект прием массива: \n";
+            m_addr = adr1;
+            if(m_enabledKits == RESERVE_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(1, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == ALL_KITS)
+            {
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(2, 0);
+                Sleep(1100);
+                startMKO();
+            }
+
+            m_enabledKits = MAIN_KIT;
+
+            WORD buff1[23];
+            m_subAddr = 13;
+            send(buff1, 22, data, err3);
+        }
+        break;
+    case RESERVE_KIT:
+        {
+            err3 += " Резервный полукомплект прием массива: \n";
+            m_addr = adr2;
+            if(m_enabledKits == MAIN_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(2, 1);
+                Sleep(1100);
+                startMKO();
+            }
+            else if(m_enabledKits == ALL_KITS)
+            {
+                stopMKO1();
+                Sleep(100);
+                emit MKO_CTM(1, 0);
+                Sleep(1100);
+                startMKO();
+            }
+
+            m_enabledKits = RESERVE_KIT;
+
+            WORD buff1[23];
+            m_subAddr = 13;
+            send(buff1, 22, data, err3);
+        }
+        break;
+    case ALL_KITS:
+        {
+            WORD buff2[23];
+            err3 += " Основной полукомплект прием массива: \n";
+            m_addr = adr1;
+            if (m_enabledKits == MAIN_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if(m_enabledKits == RESERVE_KIT)
+            {
+                stopMKO();
+                Sleep(100);
+                emit MKO_CTM(1, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            if (m_enabledKits == NO_KIT)
+            {
+                emit MKO_CTM(1, 1);
+                emit MKO_CTM(2, 1);
+                Sleep(1200);
+                startMKO1();
+            }
+
+            m_enabledKits = ALL_KITS;
+            if (tmkselect(1) != 0)
+            {
+                err3 += "Ошибка! tmk0!\n";
+            }
+
+            bcreset();
             Sleep(100);
-            emit MKO_CTM(2, 0);
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 0)
-        {
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 3)
-        {
-            stopMKO1();
+            m_subAddr = 13;
+            send(buff2, 22, data, err3);
+
+            if (tmkselect(0) != 0)
+            {
+                err3 += "Ошибка! tmk1!\n";
+            }
+
+            bcreset();
             Sleep(100);
-            emit MKO_CTM(2, 0);
-            Sleep(1100);
-            startMKO();
+            err3 += " Резервный полукомплект прием массива: \n";
+
+            m_addr = adr2;
+            m_subAddr = 13;
+
+            send(buff2, 22, data, err3);
         }
-
-        ch_cur = 1;
-    }
-
-    if (x == 2)
-    {
-        err3 += " Резервный полукомплект прием массива: \n";
-        m_addr = adr2;
-        if(ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 0)
-        {
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur == 3)
-        {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            Sleep(1100);
-            startMKO();
-        }
-
-        ch_cur = 2;
-    }
-
-    if (x == 1 || x == 2)
-    {
-        WORD buff1[23];
-        m_subAddr = 13;
-        send(buff1, 22, data, err3);
-    }
-
-    if (x == 3)
-    {
-        WORD buff2[23];
-        err3 += " Основной полукомплект прием массива: \n";
-        m_addr = adr1;
-        if (ch_cur == 1)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if(ch_cur == 2)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        if (ch_cur == 0)
-        {
-            emit MKO_CTM(1, 1);
-            emit MKO_CTM(2, 1);
-            Sleep(1200);
-            startMKO1();
-        }
-
-        ch_cur = 3;
-        if (tmkselect(1)!= 0)
-        {
-            err3 += "Ошибка! tmk0!\n";
-        }
-
-        bcreset();
-        Sleep(100);
-        m_subAddr = 13;
-        send(buff2, 22, data, err3);
-
-        if (tmkselect(0)!= 0)
-        {
-            err3 += "Ошибка! tmk1!\n";
-        }
-
-        bcreset();
-        Sleep(100);
-        err3 += " Резервный полукомплект прием массива: \n";
-
-        m_addr = adr2;
-        m_subAddr = 13;
-
-        send(buff2, 22, data, err3);
+        break;
+    default:
+        break;
     }
 
     emit data_MKO(data);
