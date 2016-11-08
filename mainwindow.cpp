@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     threadMKO = new QThread(this);
     myMKO = new MKO("B", this);
 
-    //startCondition(); // Ivan Semenchuk: uncomment to work with real device
+    //startCondition(); // TODO: uncomment to work with real device
 }
 
 MainWindow::~MainWindow()
