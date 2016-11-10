@@ -17,6 +17,7 @@ public:
 
     Cell();
     Cell(QPoint pos, Type type);
+    Cell(QPoint pos, Command* cmd);
 
     const QPoint& getPos() const { return mPos; }
     void setPos(const QPoint& pos) { mPos = pos; }

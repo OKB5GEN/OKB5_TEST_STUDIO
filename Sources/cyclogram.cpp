@@ -1,4 +1,6 @@
 #include "Headers/cyclogram.h"
+#include "Headers/commands/cmd_state_start.h"
+#include "Headers/commands/cmd_set_state.h"
 
 // Описание архитектуры
 
@@ -15,7 +17,22 @@
  * В ячейке (2;1) по умолчанию команда "Начало состояния" "END_FAIL". Эта команда всегда в последнем столбце. Завершает выполнение циклограммы  с рез-том "Неуспешно".
 */
 
+
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent)
 {
+}
+
+void Cyclogram::createDefault()
+{
+     addCell(Cell(QPoint(0, 0), new CmdStateStart(START_STATE_NAME, this)));
+     addCell(Cell(QPoint(0, 1), Cell::ADD_COMMAND));
+     addCell(Cell(QPoint(0, 2), new CmdSetState(END_OK_STATE_NAME, this)));
+     addCell(Cell(QPoint(1, 0), new CmdStateStart(END_OK_STATE_NAME, this)));
+     addCell(Cell(QPoint(2, 0), new CmdStateStart(END_FAIL_STATE_NAME, this)));
+}
+
+void Cyclogram::addCell(const Cell& cell)
+{
+
 }
