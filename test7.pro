@@ -24,7 +24,9 @@ SOURCES += main.cpp\
     OTD.cpp \
     MKO.cpp \
     Sources/command.cpp \
-    Sources/commandscontroller.cpp
+    Sources/commandscontroller.cpp \
+    Sources/cyclogram.cpp \
+    Sources/cell.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -34,7 +36,9 @@ HEADERS  += mainwindow.h \
     WDMTMKv2.h \
     MKO.h \
     Headers/command.h \
-    Headers/commandscontroller.h
+    Headers/commandscontroller.h \
+    Headers/cyclogram.h \
+    Headers/cell.h
 
 
 FORMS    += mainwindow.ui
