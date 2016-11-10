@@ -12,8 +12,8 @@ class Cyclogram: public QObject
 public:
     Cyclogram(QObject * parent);
 
+
 private:
-    void addState(QString name);
 
 signals:
 };

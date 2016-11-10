@@ -19,8 +19,3 @@ Cyclogram::Cyclogram(QObject * parent):
     QObject(parent)
 {
 }
-
-void Cyclogram::addState(QString name)
-{
-
-}

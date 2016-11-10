@@ -26,7 +26,22 @@ SOURCES += main.cpp\
     Sources/command.cpp \
     Sources/commandscontroller.cpp \
     Sources/cyclogram.cpp \
-    Sources/cell.cpp
+    Sources/cell.cpp \
+    Sources/commands/cmd_case.cpp \
+    Sources/commands/cmd_check_condition.cpp \
+    Sources/commands/cmd_cycle_do_while.cpp \
+    Sources/commands/cmd_cycle_for.cpp \
+    Sources/commands/cmd_cycle_while.cpp \
+    Sources/commands/cmd_delay.cpp \
+    Sources/commands/cmd_parallel_process.cpp \
+    Sources/commands/cmd_send_msg_ok_fail.cpp \
+    Sources/commands/cmd_send_msg_result.cpp \
+    Sources/commands/cmd_send_msg_result_fail.cpp \
+    Sources/commands/cmd_set_state.cpp \
+    Sources/commands/cmd_state_start.cpp \
+    Sources/commands/cmd_sub_program.cpp \
+    Sources/commands/cmd_switch.cpp \
+    Sources/commands/cmd_variable.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -35,10 +50,25 @@ HEADERS  += mainwindow.h \
     OTD.h \
     WDMTMKv2.h \
     MKO.h \
-    Headers/command.h \
     Headers/commandscontroller.h \
     Headers/cyclogram.h \
-    Headers/cell.h
+    Headers/cell.h \
+    Headers/commands/cmd_case.h \
+    Headers/commands/cmd_check_condition.h \
+    Headers/commands/cmd_cycle_do_while.h \
+    Headers/commands/cmd_cycle_for.h \
+    Headers/commands/cmd_cycle_while.h \
+    Headers/commands/cmd_delay.h \
+    Headers/commands/cmd_parallel_process.h \
+    Headers/commands/cmd_send_msg_ok_fail.h \
+    Headers/commands/cmd_send_msg_result.h \
+    Headers/commands/cmd_send_msg_result_fail.h \
+    Headers/commands/cmd_set_state.h \
+    Headers/commands/cmd_state_start.h \
+    Headers/commands/cmd_sub_program.h \
+    Headers/commands/cmd_switch.h \
+    Headers/commands/cmd_variable.h \
+    Headers/command.h
 
 
 FORMS    += mainwindow.ui
