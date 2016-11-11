@@ -2,7 +2,7 @@
 #define CYCLOGRAM_H
 
 #include <QObject>
-//#include <QList>
+#include <QList>
 #include "Headers/cell.h"
 
 class Command;
@@ -13,25 +13,26 @@ class Cyclogram: public QObject
 
 public:
     const QString START_STATE_NAME = "START";
-    const QString END_OK_STATE_NAME = "END_OK";
-    const QString END_FAIL_STATE_NAME = "END_FAIL";
-
-    const int MAX_COLUMNS = 10;
-    const int MAX_ROWS = 10;
+    const QString END_STATE_NAME = "END";
 
     Cyclogram(QObject * parent);
 
     void createDefault();
+    void run();
 
+private slots:
+    void onCommandFinished(Command* cmd);
 
 private:
-    void addCell(const Cell& cell);
+    void insertCell(const Cell& cell);
 
-    //Cell mCells[MAX_ROWS][MAX_COLUMNS]; // memory overhead but modification will be quick
-
-    //int mRows = 0;
-    //int mColumns = 0;
+    QList<Cell> mCells;
+    int mRows = 0;
+    int mColumns = 0;
+    Command* mFirst = Q_NULLPTR;
+    bool mIsRunning = false;
 
 signals:
+    void changed();
 };
 #endif // CYCLOGRAM_H

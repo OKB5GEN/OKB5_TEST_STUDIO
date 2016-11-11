@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include <QObject>
+#include <QSize>
 
 class Command: public QObject
 {
@@ -13,8 +14,13 @@ public:
     virtual void run();
     virtual void stop();
 
+    const QSize& getSize() const { return mSize; }
+
 signals:
-    void onFinished(Command* cmd); // must be sent on command finish
+    void onFinished(Command* nextCmd); // must be sent on command finish
+
+protected:
+    QSize mSize; // must be initialized in command
 
 private:
 };

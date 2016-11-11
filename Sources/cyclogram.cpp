@@ -17,6 +17,18 @@
  * В ячейке (2;1) по умолчанию команда "Начало состояния" "END_FAIL". Эта команда всегда в последнем столбце. Завершает выполнение циклограммы  с рез-том "Неуспешно".
 */
 
+/* Как это работает
+ *
+ * Есть редактор, он следит за расположением операций по ячейкам
+ * Есть обработчик команд. Он знает только первую команду и запускает ее.
+ * Команда по своем завешении присылает сигнал, в котором присылает указатель на следующую команду
+ * Если команда присылает 0, то это значит окончание циклограммы
+ * По итогу у каждой команды есть список команд, которые могут быть выполнены по ее завершении
+ * Обратная связь команд я не уверен, что нужна
+ *
+ * Добавление/удаление команд
+ *
+ */
 
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent)
@@ -25,14 +37,105 @@ Cyclogram::Cyclogram(QObject * parent):
 
 void Cyclogram::createDefault()
 {
-     addCell(Cell(QPoint(0, 0), new CmdStateStart(START_STATE_NAME, this)));
-     addCell(Cell(QPoint(0, 1), Cell::ADD_COMMAND));
-     addCell(Cell(QPoint(0, 2), new CmdSetState(END_OK_STATE_NAME, this)));
-     addCell(Cell(QPoint(1, 0), new CmdStateStart(END_OK_STATE_NAME, this)));
-     addCell(Cell(QPoint(2, 0), new CmdStateStart(END_FAIL_STATE_NAME, this)));
+    foreach (const Cell& cell, mCells)
+    {
+        Command* cmd = cell.getCommand();
+        if (cmd != Q_NULLPTR)
+        {
+            cmd->deleteLater();
+        }
+    }
+
+    mCells.clear();
+
+    CmdStateStart* first = new CmdStateStart(START_STATE_NAME, this);
+    CmdStateStart* setEndState = new CmdStateStart(END_STATE_NAME, this);
+    first->setNextCommand(setEndState);
+    mFirst = first;
+
+    mCells.append(Cell(QPoint(mRows, 0), mFirst));
+    mCells.append(Cell(QPoint(mRows, 1), setEndState));
+    ++mRows;
+
+    mCells.append(Cell(QPoint(mRows, 0), Cell::ADD_COMMAND));
+    mCells.append(Cell(QPoint(mRows, 1), Cell::EMPTY));
+    ++mRows;
+
+    mCells.append(Cell(QPoint(mRows, 0), new CmdSetState(END_STATE_NAME, this)));
+    mCells.append(Cell(QPoint(mRows, 1), Cell::EMPTY));
+    ++mRows;
+    mColumns = 2;
+
+    emit changed();
 }
 
-void Cyclogram::addCell(const Cell& cell)
+void Cyclogram::insertCell(const Cell& cell)
 {
+    int row = cell.getPos().x();
+    int column = cell.getPos().y();
 
+    if (cell.getCommand() != Q_NULLPTR)
+    {
+        //QSize size = cell.getCommand()->getSize();
+        //insertColumns(size.width() - 1);
+
+        /* TODO НА ПОПОЗЖЕ, СНАЧАЛА БУДЕТ ТОЛЬКО ЛИНЕЙНОЕ ДОБАВЛЕНИЕ/УДАЛЕНИЕ КОМАНД
+         *
+         * Надо как-то правильно посчитать когда вставлять, а когда не вставлять строки и столбцы
+         * Скорее всего как-то надо держать в уме:
+         * - самую большую длину ветки
+         * - длину текущей ветки
+         * - ширину текущей ветки
+         *
+         * Алгоритм примерно такой (ппц):
+         * - по координатам ячейки определяем в какую ветку мы будем вставляться
+         * - видимо придется иметь QMap<QString, QPoint>, где в QPoint хрянится column min и column max,
+         * из которых мы сможем определить в какую ветку вставляемся
+         * - если "индекс колонки вставки + вставляемая ширина - 1 (наверное)" > "текущая ширина ветки",
+         * то вставляем столбец, при этом все, что справа от вставляемого двигаем вправо
+         * обновляем мапу новыми значениями
+         * - далее смотрим в другой QMap<QString, int>, где указан row max для каждой ветки
+         * - если мы вставляем в самую длинную ветку или не в самую длинную,
+         * но "текущая длина + размер вставляемого - 1 (размер плюсика)" > "самой большой длины", то вставляем строки
+         * при этом все, что ниже места строки вставки, двигается вниз
+*/
+    }
+
+    /*
+    // we can insert
+    if ((row + 1) > mRows) // insert new row
+    {
+        ++mRows;
+
+        if ((column + 1) > mColumns)
+        {
+            ++mColumns;
+        }
+
+        mCells.insert(column + row * mColumns, cell);
+    }
+    */
+}
+
+void Cyclogram::run()
+{
+    if (!mIsRunning)
+    {
+        mIsRunning = true;
+        connect(mFirst, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*)));
+        mFirst->run();
+    }
+}
+
+void Cyclogram::onCommandFinished(Command* cmd)
+{
+    if (cmd != Q_NULLPTR)
+    {
+        connect(cmd, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on commend creation
+        cmd->run();
+    }
+    else
+    {
+        mIsRunning = false; // execution finished
+    }
 }

@@ -2,6 +2,12 @@
 
 CmdStateStart::CmdStateStart(QString name, QObject * parent):
     Command(parent),
-    mName(name)
+    mName(name),
+    mNext(Q_NULLPTR)
 {
+}
+
+void CmdStateStart::run()
+{
+    emit onFinished(mNext);
 }

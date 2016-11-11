@@ -24,7 +24,6 @@ SOURCES += main.cpp\
     OTD.cpp \
     MKO.cpp \
     Sources/command.cpp \
-    Sources/commandscontroller.cpp \
     Sources/cyclogram.cpp \
     Sources/cell.cpp \
     Sources/commands/cmd_case.cpp \
@@ -50,7 +49,6 @@ HEADERS  += mainwindow.h \
     OTD.h \
     WDMTMKv2.h \
     MKO.h \
-    Headers/commandscontroller.h \
     Headers/cyclogram.h \
     Headers/cell.h \
     Headers/commands/cmd_case.h \
