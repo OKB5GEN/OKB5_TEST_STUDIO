@@ -52,6 +52,7 @@ void Cyclogram::createDefault()
     CmdStateStart* setEndState = new CmdStateStart(END_STATE_NAME, this);
     first->setNextCommand(setEndState);
     mFirst = first;
+    mCurrent = Q_NULLPTR;
 
     mCells.append(Cell(QPoint(mRows, 0), mFirst));
     mCells.append(Cell(QPoint(mRows, 1), setEndState));
@@ -119,11 +120,12 @@ void Cyclogram::insertCell(const Cell& cell)
 
 void Cyclogram::run()
 {
-    if (!mIsRunning)
+    if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
-        mIsRunning = true;
+        mState = RUNNING;
         connect(mFirst, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*)));
-        mFirst->run();
+        mCurrent = mFirst;
+        mCurrent->run();
     }
 }
 
@@ -131,11 +133,44 @@ void Cyclogram::onCommandFinished(Command* cmd)
 {
     if (cmd != Q_NULLPTR)
     {
-        connect(cmd, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on commend creation
-        cmd->run();
+        mCurrent = cmd;
+        connect(mCurrent, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on command creation
+
+        if (mState == RUNNING)
+        {
+            mCurrent->run();
+        }
     }
     else
     {
-        mIsRunning = false; // execution finished
+        stop();
+    }
+}
+
+void Cyclogram::stop()
+{
+    if (mState == RUNNING || mState == PAUSED)
+    {
+        mCurrent->stop();
+        mState = STOPPED;
+        mCurrent = mFirst;
+    }
+}
+
+void Cyclogram::pause()
+{
+    if (mState == RUNNING)
+    {
+        mCurrent->pause();
+        mState = PAUSED;
+    }
+}
+
+void Cyclogram::resume()
+{
+    if (mState == PAUSED)
+    {
+        mCurrent->resume();
+        mState = RUNNING;
     }
 }

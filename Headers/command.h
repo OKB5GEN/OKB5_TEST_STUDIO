@@ -13,6 +13,8 @@ public:
     virtual ~Command();
     virtual void run();
     virtual void stop();
+    virtual void pause();
+    virtual void resume();
 
     const QSize& getSize() const { return mSize; }
 

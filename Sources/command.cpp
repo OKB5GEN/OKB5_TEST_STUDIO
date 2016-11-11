@@ -20,3 +20,13 @@ void Command::stop()
 {
 
 }
+
+void Command::pause()
+{
+
+}
+
+void Command::resume()
+{
+
+}

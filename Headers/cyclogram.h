@@ -19,18 +19,29 @@ public:
 
     void createDefault();
     void run();
+    void stop();
+    void pause();
+    void resume();
 
 private slots:
     void onCommandFinished(Command* cmd);
 
 private:
+    enum State // TODO correct cyclogram start/pause/stop -ing
+    {
+        STOPPED,
+        RUNNING,
+        PAUSED
+    };
+
     void insertCell(const Cell& cell);
 
     QList<Cell> mCells;
     int mRows = 0;
     int mColumns = 0;
     Command* mFirst = Q_NULLPTR;
-    bool mIsRunning = false;
+    Command* mCurrent = Q_NULLPTR;
+    State mState = STOPPED;
 
 signals:
     void changed();
