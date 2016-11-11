@@ -40,7 +40,9 @@ SOURCES += main.cpp\
     Sources/commands/cmd_state_start.cpp \
     Sources/commands/cmd_sub_program.cpp \
     Sources/commands/cmd_switch.cpp \
-    Sources/commands/cmd_variable.cpp
+    Sources/commands/cmd_variable.cpp \
+    Sources/editorwindow.cpp \
+    Sources/renderarea.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -66,7 +68,12 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_sub_program.h \
     Headers/commands/cmd_switch.h \
     Headers/commands/cmd_variable.h \
-    Headers/command.h
+    Headers/command.h \
+    Headers/editorwindow.h \
+    Headers/renderarea.h
 
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    application.qrc
