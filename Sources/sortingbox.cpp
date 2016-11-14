@@ -2,10 +2,26 @@
 #include <stdlib.h>
 #include "Headers/sortingbox.h"
 
+/*
+ * Здесь мы создаем формы для циклограммы
+ *
+ * (0;0) - это левый верхний угол. Ось Х идет вправо, ось Y идет вниз
+ * Область логически представляет собой сетку из квадратиков.
+ * Под каждый ДРАКОН-элемент циклограммы отводится прямоугольник из W на H квадратиков
+ * Вокруг собственно элемента дорожка толщиной в 1 квадратик.
+ * Дорожка нужна в качестве бокового и вертикального интервала между элементами
+ * В дорожку на вертикальном интервале ставится валентная точка (точка, куда можно что-либо добавить)
+ * Снаружи класса управление идет по индексам элементов в сетке, а не по квадратикам
+*/
+
 namespace
 {
-    static const int CELL_WIDTH = 150;
-    static const int CELL_HEIGHT = 60;
+    static const QSizeF CELL = QSizeF(30, 30);
+    static const int CELLS_PER_ITEM_V = 4;
+    static const int CELLS_PER_ITEM_H = 8;
+
+    //static const qreal CELL_WIDTH = 176;
+    //static const qreal CELL_HEIGHT = 68;
 }
 
 SortingBox::SortingBox()
@@ -14,79 +30,73 @@ SortingBox::SortingBox()
     setBackgroundRole(QPalette::Base);
     mSelectedItem = 0;
 
+    QSizeF totalItemSize(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V);
+    QSizeF itemSz(CELL.width() * (CELLS_PER_ITEM_H - 2), CELL.height() * (CELLS_PER_ITEM_V - 2)); // -2 rows/columns at each side
+
     //newCircleButton = createToolButton(tr("New Circle"), QIcon(":/images/circle.png"), SLOT(createNewCircle()));
     //newSquareButton = createToolButton(tr("New Square"), QIcon(":/images/square.png"), SLOT(createNewSquare()));
     //newTriangleButton = createToolButton(tr("New Triangle"), QIcon(":/images/triangle.png"), SLOT(createNewTriangle()));
 
-    mTitlePath.addRoundedRect(QRectF(0, 0, CELL_WIDTH, CELL_HEIGHT), CELL_HEIGHT / 2, CELL_HEIGHT / 2);
+    mTitlePath.addRoundedRect(QRectF(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()), itemSz.height() / 2, itemSz.height() / 2);
 
+    /*
     mAddPath.addEllipse(QRect((CELL_WIDTH - CELL_HEIGHT) / 2, 0, CELL_HEIGHT, CELL_HEIGHT));
     mAddPath.moveTo(CELL_WIDTH / 2, CELL_HEIGHT / 6);
     mAddPath.lineTo(CELL_WIDTH / 2, CELL_HEIGHT * 5 / 6);
     mAddPath.moveTo(CELL_HEIGHT / 6 + (CELL_WIDTH - CELL_HEIGHT) / 2, CELL_HEIGHT / 2);
     mAddPath.lineTo((CELL_WIDTH + CELL_HEIGHT) / 2 - CELL_HEIGHT / 6, CELL_HEIGHT / 2);
+    */
 
 
-    mCirclePath.addEllipse(QRect(0, 0, CELL_HEIGHT, CELL_HEIGHT));
-    mSquarePath.addRect(QRect(0, 0, CELL_WIDTH, CELL_HEIGHT));
+    mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()));
+    mSquarePath.addRect(QRect(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()));
 
-    qreal x = mTrianglePath.currentPosition().x();
-    qreal y = mTrianglePath.currentPosition().y();
-    mTrianglePath.moveTo(x + 120 / 2, y);
+    mTrianglePath.moveTo(120 / 2, 0);
     mTrianglePath.lineTo(0, 100);
     mTrianglePath.lineTo(120, 100);
-    mTrianglePath.lineTo(x + 120 / 2, y);
+    mTrianglePath.lineTo(120 / 2, 0);
 
-    qreal x1 = mHexagonPath.currentPosition().x();
-    qreal y1 = mHexagonPath.currentPosition().y();
+    mHexagonPath.moveTo(CELL.width(), totalItemSize.height() / 2);
+    mHexagonPath.lineTo(CELL.width() * 2, totalItemSize.height() - CELL.height());
+    mHexagonPath.lineTo(totalItemSize.width() - 2 * CELL.width(), totalItemSize.height() - CELL.height());
+    mHexagonPath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() / 2);
+    mHexagonPath.lineTo(totalItemSize.width() - 2 * CELL.width(), CELL.height());
+    mHexagonPath.lineTo(CELL.width() * 2, CELL.height());
+    mHexagonPath.lineTo(CELL.width(), totalItemSize.height() / 2);
 
-    mHexagonPath.moveTo(x1, y1 + CELL_HEIGHT / 2);
-    mHexagonPath.lineTo(CELL_WIDTH / 6, CELL_HEIGHT);
-    mHexagonPath.lineTo(CELL_WIDTH * 5 / 6, CELL_HEIGHT);
-    mHexagonPath.lineTo(CELL_WIDTH, CELL_HEIGHT / 2);
-    mHexagonPath.lineTo(CELL_WIDTH * 5 / 6, 0);
-    mHexagonPath.lineTo(CELL_WIDTH / 6, 0);
-    mHexagonPath.lineTo(x1, y1 + CELL_HEIGHT / 2);
+    mHeadlinePath.moveTo(CELL.width(), CELL.height());
+    mHeadlinePath.lineTo(CELL.width(), totalItemSize.height() - CELL.height() * 3 / 2);
+    mHeadlinePath.lineTo(totalItemSize.width() / 2, totalItemSize.height() - CELL.height());
+    mHeadlinePath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() - CELL.height() * 3 / 2);
+    mHeadlinePath.lineTo(totalItemSize.width() - CELL.width(), CELL.height());
+    mHeadlinePath.lineTo(CELL.width(), CELL.height());
 
-    qreal x2 = mHeadlinePath.currentPosition().x();
-    qreal y2 = mHeadlinePath.currentPosition().y();
-
-    mHeadlinePath.moveTo(x2, y2);
-    mHeadlinePath.lineTo(0, CELL_HEIGHT * 2 / 3);
-    mHeadlinePath.lineTo(CELL_WIDTH / 2, CELL_HEIGHT);
-    mHeadlinePath.lineTo(CELL_WIDTH, CELL_HEIGHT * 2 / 3);
-    mHeadlinePath.lineTo(CELL_WIDTH, 0);
-    mHeadlinePath.lineTo(x2, y2);
-
-    qreal x3 = mAddressPath.currentPosition().x();
-    qreal y3 = mAddressPath.currentPosition().y();
-
-    mAddressPath.moveTo(x3, y3 + CELL_HEIGHT / 3);
-    mAddressPath.lineTo(0, CELL_HEIGHT);
-    mAddressPath.lineTo(CELL_WIDTH, CELL_HEIGHT);
-    mAddressPath.lineTo(CELL_WIDTH, CELL_HEIGHT / 3);
-    mAddressPath.lineTo(CELL_WIDTH / 2, 0);
-    mAddressPath.lineTo(x3, y3 + CELL_HEIGHT / 3);
+    mAddressPath.moveTo(CELL.width(), CELL.height() * 3 / 2);
+    mAddressPath.lineTo(CELL.width(), totalItemSize.height() - CELL.height());
+    mAddressPath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() - CELL.height());
+    mAddressPath.lineTo(totalItemSize.width() - CELL.width(), CELL.height() * 3 / 2);
+    mAddressPath.lineTo(totalItemSize.width() / 2, CELL.height());
+    mAddressPath.lineTo(CELL.width(), CELL.height() * 3 / 2);
 
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
 
-    QPoint currentPos(CELL_WIDTH, CELL_HEIGHT);
+    QPoint currentPos(totalItemSize.width(), totalItemSize.height());
 
     createShapeItem(mTitlePath, tr("Title"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, CELL_HEIGHT);
+    currentPos += QPoint(0, totalItemSize.height());
 
     createShapeItem(mHeadlinePath, tr("Headline"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, CELL_HEIGHT);
+    currentPos += QPoint(0, totalItemSize.height());
 
-    createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, CELL_HEIGHT);
+    //createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
+    //currentPos += QPoint(0, totalItemSize.height());
 
     createShapeItem(mAddressPath, tr("Address"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, CELL_HEIGHT);
+    currentPos += QPoint(0, totalItemSize.height());
 
-    createShapeItem(mHeadlinePath, tr("Headline END"), QPoint(2 * CELL_WIDTH, 2 * CELL_HEIGHT) /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    createShapeItem(mTitlePath, tr("Title END"), QPoint(2 * CELL_WIDTH, 3 * CELL_HEIGHT) /*initialItemPosition(mCirclePath)*/, initialItemColor());
+    createShapeItem(mHeadlinePath, tr("Headline END"), QPoint(2 * totalItemSize.width(), 2 * totalItemSize.height()) /*initialItemPosition(mCirclePath)*/, initialItemColor());
+    createShapeItem(mTitlePath, tr("Title END"), QPoint(2 * totalItemSize.width(), 3 * totalItemSize.height()) /*initialItemPosition(mCirclePath)*/, initialItemColor());
 
     //createShapeItem(mAddressPath, tr("Address"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
     //currentPos += QPoint(0, CELL_HEIGHT);
