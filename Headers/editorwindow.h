@@ -11,8 +11,11 @@ class QSessionManager;
 QT_END_NAMESPACE
 
 class RenderArea;
+class SortingBox;
 
-//! [0]
+#define USE_SORTING_BOX
+
+
 class EditorWindow : public QMainWindow
 {
     Q_OBJECT
@@ -46,9 +49,13 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
+#ifdef USE_SORTING_BOX
+    SortingBox *renderArea;
+#else
     RenderArea *renderArea;
+#endif
+
     //QPlainTextEdit *textEdit;
     QString curFile;
 };
-//! [0]
 #endif // EDITORWINDOW_H

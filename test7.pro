@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     Sources/commands/cmd_switch.cpp \
     Sources/commands/cmd_variable.cpp \
     Sources/editorwindow.cpp \
-    Sources/renderarea.cpp
+    Sources/renderarea.cpp \
+    Sources/shapeitem.cpp \
+    Sources/sortingbox.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -70,7 +72,9 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_variable.h \
     Headers/command.h \
     Headers/editorwindow.h \
-    Headers/renderarea.h
+    Headers/renderarea.h \
+    Headers/shapeitem.h \
+    Headers/sortingbox.h
 
 
 FORMS    += mainwindow.ui
