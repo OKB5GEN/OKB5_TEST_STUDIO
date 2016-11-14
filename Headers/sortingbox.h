@@ -16,6 +16,43 @@ class SortingBox : public QWidget
     Q_OBJECT
 
 public:
+    // List of all DRAKON icons
+    enum IconID
+    {
+        // IMPLEMENTED >>>
+
+        // NOT IMPLEMENTED >>>
+        TITLE,
+        END,
+        ACTION,
+        QUESTION,
+        CHOICE,
+        CASE,
+        HEADLINE,
+        ADDRESS,
+        INSERTION,
+        SHELF,
+        PARAMS,
+        FOR_BEGIN,
+        FOR_END,
+        OUTPUT,
+        INPUT,
+        PAUSE,
+        PERIOD,
+        START_TIMER,
+        SYNCHRONIZER,
+        PARALLEL_PROCESS,
+        COMMENT,
+        RIGHT_COMMENT,
+        LEFT_COMMENT,
+        LOOP_ARROW,
+        SILHOUETTE_ARROW,
+        CONNECTOR,
+        CONCURRENT_PROCESS,
+
+        COUNT // always must be last
+    };
+
     SortingBox();
 
 protected:
@@ -43,12 +80,22 @@ private:
     QColor randomItemColor();
     QToolButton *createToolButton(const QString &toolTip, const QIcon &icon, const char *member);
 
-    QList<ShapeItem> shapeItems;
-    QPainterPath circlePath;
-    QPainterPath squarePath;
-    QPainterPath trianglePath;
+    QList<ShapeItem> mShapeItems;
 
-    QPoint previousPosition;
+    QPainterPath mTitlePath;
+
+    QPainterPath mHeadlinePath;
+    QPainterPath mAddressPath;
+
+    QPainterPath mAddPath;
+
+    QPainterPath mCirclePath;
+    QPainterPath mSquarePath;
+    QPainterPath mTrianglePath;
+
+    QPainterPath mHexagonPath;
+
+    QPoint mPreviousPosition;
     ShapeItem * mSelectedItem;
 
     //QToolButton *newCircleButton;
