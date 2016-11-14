@@ -69,6 +69,9 @@ protected:
     void createNewSquare();
     void createNewTriangle();
 
+private slots:
+    void addItem(SortingBox::IconID id, const QPoint& pos);
+
 private:
     int updateButtonGeometry(QToolButton *button, int x, int y);
     void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color);
@@ -79,6 +82,9 @@ private:
     QColor initialItemColor();
     QColor randomItemColor();
     QToolButton *createToolButton(const QString &toolTip, const QIcon &icon, const char *member);
+
+    QPointF mOrigin;
+    QSizeF mItem;
 
     QList<ShapeItem> mShapeItems;
 

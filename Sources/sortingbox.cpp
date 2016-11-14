@@ -19,25 +19,23 @@ namespace
     static const QSizeF CELL = QSizeF(30, 30);
     static const int CELLS_PER_ITEM_V = 4;
     static const int CELLS_PER_ITEM_H = 8;
-
-    //static const qreal CELL_WIDTH = 176;
-    //static const qreal CELL_HEIGHT = 68;
 }
 
-SortingBox::SortingBox()
+SortingBox::SortingBox():
+    mItem(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
     mSelectedItem = 0;
 
-    QSizeF totalItemSize(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V);
-    QSizeF itemSz(CELL.width() * (CELLS_PER_ITEM_H - 2), CELL.height() * (CELLS_PER_ITEM_V - 2)); // -2 rows/columns at each side
+    mOrigin.setX(mItem.width());
+    mOrigin.setY(mItem.height());
 
     //newCircleButton = createToolButton(tr("New Circle"), QIcon(":/images/circle.png"), SLOT(createNewCircle()));
     //newSquareButton = createToolButton(tr("New Square"), QIcon(":/images/square.png"), SLOT(createNewSquare()));
     //newTriangleButton = createToolButton(tr("New Triangle"), QIcon(":/images/triangle.png"), SLOT(createNewTriangle()));
 
-    mTitlePath.addRoundedRect(QRectF(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()), itemSz.height() / 2, itemSz.height() / 2);
+    mTitlePath.addRoundedRect(QRectF(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()), (mItem.height() - 2 * CELL.height()) / 2, (mItem.height() - 2 * CELL.height()) / 2);
 
     /*
     mAddPath.addEllipse(QRect((CELL_WIDTH - CELL_HEIGHT) / 2, 0, CELL_HEIGHT, CELL_HEIGHT));
@@ -48,63 +46,52 @@ SortingBox::SortingBox()
     */
 
 
-    mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()));
-    mSquarePath.addRect(QRect(CELL.width(), CELL.height(), itemSz.width(), itemSz.height()));
+    mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
+    mSquarePath.addRect(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
 
     mTrianglePath.moveTo(120 / 2, 0);
     mTrianglePath.lineTo(0, 100);
     mTrianglePath.lineTo(120, 100);
     mTrianglePath.lineTo(120 / 2, 0);
 
-    mHexagonPath.moveTo(CELL.width(), totalItemSize.height() / 2);
-    mHexagonPath.lineTo(CELL.width() * 2, totalItemSize.height() - CELL.height());
-    mHexagonPath.lineTo(totalItemSize.width() - 2 * CELL.width(), totalItemSize.height() - CELL.height());
-    mHexagonPath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() / 2);
-    mHexagonPath.lineTo(totalItemSize.width() - 2 * CELL.width(), CELL.height());
+    mHexagonPath.moveTo(CELL.width(), mItem.height() / 2);
+    mHexagonPath.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
+    mHexagonPath.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
+    mHexagonPath.lineTo(mItem.width() - CELL.width(), mItem.height() / 2);
+    mHexagonPath.lineTo(mItem.width() - 2 * CELL.width(), CELL.height());
     mHexagonPath.lineTo(CELL.width() * 2, CELL.height());
-    mHexagonPath.lineTo(CELL.width(), totalItemSize.height() / 2);
+    mHexagonPath.lineTo(CELL.width(), mItem.height() / 2);
 
     mHeadlinePath.moveTo(CELL.width(), CELL.height());
-    mHeadlinePath.lineTo(CELL.width(), totalItemSize.height() - CELL.height() * 3 / 2);
-    mHeadlinePath.lineTo(totalItemSize.width() / 2, totalItemSize.height() - CELL.height());
-    mHeadlinePath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() - CELL.height() * 3 / 2);
-    mHeadlinePath.lineTo(totalItemSize.width() - CELL.width(), CELL.height());
+    mHeadlinePath.lineTo(CELL.width(), mItem.height() - CELL.height() * 3 / 2);
+    mHeadlinePath.lineTo(mItem.width() / 2, mItem.height() - CELL.height());
+    mHeadlinePath.lineTo(mItem.width() - CELL.width(), mItem.height() - CELL.height() * 3 / 2);
+    mHeadlinePath.lineTo(mItem.width() - CELL.width(), CELL.height());
     mHeadlinePath.lineTo(CELL.width(), CELL.height());
 
     mAddressPath.moveTo(CELL.width(), CELL.height() * 3 / 2);
-    mAddressPath.lineTo(CELL.width(), totalItemSize.height() - CELL.height());
-    mAddressPath.lineTo(totalItemSize.width() - CELL.width(), totalItemSize.height() - CELL.height());
-    mAddressPath.lineTo(totalItemSize.width() - CELL.width(), CELL.height() * 3 / 2);
-    mAddressPath.lineTo(totalItemSize.width() / 2, CELL.height());
+    mAddressPath.lineTo(CELL.width(), mItem.height() - CELL.height());
+    mAddressPath.lineTo(mItem.width() - CELL.width(), mItem.height() - CELL.height());
+    mAddressPath.lineTo(mItem.width() - CELL.width(), CELL.height() * 3 / 2);
+    mAddressPath.lineTo(mItem.width() / 2, CELL.height());
     mAddressPath.lineTo(CELL.width(), CELL.height() * 3 / 2);
 
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
 
-    QPoint currentPos(totalItemSize.width(), totalItemSize.height());
-
-    createShapeItem(mTitlePath, tr("Title"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, totalItemSize.height());
-
-    createShapeItem(mHeadlinePath, tr("Headline"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, totalItemSize.height());
+    addItem(TITLE, QPoint(0, 0));
+    addItem(HEADLINE, QPoint(0, 1));
+    addItem(ADDRESS, QPoint(0, 2));
+    addItem(HEADLINE, QPoint(1, 1));
+    addItem(TITLE, QPoint(1, 2));
 
     //createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    //currentPos += QPoint(0, totalItemSize.height());
-
-    createShapeItem(mAddressPath, tr("Address"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    currentPos += QPoint(0, totalItemSize.height());
-
-    createShapeItem(mHeadlinePath, tr("Headline END"), QPoint(2 * totalItemSize.width(), 2 * totalItemSize.height()) /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    createShapeItem(mTitlePath, tr("Title END"), QPoint(2 * totalItemSize.width(), 3 * totalItemSize.height()) /*initialItemPosition(mCirclePath)*/, initialItemColor());
-
+    //currentPos += QPoint(0, item.height());
     //createShapeItem(mAddressPath, tr("Address"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
     //currentPos += QPoint(0, CELL_HEIGHT);
-
     //createShapeItem(mCirclePath, tr("Circle"), QPoint(0, 0) /*initialItemPosition(mCirclePath)*/, initialItemColor());
     //createShapeItem(mSquarePath, tr("Square"), QPoint(0, 0) /*initialItemPosition(mSquarePath)*/, initialItemColor());
     //createShapeItem(mTrianglePath, tr("Triangle"),QPoint(0, 0) /*initialItemPosition(mTrianglePath)*/, initialItemColor());
-
     //createShapeItem(mHexagonPath, tr("Hexagon"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
     //createShapeItem(mTitlePath, tr("Title"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
 }
@@ -288,3 +275,28 @@ QColor SortingBox::randomItemColor()
     return QColor::fromHsv(qrand() % 256, 255, 190);
 }
 
+void SortingBox::addItem(SortingBox::IconID id, const QPoint& pos)
+{
+    QPoint p(mOrigin.x() + pos.x() * mItem.width(), mOrigin.y() + pos.y() * mItem.height());
+
+    switch (id)
+    {
+    case TITLE:
+        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor());
+        break;
+    case HEADLINE:
+        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor());
+        break;
+
+    case ADDRESS:
+        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor());
+        break;
+
+    default:
+        {
+            QMessageBox::warning(this, tr("Application"), tr("Shape not implemented %1.").arg(id));
+            return;
+        }
+        break;
+    }
+}
