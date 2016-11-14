@@ -22,7 +22,8 @@ namespace
 }
 
 SortingBox::SortingBox():
-    mItem(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V)
+    mItem(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V),
+    mDiagramSize(0, 0)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -84,6 +85,10 @@ SortingBox::SortingBox():
     addItem(ADDRESS, QPoint(0, 2));
     addItem(HEADLINE, QPoint(1, 1));
     addItem(TITLE, QPoint(1, 2));
+    connectItems(QPoint(0, 0), QPoint(0, 1));
+    connectItems(QPoint(0, 1), QPoint(0, 2));
+    connectItems(QPoint(1, 1), QPoint(1, 2));
+    drawSilhouette();
 
     //createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
     //currentPos += QPoint(0, item.height());
@@ -177,19 +182,19 @@ void SortingBox::mouseReleaseEvent(QMouseEvent *event)
 void SortingBox::createNewCircle()
 {
     static int count = 1;
-    createShapeItem(mCirclePath, tr("Circle <%1>").arg(++count), randomItemPosition(), randomItemColor());
+    createShapeItem(mCirclePath, tr("Circle <%1>").arg(++count), randomItemPosition(), randomItemColor(), -1);
 }
 
 void SortingBox::createNewSquare()
 {
     static int count = 1;
-    createShapeItem(mSquarePath, tr("Square <%1>").arg(++count), randomItemPosition(), randomItemColor());
+    createShapeItem(mSquarePath, tr("Square <%1>").arg(++count), randomItemPosition(), randomItemColor(), -1);
 }
 
 void SortingBox::createNewTriangle()
 {
     static int count = 1;
-    createShapeItem(mTrianglePath, tr("Triangle <%1>").arg(++count), randomItemPosition(), randomItemColor());
+    createShapeItem(mTrianglePath, tr("Triangle <%1>").arg(++count), randomItemPosition(), randomItemColor(), -1);
 }
 
 int SortingBox::itemAt(const QPoint &pos)
@@ -221,13 +226,14 @@ int SortingBox::updateButtonGeometry(QToolButton *button, int x, int y)
     return y - size.rheight() - style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
 }
 
-void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color)
+void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, int type)
 {
     ShapeItem shapeItem;
     shapeItem.setPath(path);
     shapeItem.setToolTip(toolTip);
     shapeItem.setPosition(pos);
     shapeItem.setColor(color);
+    shapeItem.setType(type);
     mShapeItems.append(shapeItem);
     update();
 }
@@ -267,7 +273,7 @@ QPoint SortingBox::randomItemPosition()
 QColor SortingBox::initialItemColor()
 {
     //return QColor::fromHsv(((shapeItems.size() + 1) * 85) % 256, 255, 190);
-    return QColor::fromRgba(0x00ffffff);
+    return QColor::fromRgba(0xffffffff);
 }
 
 QColor SortingBox::randomItemColor()
@@ -279,17 +285,27 @@ void SortingBox::addItem(SortingBox::IconID id, const QPoint& pos)
 {
     QPoint p(mOrigin.x() + pos.x() * mItem.width(), mOrigin.y() + pos.y() * mItem.height());
 
+    if (pos.x() + 1 > mDiagramSize.width())
+    {
+        mDiagramSize.setWidth(pos.x() + 1);
+    }
+
+    if (pos.y() + 1 > mDiagramSize.height())
+    {
+        mDiagramSize.setHeight(pos.y() + 1);
+    }
+
     switch (id)
     {
     case TITLE:
-        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor());
+        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor(), id);
         break;
     case HEADLINE:
-        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor());
+        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor(), id);
         break;
 
     case ADDRESS:
-        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor());
+        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor(), id);
         break;
 
     default:
@@ -299,4 +315,68 @@ void SortingBox::addItem(SortingBox::IconID id, const QPoint& pos)
         }
         break;
     }
+}
+
+void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2)
+{
+    /* Тут надо понять логику сочленений между итемами
+     * 1. По идее надо рисовать линию "силуэта"
+     * 2. Линия силуэта проходит так:
+     *    - идет по низу на расстояии 1 клетка от от крайнего правого адреса влево
+     *    - в нее входят коннекторы от каждого адреса перехода (они все внизу), до крайнего левого адреса
+*/
+
+    // пока полухардкод для соседних элементов по вертикали
+    if (pos1.x() == pos2.x() && qAbs(pos2.y() - pos1.y()) == 1)
+    {
+        QPoint pos = pos1;
+        if (pos2.y() < pos1.y())
+        {
+            pos = pos2;
+        }
+
+        qreal x = mOrigin.x() + pos.x() * mItem.width() + mItem.width() / 2;
+        qreal y = mOrigin.y() + pos.y() * mItem.height() + mItem.height();
+
+        mItemConnectorPath.moveTo(x, y - CELL.height());
+        mItemConnectorPath.lineTo(x, y + CELL.height());
+
+        createShapeItem(mItemConnectorPath, "Connector", pos, initialItemColor(), -1);
+    }
+}
+
+void SortingBox::drawSilhouette()
+{
+    return;
+
+    mDiagramSize.width();
+    mDiagramSize.height();
+
+    int maxAddress = -1;
+
+    QPainterPath silhouette;
+
+    foreach (ShapeItem shapeItem, mShapeItems)
+    {
+        if (shapeItem.type() == ADDRESS)
+        {
+            if (shapeItem.position().x() > maxAddress)
+            {
+                maxAddress = shapeItem.position().x();
+            }
+
+            shapeItem.position();
+            //TODO добавить палочку вниз в путь
+        }
+        else if (shapeItem.type() == HEADLINE)
+        {
+            shapeItem.position();
+            //TODO добавить палочку ввех в путь
+        }
+    }
+
+    //TODO от maxAddress до 0 минус клеточка по X  нарисовать горизонтальную линию влево
+    // далее вверх до Y = 0 минус клеточка
+    // далее вправо до mDiagramSize.width() минус половина итема/ячейки
+    // нарисовать стрелочку и точку над элементом (0;0)
 }

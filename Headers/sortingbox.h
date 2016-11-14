@@ -73,8 +73,11 @@ private slots:
     void addItem(SortingBox::IconID id, const QPoint& pos);
 
 private:
+    void connectItems(const QPoint& pos1, const QPoint& pos2);
+    void drawSilhouette();
+
     int updateButtonGeometry(QToolButton *button, int x, int y);
-    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color);
+    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, int type);
     int itemAt(const QPoint &pos);
     void moveItemTo(const QPoint &pos);
     QPoint initialItemPosition(const QPainterPath &path);
@@ -85,6 +88,7 @@ private:
 
     QPointF mOrigin;
     QSizeF mItem;
+    QSize mDiagramSize;
 
     QList<ShapeItem> mShapeItems;
 
@@ -100,6 +104,8 @@ private:
     QPainterPath mTrianglePath;
 
     QPainterPath mHexagonPath;
+
+    QPainterPath mItemConnectorPath;
 
     QPoint mPreviousPosition;
     ShapeItem * mSelectedItem;
