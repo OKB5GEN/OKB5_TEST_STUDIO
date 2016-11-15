@@ -158,6 +158,17 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         int index = itemAt(event->pos());
         if (index != -1)
         {
+            if (mShapeItems[index].toolTip() == "AddItem")
+            {
+                // TODO make dialog
+                QMessageBox::information(this,
+                                            tr("Shape add dialog"),
+                                            tr("Commands list"),
+                                            QMessageBox::Ok, QMessageBox::Cancel);
+
+            }
+
+            /*
             int TODO; // split shapes on movable selectable
             bool movable = false;
             bool selectable = false;
@@ -169,6 +180,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
                 mShapeItems.move(index, mShapeItems.size() - 1);
                 update();
             }
+            */
         }
     }
 }
@@ -182,6 +194,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
         int index = itemAt(event->pos());
         if (index != -1)
         {
+            /*
             if (mShapeItems[index].toolTip() == "AddItem")
             {
                 // TODO make dialog
@@ -191,6 +204,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
                                             QMessageBox::Ok, QMessageBox::Cancel);
 
             }
+            */
         }
     }
 }
@@ -379,7 +393,7 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
             qreal radius = qMin(CELL.width(), CELL.height()) / 2;
 
             addItemPath.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xffffffff), -1);
+            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xff00ff00), -1);
         }
 
         /*

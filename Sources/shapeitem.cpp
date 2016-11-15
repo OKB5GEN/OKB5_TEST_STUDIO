@@ -51,3 +51,14 @@ int ShapeItem::type() const
 {
     return mType;
 }
+
+void ShapeItem::setFlags(uint32_t flags)
+{
+    mFlags = flags;
+}
+
+uint32_t ShapeItem::flags() const
+{
+    return mFlags;
+}
+
