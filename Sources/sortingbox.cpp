@@ -319,14 +319,7 @@ void SortingBox::addItem(SortingBox::IconID id, const QPoint& pos)
 
 void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2)
 {
-    /* Тут надо понять логику сочленений между итемами
-     * 1. По идее надо рисовать линию "силуэта"
-     * 2. Линия силуэта проходит так:
-     *    - идет по низу на расстояии 1 клетка от от крайнего правого адреса влево
-     *    - в нее входят коннекторы от каждого адреса перехода (они все внизу), до крайнего левого адреса
-*/
-
-    // пока полухардкод для соседних элементов по вертикали
+    // TODO пока полухардкод для соседних элементов по вертикали
     if (pos1.x() == pos2.x() && qAbs(pos2.y() - pos1.y()) == 1)
     {
         QPoint pos = pos1;
@@ -347,12 +340,10 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2)
 
 void SortingBox::drawSilhouette()
 {
-    return;
-
-    mDiagramSize.width();
-    mDiagramSize.height();
-
-    int maxAddress = -1;
+    QPoint bottomRight(INT_MIN, INT_MIN);
+    QPoint bottomLeft(mOrigin.x(), (mDiagramSize.height() + 1) * mItem.height());
+    QPoint topLeft(mOrigin.x(), mOrigin.y() + mItem.height());
+    QPoint topRight(INT_MIN, INT_MAX);
 
     QPainterPath silhouette;
 
@@ -360,23 +351,48 @@ void SortingBox::drawSilhouette()
     {
         if (shapeItem.type() == ADDRESS)
         {
-            if (shapeItem.position().x() > maxAddress)
+            qreal x = shapeItem.position().x() + mItem.width() / 2;
+            qreal y = shapeItem.position().y() + mItem.height() - CELL.height();
+            QPoint src(x, y);
+            QPoint dest(x, y + CELL.height());
+            silhouette.moveTo(src);
+            silhouette.lineTo(dest);
+            if (dest.x() > bottomRight.x())
             {
-                maxAddress = shapeItem.position().x();
+                bottomRight = dest;
             }
-
-            shapeItem.position();
-            //TODO добавить палочку вниз в путь
         }
         else if (shapeItem.type() == HEADLINE)
         {
-            shapeItem.position();
-            //TODO добавить палочку ввех в путь
+            qreal x = shapeItem.position().x() + mItem.width() / 2;
+            qreal y = shapeItem.position().y() + CELL.height();
+            QPoint src(x, y);
+            QPoint dest(x, y - CELL.height());
+            silhouette.moveTo(src);
+            silhouette.lineTo(dest);
+            if (dest.x() > topRight.x())
+            {
+                topRight = dest;
+            }
         }
     }
 
-    //TODO от maxAddress до 0 минус клеточка по X  нарисовать горизонтальную линию влево
-    // далее вверх до Y = 0 минус клеточка
-    // далее вправо до mDiagramSize.width() минус половина итема/ячейки
-    // нарисовать стрелочку и точку над элементом (0;0)
+    silhouette.moveTo(bottomRight);
+    silhouette.lineTo(bottomLeft);
+    silhouette.lineTo(topLeft);
+    silhouette.lineTo(topRight);
+
+    createShapeItem(silhouette, "Connector", QPoint(0, 0), QColor::fromRgba(0x00ffffff), -1);
+
+    // draw arrow
+    QPainterPath arrow;
+    QPoint pos;
+    pos.setX(topLeft.x() + mItem.width() / 2);
+    pos.setY(topLeft.y());
+    arrow.moveTo(pos);
+    arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() + CELL.height() / 4));
+    arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() - CELL.height() / 4));
+    arrow.lineTo(pos);
+
+    createShapeItem(arrow, "Arrow", QPoint(0, 0), QColor::fromRgba(0xff000000), -1);
 }
