@@ -71,7 +71,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
 void EditorWindow::newFile()
 {
 #ifdef USE_SORTING_BOX // TODO temporary
-    renderArea->createNewCircle();
+    //renderArea->createNewCircle();
 #else
 #endif
 
@@ -87,7 +87,7 @@ void EditorWindow::newFile()
 void EditorWindow::open()
 {
 #ifdef USE_SORTING_BOX // TODO temporary
-    renderArea->createNewSquare();
+    //renderArea->createNewSquare();
 #else
 #endif
 
@@ -105,7 +105,7 @@ void EditorWindow::open()
 bool EditorWindow::save()
 {
 #ifdef USE_SORTING_BOX // TODO temporary
-    renderArea->createNewTriangle();
+    //renderArea->createNewTriangle();
 #else
 #endif
 

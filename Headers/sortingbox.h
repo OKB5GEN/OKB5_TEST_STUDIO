@@ -3,56 +3,22 @@
 
 #include <QWidget>
 
-#include "shapeitem.h"
+#include "Headers/shapeitem.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
 class QPoint;
 class QToolButton;
+class QDialog;
 QT_END_NAMESPACE
+
+class ShapeAddDialog;
 
 class SortingBox : public QWidget
 {
     Q_OBJECT
 
 public:
-    // List of all DRAKON icons
-    enum IconID
-    {
-        // IMPLEMENTED >>>
-
-        // NOT IMPLEMENTED >>>
-        TITLE,
-        END,
-        ACTION,
-        QUESTION,
-        CHOICE,
-        CASE,
-        HEADLINE,
-        ADDRESS,
-        INSERTION,
-        SHELF,
-        PARAMS,
-        FOR_BEGIN,
-        FOR_END,
-        OUTPUT,
-        INPUT,
-        PAUSE,
-        PERIOD,
-        START_TIMER,
-        SYNCHRONIZER,
-        PARALLEL_PROCESS,
-        COMMENT,
-        RIGHT_COMMENT,
-        LEFT_COMMENT,
-        LOOP_ARROW,
-        SILHOUETTE_ARROW,
-        CONNECTOR,
-        CONCURRENT_PROCESS,
-
-        COUNT // always must be last
-    };
-
     SortingBox();
     ~SortingBox();
 
@@ -66,20 +32,20 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 //private slots:
- public slots:
-    void createNewCircle();
-    void createNewSquare();
-    void createNewTriangle();
+public slots:
+//    void createNewCircle();
+//    void createNewSquare();
+//    void createNewTriangle();
 
 private slots:
-    void addItem(SortingBox::IconID id, const QPoint& pos);
+    void addItem(ShapeTypes id, const QPoint& pos);
 
 private:
     void connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount);
     void drawSilhouette();
 
     int updateButtonGeometry(QToolButton *button, int x, int y);
-    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, int type);
+    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type);
     int itemAt(const QPoint &pos);
     void moveItemTo(const QPoint &pos);
     QPoint initialItemPosition(const QPainterPath &path);
@@ -115,6 +81,8 @@ private:
     //QToolButton *newCircleButton;
     //QToolButton *newSquareButton;
     //QToolButton *newTriangleButton;
+
+    ShapeAddDialog * mShapeAddDialog;
 };
 
 #endif

@@ -42,12 +42,12 @@ void ShapeItem::setColor(const QColor &color)
     myColor = color;
 }
 
-void ShapeItem::setType(int type)
+void ShapeItem::setType(ShapeTypes type)
 {
     mType = type;
 }
 
-int ShapeItem::type() const
+ShapeTypes ShapeItem::type() const
 {
     return mType;
 }

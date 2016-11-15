@@ -5,6 +5,8 @@
 #include <QPainterPath>
 #include <QPoint>
 
+#include "Headers/shapetypes.h"
+
 class ShapeItem
 {
 public:
@@ -15,7 +17,7 @@ public:
         Editable    = 0x00000004
     };
 
-    void setType(int type);
+    void setType(ShapeTypes type);
     void setPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
     void setPosition(const QPoint &position);
@@ -26,7 +28,7 @@ public:
     QPoint position() const;
     QColor color() const;
     QString toolTip() const;
-    int type() const;
+    ShapeTypes type() const;
     uint32_t flags() const;
 
 private:
@@ -35,7 +37,7 @@ private:
     QColor myColor;
     QString myToolTip;
 
-    int mType;
+    ShapeTypes mType;
     uint32_t mFlags;
 };
 
