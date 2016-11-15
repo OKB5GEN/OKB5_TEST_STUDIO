@@ -1,4 +1,5 @@
 #include <QtWidgets>
+#include <QDebug>
 #include <stdlib.h>
 #include "Headers/sortingbox.h"
 
@@ -38,13 +39,11 @@ SortingBox::SortingBox():
 
     mTitlePath.addRoundedRect(QRectF(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()), (mItem.height() - 2 * CELL.height()) / 2, (mItem.height() - 2 * CELL.height()) / 2);
 
-    /*
-    mAddPath.addEllipse(QRect((CELL_WIDTH - CELL_HEIGHT) / 2, 0, CELL_HEIGHT, CELL_HEIGHT));
-    mAddPath.moveTo(CELL_WIDTH / 2, CELL_HEIGHT / 6);
-    mAddPath.lineTo(CELL_WIDTH / 2, CELL_HEIGHT * 5 / 6);
-    mAddPath.moveTo(CELL_HEIGHT / 6 + (CELL_WIDTH - CELL_HEIGHT) / 2, CELL_HEIGHT / 2);
-    mAddPath.lineTo((CELL_WIDTH + CELL_HEIGHT) / 2 - CELL_HEIGHT / 6, CELL_HEIGHT / 2);
-    */
+    mAddPath.addEllipse(QRect((CELL.width() - CELL.height()) / 2, 0, CELL.height(), CELL.height()));
+    mAddPath.moveTo(CELL.width() / 2, CELL.height() / 6);
+    mAddPath.lineTo(CELL.width() / 2, CELL.height() * 5 / 6);
+    mAddPath.moveTo(CELL.width() / 6 + (CELL.width() - CELL.height()) / 2, CELL.height() / 2);
+    mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
 
 
     mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
@@ -85,10 +84,10 @@ SortingBox::SortingBox():
     addItem(ADDRESS, QPoint(0, 2));
     addItem(HEADLINE, QPoint(1, 1));
     addItem(TITLE, QPoint(1, 2));
-    connectItems(QPoint(0, 0), QPoint(0, 1));
-    connectItems(QPoint(0, 1), QPoint(0, 2));
-    connectItems(QPoint(1, 1), QPoint(1, 2));
     drawSilhouette();
+    connectItems(QPoint(0, 0), QPoint(0, 1), 0);
+    connectItems(QPoint(0, 1), QPoint(0, 2), 1);
+    connectItems(QPoint(1, 1), QPoint(1, 2), 0);
 
     //createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
     //currentPos += QPoint(0, item.height());
@@ -99,6 +98,11 @@ SortingBox::SortingBox():
     //createShapeItem(mTrianglePath, tr("Triangle"),QPoint(0, 0) /*initialItemPosition(mTrianglePath)*/, initialItemColor());
     //createShapeItem(mHexagonPath, tr("Hexagon"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
     //createShapeItem(mTitlePath, tr("Title"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
+}
+
+SortingBox::~SortingBox()
+{
+
 }
 
 bool SortingBox::event(QEvent *event)
@@ -154,10 +158,39 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         int index = itemAt(event->pos());
         if (index != -1)
         {
-            mSelectedItem = &mShapeItems[index];
-            mPreviousPosition = event->pos();
-            mShapeItems.move(index, mShapeItems.size() - 1);
-            update();
+            int TODO; // split shapes on movable selectable
+            bool movable = false;
+            bool selectable = false;
+
+            if (selectable)
+            {
+                mSelectedItem = &mShapeItems[index];
+                mPreviousPosition = event->pos();
+                mShapeItems.move(index, mShapeItems.size() - 1);
+                update();
+            }
+        }
+    }
+}
+
+void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    //remember that mousePressEvent will be called first!
+
+    if (event->button() == Qt::LeftButton)
+    {
+        int index = itemAt(event->pos());
+        if (index != -1)
+        {
+            if (mShapeItems[index].toolTip() == "AddItem")
+            {
+                // TODO make dialog
+                QMessageBox::information(this,
+                                            tr("Command name"),
+                                            tr("Command params"),
+                                            QMessageBox::Ok, QMessageBox::Cancel);
+
+            }
         }
     }
 }
@@ -317,7 +350,7 @@ void SortingBox::addItem(SortingBox::IconID id, const QPoint& pos)
     }
 }
 
-void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2)
+void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount)
 {
     // TODO пока полухардкод для соседних элементов по вертикали
     if (pos1.x() == pos2.x() && qAbs(pos2.y() - pos1.y()) == 1)
@@ -331,10 +364,32 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2)
         qreal x = mOrigin.x() + pos.x() * mItem.width() + mItem.width() / 2;
         qreal y = mOrigin.y() + pos.y() * mItem.height() + mItem.height();
 
-        mItemConnectorPath.moveTo(x, y - CELL.height());
-        mItemConnectorPath.lineTo(x, y + CELL.height());
+        QPainterPath itemConnectorPath;
+        itemConnectorPath.moveTo(x, y - CELL.height());
+        itemConnectorPath.lineTo(x, y + CELL.height());
 
-        createShapeItem(mItemConnectorPath, "Connector", pos, initialItemColor(), -1);
+        createShapeItem(itemConnectorPath, "Connector", pos, initialItemColor(), -1);
+
+        // TODO hardcode
+        if (addItemCount == 1)
+        {
+            QPainterPath addItemPath;
+
+            addItemPath.moveTo(QPoint(x, y));
+            qreal radius = qMin(CELL.width(), CELL.height()) / 2;
+
+            addItemPath.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
+            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xffffffff), -1);
+        }
+
+        /*
+        mAddPath.addEllipse(QRect((CELL.width() - CELL.height()) / 2, 0, CELL.height(), CELL.height()));
+
+        mAddPath.moveTo(CELL.width() / 2, CELL.height() / 6);
+        mAddPath.lineTo(CELL.width() / 2, CELL.height() * 5 / 6);
+        mAddPath.moveTo(CELL.width() / 6 + (CELL.width() - CELL.height()) / 2, CELL.height() / 2);
+        mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
+        */
     }
 }
 

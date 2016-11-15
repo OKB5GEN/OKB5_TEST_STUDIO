@@ -54,6 +54,7 @@ public:
     };
 
     SortingBox();
+    ~SortingBox();
 
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
@@ -62,6 +63,7 @@ protected:
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 //private slots:
  public slots:
@@ -73,7 +75,7 @@ private slots:
     void addItem(SortingBox::IconID id, const QPoint& pos);
 
 private:
-    void connectItems(const QPoint& pos1, const QPoint& pos2);
+    void connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount);
     void drawSilhouette();
 
     int updateButtonGeometry(QToolButton *button, int x, int y);
