@@ -3,13 +3,21 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
+#include <QLineEdit>
 
 ShapeEditDialog::ShapeEditDialog(QWidget * parent):
     QDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
+
+    mLineEdit = new QLineEdit(this);
+    mLineEdit->setText("Default value");
+    layout->addWidget(mLineEdit, 0, 0);
+
+    //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 0, 0);
+    layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
     setWindowTitle("Shape Edit Dialog");
@@ -48,4 +56,14 @@ void ShapeEditDialog::mouseReleaseEvent(QMouseEvent *event)
 void ShapeEditDialog::mouseMoveEvent(QMouseEvent *event)
 {
 
+}
+
+QString ShapeEditDialog::text() const
+{
+    return mLineEdit->text();
+}
+
+void ShapeEditDialog::setText(const QString& text)
+{
+    mLineEdit->setText(text);
 }

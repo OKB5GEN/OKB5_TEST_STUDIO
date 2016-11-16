@@ -17,8 +17,10 @@ public:
         Editable    = 0x00000004
     };
 
+    void setText(const QString& text);
     void setType(ShapeTypes type);
     void setPath(const QPainterPath &path);
+    void setTextPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
     void setPosition(const QPoint &position);
     void setColor(const QColor &color);
@@ -26,22 +28,26 @@ public:
     void setCell(const QPoint &position);
 
     QPainterPath path() const;
+    QPainterPath textPath() const;
     QPoint position() const;
     QColor color() const;
     QString toolTip() const;
     ShapeTypes type() const;
     uint32_t flags() const;
     QPoint cell() const;
+    const QString& text() const;
 
 private:
-    QPainterPath myPath;
-    QPoint myPosition;
-    QColor myColor;
-    QString myToolTip;
+    QPainterPath mPath;
+    QPainterPath mTextPath;
+    QPoint mPosition;
+    QColor mColor;
+    QString mToolTip;
 
     ShapeTypes mType;
     uint32_t mFlags;
     QPoint mCell;
+    QString mText = "Default";
 };
 
 

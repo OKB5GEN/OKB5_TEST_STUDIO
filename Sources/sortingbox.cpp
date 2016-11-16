@@ -31,6 +31,10 @@ SortingBox::SortingBox():
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
 
+    QString defaultText = "Default";
+    mFont.setPointSize(16);
+    mFont.setFamily("Arial");
+
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
     mSelectedItem = 0;
@@ -51,6 +55,7 @@ SortingBox::SortingBox():
     mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
 
     mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
+
     mActionPath.addRect(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
 
     mTrianglePath.moveTo(120 / 2, 0);
@@ -83,11 +88,11 @@ SortingBox::SortingBox():
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
 
-    addItem(ShapeTypes::TITLE, QPoint(0, 0));
-    addItem(ShapeTypes::HEADLINE, QPoint(0, 1));
-    addItem(ShapeTypes::ADDRESS, QPoint(0, 2));
-    addItem(ShapeTypes::HEADLINE, QPoint(1, 1));
-    addItem(ShapeTypes::TITLE, QPoint(1, 2));
+    addItem(ShapeTypes::TITLE, QPoint(0, 0), "Begin");
+    addItem(ShapeTypes::HEADLINE, QPoint(0, 1), "First Branch");
+    addItem(ShapeTypes::ADDRESS, QPoint(0, 2), "Second Branch");
+    addItem(ShapeTypes::HEADLINE, QPoint(1, 1), "Second Branch");
+    addItem(ShapeTypes::TITLE, QPoint(1, 2), "End");
 
     drawSilhouette();
     connectItems(QPoint(0, 0), QPoint(0, 1), 0);
@@ -142,6 +147,7 @@ void SortingBox::paintEvent(QPaintEvent * /* event */)
         painter.translate(shapeItem.position());
         painter.setBrush(shapeItem.color());
         painter.drawPath(shapeItem.path());
+        painter.drawPath(shapeItem.textPath());
         painter.translate(-shapeItem.position());
     }
 }
@@ -162,7 +168,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
                 {
                     ShapeTypes shapeType = mShapeAddDialog->shapeType();
                     QPoint insertionCell = mShapeItems[index].cell();
-                    insertItem(shapeType, insertionCell, index);
+                    insertItem(shapeType, insertionCell, "Action", index);
                     inserted = true;
                 }
             }
@@ -196,11 +202,14 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
             ShapeTypes type = mShapeItems[index].type();
             if (mShapeItems[index].type() < ShapeTypes::TOTAL_COUNT)
             {
+                mShapeEditDialog->setText(mShapeItems[index].text());
                 mShapeEditDialog->exec();
+
                 if (mShapeEditDialog->result() == QDialog::Accepted)
                 {
-                    // TODO Apply settings in GUI (write text)
-                }
+                    mShapeItems[index].setText(mShapeEditDialog->text());
+                    addText(mShapeItems[index]);
+               }
             }
         }
     }
@@ -262,7 +271,7 @@ int SortingBox::updateButtonGeometry(QToolButton *button, int x, int y)
     return y - size.rheight() - style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
 }
 
-void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type, const QPoint& cell)
+void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type, const QPoint& cell, const QString& text)
 {
     bool found = false;
 
@@ -287,6 +296,13 @@ void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTi
     if (!found)
     {
         ShapeItem shapeItem;
+        shapeItem.setText(text);
+
+        if (type < ShapeTypes::SILHOUETTE_ARROW) // TODO remove hack
+        {
+            addText(shapeItem);
+        }
+
         shapeItem.setPath(path);
         shapeItem.setToolTip(toolTip);
         shapeItem.setPosition(pos);
@@ -297,6 +313,17 @@ void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTi
     }
 
     update();
+}
+
+void SortingBox::addText(ShapeItem& item)
+{
+    QPainterPath textPath;
+    QFontMetrics fm(mFont);
+    QRect textRect = fm.boundingRect(item.text());
+    qreal x = (mItem.width() - textRect.width()) / 2;
+    qreal y = (mItem.height() + textRect.height()) / 2;
+    textPath.addText(x, y, mFont, item.text());
+    item.setTextPath(textPath);
 }
 
 QToolButton *SortingBox::createToolButton(const QString &toolTip, const QIcon &icon, const char *member)
@@ -342,7 +369,7 @@ QColor SortingBox::randomItemColor()
     return QColor::fromHsv(qrand() % 256, 255, 190);
 }
 
-void SortingBox::addItem(ShapeTypes id, const QPoint& pos)
+void SortingBox::addItem(ShapeTypes id, const QPoint& pos, const QString& text)
 {
     QPoint p(mOrigin.x() + pos.x() * mItem.width(), mOrigin.y() + pos.y() * mItem.height());
 
@@ -362,16 +389,16 @@ void SortingBox::addItem(ShapeTypes id, const QPoint& pos)
     switch (id)
     {
     case ShapeTypes::TITLE:
-        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor(), id, pos);
+        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor(), id, pos, text);
         break;
     case ShapeTypes::HEADLINE:
-        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor(), id, pos);
+        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor(), id, pos, text);
         break;
     case ShapeTypes::ADDRESS:
-        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor(), id, pos);
+        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor(), id, pos, text);
         break;
     case ShapeTypes::ACTION:
-        createShapeItem(mActionPath, "Tooltip", p, initialItemColor(), id, pos);
+        createShapeItem(mActionPath, "Tooltip", p, initialItemColor(), id, pos, text);
         break;
 
     default:
@@ -401,7 +428,7 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
         itemConnectorPath.moveTo(x, y - CELL.height());
         itemConnectorPath.lineTo(x, y + CELL.height());
 
-        createShapeItem(itemConnectorPath, "Connector", pos, initialItemColor(), ShapeTypes::CONNECT_LINE, QPoint(0, 0));
+        createShapeItem(itemConnectorPath, "Connector", pos, initialItemColor(), ShapeTypes::CONNECT_LINE, QPoint(0, 0), "");
 
         // TODO hardcode
         if (addItemCount == 1)
@@ -412,7 +439,7 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
             qreal radius = qMin(CELL.width(), CELL.height()) / 2;
 
             addItemPath.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xff00ff00), ShapeTypes::VALENCY_POINT, pos2);
+            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xff00ff00), ShapeTypes::VALENCY_POINT, pos2, "");
         }
     }
 }
@@ -464,7 +491,7 @@ void SortingBox::drawSilhouette()
     silhouette.lineTo(topLeft);
     silhouette.lineTo(topRight);
 
-    createShapeItem(silhouette, "Silhouette", QPoint(0, 0), QColor::fromRgba(0x00ffffff), ShapeTypes::SILHOUETTE_ARROW, QPoint(0, 0));
+    createShapeItem(silhouette, "Silhouette", QPoint(0, 0), QColor::fromRgba(0x00ffffff), ShapeTypes::SILHOUETTE_ARROW, QPoint(0, 0), "");
 
     // draw arrow
     QPainterPath arrow;
@@ -476,11 +503,10 @@ void SortingBox::drawSilhouette()
     arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() - CELL.height() / 4));
     arrow.lineTo(pos);
 
-    createShapeItem(arrow, "Arrow", QPoint(0, 0), QColor::fromRgba(0xff000000), ShapeTypes::ARROW, QPoint(0, 0));
+    createShapeItem(arrow, "Arrow", QPoint(0, 0), QColor::fromRgba(0xff000000), ShapeTypes::ARROW, QPoint(0, 0), "");
 }
 
-
-void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, int shapeAddItemIndex)
+void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex)
 {
     /*
      * Здесь должен быть какой-то хитрожопый алгоритм вставки итема
@@ -512,7 +538,7 @@ void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, int shapeAddItemIn
         }
     }
 
-    addItem(id, pos);
+    addItem(id, pos, text);
     mDiagramSize.setHeight(mDiagramSize.height() + 1);
 
     connectItems(pos, QPoint(pos.x(), pos.y() + 1), 0);

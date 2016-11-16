@@ -4,42 +4,58 @@
 
 QPainterPath ShapeItem::path() const
 {
-    return myPath;
+    //QPainterPath p = mPath;
+    //p.addPath(mTextPath);
+    //return p;
+    return mPath;
+}
+
+QPainterPath ShapeItem::textPath() const
+{
+    //QPainterPath p = mPath;
+    //p.addPath(mTextPath);
+    //return p;
+    return mTextPath;
 }
 
 QPoint ShapeItem::position() const
 {
-    return myPosition;
+    return mPosition;
 }
 
 QColor ShapeItem::color() const
 {
-    return myColor;
+    return mColor;
 }
 
 QString ShapeItem::toolTip() const
 {
-    return myToolTip;
+    return mToolTip;
 }
 
 void ShapeItem::setPath(const QPainterPath &path)
 {
-    myPath = path;
+    mPath = path;
+}
+
+void ShapeItem::setTextPath(const QPainterPath &path)
+{
+    mTextPath = path;
 }
 
 void ShapeItem::setToolTip(const QString &toolTip)
 {
-    myToolTip = toolTip;
+    mToolTip = toolTip;
 }
 
 void ShapeItem::setPosition(const QPoint &position)
 {
-    myPosition = position;
+    mPosition = position;
 }
 
 void ShapeItem::setColor(const QColor &color)
 {
-    myColor = color;
+    mColor = color;
 }
 
 void ShapeItem::setType(ShapeTypes type)
@@ -70,4 +86,14 @@ QPoint ShapeItem::cell() const
 void ShapeItem::setCell(const QPoint &position)
 {
     mCell = position;
+}
+
+void ShapeItem::setText(const QString& text)
+{
+    mText = text;
+}
+
+const QString& ShapeItem::text() const
+{
+    return mText;
 }
