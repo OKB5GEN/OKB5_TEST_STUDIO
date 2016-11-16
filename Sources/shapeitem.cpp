@@ -62,3 +62,12 @@ uint32_t ShapeItem::flags() const
     return mFlags;
 }
 
+QPoint ShapeItem::cell() const
+{
+    return mCell;
+}
+
+void ShapeItem::setCell(const QPoint &position)
+{
+    mCell = position;
+}

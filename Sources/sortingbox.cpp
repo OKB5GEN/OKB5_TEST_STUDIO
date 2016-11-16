@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "Headers/sortingbox.h"
 #include "Headers/shapeadddialog.h"
+#include "Headers/shapeeditdialog.h"
 
 /*
  * Здесь мы создаем формы для циклограммы
@@ -28,6 +29,7 @@ SortingBox::SortingBox():
     mDiagramSize(0, 0)
 {
     mShapeAddDialog = new ShapeAddDialog(this);
+    mShapeEditDialog = new ShapeEditDialog(this);
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -48,9 +50,8 @@ SortingBox::SortingBox():
     mAddPath.moveTo(CELL.width() / 6 + (CELL.width() - CELL.height()) / 2, CELL.height() / 2);
     mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
 
-
     mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
-    mSquarePath.addRect(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
+    mActionPath.addRect(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
 
     mTrianglePath.moveTo(120 / 2, 0);
     mTrianglePath.lineTo(0, 100);
@@ -87,20 +88,11 @@ SortingBox::SortingBox():
     addItem(ShapeTypes::ADDRESS, QPoint(0, 2));
     addItem(ShapeTypes::HEADLINE, QPoint(1, 1));
     addItem(ShapeTypes::TITLE, QPoint(1, 2));
+
     drawSilhouette();
     connectItems(QPoint(0, 0), QPoint(0, 1), 0);
     connectItems(QPoint(0, 1), QPoint(0, 2), 1);
     connectItems(QPoint(1, 1), QPoint(1, 2), 0);
-
-    //createShapeItem(mAddPath, tr("Add"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    //currentPos += QPoint(0, item.height());
-    //createShapeItem(mAddressPath, tr("Address"), currentPos /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    //currentPos += QPoint(0, CELL_HEIGHT);
-    //createShapeItem(mCirclePath, tr("Circle"), QPoint(0, 0) /*initialItemPosition(mCirclePath)*/, initialItemColor());
-    //createShapeItem(mSquarePath, tr("Square"), QPoint(0, 0) /*initialItemPosition(mSquarePath)*/, initialItemColor());
-    //createShapeItem(mTrianglePath, tr("Triangle"),QPoint(0, 0) /*initialItemPosition(mTrianglePath)*/, initialItemColor());
-    //createShapeItem(mHexagonPath, tr("Hexagon"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
-    //createShapeItem(mTitlePath, tr("Title"), QPoint(0, 0) /*initialItemPosition(mHexagonPath)*/, initialItemColor());
 }
 
 SortingBox::~SortingBox()
@@ -161,14 +153,17 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         int index = itemAt(event->pos());
         if (index != -1)
         {
-            if (mShapeItems[index].toolTip() == "AddItem")
+            static bool inserted = false; // remove this shit
+
+            if (!inserted && mShapeItems[index].toolTip() == "AddItem") // TODO remove this hack, and implement normally
             {
                 mShapeAddDialog->exec();
                 if (mShapeAddDialog->result() == QDialog::Accepted)
                 {
-                    //TODO get selected shape and add it to cyclogram
                     ShapeTypes shapeType = mShapeAddDialog->shapeType();
-                    int i = 0;
+                    QPoint insertionCell = mShapeItems[index].cell();
+                    insertItem(shapeType, insertionCell, index);
+                    inserted = true;
                 }
             }
 
@@ -198,17 +193,15 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
         int index = itemAt(event->pos());
         if (index != -1)
         {
-            /*
-            if (mShapeItems[index].toolTip() == "AddItem")
+            ShapeTypes type = mShapeItems[index].type();
+            if (mShapeItems[index].type() < ShapeTypes::TOTAL_COUNT)
             {
-                // TODO make dialog
-                QMessageBox::information(this,
-                                            tr("Command name"),
-                                            tr("Command params"),
-                                            QMessageBox::Ok, QMessageBox::Cancel);
-
+                mShapeEditDialog->exec();
+                if (mShapeEditDialog->result() == QDialog::Accepted)
+                {
+                    // TODO Apply settings in GUI (write text)
+                }
             }
-            */
         }
     }
 }
@@ -235,6 +228,16 @@ int SortingBox::itemAt(const QPoint &pos)
     for (int i = mShapeItems.size() - 1; i >= 0; --i)
     {
         const ShapeItem &item = mShapeItems[i];
+
+        // TODO hack for excluding "service" shapes
+        if (item.type() == ShapeTypes::SILHOUETTE_ARROW
+           || item.type() == ShapeTypes::ARROW
+           || item.type() == ShapeTypes::CONNECT_LINE)
+        {
+            continue;
+        }
+
+
         if (item.path().contains(pos - item.position()))
         {
             return i;
@@ -259,15 +262,40 @@ int SortingBox::updateButtonGeometry(QToolButton *button, int x, int y)
     return y - size.rheight() - style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
 }
 
-void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type)
+void SortingBox::createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type, const QPoint& cell)
 {
-    ShapeItem shapeItem;
-    shapeItem.setPath(path);
-    shapeItem.setToolTip(toolTip);
-    shapeItem.setPosition(pos);
-    shapeItem.setColor(color);
-    shapeItem.setType(type);
-    mShapeItems.append(shapeItem);
+    bool found = false;
+
+    if (toolTip == "Silhouette" || toolTip == "Arrow") // replace if exist TODO remove
+    {
+        for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
+        {
+            if (mShapeItems[i].toolTip() == toolTip)
+            {
+                found = true;
+                mShapeItems[i].setPath(path);
+                mShapeItems[i].setToolTip(toolTip);
+                mShapeItems[i].setPosition(pos);
+                mShapeItems[i].setColor(color);
+                mShapeItems[i].setType(type);
+                mShapeItems[i].setCell(cell);
+                break;
+            }
+        }
+    }
+
+    if (!found)
+    {
+        ShapeItem shapeItem;
+        shapeItem.setPath(path);
+        shapeItem.setToolTip(toolTip);
+        shapeItem.setPosition(pos);
+        shapeItem.setColor(color);
+        shapeItem.setType(type);
+        shapeItem.setCell(cell);
+        mShapeItems.append(shapeItem);
+    }
+
     update();
 }
 
@@ -318,6 +346,9 @@ void SortingBox::addItem(ShapeTypes id, const QPoint& pos)
 {
     QPoint p(mOrigin.x() + pos.x() * mItem.width(), mOrigin.y() + pos.y() * mItem.height());
 
+    qDebug("AddItem to pos (%i, %i) diag sz before is (%i, %i)", pos.x(), pos.y(), mDiagramSize.width(), mDiagramSize.height());
+    // TODO неправильная логика при вставке в середину, тут только случай вставки в конец!!!
+
     if (pos.x() + 1 > mDiagramSize.width())
     {
         mDiagramSize.setWidth(pos.x() + 1);
@@ -331,14 +362,16 @@ void SortingBox::addItem(ShapeTypes id, const QPoint& pos)
     switch (id)
     {
     case ShapeTypes::TITLE:
-        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor(), id);
+        createShapeItem(mTitlePath, "Tooltip", p, initialItemColor(), id, pos);
         break;
     case ShapeTypes::HEADLINE:
-        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor(), id);
+        createShapeItem(mHeadlinePath, "Tooltip", p, initialItemColor(), id, pos);
         break;
-
     case ShapeTypes::ADDRESS:
-        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor(), id);
+        createShapeItem(mAddressPath, "Tooltip", p, initialItemColor(), id, pos);
+        break;
+    case ShapeTypes::ACTION:
+        createShapeItem(mActionPath, "Tooltip", p, initialItemColor(), id, pos);
         break;
 
     default:
@@ -368,7 +401,7 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
         itemConnectorPath.moveTo(x, y - CELL.height());
         itemConnectorPath.lineTo(x, y + CELL.height());
 
-        createShapeItem(itemConnectorPath, "Connector", pos, initialItemColor(), ShapeTypes::COUNT);
+        createShapeItem(itemConnectorPath, "Connector", pos, initialItemColor(), ShapeTypes::CONNECT_LINE, QPoint(0, 0));
 
         // TODO hardcode
         if (addItemCount == 1)
@@ -379,17 +412,8 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
             qreal radius = qMin(CELL.width(), CELL.height()) / 2;
 
             addItemPath.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xff00ff00), ShapeTypes::COUNT);
+            createShapeItem(addItemPath, "AddItem", QPoint(x, y), QColor::fromRgba(0xff00ff00), ShapeTypes::VALENCY_POINT, pos2);
         }
-
-        /*
-        mAddPath.addEllipse(QRect((CELL.width() - CELL.height()) / 2, 0, CELL.height(), CELL.height()));
-
-        mAddPath.moveTo(CELL.width() / 2, CELL.height() / 6);
-        mAddPath.lineTo(CELL.width() / 2, CELL.height() * 5 / 6);
-        mAddPath.moveTo(CELL.width() / 6 + (CELL.width() - CELL.height()) / 2, CELL.height() / 2);
-        mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
-        */
     }
 }
 
@@ -399,6 +423,9 @@ void SortingBox::drawSilhouette()
     QPoint bottomLeft(mOrigin.x(), (mDiagramSize.height() + 1) * mItem.height());
     QPoint topLeft(mOrigin.x(), mOrigin.y() + mItem.height());
     QPoint topRight(INT_MIN, INT_MAX);
+
+
+    qDebug("Silh Bottom left is (%i; %i)", bottomLeft.x(), bottomLeft.y());
 
     QPainterPath silhouette;
 
@@ -437,7 +464,7 @@ void SortingBox::drawSilhouette()
     silhouette.lineTo(topLeft);
     silhouette.lineTo(topRight);
 
-    createShapeItem(silhouette, "Connector", QPoint(0, 0), QColor::fromRgba(0x00ffffff), ShapeTypes::COUNT);
+    createShapeItem(silhouette, "Silhouette", QPoint(0, 0), QColor::fromRgba(0x00ffffff), ShapeTypes::SILHOUETTE_ARROW, QPoint(0, 0));
 
     // draw arrow
     QPainterPath arrow;
@@ -449,5 +476,49 @@ void SortingBox::drawSilhouette()
     arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() - CELL.height() / 4));
     arrow.lineTo(pos);
 
-    createShapeItem(arrow, "Arrow", QPoint(0, 0), QColor::fromRgba(0xff000000), ShapeTypes::COUNT);
+    createShapeItem(arrow, "Arrow", QPoint(0, 0), QColor::fromRgba(0xff000000), ShapeTypes::ARROW, QPoint(0, 0));
+}
+
+
+void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, int shapeAddItemIndex)
+{
+    /*
+     * Здесь должен быть какой-то хитрожопый алгоритм вставки итема
+     * Притом сложные формы типа question или switch будут вставляться более хитрожопо,
+     * так как помимо строк будут вставляться еще и столбцы
+     *
+     * Попробую описать примерный алгоритм вставки простой формы (для демки этого хватит):
+     * Вставляется форма ТИП в ячейку (X, Y)
+     * Все элементы, расположенные по Y в ОБЩЕМ случае сдвигаются вниз
+     *
+    */
+
+    for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
+    {
+        if (i == shapeAddItemIndex) // skip add item index
+        {
+            continue;
+        }
+
+        ShapeTypes type = mShapeItems[i].type();
+        QPoint cell = mShapeItems[i].cell();
+
+        if (id < ShapeTypes::DRAKON_ELEMENTS_COUNT && cell.y() >= pos.y() && cell.x() == pos.x()) // TODO: Х - только для сдвига по столбцу
+        {
+            QPoint position = mShapeItems[i].position();
+            position.setY(position.y() + mItem.height());
+            mShapeItems[i].setPosition(position);
+            qDebug("Set shape %i pos to (%i; %i)", int(id), position.x(), position.y());
+        }
+    }
+
+    addItem(id, pos);
+    mDiagramSize.setHeight(mDiagramSize.height() + 1);
+
+    connectItems(pos, QPoint(pos.x(), pos.y() + 1), 0);
+
+    drawSilhouette();
+
+    //TODO update connectors
+    update();
 }

@@ -23,6 +23,7 @@ public:
     void setPosition(const QPoint &position);
     void setColor(const QColor &color);
     void setFlags(uint32_t flags);
+    void setCell(const QPoint &position);
 
     QPainterPath path() const;
     QPoint position() const;
@@ -30,6 +31,7 @@ public:
     QString toolTip() const;
     ShapeTypes type() const;
     uint32_t flags() const;
+    QPoint cell() const;
 
 private:
     QPainterPath myPath;
@@ -39,6 +41,7 @@ private:
 
     ShapeTypes mType;
     uint32_t mFlags;
+    QPoint mCell;
 };
 
 

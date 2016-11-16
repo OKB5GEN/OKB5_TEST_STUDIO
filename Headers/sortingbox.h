@@ -13,6 +13,7 @@ class QDialog;
 QT_END_NAMESPACE
 
 class ShapeAddDialog;
+class ShapeEditDialog;
 
 class SortingBox : public QWidget
 {
@@ -41,11 +42,13 @@ private slots:
     void addItem(ShapeTypes id, const QPoint& pos);
 
 private:
+    void insertItem(ShapeTypes id, const QPoint& pos, int shapeAddItemIndex);
+
     void connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount);
     void drawSilhouette();
 
     int updateButtonGeometry(QToolButton *button, int x, int y);
-    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type);
+    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type, const QPoint &cell);
     int itemAt(const QPoint &pos);
     void moveItemTo(const QPoint &pos);
     QPoint initialItemPosition(const QPainterPath &path);
@@ -64,11 +67,11 @@ private:
 
     QPainterPath mHeadlinePath;
     QPainterPath mAddressPath;
+    QPainterPath mActionPath;
 
     QPainterPath mAddPath;
 
     QPainterPath mCirclePath;
-    QPainterPath mSquarePath;
     QPainterPath mTrianglePath;
 
     QPainterPath mHexagonPath;
@@ -83,6 +86,7 @@ private:
     //QToolButton *newTriangleButton;
 
     ShapeAddDialog * mShapeAddDialog;
+    ShapeEditDialog * mShapeEditDialog;
 };
 
 #endif

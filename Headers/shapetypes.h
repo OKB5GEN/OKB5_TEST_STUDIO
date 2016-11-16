@@ -35,6 +35,12 @@ enum class ShapeTypes
     CONNECTOR,
     CONCURRENT_PROCESS,
 
-    COUNT // always must be last
+    DRAKON_ELEMENTS_COUNT,
+
+    CONNECT_LINE, // no drakon
+    ARROW, // no drakon
+    VALENCY_POINT, // no drakon
+
+    TOTAL_COUNT // always must be last
 };
 #endif // SHAPETYPES_H
