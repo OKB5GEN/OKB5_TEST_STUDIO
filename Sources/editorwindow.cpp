@@ -3,6 +3,7 @@
 #include "Headers/editorwindow.h"
 #include "Headers/renderarea.h"
 #include "Headers/sortingbox.h"
+#include "Headers/monitordialog.h"
 
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
@@ -409,7 +410,9 @@ void EditorWindow::stopCyclogram()
 
 void EditorWindow::addMonitor()
 {
-
+    MonitorDialog* dialog = new MonitorDialog(this);
+    dialog->show();
+    //dialog->exec();
 }
 
 #ifndef QT_NO_SESSIONMANAGER

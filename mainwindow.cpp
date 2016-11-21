@@ -438,15 +438,15 @@ void MainWindow::paintvalue()
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 
-    if(er1==1) ui->err1->setText("Overvoltage protection!");
-    if(er1==2) ui->err1->setText("Overcurrent protection!");
-    if(er1==4) ui->err1->setText("Overpower protection!");
-    if(er1==8) ui->err1->setText("Overtemperature protection!");
+    if (er1 == 1) ui->err1->setText("Overvoltage protection!");
+    if (er1 == 2) ui->err1->setText("Overcurrent protection!");
+    if (er1 == 4) ui->err1->setText("Overpower protection!");
+    if (er1 == 8) ui->err1->setText("Overtemperature protection!");
 
-    if(er2==1) ui->err2->setText("Overvoltage protection!");
-    if(er2==2) ui->err2->setText("Overcurrent protection!");
-    if(er2==4) ui->err2->setText("Overpower protection!");
-    if(er2==8) ui->err2->setText("Overtemperature protection!");
+    if (er2 == 1) ui->err2->setText("Overvoltage protection!");
+    if (er2 == 2) ui->err2->setText("Overcurrent protection!");
+    if (er2 == 4) ui->err2->setText("Overpower protection!");
+    if (er2 == 8) ui->err2->setText("Overtemperature protection!");
 
     ui->U1out->setText(QString::number(u1 / 100));
     ui->U2out->setText(QString::number(u2 / 100));
@@ -558,9 +558,15 @@ void MainWindow::plot_point()
     double a = 0; //Начало интервала, где рисуем график по оси Ox
     double b = k; //Конец интервала, где рисуем график по оси Ox
     int N = k + 1; //Вычисляем количество точек, которые будем отрисовывать
-    QVector<double> x(N), y(N),z(N); //Массивы координат точек
-    double tra,tra1;
-    int i=0;
+
+    //Массивы координат точек
+    QVector<double> x(N);
+    QVector<double> y(N);
+    QVector<double> z(N);
+    double tra = 0;
+    double tra1 = 0;
+    int i = 0;
+
     for (double X = 0; X < b; X++)//Пробегаем по всем точкам
     {
         tra = dat[i];

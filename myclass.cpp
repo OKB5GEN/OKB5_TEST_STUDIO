@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <windows.h>
 #include "comport.h"
+
 MyClass::MyClass(QString s) : name(s)
 {
 

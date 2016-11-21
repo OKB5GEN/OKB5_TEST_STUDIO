@@ -8,17 +8,17 @@ class MyClass:public QObject
 {
 Q_OBJECT
 public:
-MyClass(QString name);
+    MyClass(QString name);
 public slots:
-void doWork();
+    void doWork();
 signals:
-void send();
-void send2();
-void send3();
-void send4();
-void send5();
+    void send();
+    void send2();
+    void send3();
+    void send4();
+    void send5();
 private:
-QString name;
+    QString name;
 };
 
 #endif // MYCLASS_H

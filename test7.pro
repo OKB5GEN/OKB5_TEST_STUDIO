@@ -46,7 +46,8 @@ SOURCES += main.cpp\
     Sources/shapeitem.cpp \
     Sources/sortingbox.cpp \
     Sources/shapeadddialog.cpp \
-    Sources/shapeeditdialog.cpp
+    Sources/shapeeditdialog.cpp \
+    Sources/monitordialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -79,7 +80,8 @@ HEADERS  += mainwindow.h \
     Headers/sortingbox.h \
     Headers/shapeadddialog.h \
     Headers/shapetypes.h \
-    Headers/shapeeditdialog.h
+    Headers/shapeeditdialog.h \
+    Headers/monitordialog.h
 
 
 FORMS    += mainwindow.ui
