@@ -25,6 +25,8 @@ MonitorDialog::MonitorDialog(QWidget * parent):
                     WIDTH, HEIGHT);
     }
 
+    // ver 1
+    /*
     QGridLayout * layout = new QGridLayout(this);
 
     // value select checkbox
@@ -61,6 +63,190 @@ MonitorDialog::MonitorDialog(QWidget * parent):
     plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
     //plot->setVisible(false);
     layout->addWidget(plot, 2, 0, 12, 4);
+    */
+
+    // ver 2
+    QGridLayout * layout = new QGridLayout(this);
+
+    QComboBox* comboBox = new QComboBox(this);
+    comboBox->addItem("Select value to monitor...");
+    comboBox->addItem("Current voltage");
+    comboBox->addItem("Temperature 1");
+    comboBox->addItem("Temperature 2");
+    comboBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    layout->addWidget(comboBox, 0, 0, 1, 2);
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QToolButton* playBtn = new QToolButton(this);
+        hLayout->addWidget(playBtn);
+        QToolButton* pauseBtn = new QToolButton(this);
+        hLayout->addWidget(pauseBtn);
+        QToolButton* stopBtn = new QToolButton(this);
+        hLayout->addWidget(stopBtn);
+        QToolButton* restartBtn = new QToolButton(this);
+        hLayout->addWidget(restartBtn);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 1, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 2, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 3, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 4, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 5, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        hLayout->setAlignment(Qt::AlignLeft);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 6, 0, 1, 4);
+    }
+
+    {
+        QHBoxLayout* hLayout = new QHBoxLayout(this);
+        QCheckBox* activeBox = new QCheckBox(this);
+        activeBox->setChecked(false);
+        hLayout->addWidget(activeBox);
+        QLabel* activeCaption = new QLabel(this);
+        activeCaption->setText("Caption");
+        activeCaption->setAlignment(Qt::AlignLeft);
+        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        activeCaption->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+        hLayout->addWidget(activeCaption);
+        QLineEdit* lineEdit = new QLineEdit(this);
+        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(lineEdit);
+        QLabel* uintsName = new QLabel(this);
+        uintsName->setText(", Volts");
+        uintsName->setAlignment(Qt::AlignLeft);
+        uintsName->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        hLayout->addWidget(uintsName);
+
+        hLayout->addStretch();
+        layout->addLayout(hLayout, 7, 0, 1, 4);
+    }
+
+
+    QCustomPlot* plot = new QCustomPlot(this);
+    plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
+    //plot->setVisible(false);
+    layout->addWidget(plot, 8, 0, 12, 4);
+
 
     /*
     mLineEdit = new QLineEdit(this);
