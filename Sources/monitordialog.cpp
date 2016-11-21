@@ -13,6 +13,8 @@ namespace
 {
     static const qreal WIDTH = 500;
     static const qreal HEIGHT = 300;
+
+    static const qreal BTN_SIZE = 50;
 }
 MonitorDialog::MonitorDialog(QWidget * parent):
     QDialog(parent)
@@ -25,47 +27,7 @@ MonitorDialog::MonitorDialog(QWidget * parent):
                     WIDTH, HEIGHT);
     }
 
-    // ver 1
-    /*
-    QGridLayout * layout = new QGridLayout(this);
 
-    // value select checkbox
-    QComboBox* comboBox = new QComboBox(this);
-    comboBox->addItem("Current voltage");
-    comboBox->addItem("Temperature 1");
-    comboBox->addItem("Temperature 2");
-    layout->addWidget(comboBox, 0, 0, 1, 2);
-
-    // active checkbox
-    QHBoxLayout* hLayout = new QHBoxLayout(this);
-    QCheckBox* activeBox = new QCheckBox(this);
-    activeBox->setChecked(false);
-    hLayout->addWidget(activeBox);
-    QLabel* activeCaption = new QLabel(this);
-    activeCaption->setText("Active");
-    activeCaption->setAlignment(Qt::AlignLeft);
-    activeCaption->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    hLayout->addWidget(activeCaption);
-    layout->addLayout(hLayout, 0, 3, 1, 1);
-
-    // current value
-    QLabel* caption = new QLabel(this);
-    caption->setText("Current value");
-    caption->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    layout->addWidget(caption, 1, 0, 1, 1);
-    QLabel* value = new QLabel(this);
-    value->setText(QString::number(100));
-    value->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    value->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    layout->addWidget(value, 1, 1, 1, 1);
-
-    QCustomPlot* plot = new QCustomPlot(this);
-    plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
-    //plot->setVisible(false);
-    layout->addWidget(plot, 2, 0, 12, 4);
-    */
-
-    // ver 2
     QGridLayout * layout = new QGridLayout(this);
 
     QComboBox* comboBox = new QComboBox(this);
@@ -80,12 +42,16 @@ MonitorDialog::MonitorDialog(QWidget * parent):
         QHBoxLayout* hLayout = new QHBoxLayout(this);
         hLayout->setAlignment(Qt::AlignLeft);
         QToolButton* playBtn = new QToolButton(this);
+        playBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
         hLayout->addWidget(playBtn);
         QToolButton* pauseBtn = new QToolButton(this);
+        pauseBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
         hLayout->addWidget(pauseBtn);
         QToolButton* stopBtn = new QToolButton(this);
+        stopBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
         hLayout->addWidget(stopBtn);
         QToolButton* restartBtn = new QToolButton(this);
+        restartBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
         hLayout->addWidget(restartBtn);
 
         hLayout->addStretch();
