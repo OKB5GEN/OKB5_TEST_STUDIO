@@ -222,6 +222,34 @@ void EditorWindow::createActions()
 
     menuBar()->addSeparator();
 
+    QMenu *runMenu = menuBar()->addMenu(tr("&Run"));
+    QToolBar *runToolBar = addToolBar(tr("Run"));
+
+    const QIcon runIcon = QIcon(":/images/media-play-32.png");
+    QAction *runAct = new QAction(runIcon, tr("Run"), this);
+    //runAct->setShortcuts(QKeySequence::New);
+    runAct->setStatusTip(tr("Runs the cyclogram"));
+    connect(runAct, &QAction::triggered, this, &EditorWindow::runCyclogram);
+    runMenu->addAction(runAct);
+    runToolBar->addAction(runAct);
+
+    const QIcon pauseIcon = QIcon(":/images/media-pause-32.png");
+    QAction *pauseAct = new QAction(pauseIcon, tr("Pause"), this);
+    //pauseAct->setShortcuts(QKeySequence::New);
+    pauseAct->setStatusTip(tr("Pauses the cyclogram"));
+    connect(pauseAct, &QAction::triggered, this, &EditorWindow::pauseCyclogram);
+    runMenu->addAction(pauseAct);
+    runToolBar->addAction(pauseAct);
+
+    const QIcon stopIcon = QIcon(":/images/media-stop-32.png");
+    QAction *stopAct = new QAction(stopIcon, tr("Stop"), this);
+    //stopAct->setShortcuts(QKeySequence::New);
+    stopAct->setStatusTip(tr("Stops the cyclogram"));
+    connect(stopAct, &QAction::triggered, this, &EditorWindow::stopCyclogram);
+    runMenu->addAction(stopAct);
+    runToolBar->addAction(stopAct);
+
+
 #endif // !QT_NO_CLIPBOARD
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -356,6 +384,18 @@ void EditorWindow::setCurrentFile(const QString &fileName)
 QString EditorWindow::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
+}
+
+void EditorWindow::runCyclogram()
+{
+}
+
+void EditorWindow::pauseCyclogram()
+{
+}
+
+void EditorWindow::stopCyclogram()
+{
 }
 
 #ifndef QT_NO_SESSIONMANAGER
