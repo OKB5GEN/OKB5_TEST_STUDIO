@@ -39,6 +39,7 @@ private slots:
     void runCyclogram();
     void pauseCyclogram();
     void stopCyclogram();
+    void addMonitor();
 
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);

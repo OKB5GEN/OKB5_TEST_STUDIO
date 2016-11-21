@@ -249,6 +249,13 @@ void EditorWindow::createActions()
     runMenu->addAction(stopAct);
     runToolBar->addAction(stopAct);
 
+    const QIcon addMonitorIcon = QIcon(":/images/monitor_48.png");
+    QAction *addMonitorAct = new QAction(addMonitorIcon, tr("Add monitor"), this);
+    //addMonitorAct->setShortcuts(QKeySequence::New);
+    addMonitorAct->setStatusTip(tr("Add parameter monitor"));
+    connect(addMonitorAct, &QAction::triggered, this, &EditorWindow::addMonitor);
+    runMenu->addAction(addMonitorAct);
+    runToolBar->addAction(addMonitorAct);
 
 #endif // !QT_NO_CLIPBOARD
 
@@ -296,6 +303,8 @@ void EditorWindow::writeSettings()
 
 bool EditorWindow::maybeSave()
 {
+    return true; // TODO
+
 //    if (!textEdit->document()->isModified())
 //        return true;
 
@@ -396,6 +405,11 @@ void EditorWindow::pauseCyclogram()
 
 void EditorWindow::stopCyclogram()
 {
+}
+
+void EditorWindow::addMonitor()
+{
+
 }
 
 #ifndef QT_NO_SESSIONMANAGER
