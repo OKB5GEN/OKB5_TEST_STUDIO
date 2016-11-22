@@ -30,9 +30,6 @@ private slots:
 
     void setUpdatePeriod(QString period);
 
-    void setAutoMode();
-    void setManualMode();
-
     void getCurrentValue();
     void updateUI();
 
@@ -42,10 +39,6 @@ private:
     QCustomPlot* mPlot;
     QCheckBox* mPlotCheckBox;
 
-    QList<QWidget*> mAutoModeWidgets;
-    QList<QWidget*> mManualModeWidgets;
-
-    bool mIsAutoMode;
     int mUpdatePeriod;
 };
 

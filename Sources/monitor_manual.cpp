@@ -354,11 +354,12 @@ void MonitorManual::addParam()
     comboBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     hLayout->addWidget(comboBox);
 
-    QLabel* value = new QLabel(this);
+    QLineEdit* value = new QLineEdit(this);
+    value->setReadOnly(true);
     value->setAlignment(Qt::AlignRight);
     value->setText(QString::number(0));
     value->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-    value->setFrameStyle(QFrame::Sunken | QFrame::Panel);
+    //value->setFrameStyle(QFrame::Sunken | QFrame::Panel);
     hLayout->addWidget(value);
 
     QLabel* activeLabel = new QLabel(this);
