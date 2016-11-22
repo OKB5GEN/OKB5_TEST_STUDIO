@@ -2,13 +2,12 @@
 #define MONITORDIALOG_H
 
 #include <QDialog>
-//#include "Headers/shapetypes.h"
 
-/*
 QT_BEGIN_NAMESPACE
-class QLineEdit;
+class QCheckBox;
 QT_END_NAMESPACE
-*/
+
+class QCustomPlot;
 
 class MonitorDialog : public QDialog
 {
@@ -18,12 +17,6 @@ public:
     MonitorDialog(QWidget * parent);
     ~MonitorDialog();
 
-    //ShapeTypes shapeType() const;
-    //void setText(const QString& text);
-
-    //QString text() const;
-
-
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
@@ -31,11 +24,29 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
+    void onPlayClicked();
+    void onPauseClicked();
+    void onStopClicked();
 
+    void setUpdatePeriod(QString period);
+
+    void setAutoMode();
+    void setManualMode();
+
+    void getCurrentValue();
+    void updateUI();
 
 private:
-    //QLineEdit* mLineEdit;
-    //ShapeTypes mShapeType;
+    QTimer* mTimer;
+
+    QCustomPlot* mPlot;
+    QCheckBox* mPlotCheckBox;
+
+    QList<QWidget*> mAutoModeWidgets;
+    QList<QWidget*> mManualModeWidgets;
+
+    bool mIsAutoMode;
+    int mUpdatePeriod;
 };
 
 #endif // MONITORDIALOG_H
