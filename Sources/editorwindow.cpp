@@ -4,15 +4,13 @@
 #include "Headers/renderarea.h"
 #include "Headers/sortingbox.h"
 #include "Headers/monitordialog.h"
+#include "Headers/monitor_manual.h"
+#include "Headers/monitor_auto.h"
 
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
 {
-#ifdef USE_SORTING_BOX
-    renderArea = new SortingBox;
-#else
-    renderArea = new RenderArea;
-#endif
+    renderArea = new SortingBox();
 
     //setCentralWidget(textEdit);
     setCentralWidget(renderArea); // takes control over renderArea
@@ -32,28 +30,6 @@ EditorWindow::EditorWindow()
 
 
     setWindowTitle(tr("ЭТО СПАРТАААА!!!!"));
-
-    ////////////////>>>>>>>>>>>
-#ifdef USE_SORTING_BOX
-#else
-    renderArea->setAntialiased(true);
-    renderArea->setTransformed(false);
-    renderArea->setShape(RenderArea::Polygon);
-
-    int width = 1;
-    Qt::PenStyle style = Qt::SolidLine;
-    Qt::PenCapStyle cap = Qt::FlatCap;
-    Qt::PenJoinStyle join = Qt::RoundJoin;
-    renderArea->setPen(QPen(Qt::blue, width, style, cap, join));
-
-    //Qt::BrushStyle style1 = Qt::LinearGradientPattern;
-    QLinearGradient linearGradient(0, 0, 100, 100);
-    linearGradient.setColorAt(0.0, Qt::white);
-    linearGradient.setColorAt(0.2, Qt::green);
-    linearGradient.setColorAt(1.0, Qt::black);
-    renderArea->setBrush(linearGradient);
-#endif
-    /////////////////<<<<<<<<<<
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
@@ -71,11 +47,6 @@ void EditorWindow::closeEvent(QCloseEvent *event)
 
 void EditorWindow::newFile()
 {
-#ifdef USE_SORTING_BOX // TODO temporary
-    //renderArea->createNewCircle();
-#else
-#endif
-
     /*
     if (maybeSave())
     {
@@ -87,11 +58,6 @@ void EditorWindow::newFile()
 
 void EditorWindow::open()
 {
-#ifdef USE_SORTING_BOX // TODO temporary
-    //renderArea->createNewSquare();
-#else
-#endif
-
     /*
     if (maybeSave())
     {
@@ -105,11 +71,6 @@ void EditorWindow::open()
 
 bool EditorWindow::save()
 {
-#ifdef USE_SORTING_BOX // TODO temporary
-    //renderArea->createNewTriangle();
-#else
-#endif
-
     return true;
     /*
     if (curFile.isEmpty())
@@ -150,6 +111,7 @@ void EditorWindow::documentWasModified()
 
 void EditorWindow::createActions()
 {
+    /*
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
     const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
@@ -223,6 +185,22 @@ void EditorWindow::createActions()
 
     menuBar()->addSeparator();
 
+#endif // !QT_NO_CLIPBOARD
+
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &EditorWindow::about);
+    aboutAct->setStatusTip(tr("Show the application's About box"));
+
+    QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+
+#ifndef QT_NO_CLIPBOARD
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    //connect(textEdit, &QPlainTextEdit::copyAvailable, cutAct, &QAction::setEnabled);
+    //connect(textEdit, &QPlainTextEdit::copyAvailable, copyAct, &QAction::setEnabled);
+#endif // !QT_NO_CLIPBOARD
+*/
     QMenu *runMenu = menuBar()->addMenu(tr("&Run"));
     QToolBar *runToolBar = addToolBar(tr("Run"));
 
@@ -250,29 +228,22 @@ void EditorWindow::createActions()
     runMenu->addAction(stopAct);
     runToolBar->addAction(stopAct);
 
-    const QIcon addMonitorIcon = QIcon(":/images/monitor_48.png");
-    QAction *addMonitorAct = new QAction(addMonitorIcon, tr("Add monitor"), this);
-    //addMonitorAct->setShortcuts(QKeySequence::New);
-    addMonitorAct->setStatusTip(tr("Add parameter monitor"));
-    connect(addMonitorAct, &QAction::triggered, this, &EditorWindow::addMonitor);
-    runMenu->addAction(addMonitorAct);
-    runToolBar->addAction(addMonitorAct);
+    QMenu *monitorMenu = menuBar()->addMenu(tr("&Monitor"));
+    QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
 
-#endif // !QT_NO_CLIPBOARD
+    const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
+    QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
+    addManualMonitorAct->setStatusTip(tr("Add manual parameter monitor"));
+    connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::addManualMonitor);
+    monitorMenu->addAction(addManualMonitorAct);
+    monitorToolBar->addAction(addManualMonitorAct);
 
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-    QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &EditorWindow::about);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-
-    QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-
-#ifndef QT_NO_CLIPBOARD
-    cutAct->setEnabled(false);
-    copyAct->setEnabled(false);
-    //connect(textEdit, &QPlainTextEdit::copyAvailable, cutAct, &QAction::setEnabled);
-    //connect(textEdit, &QPlainTextEdit::copyAvailable, copyAct, &QAction::setEnabled);
-#endif // !QT_NO_CLIPBOARD
+    const QIcon addAutoMonitorIcon = QIcon(":/images/monitor_auto.png");
+    QAction *addAutoMonitorAct = new QAction(addAutoMonitorIcon, tr("Add auto monitor"), this);
+    addAutoMonitorAct->setStatusTip(tr("Add auto parameter monitor"));
+    connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addAutoMonitor);
+    monitorMenu->addAction(addAutoMonitorAct);
+    monitorToolBar->addAction(addAutoMonitorAct);
 }
 
 void EditorWindow::createStatusBar()
@@ -413,6 +384,18 @@ void EditorWindow::addMonitor()
     MonitorDialog* dialog = new MonitorDialog(this);
     dialog->show();
     //dialog->exec();
+}
+
+void EditorWindow::addManualMonitor()
+{
+    MonitorManual* dialog = new MonitorManual(this);
+    dialog->show();
+}
+
+void EditorWindow::addAutoMonitor()
+{
+    MonitorAuto* dialog = new MonitorAuto(this);
+    dialog->show();
 }
 
 #ifndef QT_NO_SESSIONMANAGER

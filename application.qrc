@@ -11,6 +11,9 @@
     <file>images/media-pause-32.png</file>
     <file>images/media-play-32.png</file>
     <file>images/media-stop-32.png</file>
-    <file>images/monitor_48.png</file>
+    <file>images/monitor_auto.png</file>
+    <file>images/monitor_manual.png</file>
+    <file>images/edit_add.png</file>
+    <file>images/edit_remove.png</file>
 </qresource>
 </RCC>

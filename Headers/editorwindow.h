@@ -13,9 +13,6 @@ QT_END_NAMESPACE
 class RenderArea;
 class SortingBox;
 
-#define USE_SORTING_BOX
-
-
 class EditorWindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,6 +38,9 @@ private slots:
     void stopCyclogram();
     void addMonitor();
 
+    void addManualMonitor();
+    void addAutoMonitor();
+
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
 #endif
@@ -55,11 +55,7 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
-#ifdef USE_SORTING_BOX
     SortingBox *renderArea;
-#else
-    RenderArea *renderArea;
-#endif
 
     //QPlainTextEdit *textEdit;
     QString curFile;
