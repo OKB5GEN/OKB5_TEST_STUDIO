@@ -12,6 +12,7 @@ QT_END_NAMESPACE
 
 class RenderArea;
 class SortingBox;
+class Cyclogram;
 
 class EditorWindow : public QMainWindow
 {
@@ -55,9 +56,11 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
-    SortingBox *renderArea;
+    Cyclogram* mCyclogram;
+
+    SortingBox *mRenderArea;
 
     //QPlainTextEdit *textEdit;
-    QString curFile;
+    QString mCurFile;
 };
 #endif // EDITORWINDOW_H

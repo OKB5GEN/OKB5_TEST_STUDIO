@@ -39,8 +39,8 @@ void Cyclogram::createDefault()
 {
     foreach (const Cell& cell, mCells)
     {
-        Command* cmd = cell.getCommand();
-        if (cmd != Q_NULLPTR)
+        Command* cmd = cell.command();
+        if (cmd)
         {
             cmd->deleteLater();
         }
@@ -50,7 +50,7 @@ void Cyclogram::createDefault()
 
     CmdStateStart* first = new CmdStateStart(START_STATE_NAME, this);
     CmdStateStart* setEndState = new CmdStateStart(END_STATE_NAME, this);
-    first->setNextCommand(setEndState);
+    first->setNext(setEndState);
     mFirst = first;
     mCurrent = Q_NULLPTR;
 
@@ -72,10 +72,10 @@ void Cyclogram::createDefault()
 
 void Cyclogram::insertCell(const Cell& cell)
 {
-    int row = cell.getPos().x();
-    int column = cell.getPos().y();
+    int row = cell.pos().x();
+    int column = cell.pos().y();
 
-    if (cell.getCommand() != Q_NULLPTR)
+    if (cell.command())
     {
         //QSize size = cell.getCommand()->getSize();
         //insertColumns(size.width() - 1);
@@ -173,4 +173,10 @@ void Cyclogram::resume()
         mCurrent->resume();
         mState = RUNNING;
     }
+}
+
+const QList<Cell>& Cyclogram::cells() const
+{
+    return mCells;
+
 }

@@ -14,6 +14,7 @@ QT_END_NAMESPACE
 
 class ShapeAddDialog;
 class ShapeEditDialog;
+class Cyclogram;
 
 class SortingBox : public QWidget
 {
@@ -32,11 +33,8 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
-//private slots:
 public slots:
-//    void createNewCircle();
-//    void createNewSquare();
-//    void createNewTriangle();
+    void load(Cyclogram* cyclogram);
 
 private slots:
     void addItem(ShapeTypes id, const QPoint& pos, const QString& text);

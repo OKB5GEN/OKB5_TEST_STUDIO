@@ -23,6 +23,8 @@ public:
     void pause();
     void resume();
 
+    const QList<Cell>& cells() const;
+
 private slots:
     void onCommandFinished(Command* cmd);
 

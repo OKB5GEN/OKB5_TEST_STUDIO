@@ -1,8 +1,9 @@
 #include "Headers/command.h"
 
-Command::Command(QObject * parent):
+Command::Command(ShapeTypes type, QObject * parent):
     QObject(parent),
-    mNext(Q_NULLPTR)
+    mNext(Q_NULLPTR),
+    mType(type)
 {
 
 }
@@ -32,7 +33,12 @@ void Command::resume()
 
 }
 
-void Command::setNextCommand(Command* cmd)
+void Command::setNext(Command* cmd)
 {
     mNext = cmd;
+}
+
+ShapeTypes Command::type() const
+{
+    return mType;
 }

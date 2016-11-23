@@ -2,6 +2,7 @@
 #define CELL_H
 
 #include <QPoint>
+#include <QString>
 
 class Command;
 
@@ -19,18 +20,22 @@ public:
     Cell(QPoint pos, Type type);
     Cell(QPoint pos, Command* cmd);
 
-    const QPoint& getPos() const { return mPos; }
-    void setPos(const QPoint& pos) { mPos = pos; }
+    const QPoint& pos() const;
+    void setPos(const QPoint& pos);
 
-    Type getType() const { return mType; }
-    void setType(Type type) { mType = type; }
+    Type type() const;
+    void setType(Type type);
 
-    Command* getCommand() const { return mCommand; }
-    void setCommand(Command* command) { mCommand = command; }
+    Command* command() const;
+    void setCommand(Command* command);
+
+    const QString& text() const;
+    void setText(const QString& text);
 
 private:
     QPoint mPos;
     Type mType = EMPTY;
     Command * mCommand = Q_NULLPTR;
+    QString mText;
 };
 #endif // CELL_H

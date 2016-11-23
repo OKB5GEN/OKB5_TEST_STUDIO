@@ -4,6 +4,9 @@
 #include "Headers/sortingbox.h"
 #include "Headers/shapeadddialog.h"
 #include "Headers/shapeeditdialog.h"
+#include "Headers/cyclogram.h"
+#include "Headers/cell.h"
+#include "Headers/command.h"
 
 /*
  * Здесь мы создаем формы для циклограммы
@@ -39,8 +42,9 @@ SortingBox::SortingBox():
     setBackgroundRole(QPalette::Base);
     mSelectedItem = 0;
 
-    mOrigin.setX(mItem.width());
-    mOrigin.setY(mItem.height());
+    // Set cyclogram origin
+    mOrigin.setX(mItem.width() / 4);
+    mOrigin.setY(0);
 
     //newCircleButton = createToolButton(tr("New Circle"), QIcon(":/images/circle.png"), SLOT(createNewCircle()));
     //newSquareButton = createToolButton(tr("New Square"), QIcon(":/images/square.png"), SLOT(createNewSquare()));
@@ -456,7 +460,7 @@ void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addIte
 void SortingBox::drawSilhouette()
 {
     QPoint bottomRight(INT_MIN, INT_MIN);
-    QPoint bottomLeft(mOrigin.x(), (mDiagramSize.height() + 1) * mItem.height());
+    QPoint bottomLeft(mOrigin.x(), mDiagramSize.height() * mItem.height());
     QPoint topLeft(mOrigin.x(), mOrigin.y() + mItem.height());
     QPoint topRight(INT_MIN, INT_MAX);
 
@@ -556,4 +560,20 @@ void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, const QString& tex
 
     //TODO update connectors
     update();
+}
+
+void SortingBox::load(Cyclogram* cyclogram)
+{
+    if (!cyclogram)
+    {
+        return;
+    }
+
+    const QList<Cell>& cells = cyclogram->cells();
+
+    // TODO cyclogram reading
+    for (int i = 0, sz = cells.size(); i < sz; ++i)
+    {
+        addItem(cells[i].command()->type(), cells[i].pos(), cells[i].text());
+    }
 }

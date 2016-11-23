@@ -6,14 +6,22 @@
 #include "Headers/monitordialog.h"
 #include "Headers/monitor_manual.h"
 #include "Headers/monitor_auto.h"
+#include "Headers/cyclogram.h"
 
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
 {
-    renderArea = new SortingBox();
+    mRenderArea = new SortingBox();
+    mCyclogram = new Cyclogram(this);
+
+    // TODO cyclogram loading
+    //mCyclogram->createDefault();
+    //mRenderArea->load(mCyclogram);
+
+    //connect(); // connect signals and slots of GUI (SortingBox TODO rename)) and Logics (Cyclogram)
 
     //setCentralWidget(textEdit);
-    setCentralWidget(renderArea); // takes control over renderArea
+    setCentralWidget(mRenderArea); // takes control over renderArea
 
     createActions();
     createStatusBar();
@@ -27,7 +35,6 @@ EditorWindow::EditorWindow()
 
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
-
 
     setWindowTitle(tr("ЭТО СПАРТАААА!!!!"));
 }
@@ -349,12 +356,12 @@ bool EditorWindow::saveFile(const QString &fileName)
 
 void EditorWindow::setCurrentFile(const QString &fileName)
 {
-    curFile = fileName;
+    mCurFile = fileName;
     //textEdit->document()->setModified(false);
     setWindowModified(false);
 
-    QString shownName = curFile;
-    if (curFile.isEmpty())
+    QString shownName = mCurFile;
+    if (mCurFile.isEmpty())
     {
         shownName = "untitled.txt";
     }
@@ -369,14 +376,17 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 
 void EditorWindow::runCyclogram()
 {
+    mCyclogram->run();
 }
 
 void EditorWindow::pauseCyclogram()
 {
+    mCyclogram->pause();
 }
 
 void EditorWindow::stopCyclogram()
 {
+    mCyclogram->stop();
 }
 
 void EditorWindow::addMonitor()

@@ -2,7 +2,7 @@
 #include <QTimer>
 
 CmdDelay::CmdDelay(QObject* parent):
-    Command(parent),
+    Command(ShapeTypes::DELAY, parent),
     mDelay(0)
 {
     mTimer = new QTimer(this);
