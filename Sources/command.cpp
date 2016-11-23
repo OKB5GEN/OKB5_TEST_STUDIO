@@ -1,7 +1,8 @@
 #include "Headers/command.h"
 
 Command::Command(QObject * parent):
-    QObject(parent)
+    QObject(parent),
+    mNext(Q_NULLPTR)
 {
 
 }
@@ -29,4 +30,9 @@ void Command::pause()
 void Command::resume()
 {
 
+}
+
+void Command::setNextCommand(Command* cmd)
+{
+    mNext = cmd;
 }

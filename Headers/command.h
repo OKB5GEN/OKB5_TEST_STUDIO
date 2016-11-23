@@ -16,15 +16,16 @@ public:
     virtual void pause();
     virtual void resume();
 
-    const QSize& getSize() const { return mSize; }
+    void setNextCommand(Command* cmd);
 
 signals:
     void onFinished(Command* nextCmd); // must be sent on command finish
 
 protected:
-    QSize mSize; // must be initialized in command
+    Command* mNext;
 
 private:
+
 };
 
 #endif // COMMAND_H
