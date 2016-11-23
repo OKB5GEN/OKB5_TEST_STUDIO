@@ -63,6 +63,12 @@ SortingBox::SortingBox():
     mTrianglePath.lineTo(120, 100);
     mTrianglePath.lineTo(120 / 2, 0);
 
+    mDelayPath.moveTo(CELL.width(), CELL.height());
+    mDelayPath.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
+    mDelayPath.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
+    mDelayPath.lineTo(mItem.width() - CELL.width(), CELL.height());
+    mDelayPath.lineTo(CELL.width(), CELL.height());
+
     mHexagonPath.moveTo(CELL.width(), mItem.height() / 2);
     mHexagonPath.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
     mHexagonPath.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
@@ -168,7 +174,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
                 {
                     ShapeTypes shapeType = mShapeAddDialog->shapeType();
                     QPoint insertionCell = mShapeItems[index].cell();
-                    insertItem(shapeType, insertionCell, "Action", index);
+                    insertItem(shapeType, insertionCell, "Delay", index);
                     inserted = true;
                 }
             }
@@ -399,6 +405,9 @@ void SortingBox::addItem(ShapeTypes id, const QPoint& pos, const QString& text)
         break;
     case ShapeTypes::ACTION:
         createShapeItem(mActionPath, "Tooltip", p, initialItemColor(), id, pos, text);
+        break;
+    case ShapeTypes::DELAY:
+        createShapeItem(mDelayPath, "Tooltip", p, initialItemColor(), id, pos, text);
         break;
 
     default:

@@ -18,7 +18,7 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
 
     // TODO Create widget with tabs/filtering to create shapes
     // вероятно это будет прокручиваемый список/таблица из элементов-иконок циклограммы (тут надо подумать над дизайном)
-    mShapeType = ShapeTypes::ACTION;
+    mShapeType = ShapeTypes::DELAY;
 }
 
 ShapeAddDialog::~ShapeAddDialog()

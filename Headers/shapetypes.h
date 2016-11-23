@@ -23,7 +23,7 @@ enum class ShapeTypes
     OUTPUT,
     INPUT,
     PAUSE,
-    PERIOD,
+    DELAY,
     START_TIMER,
     SYNCHRONIZER,
     PARALLEL_PROCESS,

@@ -70,6 +70,7 @@ private:
     QPainterPath mHeadlinePath;
     QPainterPath mAddressPath;
     QPainterPath mActionPath;
+    QPainterPath mDelayPath;
 
     QPainterPath mAddPath;
 
