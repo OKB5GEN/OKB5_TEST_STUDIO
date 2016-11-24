@@ -8,10 +8,10 @@ class CmdSetState: public Command
     Q_OBJECT
 
 public:
-    CmdSetState(QString name, QObject * parent);
+    CmdSetState(const QString& name, QObject * parent);
 
-    QString getName() const { return mName; }
-    void setName(QString name) { mName = name; }
+    const QString& name() const;
+    void setName(const QString& name);
 private:
     QString mName;
 };

@@ -37,8 +37,15 @@ void CmdDelay::resume()
 
 void CmdDelay::finish()
 {
-    emit onFinished(mNext);
     mTimer->stop(); // to not restart timer again
+    if (mNextCommands.empty())
+    {
+        emit onFinished(Q_NULLPTR);
+        return;
+    }
+
+    emit onFinished(mNextCommands[0]);
+
 }
 
 void CmdDelay::setDelay(int seconds)

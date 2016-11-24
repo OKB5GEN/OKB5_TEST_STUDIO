@@ -2,8 +2,8 @@
 
 Command::Command(ShapeTypes type, QObject * parent):
     QObject(parent),
-    mNext(Q_NULLPTR),
-    mType(type)
+    mType(type),
+    mRole(0)
 {
 
 }
@@ -33,12 +33,37 @@ void Command::resume()
 
 }
 
-void Command::setNext(Command* cmd)
-{
-    mNext = cmd;
-}
-
 ShapeTypes Command::type() const
 {
     return mType;
 }
+
+QString Command::text() const
+{
+    return mText;
+}
+
+const QList<Command*>& Command::nextCommands() const
+{
+    return mNextCommands;
+}
+
+void Command::addCommand(Command* cmd, int role /*= 0*/)
+{
+    if (cmd)
+    {
+        cmd->setRole(role);
+        mNextCommands.push_back(cmd);
+    }
+}
+
+int Command::role() const
+{
+    return mRole;
+}
+
+void Command::setRole(int role)
+{
+    mRole = role;
+}
+

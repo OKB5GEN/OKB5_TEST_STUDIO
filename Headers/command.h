@@ -18,16 +18,24 @@ public:
     virtual void pause();
     virtual void resume();
 
-    void setNext(Command* cmd);
+    virtual QString text() const;
     ShapeTypes type() const;
+
+    const QList<Command*>& nextCommands() const;
+    void addCommand(Command* cmd, int role = 0);
+
+    int role() const;
+    void setRole(int role);
 
 signals:
     void onFinished(Command* nextCmd); // must be sent on command finish
 
 protected:
-    Command* mNext;
     ShapeTypes mType;
+    QString mText;
+    int mRole;
 
+    QList<Command*> mNextCommands;
 
 private:
 

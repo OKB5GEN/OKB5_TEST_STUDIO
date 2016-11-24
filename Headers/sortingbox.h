@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 class ShapeAddDialog;
 class ShapeEditDialog;
 class Cyclogram;
+class Command;
 
 class SortingBox : public QWidget
 {
@@ -56,6 +57,8 @@ private:
     QToolButton *createToolButton(const QString &toolTip, const QIcon &icon, const char *member);
 
     void addText(ShapeItem& item);
+    void addChildCommands(Command* parentCmd, const QPoint& parentCell);
+    bool isHeadlineExist(Command* parentCmd);
 
     QPointF mOrigin;
     QSizeF mItem;

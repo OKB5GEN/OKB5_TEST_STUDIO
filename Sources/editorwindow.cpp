@@ -15,8 +15,8 @@ EditorWindow::EditorWindow()
     mCyclogram = new Cyclogram(this);
 
     // TODO cyclogram loading
-    //mCyclogram->createDefault();
-    //mRenderArea->load(mCyclogram);
+    mCyclogram->createDefault();
+    mRenderArea->load(mCyclogram);
 
     //connect(); // connect signals and slots of GUI (SortingBox TODO rename)) and Logics (Cyclogram)
 

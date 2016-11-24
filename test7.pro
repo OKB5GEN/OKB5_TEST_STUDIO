@@ -40,7 +40,6 @@ SOURCES += main.cpp\
     Sources/commands/cmd_state_start.cpp \
     Sources/commands/cmd_sub_program.cpp \
     Sources/commands/cmd_switch.cpp \
-    Sources/commands/cmd_variable.cpp \
     Sources/editorwindow.cpp \
     Sources/renderarea.cpp \
     Sources/shapeitem.cpp \
@@ -49,7 +48,8 @@ SOURCES += main.cpp\
     Sources/shapeeditdialog.cpp \
     Sources/monitordialog.cpp \
     Sources/monitor_auto.cpp \
-    Sources/monitor_manual.cpp
+    Sources/monitor_manual.cpp \
+    Sources/commands/cmd_title.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -74,7 +74,6 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_state_start.h \
     Headers/commands/cmd_sub_program.h \
     Headers/commands/cmd_switch.h \
-    Headers/commands/cmd_variable.h \
     Headers/command.h \
     Headers/editorwindow.h \
     Headers/renderarea.h \
@@ -85,7 +84,8 @@ HEADERS  += mainwindow.h \
     Headers/shapeeditdialog.h \
     Headers/monitordialog.h \
     Headers/monitor_auto.h \
-    Headers/monitor_manual.h
+    Headers/monitor_manual.h \
+    Headers/commands/cmd_title.h
 
 
 FORMS    += mainwindow.ui

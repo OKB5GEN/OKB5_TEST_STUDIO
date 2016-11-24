@@ -98,6 +98,7 @@ SortingBox::SortingBox():
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
 
+    /*
     addItem(ShapeTypes::TITLE, QPoint(0, 0), "Begin");
     addItem(ShapeTypes::HEADLINE, QPoint(0, 1), "First Branch");
     addItem(ShapeTypes::ADDRESS, QPoint(0, 2), "Second Branch");
@@ -108,6 +109,7 @@ SortingBox::SortingBox():
     connectItems(QPoint(0, 0), QPoint(0, 1), 0);
     connectItems(QPoint(0, 1), QPoint(0, 2), 1);
     connectItems(QPoint(1, 1), QPoint(1, 2), 0);
+    */
 }
 
 SortingBox::~SortingBox()
@@ -383,6 +385,19 @@ void SortingBox::addItem(ShapeTypes id, const QPoint& pos, const QString& text)
 {
     QPoint p(mOrigin.x() + pos.x() * mItem.width(), mOrigin.y() + pos.y() * mItem.height());
 
+    // check is insertion
+    /*
+    bool isInsertion = false;
+    for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
+    {
+        if (mShapeItems[i].position() == pos)
+        {
+            isInsertion = true;
+            break;
+        }
+    }
+    */
+
     qDebug("AddItem to pos (%i, %i) diag sz before is (%i, %i)", pos.x(), pos.y(), mDiagramSize.width(), mDiagramSize.height());
     // TODO неправильная логика при вставке в середину, тут только случай вставки в конец!!!
 
@@ -569,11 +584,76 @@ void SortingBox::load(Cyclogram* cyclogram)
         return;
     }
 
-    const QList<Cell>& cells = cyclogram->cells();
-
     // TODO cyclogram reading
-    for (int i = 0, sz = cells.size(); i < sz; ++i)
+    /* Алгоритм построения графической циклограммы из логической (алгоритм скорее всего будет рекурсивный):
+     *
+     * 1. Берем начало циклограммы. Им всегда является овальчик "НАЧАЛО" и ставим его в клетку (0;0)
+     * 2. Вправо от него рисуем прямоугольничек с глобальными переменными
+     * 3. Берем список "следующих" команд и переходим на новую строчку по Y
+     * 4. Слева направо располагаем следующие команды
+     * 5. Если команд больше одной, то вставляем количество столбцов, равное кол-во следующих команд минус 1 (все, что справа сдвигается)
+     *
+     * По идее мы сначала должны отрисовать все ветки бранча от HEADLINE получить список ADDRESS, которыми ветка заканчивается
+     * Также надо проверять заканичвается ли данная ветка END-ом. Если заканчивается, то этот HEADLINE должен быть правее всех веток
+     *
+    */
+
+    Command* first = cyclogram->first();
+
+    if (!first || first->type() != ShapeTypes::TITLE)
     {
-        addItem(cells[i].command()->type(), cells[i].pos(), cells[i].text());
+        return;
     }
+
+    QPoint parentCell(0, 0);
+    addItem(first->type(), parentCell, first->text());
+    addChildCommands(first, parentCell);
+
+    drawSilhouette();
+}
+
+void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
+{
+    QList<Command*> nextCommands = parentCmd->nextCommands();
+    if (nextCommands.empty())
+    {
+        return;
+    }
+
+    if (nextCommands.size() == 1)
+    {
+        Command* cmd = nextCommands[0];
+        QPoint cell(parentCell.x(), parentCell.y() + 1);
+
+        if (cmd->type() == ShapeTypes::HEADLINE && parentCmd->type() == ShapeTypes::ADDRESS) // not first branch
+        {
+            cell.setX(mDiagramSize.width());
+            cell.setY(1);
+        }
+
+        addItem(cmd->type(), cell, cmd->text());
+
+        if (cmd->type() == ShapeTypes::ADDRESS) // move to another branch
+        {
+            if (!isHeadlineExist(cmd))
+            {
+                addChildCommands(cmd, cell);
+            }
+        }
+        else
+        {
+            addChildCommands(cmd, cell);
+        }
+
+    }
+    else // QUESTION or SWITCH-CASE command
+    {
+        int TODO;
+    }
+}
+
+
+bool SortingBox::isHeadlineExist(Command* parentCmd)
+{
+    return false;
 }
