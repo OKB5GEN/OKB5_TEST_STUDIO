@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include "Headers/shapetypes.h"
 #include "Headers/shapeitem.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,24 +38,25 @@ protected:
 public slots:
     void load(Cyclogram* cyclogram);
 
-private slots:
-    void addItem(ShapeTypes id, const QPoint& pos, const QString& text);
-
 private:
     void insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex);
 
     void connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount);
     void drawSilhouette();
 
-    int updateButtonGeometry(QToolButton *button, int x, int y);
-    void createShapeItem(const QPainterPath &path, const QString &toolTip, const QPoint &pos, const QColor &color, ShapeTypes type, const QPoint &cell, const QString& text);
-    int itemAt(const QPoint &pos);
+    //int updateButtonGeometry(QToolButton *button, int x, int y);
+
+    void createCommandShape(Command* cmd, const QPoint& cell);
+    void createConnectorShape(const QPainterPath &path, const QPoint &pos);
+    void createValencyPointShape(const QPoint &pos, const QPoint& cell);
+
+    int itemAt(const QPoint &pos, const QList<ShapeItem>& items);
+
+    void drawItems(QList<ShapeItem>& items, QPainter& painter);
+
+    QPainterPath createPath(ShapeTypes type);
+
     void moveItemTo(const QPoint &pos);
-    QPoint initialItemPosition(const QPainterPath &path);
-    QPoint randomItemPosition();
-    QColor initialItemColor();
-    QColor randomItemColor();
-    QToolButton *createToolButton(const QString &toolTip, const QIcon &icon, const char *member);
 
     void addText(ShapeItem& item);
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
@@ -64,30 +66,13 @@ private:
     QSizeF mItem;
     QSize mDiagramSize;
 
-    QList<ShapeItem> mShapeItems;
-
-    QPainterPath mTitlePath;
-
-    QPainterPath mHeadlinePath;
-    QPainterPath mAddressPath;
-    QPainterPath mActionPath;
-    QPainterPath mDelayPath;
-
-    QPainterPath mAddPath;
-
-    QPainterPath mCirclePath;
-    QPainterPath mTrianglePath;
-
-    QPainterPath mHexagonPath;
-
-    QPainterPath mItemConnectorPath;
+    QList<ShapeItem> mCommands; // cyclogram commands (created by user, editable)
+    QList<ShapeItem> mConnectors; // connectors between cyclogram commands (created by program, not editable)
+    QList<ShapeItem> mValencyPoints; // points where user can add new cyclogram commands
+    QList<ShapeItem> mSihlouette; // sihlouette (TODO temporary)
 
     QPoint mPreviousPosition;
     ShapeItem * mSelectedItem;
-
-    //QToolButton *newCircleButton;
-    //QToolButton *newSquareButton;
-    //QToolButton *newTriangleButton;
 
     QFont mFont;
 

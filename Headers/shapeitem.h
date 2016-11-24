@@ -5,7 +5,7 @@
 #include <QPainterPath>
 #include <QPoint>
 
-#include "Headers/shapetypes.h"
+class Command;
 
 class ShapeItem
 {
@@ -17,8 +17,6 @@ public:
         Editable    = 0x00000004
     };
 
-    void setText(const QString& text);
-    void setType(ShapeTypes type);
     void setPath(const QPainterPath &path);
     void setTextPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
@@ -26,16 +24,16 @@ public:
     void setColor(const QColor &color);
     void setFlags(uint32_t flags);
     void setCell(const QPoint &position);
+    void setCommand(Command* command);
 
     QPainterPath path() const;
     QPainterPath textPath() const;
     QPoint position() const;
     QColor color() const;
     QString toolTip() const;
-    ShapeTypes type() const;
     uint32_t flags() const;
     QPoint cell() const;
-    const QString& text() const;
+    Command* command() const;
 
 private:
     QPainterPath mPath;
@@ -44,11 +42,10 @@ private:
     QColor mColor;
     QString mToolTip;
 
-    ShapeTypes mType;
     uint32_t mFlags;
     QPoint mCell;
-    QString mText = "Default";
-};
 
+    Command* mCommand = Q_NULLPTR;
+};
 
 #endif

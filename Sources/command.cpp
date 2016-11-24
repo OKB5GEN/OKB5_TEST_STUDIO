@@ -15,7 +15,13 @@ Command::~Command()
 
 void Command::run()
 {
+    if (mNextCommands.empty())
+    {
+        emit onFinished(Q_NULLPTR);
+        return;
+    }
 
+    emit onFinished(mNextCommands[0]);
 }
 
 void Command::stop()

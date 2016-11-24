@@ -2,11 +2,14 @@
 #define SHAPEEDITDIALOG_H
 
 #include <QDialog>
-#include "Headers/shapetypes.h"
 
+/*
 QT_BEGIN_NAMESPACE
 class QLineEdit;
 QT_END_NAMESPACE
+*/
+
+class Command;
 
 class ShapeEditDialog : public QDialog
 {
@@ -16,11 +19,7 @@ public:
     ShapeEditDialog(QWidget * parent);
     ~ShapeEditDialog();
 
-    //ShapeTypes shapeType() const;
-    void setText(const QString& text);
-
-    QString text() const;
-
+    void setCommand(Command* command);
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
@@ -32,8 +31,7 @@ private slots:
 
 
 private:
-    QLineEdit* mLineEdit;
-    //ShapeTypes mShapeType;
+    //QLineEdit* mLineEdit;
 };
 
 #endif // SHAPEEDITDIALOG_H

@@ -4,17 +4,11 @@
 
 QPainterPath ShapeItem::path() const
 {
-    //QPainterPath p = mPath;
-    //p.addPath(mTextPath);
-    //return p;
     return mPath;
 }
 
 QPainterPath ShapeItem::textPath() const
 {
-    //QPainterPath p = mPath;
-    //p.addPath(mTextPath);
-    //return p;
     return mTextPath;
 }
 
@@ -58,16 +52,6 @@ void ShapeItem::setColor(const QColor &color)
     mColor = color;
 }
 
-void ShapeItem::setType(ShapeTypes type)
-{
-    mType = type;
-}
-
-ShapeTypes ShapeItem::type() const
-{
-    return mType;
-}
-
 void ShapeItem::setFlags(uint32_t flags)
 {
     mFlags = flags;
@@ -88,12 +72,12 @@ void ShapeItem::setCell(const QPoint &position)
     mCell = position;
 }
 
-void ShapeItem::setText(const QString& text)
+void ShapeItem::setCommand(Command* command)
 {
-    mText = text;
+    mCommand = command;
 }
 
-const QString& ShapeItem::text() const
+Command* ShapeItem::command() const
 {
-    return mText;
+    return mCommand;
 }

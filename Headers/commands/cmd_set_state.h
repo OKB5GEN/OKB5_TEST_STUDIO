@@ -10,10 +10,7 @@ class CmdSetState: public Command
 public:
     CmdSetState(const QString& name, QObject * parent);
 
-    const QString& name() const;
-    void setName(const QString& name);
 private:
-    QString mName;
 };
 
 #endif // CMD_SET_STATE_H

@@ -19,9 +19,9 @@ void Cyclogram::createDefault()
 
     // empty silhouette
     CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
-    CmdStateStart* branch1 = new CmdStateStart("START_BRANCH", this);
-    CmdSetState* toBranch2 = new CmdSetState("END_BRANCH", this);
-    CmdStateStart* branch2 = new CmdStateStart("START_BRANCH", this);
+    CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
+    CmdSetState* toBranch2 = new CmdSetState("BRANCH2", this);
+    CmdStateStart* branch2 = new CmdStateStart("BRANCH2", this);
     CmdTitle* end = new CmdTitle(CmdTitle::END, this);
 
     createPair(begin, branch1);

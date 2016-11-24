@@ -10,7 +10,8 @@ ShapeEditDialog::ShapeEditDialog(QWidget * parent):
 {
     QGridLayout * layout = new QGridLayout(this);
 
-    mLineEdit = new QLineEdit(this);
+    int TODO; // remove line edit its just for testing
+    QLineEdit* mLineEdit = new QLineEdit(this);
     mLineEdit->setText("Default value");
     layout->addWidget(mLineEdit, 0, 0);
 
@@ -20,24 +21,17 @@ ShapeEditDialog::ShapeEditDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Shape Edit Dialog");
+    setWindowTitle("Command Edit Dialog");
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-    //mShapeType = ShapeTypes::ACTION;
 }
 
 ShapeEditDialog::~ShapeEditDialog()
 {
 
 }
-/*
-ShapeTypes ShapeEditDialog::shapeType() const
-{
-    return mShapeType;
-}
-*/
+
 void ShapeEditDialog::paintEvent(QPaintEvent *event)
 {
 
@@ -58,12 +52,7 @@ void ShapeEditDialog::mouseMoveEvent(QMouseEvent *event)
 
 }
 
-QString ShapeEditDialog::text() const
+void ShapeEditDialog::setCommand(Command* command)
 {
-    return mLineEdit->text();
-}
-
-void ShapeEditDialog::setText(const QString& text)
-{
-    mLineEdit->setText(text);
+    int TODO; // create GUI for command params editing
 }

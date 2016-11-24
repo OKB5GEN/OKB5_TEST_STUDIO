@@ -9,14 +9,7 @@ class CmdStateStart: public Command
 
 public:
     CmdStateStart(const QString& name, QObject * parent);
-
-    void run() override;
-
-    const QString& name() const;
-    void setName(const QString& name);
-
 private:
-    QString mName;
 };
 
 #endif // CMD_STATE_START_H
