@@ -612,7 +612,7 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
             ValencyPoint point = createPoint(QPointF(mItem.width() / 2, mItem.height()));
             points.push_back(point);
 
-            if (type == ShapeTypes::BRANCH_BEGIN)
+            if (type == ShapeTypes::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
             {
                 ValencyPoint point = createPoint(QPointF(mItem.width(), 0));
                 points.push_back(point);
@@ -660,4 +660,26 @@ ValencyPoint SortingBox::createPoint(const QPointF& point)
     vPoint.setColor(QColor::fromRgba(0xff00ff00));
 
     return vPoint;
+}
+
+bool SortingBox::isCyclogramEndBranch(Command* cmd) const
+{
+    if (cmd->type() == ShapeTypes::TERMINATOR)
+    {
+        return true;
+    }
+    else if (cmd->type() == ShapeTypes::GO_TO_BRANCH)
+    {
+        return false; // do not search further
+    }
+
+    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
+    {
+        if (isCyclogramEndBranch(cmd->nextCommands()[i]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

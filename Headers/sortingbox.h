@@ -47,6 +47,7 @@ private:
 
     void createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point);
+    bool isCyclogramEndBranch(Command* cmd) const;
 
     int commandAt(const QPoint &pos);
     int valencyPointAt(const QPoint &pos);
