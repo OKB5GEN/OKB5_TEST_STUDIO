@@ -4,6 +4,8 @@
 #include "Headers/commands/cmd_title.h"
 #include "Headers/commands/cmd_delay.h"
 
+//#define USE_CUSTOM_SIHLOUETTE
+
 namespace
 {
 }
@@ -17,19 +19,7 @@ void Cyclogram::createDefault()
 {
     clear();
 
-    // empty silhouette
-    CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
-    CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
-    CmdSetState* toBranch2 = new CmdSetState("BRANCH2", this);
-    CmdStateStart* branch2 = new CmdStateStart("BRANCH2", this);
-    CmdTitle* end = new CmdTitle(CmdTitle::END, this);
-
-    createPair(begin, branch1);
-    createPair(branch1, toBranch2);
-    createPair(toBranch2, branch2);
-    createPair(branch2, end);
-
-/*
+#ifdef USE_CUSTOM_SIHLOUETTE
     CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
     CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
     CmdDelay* delay1 = new CmdDelay(this);
@@ -48,7 +38,20 @@ void Cyclogram::createDefault()
     createPair(delay2, toBranch3);
     createPair(toBranch3, branch3);
     createPair(branch3, end);
-*/
+#else
+    // empty silhouette
+    CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
+    CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
+    CmdSetState* toBranch2 = new CmdSetState("BRANCH2", this);
+    CmdStateStart* branch2 = new CmdStateStart("BRANCH2", this);
+    CmdTitle* end = new CmdTitle(CmdTitle::END, this);
+
+    createPair(begin, branch1);
+    createPair(branch1, toBranch2);
+    createPair(toBranch2, branch2);
+    createPair(branch2, end);
+#endif
+
     mFirst = begin;
     mLast = end;
 
