@@ -75,6 +75,10 @@ void ShapeItem::setCell(const QPoint &position)
 void ShapeItem::setCommand(Command* command)
 {
     mCommand = command;
+    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+    {
+        mValencyPoints[i].setOwner(mCommand);
+    }
 }
 
 Command* ShapeItem::command() const
@@ -90,4 +94,8 @@ const QList<ValencyPoint>& ShapeItem::valencyPoints() const
 void ShapeItem::setValencyPoints(const QList<ValencyPoint>& points)
 {
     mValencyPoints = points;
+    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+    {
+        mValencyPoints[i].setOwner(mCommand);
+    }
 }

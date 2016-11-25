@@ -576,8 +576,8 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
     // 4. BRANCH_BEGIN shape has two valency points: below shape and in top-right corner
     // 5. BRANCH_BEGIN shapes' valency point in top-right corner is for adding new branches only
     // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
-    // 7. QUESTION shape in "IF" form contains 2 valency points: below and at bottom-right corner
-    // 8. QUESTION shape in "CYCLE" form contains 3 valency points: below, above and at top-right corner
+    // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
+    // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
 
     // QUESTION shape valency points transformations while adding forms
     //
@@ -667,3 +667,80 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
 
     return false;
 }
+
+void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
+{
+    /* Как добавлять команду в циклограмму (мысли вслух)?
+     *
+     * 1. Команда добавляется в точку валентности
+     * 2. Точка валентности принадлежит команде
+     * 3. Поэтому снчала надо создать команду в логике, а потом правильно ее отрисовать
+     * 4. Создание команды в логике - это:
+     *    - создать новый объект
+     *    - в качестве следующей команды впихнуть в него next-команду, привязанную к точке валентности
+     *    - команде-владельцу точки валентности в качестве next прописать новую команду
+     * 5. После этого мы имеем команду в логике и теперь ее надо правильно отобразить в циклограмме
+     * 6. Предположительно в параметрах команды должен появиться параметр "Прямоугольник в графике", размером от top-left ячейки до bottom-right
+     * 7. Этот прямоугольник задает область расположения команды
+     * 8. Сама команда всегда расположена в левом нижнем углу своего прямоугольника (допустим)
+     * 9. От нее до top-left ячейки веритикально рисуется линия (сейчас пока просто полклетки по прямой рисуется).
+     * 10. При этом cell и position (надо избавиться от двух сущностей - либо в ячейках считать либо в позициях) двигается на 1 строчку вниз
+     * 11. При добавлении новой команды также нужно пробежаться по всем остальным командам
+     * 12. Все команды, которые расположены на одной высоте по Y сдвигаются на однй строчку вниз, при этом их top-left остается прежним
+     *
+     * При отрисовке QUESTION будут свои свистопляски, но пока для упрощения забьем и сделаем линейно-бранчевые циклограммы
+     *
+     * Если коротко, то с QUESION (как и SWITCH-CASE) надо будет как-то мониторить стрелку ветвления и делать хитрожопую логику ее отрисовки
+     * Логика точек валентности при этом будет завязана на то является ли ее хозяином QUESION, кто яаляется следующей командой
+     * Наприммер, если хозяин - это IF-QUESTION, а след команда - GO_TO_BRANCH, то сюда можно вставить GO_TO_BRANCH и при вставке разорвать петлю IF'а
+     *
+     * Наиболее вероятно то, что QUESTION потребует хранения какой-то информации о дереве подобъектов
+     * Rect этого QUESTION'а будет bounding rect'ом этого дерева команд
+     * При добавлении команды нужно проверять не состоит ли команда в дереве какого-то QUESTIONа
+     * Если состояит, то надо обновить rect'ы всех QUESTION'ов куда входит команда
+     *
+     * В итоге рисовать коннектторя надо по следующему алгоритму:
+     * Есть Rect команды
+     * - от ячейки, где находится position команды рисуем вверх линию от (position + CELL.height()) до top rect'а
+     * - при этом по пути до top rectа проверяем нет ли в ячейке команды (если есть, то рисование прекращаем) - это для QUESTION'а типа CYCLE
+     * - от ячейки position + mItem.height - CELL.height рисуем линию вниз до bottom rect'а
+     * - опять же если по пути встречаем команду в ячейке, то рисование прекращаем - опять актуально для QUESTION'а
+     * - QUESTION по Х всегда находтся в левом столбце своего rectа, по Y же может плавать в зависимости от наполнения веток дерева
+     * - Дополнительно для QUESTION'а нужно отрисовывать стрелку
+     *
+     *
+    */
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

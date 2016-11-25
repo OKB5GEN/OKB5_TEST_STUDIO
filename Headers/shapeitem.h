@@ -48,7 +48,7 @@ private:
 
     QList<ValencyPoint> mValencyPoints;
 
-    uint32_t mFlags;
+    uint32_t mFlags = 0; // by default the shape is not interactive
     QPoint mCell;
 
     Command* mCommand = Q_NULLPTR;

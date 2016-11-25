@@ -22,6 +22,16 @@ QColor ValencyPoint::color() const
     return mColor;
 }
 
+void ValencyPoint::setOwner(Command* owner)
+{
+    mOwner = owner;
+}
+
+Command* ValencyPoint::owner() const
+{
+    return mOwner;
+}
+
 /*
 
 QPainterPath ValencyPoint::textPath() const

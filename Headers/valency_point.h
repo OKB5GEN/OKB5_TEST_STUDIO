@@ -1,26 +1,23 @@
 #ifndef VALENCY_POINT_H
 #define VALENCY_POINT_H
 
-/*
-#include <QColor>
-#include <QPainterPath>
-#include <QPoint>
-
 class Command;
-*/
 
 class ValencyPoint
 {
 public:
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);
+    void setOwner(Command* owner);
 
     QPainterPath path() const;
     QColor color() const;
+    Command* owner() const;
 
 private:
     QPainterPath mPath;
     QColor mColor;
+    Command* mOwner = Q_NULLPTR;
 
 /*    enum ShapeFlags
     {
