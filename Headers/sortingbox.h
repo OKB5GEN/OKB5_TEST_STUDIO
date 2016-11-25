@@ -39,8 +39,7 @@ public slots:
     void load(Cyclogram* cyclogram);
 
 private:
-    void insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex);
-
+    void clear();
     void drawSilhouette();
 
     //int updateButtonGeometry(QToolButton *button, int x, int y);
@@ -53,14 +52,14 @@ private:
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
 
-    void drawItems(QList<ShapeItem>& items, QPainter& painter);
+    void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
     QPainterPath createPath(Command* cmd);
     QList<ValencyPoint> createValencyPoints(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
 
-    void addText(ShapeItem& item);
+    void addText(ShapeItem* item);
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
     bool isBranchExist(Command* goToBranchCmd);
 
@@ -68,8 +67,8 @@ private:
     QSizeF mItem;
     QSize mDiagramSize;
 
-    QList<ShapeItem> mCommands; // cyclogram commands (created by user, editable)
-    QList<ShapeItem> mSihlouette; // sihlouette (TODO temporary)
+    QList<ShapeItem*> mCommands;
+    QList<ShapeItem*> mSihlouette; // sihlouette (TODO temporary)
 
     QPoint mPreviousPosition;
     ShapeItem * mSelectedItem;

@@ -28,6 +28,7 @@ public:
     void setCell(const QPoint &position);
     void setCommand(Command* command);
     void setValencyPoints(const QList<ValencyPoint>& points);
+    void setRect(const QRect& rect);
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -38,20 +39,21 @@ public:
     QPoint cell() const;
     Command* command() const;
     const QList<ValencyPoint>& valencyPoints() const;
+    QRect rect() const;
 
 private:
-    QPainterPath mPath;
-    QPainterPath mTextPath;
-    QPoint mPosition;
-    QColor mColor;
-    QString mToolTip;
+    QPainterPath mPath; // shape path
+    QPainterPath mTextPath; // path for text iside shape
+    QPoint mPosition; // top-left corner of the shape in window coordinates
+    QPoint mCell; // cell, occupied by command shape itself
+    QRect mRect; // bounding rect of the command (need for drawing command connections and QUESTION arrow)
+    QColor mColor; // color for filling shape background
+    QString mToolTip; // tooltip text for shape
+    QList<ValencyPoint> mValencyPoints; // valency points list for this command
 
-    QList<ValencyPoint> mValencyPoints;
+    uint32_t mFlags = 0; // ShapeFlags here, by default the shape is not interactive
 
-    uint32_t mFlags = 0; // by default the shape is not interactive
-    QPoint mCell;
-
-    Command* mCommand = Q_NULLPTR;
+    Command* mCommand = Q_NULLPTR; // data pointer for the command logics
 };
 
 #endif

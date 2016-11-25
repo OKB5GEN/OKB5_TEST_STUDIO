@@ -9,18 +9,6 @@
 #include "Headers/command.h"
 #include "Headers/commands/cmd_title.h"
 
-/*
- * Здесь мы создаем формы для циклограммы
- *
- * (0;0) - это левый верхний угол. Ось Х идет вправо, ось Y идет вниз
- * Область логически представляет собой сетку из квадратиков.
- * Под каждый ДРАКОН-элемент циклограммы отводится прямоугольник из W на H квадратиков
- * Вокруг собственно элемента дорожка толщиной в 1 квадратик.
- * Дорожка нужна в качестве бокового и вертикального интервала между элементами
- * В дорожку на вертикальном интервале ставится валентная точка (точка, куда можно что-либо добавить)
- * Снаружи класса управление идет по индексам элементов в сетке, а не по квадратикам
-*/
-
 namespace
 {
     static const QSizeF CELL = QSizeF(30, 30);
@@ -35,7 +23,6 @@ SortingBox::SortingBox():
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
 
-    QString defaultText = "Default";
     mFont.setPointSize(16);
     mFont.setFamily("Arial");
 
@@ -49,17 +36,17 @@ SortingBox::SortingBox():
 
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
-
-    /*
-    connectItems(QPoint(0, 0), QPoint(0, 1), 0);
-    connectItems(QPoint(0, 1), QPoint(0, 2), 1);
-    connectItems(QPoint(1, 1), QPoint(1, 2), 0);
-    */
 }
 
 SortingBox::~SortingBox()
 {
+    clear();
+}
 
+void SortingBox::clear()
+{
+    qDeleteAll(mCommands);
+    qDeleteAll(mSihlouette);
 }
 
 bool SortingBox::event(QEvent *event)
@@ -70,7 +57,7 @@ bool SortingBox::event(QEvent *event)
         int index = commandAt(helpEvent->pos());
         if (index != -1)
         {
-            QToolTip::showText(helpEvent->globalPos(), mCommands[index].toolTip());
+            QToolTip::showText(helpEvent->globalPos(), mCommands[index]->toolTip());
         }
         else
         {
@@ -112,30 +99,30 @@ void SortingBox::paintEvent(QPaintEvent * /* event */)
     drawItems(mCommands, painter);
 }
 
-void SortingBox::drawItems(QList<ShapeItem>& items, QPainter& painter)
+void SortingBox::drawItems(QList<ShapeItem*>& items, QPainter& painter)
 {
     // draw commands shapes first
-    foreach (ShapeItem shapeItem, items)
+    foreach (ShapeItem* shapeItem, items)
     {
-        painter.translate(shapeItem.position());
-        painter.setBrush(shapeItem.color());
-        painter.drawPath(shapeItem.path());
-        painter.drawPath(shapeItem.textPath());
-        painter.translate(-shapeItem.position());
+        painter.translate(shapeItem->position());
+        painter.setBrush(shapeItem->color());
+        painter.drawPath(shapeItem->path());
+        painter.drawPath(shapeItem->textPath());
+        painter.translate(-shapeItem->position());
     }
 
     // draw valency point secont (to be above the commands shapes)
-    foreach (ShapeItem shapeItem, items)
+    foreach (ShapeItem* shapeItem, items)
     {
-        painter.translate(shapeItem.position());
+        painter.translate(shapeItem->position());
 
-        foreach (ValencyPoint point, shapeItem.valencyPoints())
+        foreach (ValencyPoint point, shapeItem->valencyPoints())
         {
             painter.setBrush(point.color());
             painter.drawPath(point.path());
         }
 
-        painter.translate(-shapeItem.position());
+        painter.translate(-shapeItem->position());
     }
 }
 
@@ -184,7 +171,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
             return;
         }
 
-        mShapeEditDialog->setCommand(mCommands[index].command());
+        mShapeEditDialog->setCommand(mCommands[index]->command());
         mShapeEditDialog->exec();
 
         if (mShapeEditDialog->result() == QDialog::Accepted)
@@ -215,8 +202,8 @@ int SortingBox::commandAt(const QPoint &pos)
 {
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
-        const ShapeItem &item = mCommands[i];
-        if (item.path().contains(pos - item.position()))
+        ShapeItem* item = mCommands[i];
+        if (item->path().contains(pos - item->position()))
         {
             return i;
         }
@@ -229,10 +216,10 @@ bool SortingBox::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 {
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
-        const QList<ValencyPoint>& points = mCommands[i].valencyPoints();
+        const QList<ValencyPoint>& points = mCommands[i]->valencyPoints();
         for (int j = 0, sz = points.size(); j < sz; ++j)
         {
-            if (points[j].path().contains(pos - mCommands[i].position()))
+            if (points[j].path().contains(pos - mCommands[i]->position()))
             {
                 point = points[j];
                 return true;
@@ -276,35 +263,39 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
         mDiagramSize.setHeight(cell.y() + 1);
     }
 
-    ShapeItem shapeItem;
-    shapeItem.setCommand(cmd);
-    shapeItem.setPath(createPath(cmd));
-    shapeItem.setToolTip(tr("Tooltip"));
-    shapeItem.setPosition(pos);
-    shapeItem.setColor(QColor::fromRgba(0xffffffff));
-    shapeItem.setCell(cell);
-    shapeItem.setValencyPoints(createValencyPoints(cmd));
+    ShapeItem* shapeItem = new ShapeItem();
+    shapeItem->setCommand(cmd);
+    shapeItem->setPath(createPath(cmd));
+    shapeItem->setToolTip(tr("Tooltip"));
+    shapeItem->setPosition(pos);
+    shapeItem->setColor(QColor::fromRgba(0xffffffff));
+    shapeItem->setCell(cell);
+    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
+    shapeItem->setValencyPoints(createValencyPoints(cmd));
     addText(shapeItem);
     mCommands.append(shapeItem);
 
+    int TODO2; // перенести апдейт куда-то попозже, чтобы можно было создать формы пачкой, а потом проапдейтить
     update();
 }
 
-void SortingBox::addText(ShapeItem& item)
+void SortingBox::addText(ShapeItem* item)
 {
     int TODO; // move it to the shape item
 
     QPainterPath textPath;
     QFontMetrics fm(mFont);
-    QRect textRect = fm.boundingRect(item.command()->text());
+    QRect textRect = fm.boundingRect(item->command()->text());
     qreal x = (mItem.width() - textRect.width()) / 2;
     qreal y = (mItem.height() + textRect.height()) / 2;
-    textPath.addText(x, y, mFont, item.command()->text());
-    item.setTextPath(textPath);
+    textPath.addText(x, y, mFont, item->command()->text());
+    item->setTextPath(textPath);
 }
 
 void SortingBox::drawSilhouette()
 {
+    int TODO; // not good handling
+    qDeleteAll(mSihlouette);
     mSihlouette.clear();
 
     QPoint bottomRight(INT_MIN, INT_MIN);
@@ -314,24 +305,24 @@ void SortingBox::drawSilhouette()
 
     QPainterPath silhouette;
 
-    foreach (ShapeItem shapeItem, mCommands)
+    foreach (ShapeItem* shapeItem, mCommands)
     {
-        if (shapeItem.command()->type() == ShapeTypes::GO_TO_BRANCH)
+        if (shapeItem->command()->type() == ShapeTypes::GO_TO_BRANCH)
         {
-            qreal x = shapeItem.position().x() + mItem.width() / 2;
+            qreal x = shapeItem->position().x() + mItem.width() / 2;
             if (x > bottomRight.x())
             {
-                qreal y = shapeItem.position().y() + mItem.height();
+                qreal y = shapeItem->position().y() + mItem.height();
                 bottomRight.setX(x);
                 bottomRight.setY(y);
             }
         }
-        else if (shapeItem.command()->type() == ShapeTypes::BRANCH_BEGIN)
+        else if (shapeItem->command()->type() == ShapeTypes::BRANCH_BEGIN)
         {
-            qreal x = shapeItem.position().x() + mItem.width() / 2;
+            qreal x = shapeItem->position().x() + mItem.width() / 2;
             if (x > topRight.x())
             {
-                qreal y = shapeItem.position().y();
+                qreal y = shapeItem->position().y();
                 topRight.setX(x);
                 topRight.setY(y);
             }
@@ -343,10 +334,10 @@ void SortingBox::drawSilhouette()
     silhouette.lineTo(topLeft);
     silhouette.lineTo(topRight);
 
-    ShapeItem sihlouetteItem;
-    sihlouetteItem.setPath(silhouette);
-    sihlouetteItem.setPosition(QPoint(0, 0));
-    sihlouetteItem.setColor(QColor::fromRgba(0x00ffffff));
+    ShapeItem* sihlouetteItem = new ShapeItem();
+    sihlouetteItem->setPath(silhouette);
+    sihlouetteItem->setPosition(QPoint(0, 0));
+    sihlouetteItem->setColor(QColor::fromRgba(0x00ffffff));
 
     // draw arrow
     QPainterPath arrow;
@@ -358,51 +349,19 @@ void SortingBox::drawSilhouette()
     arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() - CELL.height() / 4));
     arrow.lineTo(pos);
 
-    ShapeItem arrowItem;
-    arrowItem.setPath(arrow);
-    arrowItem.setPosition(QPoint(0, 0));
-    arrowItem.setColor(QColor::fromRgba(0xff000000));
+    ShapeItem* arrowItem = new ShapeItem();
+    arrowItem->setPath(arrow);
+    arrowItem->setPosition(QPoint(0, 0));
+    arrowItem->setColor(QColor::fromRgba(0xff000000));
 
     mSihlouette.push_back(sihlouetteItem);
     mSihlouette.push_back(arrowItem);
 }
 
-void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex)
-{
-    /*
-    for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
-    {
-        if (i == shapeAddItemIndex) // skip add item index
-        {
-            continue;
-        }
-
-        ShapeTypes type = mShapeItems[i].type();
-        QPoint cell = mShapeItems[i].cell();
-
-        if (id < ShapeTypes::DRAKON_ELEMENTS_COUNT && cell.y() >= pos.y() && cell.x() == pos.x()) // TODO: Х - только для сдвига по столбцу
-        {
-            QPoint position = mShapeItems[i].position();
-            position.setY(position.y() + mItem.height());
-            mShapeItems[i].setPosition(position);
-            qDebug("Set shape %i pos to (%i; %i)", int(id), position.x(), position.y());
-        }
-    }
-
-    addItem(id, pos, text);
-    mDiagramSize.setHeight(mDiagramSize.height() + 1);
-
-    connectItems(pos, QPoint(pos.x(), pos.y() + 1), 0);
-
-    drawSilhouette();
-
-    //TODO update connectors
-    update();
-    */
-}
-
 void SortingBox::load(Cyclogram* cyclogram)
 {
+    clear();
+
     if (!cyclogram)
     {
         return;
@@ -464,9 +423,9 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
 
 bool SortingBox::isBranchExist(Command* goToBranchCmd)
 {
-    foreach (ShapeItem shape, mCommands)
+    foreach (ShapeItem* shape, mCommands)
     {
-        Command* command = shape.command();
+        Command* command = shape->command();
         if (command->type() == ShapeTypes::BRANCH_BEGIN && command->text() == goToBranchCmd->text())
         {
             return true;
@@ -677,6 +636,44 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
 
 void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
 {
+    ShapeItem* owner = point.owner();
+
+    Command* cmd = owner->command();
+    QRect rect = owner->rect();
+    QPoint cell = owner->cell();
+    QPoint pos = owner->position();
+
+    /*
+    for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
+    {
+        if (i == shapeAddItemIndex) // skip add item index
+        {
+            continue;
+        }
+
+        ShapeTypes type = mShapeItems[i].type();
+        QPoint cell = mShapeItems[i].cell();
+
+        if (id < ShapeTypes::DRAKON_ELEMENTS_COUNT && cell.y() >= pos.y() && cell.x() == pos.x()) // TODO: Х - только для сдвига по столбцу
+        {
+            QPoint position = mShapeItems[i].position();
+            position.setY(position.y() + mItem.height());
+            mShapeItems[i].setPosition(position);
+            qDebug("Set shape %i pos to (%i; %i)", int(id), position.x(), position.y());
+        }
+    }
+
+    addItem(id, pos, text);
+    mDiagramSize.setHeight(mDiagramSize.height() + 1);
+
+    connectItems(pos, QPoint(pos.x(), pos.y() + 1), 0);
+
+    drawSilhouette();
+
+    //TODO update connectors
+    update();
+    */
+
     /* Как добавлять команду в циклограмму (мысли вслух)?
      *
      * 1. Команда добавляется в точку валентности
@@ -719,35 +716,3 @@ void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
     */
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -22,12 +22,12 @@ QColor ValencyPoint::color() const
     return mColor;
 }
 
-void ValencyPoint::setOwner(Command* owner)
+void ValencyPoint::setOwner(ShapeItem* owner)
 {
     mOwner = owner;
 }
 
-Command* ValencyPoint::owner() const
+ShapeItem* ValencyPoint::owner() const
 {
     return mOwner;
 }
