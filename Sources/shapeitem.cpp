@@ -81,3 +81,13 @@ Command* ShapeItem::command() const
 {
     return mCommand;
 }
+
+const QList<ValencyPoint>& ShapeItem::valencyPoints() const
+{
+    return mValencyPoints;
+}
+
+void ShapeItem::setValencyPoints(const QList<ValencyPoint>& points)
+{
+    mValencyPoints = points;
+}

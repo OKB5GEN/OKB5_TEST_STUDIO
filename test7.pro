@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     Sources/monitordialog.cpp \
     Sources/monitor_auto.cpp \
     Sources/monitor_manual.cpp \
-    Sources/commands/cmd_title.cpp
+    Sources/commands/cmd_title.cpp \
+    Sources/valency_point.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -85,7 +86,8 @@ HEADERS  += mainwindow.h \
     Headers/monitordialog.h \
     Headers/monitor_auto.h \
     Headers/monitor_manual.h \
-    Headers/commands/cmd_title.h
+    Headers/commands/cmd_title.h \
+    Headers/valency_point.h
 
 
 FORMS    += mainwindow.ui

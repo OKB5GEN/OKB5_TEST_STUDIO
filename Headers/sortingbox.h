@@ -41,20 +41,20 @@ public slots:
 private:
     void insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex);
 
-    void connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount);
     void drawSilhouette();
 
     //int updateButtonGeometry(QToolButton *button, int x, int y);
 
     void createCommandShape(Command* cmd, const QPoint& cell);
-    void createConnectorShape(const QPainterPath &path, const QPoint &pos);
-    void createValencyPointShape(const QPoint &pos, const QPoint& cell);
+    ValencyPoint createPoint(const QPointF& point);
 
-    int itemAt(const QPoint &pos, const QList<ShapeItem>& items);
+    int commandAt(const QPoint &pos);
+    int valencyPointAt(const QPoint &pos);
 
     void drawItems(QList<ShapeItem>& items, QPainter& painter);
 
     QPainterPath createPath(Command* cmd);
+    QList<ValencyPoint> createValencyPoints(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
 
@@ -67,8 +67,6 @@ private:
     QSize mDiagramSize;
 
     QList<ShapeItem> mCommands; // cyclogram commands (created by user, editable)
-    QList<ShapeItem> mConnectors; // connectors between cyclogram commands (created by program, not editable)
-    QList<ShapeItem> mValencyPoints; // points where user can add new cyclogram commands
     QList<ShapeItem> mSihlouette; // sihlouette (TODO temporary)
 
     QPoint mPreviousPosition;

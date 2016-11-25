@@ -27,6 +27,6 @@ enum class ShapeTypes
     PARALLEL_PROCESS,
     CONCURRENT_PROCESS,
 
-    TOTAL_COUNT // always must be last
+    SHAPES_COUNT // always must be last
 };
 #endif // SHAPETYPES_H

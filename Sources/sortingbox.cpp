@@ -67,17 +67,17 @@ bool SortingBox::event(QEvent *event)
     if (event->type() == QEvent::ToolTip)
     {
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-        int index = itemAt(helpEvent->pos(), mCommands);
+        int index = commandAt(helpEvent->pos());
         if (index != -1)
         {
             QToolTip::showText(helpEvent->globalPos(), mCommands[index].toolTip());
         }
         else
         {
-            int index = itemAt(helpEvent->pos(), mValencyPoints);
+            int index = valencyPointAt(helpEvent->pos());
             if (index != -1)
             {
-                QToolTip::showText(helpEvent->globalPos(), mValencyPoints[index].toolTip());
+                QToolTip::showText(helpEvent->globalPos(), tr("Click to add command"));
             }
             else
             {
@@ -108,14 +108,13 @@ void SortingBox::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    drawItems(mCommands, painter);
     drawItems(mSihlouette, painter);
-    drawItems(mConnectors, painter);
-    drawItems(mValencyPoints, painter);
+    drawItems(mCommands, painter);
 }
 
 void SortingBox::drawItems(QList<ShapeItem>& items, QPainter& painter)
 {
+    // draw commands shapes first
     foreach (ShapeItem shapeItem, items)
     {
         painter.translate(shapeItem.position());
@@ -124,12 +123,44 @@ void SortingBox::drawItems(QList<ShapeItem>& items, QPainter& painter)
         painter.drawPath(shapeItem.textPath());
         painter.translate(-shapeItem.position());
     }
+
+    // draw valency point secont (to be above the commands shapes)
+    foreach (ShapeItem shapeItem, items)
+    {
+        painter.translate(shapeItem.position());
+
+        foreach (ValencyPoint point, shapeItem.valencyPoints())
+        {
+            painter.setBrush(point.color());
+            painter.drawPath(point.path());
+        }
+
+        painter.translate(-shapeItem.position());
+    }
 }
 
 void SortingBox::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        int TODO; // if click is inside command create command copy and drag it with cursor
+
+        /*
+        int TODO; // split shapes on movable selectable
+        bool movable = false;
+        bool selectable = false;
+
+        if (selectable)
+        {
+            mSelectedItem = &mShapeItems[index];
+            mPreviousPosition = event->pos();
+            mShapeItems.move(index, mShapeItems.size() - 1);
+            update();
+        }
+        */
+
+        int TODO_VALENCY_POINT; // click to valency point procesing
+/*
         int index = itemAt(event->pos(), mValencyPoints);
         if (index != -1)
         {
@@ -142,21 +173,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
                 //QPoint insertionCell = mShapeItems[index].cell();
                 //insertItem(shapeType, insertionCell, "Delay", index);
             }
-
-            /*
-            int TODO; // split shapes on movable selectable
-            bool movable = false;
-            bool selectable = false;
-
-            if (selectable)
-            {
-                mSelectedItem = &mShapeItems[index];
-                mPreviousPosition = event->pos();
-                mShapeItems.move(index, mShapeItems.size() - 1);
-                update();
-            }
-            */
-        }
+        }*/
     }
 }
 
@@ -166,7 +183,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
-        int index = itemAt(event->pos(), mCommands);
+        int index = commandAt(event->pos());
         if (index == -1)
         {
             return;
@@ -199,16 +216,36 @@ void SortingBox::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-int SortingBox::itemAt(const QPoint &pos, const QList<ShapeItem>& items)
+int SortingBox::commandAt(const QPoint &pos)
 {
-    for (int i = items.size() - 1; i >= 0; --i)
+    for (int i = mCommands.size() - 1; i >= 0; --i)
     {
-        const ShapeItem &item = items[i];
+        const ShapeItem &item = mCommands[i];
         if (item.path().contains(pos - item.position()))
         {
             return i;
         }
     }
+
+    return -1;
+}
+
+int SortingBox::valencyPointAt(const QPoint &pos)
+{
+    int TODO_VALENCY_POINT;
+    /*
+    for (int i = mCommands.size() - 1; i >= 0; --i)
+    {
+        const QList<ValencyPoint>& points = mCommands[i].valencyPoints();
+        for (int j = 0, sz = points.size(); j < sz; ++j)
+        {
+            if (points[i].path().contains(pos - points[i].position()))
+            {
+                return j;
+            }
+        }
+    }
+    */
 
     return -1;
 }
@@ -253,42 +290,17 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
     shapeItem.setPosition(pos);
     shapeItem.setColor(QColor::fromRgba(0xffffffff));
     shapeItem.setCell(cell);
+    shapeItem.setValencyPoints(createValencyPoints(cmd));
     addText(shapeItem);
     mCommands.append(shapeItem);
 
     update();
 }
 
-void SortingBox::createConnectorShape(const QPainterPath &path, const QPoint &pos)
-{
-    ShapeItem shapeItem;
-    shapeItem.setPath(path);
-    shapeItem.setPosition(pos);
-    shapeItem.setColor(QColor::fromRgba(0xffffffff));
-    mConnectors.append(shapeItem);
-    update();
-}
-
-void SortingBox::createValencyPointShape(const QPoint &pos, const QPoint& cell)
-{
-    QPainterPath path;
-    path.moveTo(pos);
-    qreal radius = qMin(CELL.width(), CELL.height()) / 2;
-    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-
-    ShapeItem shapeItem;
-    shapeItem.setPath(path);
-    shapeItem.setToolTip(tr("Valency point"));
-    shapeItem.setPosition(pos);
-    shapeItem.setColor(QColor::fromRgba(0xff00ff00));
-    shapeItem.setCell(cell);
-    mValencyPoints.append(shapeItem);
-
-    update();
-}
-
 void SortingBox::addText(ShapeItem& item)
 {
+    int TODO; // move it to the shape item
+
     QPainterPath textPath;
     QFontMetrics fm(mFont);
     QRect textRect = fm.boundingRect(item.command()->text());
@@ -296,34 +308,6 @@ void SortingBox::addText(ShapeItem& item)
     qreal y = (mItem.height() + textRect.height()) / 2;
     textPath.addText(x, y, mFont, item.command()->text());
     item.setTextPath(textPath);
-}
-
-void SortingBox::connectItems(const QPoint& pos1, const QPoint& pos2, int addItemCount)
-{
-    // TODO пока полухардкод для соседних элементов по вертикали
-    if (pos1.x() == pos2.x() && qAbs(pos2.y() - pos1.y()) == 1)
-    {
-        QPoint pos = pos1;
-        if (pos2.y() < pos1.y())
-        {
-            pos = pos2;
-        }
-
-        qreal x = mOrigin.x() + pos.x() * mItem.width() + mItem.width() / 2;
-        qreal y = mOrigin.y() + pos.y() * mItem.height() + mItem.height();
-
-        QPainterPath itemConnectorPath;
-        itemConnectorPath.moveTo(x, y - CELL.height());
-        itemConnectorPath.lineTo(x, y + CELL.height());
-
-        createConnectorShape(itemConnectorPath, pos);
-
-        // TODO hardcode
-        if (addItemCount == 1)
-        {
-            createValencyPointShape(QPoint(x, y), pos2);
-        }
-    }
 }
 
 void SortingBox::drawSilhouette()
@@ -388,8 +372,6 @@ void SortingBox::drawSilhouette()
 
     mSihlouette.push_back(sihlouetteItem);
     mSihlouette.push_back(arrowItem);
-
-    int TODO; // add connector for branch adding
 }
 
 void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex)
@@ -571,6 +553,8 @@ QPainterPath SortingBox::createPath(Command* cmd)
 
     case ShapeTypes::QUESTION:
         {
+            int TODO; // very complex logics for QUESTION connections drawing will be here
+
             path.moveTo(CELL.width(), mItem.height() / 2);
             path.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
             path.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
@@ -595,4 +579,85 @@ QPainterPath SortingBox::createPath(Command* cmd)
     }
 
     return path;
+}
+
+QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
+{
+    //
+    // Valency points general rules
+    //
+    // 1. All valency points belongs to any shape
+    // 2. All shapes (with except QUESION and BRANCH_BEGIN) can have only one valency point BELOW shape
+    // 3. TERMINATOR and GO_TO_BRANCH shapes does not have any valency points
+    // 4. BRANCH_BEGIN shape has two valency points: below shape and in top-right corner
+    // 5. BRANCH_BEGIN shapes' valency point in top-right corner is for adding new branches only
+    // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
+    // 7. QUESTION shape in "IF" form contains 2 valency points: below and at bottom-right corner
+    // 8. QUESTION shape in "CYCLE" form contains 3 valency points: below, above and at top-right corner
+
+    // QUESTION shape valency points transformations while adding forms
+    //
+    // 1.
+
+    QList<ValencyPoint> points;
+
+    ShapeTypes type = cmd->type();
+
+    switch (type)
+    {
+    case ShapeTypes::BRANCH_BEGIN:
+    case ShapeTypes::ACTION:
+    case ShapeTypes::DELAY:
+        {
+            ValencyPoint point = createPoint(QPointF(mItem.width() / 2, mItem.height()));
+            points.push_back(point);
+
+            if (type == ShapeTypes::BRANCH_BEGIN)
+            {
+                ValencyPoint point = createPoint(QPointF(mItem.width(), 0));
+                points.push_back(point);
+            }
+        }
+        break;
+
+    case ShapeTypes::QUESTION:
+        {
+            int TODO; // very complex logics will be here
+        /*
+            path.moveTo(CELL.width(), mItem.height() / 2);
+            path.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
+            path.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
+            path.lineTo(mItem.width() - CELL.width(), mItem.height() / 2);
+            path.lineTo(mItem.width() - 2 * CELL.width(), CELL.height());
+            path.lineTo(CELL.width() * 2, CELL.height());
+            path.lineTo(CELL.width(), mItem.height() / 2);
+            */
+        }
+        break;
+    default:
+        break;
+    }
+
+    return points;
+}
+
+ValencyPoint SortingBox::createPoint(const QPointF& point)
+{
+    QPainterPath path;
+
+    qreal crossSize = 0.6;
+    qreal radius = qMin(CELL.width(), CELL.height()) / 2;
+    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
+    path.moveTo(0, -radius * crossSize);
+    path.lineTo(0, radius * crossSize);
+    path.moveTo(-radius * crossSize, 0);
+    path.lineTo(radius * crossSize, 0);
+
+    path.translate(point);
+
+    ValencyPoint vPoint;
+    vPoint.setPath(path);
+    vPoint.setColor(QColor::fromRgba(0xff00ff00));
+
+    return vPoint;
 }
