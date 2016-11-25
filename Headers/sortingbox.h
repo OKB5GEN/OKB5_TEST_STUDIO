@@ -54,7 +54,7 @@ private:
 
     void drawItems(QList<ShapeItem>& items, QPainter& painter);
 
-    QPainterPath createPath(ShapeTypes type);
+    QPainterPath createPath(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
 

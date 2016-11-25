@@ -7,6 +7,7 @@
 #include "Headers/cyclogram.h"
 #include "Headers/cell.h"
 #include "Headers/command.h"
+#include "Headers/commands/cmd_title.h"
 
 /*
  * Здесь мы создаем формы для циклограммы
@@ -247,7 +248,7 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
 
     ShapeItem shapeItem;
     shapeItem.setCommand(cmd);
-    shapeItem.setPath(createPath(cmd->type()));
+    shapeItem.setPath(createPath(cmd));
     shapeItem.setToolTip(tr("Tooltip"));
     shapeItem.setPosition(pos);
     shapeItem.setColor(QColor::fromRgba(0xffffffff));
@@ -341,27 +342,21 @@ void SortingBox::drawSilhouette()
         if (shapeItem.command()->type() == ShapeTypes::GO_TO_BRANCH)
         {
             qreal x = shapeItem.position().x() + mItem.width() / 2;
-            qreal y = shapeItem.position().y() + mItem.height() - CELL.height();
-            QPoint src(x, y);
-            QPoint dest(x, y + CELL.height());
-            silhouette.moveTo(src);
-            silhouette.lineTo(dest);
-            if (dest.x() > bottomRight.x())
+            if (x > bottomRight.x())
             {
-                bottomRight = dest;
+                qreal y = shapeItem.position().y() + mItem.height();
+                bottomRight.setX(x);
+                bottomRight.setY(y);
             }
         }
         else if (shapeItem.command()->type() == ShapeTypes::BRANCH_BEGIN)
         {
             qreal x = shapeItem.position().x() + mItem.width() / 2;
-            qreal y = shapeItem.position().y() + CELL.height();
-            QPoint src(x, y);
-            QPoint dest(x, y - CELL.height());
-            silhouette.moveTo(src);
-            silhouette.lineTo(dest);
-            if (dest.x() > topRight.x())
+            if (x > topRight.x())
             {
-                topRight = dest;
+                qreal y = shapeItem.position().y();
+                topRight.setX(x);
+                topRight.setY(y);
             }
         }
     }
@@ -393,6 +388,8 @@ void SortingBox::drawSilhouette()
 
     mSihlouette.push_back(sihlouetteItem);
     mSihlouette.push_back(arrowItem);
+
+    int TODO; // add connector for branch adding
 }
 
 void SortingBox::insertItem(ShapeTypes id, const QPoint& pos, const QString& text, int shapeAddItemIndex)
@@ -490,15 +487,15 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
     }
 }
 
-
 bool SortingBox::isHeadlineExist(Command* parentCmd)
 {
     int TODO; // is headline exist
     return false;
 }
 
-QPainterPath SortingBox::createPath(ShapeTypes type)
+QPainterPath SortingBox::createPath(Command* cmd)
 {
+    ShapeTypes type = cmd->type();
     QPainterPath path;
 
     /*
@@ -511,8 +508,6 @@ QPainterPath SortingBox::createPath(ShapeTypes type)
     mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
     */
 
-
-
     switch (type)
     {
     case ShapeTypes::TERMINATOR:
@@ -521,6 +516,22 @@ QPainterPath SortingBox::createPath(ShapeTypes type)
             qreal xRadius = (mItem.height() - 2 * CELL.height()) / 2;
             qreal yRadius = (mItem.height() - 2 * CELL.height()) / 2;
             path.addRoundedRect(rect, xRadius, yRadius);
+
+            // connector
+            CmdTitle* titleCmd = qobject_cast<CmdTitle*>(cmd);
+            if (titleCmd)
+            {
+                if (titleCmd->titleType() == CmdTitle::BEGIN)
+                {
+                    path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
+                    path.lineTo(mItem.width() / 2, mItem.height());
+                }
+                else
+                {
+                    path.moveTo(mItem.width() / 2, CELL.height());
+                    path.lineTo(mItem.width() / 2, 0);
+                }
+            }
         }
         break;
     case ShapeTypes::BRANCH_BEGIN:
@@ -573,6 +584,15 @@ QPainterPath SortingBox::createPath(ShapeTypes type)
         break;
     }
 
+    if (cmd->type() != ShapeTypes::TERMINATOR)
+    {
+        // lower connector
+        path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
+        path.lineTo(mItem.width() / 2, mItem.height());
+        // upper connector
+        path.moveTo(mItem.width() / 2, CELL.height());
+        path.lineTo(mItem.width() / 2, 0);
+    }
 
     return path;
 }
