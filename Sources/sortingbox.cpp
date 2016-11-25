@@ -159,9 +159,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         }
         */
 
-        int TODO_VALENCY_POINT; // click to valency point procesing
-/*
-        int index = itemAt(event->pos(), mValencyPoints);
+        int index = valencyPointAt(event->pos());
         if (index != -1)
         {
             int TODO; // set valency point to dialog to know what can be inserted in this valency point
@@ -173,7 +171,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
                 //QPoint insertionCell = mShapeItems[index].cell();
                 //insertItem(shapeType, insertionCell, "Delay", index);
             }
-        }*/
+        }
     }
 }
 
@@ -232,20 +230,17 @@ int SortingBox::commandAt(const QPoint &pos)
 
 int SortingBox::valencyPointAt(const QPoint &pos)
 {
-    int TODO_VALENCY_POINT;
-    /*
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
         const QList<ValencyPoint>& points = mCommands[i].valencyPoints();
         for (int j = 0, sz = points.size(); j < sz; ++j)
         {
-            if (points[i].path().contains(pos - points[i].position()))
+            if (points[j].path().contains(pos - mCommands[i].position()))
             {
                 return j;
             }
         }
     }
-    */
 
     return -1;
 }
@@ -281,7 +276,6 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
     {
         mDiagramSize.setHeight(cell.y() + 1);
     }
-
 
     ShapeItem shapeItem;
     shapeItem.setCommand(cmd);
@@ -479,16 +473,6 @@ QPainterPath SortingBox::createPath(Command* cmd)
 {
     ShapeTypes type = cmd->type();
     QPainterPath path;
-
-    /*
-    mAddPath.addEllipse(QRect((CELL.width() - CELL.height()) / 2, 0, CELL.height(), CELL.height()));
-    mAddPath.moveTo(CELL.width() / 2, CELL.height() / 6);
-    mAddPath.lineTo(CELL.width() / 2, CELL.height() * 5 / 6);
-    mAddPath.moveTo(CELL.width() / 6 + (CELL.width() - CELL.height()) / 2, CELL.height() / 2);
-    mAddPath.lineTo((CELL.width() + CELL.height()) / 2 - CELL.height() / 6, CELL.height() / 2);
-
-    mCirclePath.addEllipse(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
-    */
 
     switch (type)
     {
