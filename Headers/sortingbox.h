@@ -51,7 +51,7 @@ private:
     void addCommand(ShapeTypes type, const ValencyPoint& point);
 
     int commandAt(const QPoint &pos);
-    int valencyPointAt(const QPoint &pos);
+    bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
 
     void drawItems(QList<ShapeItem>& items, QPainter& painter);
 
@@ -62,7 +62,7 @@ private:
 
     void addText(ShapeItem& item);
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
-    bool isHeadlineExist(Command* parentCmd);
+    bool isBranchExist(Command* goToBranchCmd);
 
     QPointF mOrigin;
     QSizeF mItem;

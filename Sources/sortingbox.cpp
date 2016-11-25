@@ -74,8 +74,8 @@ bool SortingBox::event(QEvent *event)
         }
         else
         {
-            int index = valencyPointAt(helpEvent->pos());
-            if (index != -1)
+            ValencyPoint point;
+            if (hasValencyPointAt(helpEvent->pos(), point))
             {
                 QToolTip::showText(helpEvent->globalPos(), tr("Click to add command"));
             }
@@ -159,17 +159,14 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         }
         */
 
-        int index = valencyPointAt(event->pos());
-        if (index != -1)
+        ValencyPoint point;
+        if (hasValencyPointAt(event->pos(), point))
         {
-            int TODO; // set valency point to dialog to know what can be inserted in this valency point
             mShapeAddDialog->exec();
             if (mShapeAddDialog->result() == QDialog::Accepted)
             {
                 ShapeTypes shapeType = mShapeAddDialog->shapeType();
-                int TODO2; // insert new command here
-                //QPoint insertionCell = mShapeItems[index].cell();
-                //insertItem(shapeType, insertionCell, "Delay", index);
+                addCommand(shapeType, point);
             }
         }
     }
@@ -228,7 +225,7 @@ int SortingBox::commandAt(const QPoint &pos)
     return -1;
 }
 
-int SortingBox::valencyPointAt(const QPoint &pos)
+bool SortingBox::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 {
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
@@ -237,12 +234,13 @@ int SortingBox::valencyPointAt(const QPoint &pos)
         {
             if (points[j].path().contains(pos - mCommands[i].position()))
             {
-                return j;
+                point = points[j];
+                return true;
             }
         }
     }
 
-    return -1;
+    return false;
 }
 
 void SortingBox::moveItemTo(const QPoint &pos)
@@ -266,7 +264,8 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
 {
     QPoint pos(mOrigin.x() + cell.x() * mItem.width(), mOrigin.y() + cell.y() * mItem.height());
 
-    // TODO неправильная логика при вставке в середину, тут только случай вставки в конец!!!
+    int TODO; //неправильная логика расширения размеров циклограммы при вставке в середину, тут только случай вставки в конец!!!
+
     if (cell.x() + 1 > mDiagramSize.width())
     {
         mDiagramSize.setWidth(cell.x() + 1);
@@ -446,7 +445,7 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
 
         if (cmd->type() == ShapeTypes::GO_TO_BRANCH)
         {
-            if (!isHeadlineExist(cmd))
+            if (!isBranchExist(cmd))
             {
                 addChildCommands(cmd, cell);
             }
@@ -463,9 +462,17 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
     }
 }
 
-bool SortingBox::isHeadlineExist(Command* parentCmd)
+bool SortingBox::isBranchExist(Command* goToBranchCmd)
 {
-    int TODO; // is headline exist
+    foreach (ShapeItem shape, mCommands)
+    {
+        Command* command = shape.command();
+        if (command->type() == ShapeTypes::BRANCH_BEGIN && command->text() == goToBranchCmd->text())
+        {
+            return true;
+        }
+    }
+
     return false;
 }
 

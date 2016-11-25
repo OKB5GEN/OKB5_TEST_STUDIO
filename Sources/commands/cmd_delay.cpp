@@ -2,13 +2,13 @@
 #include <QTimer>
 
 CmdDelay::CmdDelay(QObject* parent):
-    Command(ShapeTypes::DELAY, parent),
-    mDelay(0)
+    Command(ShapeTypes::DELAY, parent)
 {
     mTimer = new QTimer(this);
     //mTimer->setSingleShot(true);
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(finish()));
+    setDelay(0);
 }
 
 void CmdDelay::run()
@@ -23,6 +23,7 @@ void CmdDelay::stop()
 {
     mDelay = mTimer->remainingTime();
     mTimer->stop();
+    int TODO; // теоретически возможно, что mDelay == 0, а сигнал еще не посылался или уже послался
 }
 
 void CmdDelay::pause()
@@ -51,4 +52,5 @@ void CmdDelay::finish()
 void CmdDelay::setDelay(int seconds)
 {
      mDelay = seconds * 1000;
+     mText = tr("Wait:%1 s").arg(QString::number(seconds));
 }
