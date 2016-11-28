@@ -1,4 +1,7 @@
+#include <QTime>
+
 #include "Headers/command.h"
+
 
 Command::Command(ShapeTypes type, QObject * parent):
     QObject(parent),
@@ -15,6 +18,8 @@ Command::~Command()
 
 void Command::run()
 {
+    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
+
     if (mNextCommands.empty())
     {
         emit onFinished(Q_NULLPTR);
@@ -75,6 +80,7 @@ void Command::setRole(int role)
 
 void Command::insertCommand(Command* newCmd, int role)
 {
+    int i = 0;
     int TODO; // непонятно как эти роли должны передаваться при вставке
     // роль - это актуально только для ветвлений
     for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
@@ -87,4 +93,6 @@ void Command::insertCommand(Command* newCmd, int role)
             break;
         }
     }
+
+    int j = 0;
 }

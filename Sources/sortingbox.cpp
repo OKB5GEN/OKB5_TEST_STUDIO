@@ -653,6 +653,8 @@ void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
         return;
     }
 
+    int role = point.role();
+
     // 2. Update command tree connections
     cmd->insertCommand(newCmd, point.role());
 

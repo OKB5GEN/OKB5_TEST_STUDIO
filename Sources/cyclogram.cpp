@@ -1,3 +1,5 @@
+#include <QTime>
+
 #include "Headers/cyclogram.h"
 #include "Headers/commands/cmd_state_start.h"
 #include "Headers/commands/cmd_set_state.h"
@@ -62,6 +64,8 @@ void Cyclogram::createDefault()
 
 void Cyclogram::run()
 {
+    qDebug("[%s] Cyclogram started", qUtf8Printable(QTime::currentTime().toString()));
+
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
         mState = RUNNING;
@@ -91,6 +95,8 @@ void Cyclogram::onCommandFinished(Command* cmd)
 
 void Cyclogram::stop()
 {
+    qDebug("[%s] Cyclogram finished", qUtf8Printable(QTime::currentTime().toString()));
+
     if (mState == RUNNING || mState == PAUSED)
     {
         mCurrent->stop();
@@ -158,7 +164,6 @@ Command* Cyclogram::createCommand(ShapeTypes type)
 {
     int TODO; // pass command parameters
     Command* cmd = Q_NULLPTR;
-
 
     switch (type)
     {

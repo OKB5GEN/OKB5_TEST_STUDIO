@@ -1,5 +1,6 @@
 #include "Headers/commands/cmd_delay.h"
 #include <QTimer>
+#include <QTime>
 
 CmdDelay::CmdDelay(QObject* parent):
     Command(ShapeTypes::DELAY, parent)
@@ -13,6 +14,8 @@ CmdDelay::CmdDelay(QObject* parent):
 
 void CmdDelay::run()
 {
+    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
+
     if (!mTimer->isActive() && mDelay > 0)
     {
         mTimer->start(mDelay);
@@ -38,6 +41,8 @@ void CmdDelay::resume()
 
 void CmdDelay::finish()
 {
+    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
+
     mTimer->stop(); // to not restart timer again
     if (mNextCommands.empty())
     {

@@ -2,6 +2,12 @@
 
 #include "Headers/valency_point.h"
 
+ValencyPoint::ValencyPoint() :
+    mOwner(Q_NULLPTR),
+    mRole(0)
+{
+}
+
 QPainterPath ValencyPoint::path() const
 {
     return mPath;

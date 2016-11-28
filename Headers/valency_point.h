@@ -6,6 +6,8 @@ class ShapeItem;
 class ValencyPoint
 {
 public:
+    ValencyPoint();
+
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);
     void setOwner(ShapeItem* owner);
