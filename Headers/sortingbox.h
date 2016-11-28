@@ -2,6 +2,7 @@
 #define SORTINGBOX_H
 
 #include <QWidget>
+#include <QMap>
 
 #include "Headers/shapetypes.h"
 #include "Headers/shapeitem.h"
@@ -66,6 +67,8 @@ private:
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
+    void showEditDialog(ShapeItem* item);
+
     QPointF mOrigin;
     QSizeF mItem;
     QSize mDiagramSize;
@@ -81,6 +84,8 @@ private:
     // TODO move dialogs to main window
     ShapeAddDialog * mShapeAddDialog;
     ShapeEditDialog * mShapeEditDialog;
+
+    QMap<ShapeTypes, QDialog*> mEditDialogs;
 
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };

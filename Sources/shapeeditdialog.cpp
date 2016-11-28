@@ -21,7 +21,7 @@ ShapeEditDialog::ShapeEditDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Command Edit Dialog");
+    setWindowTitle("Default Edit Dialog");
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

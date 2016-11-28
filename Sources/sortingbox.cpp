@@ -10,6 +10,9 @@
 #include "Headers/command.h"
 #include "Headers/commands/cmd_title.h"
 
+#include "Headers/cmd_delay_edit_dialog.h"
+#include "Headers/commands/cmd_delay.h"
+
 namespace
 {
     static const QSizeF CELL = QSizeF(30, 30);
@@ -23,6 +26,8 @@ SortingBox::SortingBox():
 {
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
+
+    mEditDialogs[ShapeTypes::DELAY] = new CmdDelayEditDialog(this);
 
     mFont.setPointSize(16);
     mFont.setFamily("Arial");
@@ -174,13 +179,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
             return;
         }
 
-        mShapeEditDialog->setCommand(mCommands[index]->command());
-        mShapeEditDialog->exec();
-
-        if (mShapeEditDialog->result() == QDialog::Accepted)
-        {
-            addText(mCommands[index]);
-        }
+        showEditDialog(mCommands[index]);
     }
 }
 
@@ -786,4 +785,39 @@ void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int
     {
         item->setPath(createPath(item));
     }
+}
+
+
+void SortingBox::showEditDialog(ShapeItem *item)
+{
+    QDialog* dialog = mEditDialogs.value(item->command()->type(), Q_NULLPTR);
+
+    if (dialog) // show custom dialog
+    {
+        switch (item->command()->type())
+        {
+        case ShapeTypes::DELAY:
+            {
+                CmdDelayEditDialog* d = qobject_cast<CmdDelayEditDialog*>(dialog);
+                d->setCommand(qobject_cast<CmdDelay*>(item->command()));
+            }
+            break;
+        default:
+            break;
+        }
+    }
+    else // show default dialog
+    {
+        mShapeEditDialog->setCommand(item->command());
+        dialog = mShapeEditDialog;
+    }
+
+    dialog->exec();
+
+    int TODO; // move text path updaintg in shape item
+    if (dialog->result() == QDialog::Accepted)
+    {
+        addText(item);
+    }
+
 }
