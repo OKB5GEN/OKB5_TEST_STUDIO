@@ -437,7 +437,7 @@ bool SortingBox::isBranchExist(Command* goToBranchCmd)
     return false;
 }
 
-QPainterPath SortingBox::createPath(ShapeItem* item)
+QPainterPath SortingBox::createPath(ShapeItem* item) const
 {
     ShapeTypes type = item->command()->type();
     QPainterPath path;
@@ -665,6 +665,71 @@ void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
     // 4. Update commands positions below and to the right of the inserted command shape
 
     // 4.1 Find "expanded" elements in the insertion column, if it exist, just reduce the expanded element rect height
+    ShapeItem* expandedItem = findExpandedItem(newItem);
+
+    if (expandedItem)
+    {
+        // shift items between new inserted and found expanded item
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
+
+            if (item->cell().x() == newItem->cell().x())
+            {
+                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
+                {
+                    updateItemGeometry(item, 0, 1, 1, 1);
+                }
+            }
+        }
+
+        // reduce expanded item size
+        updateItemGeometry(expandedItem, 0, 0, 1, 0);
+
+    }
+    else // no expanded item in the column, shift items below the inserted in all columns
+    {
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
+
+            if (item->cell().y() >= newItem->cell().y())
+            {
+                // shift items below the added one down by 1 cell in own column
+                if (item->cell().x() == newItem->cell().x())
+                {
+                    updateItemGeometry(item, 0, 1, 1, 1);
+                }
+                else // expand the rect of the lowest item in all other columns
+                {
+                    if (item->cell().y() == (mDiagramSize.height() - 1))
+                    {
+                        updateItemGeometry(item, 0, 1, 0, 1);
+                    }
+                }
+            }
+        }
+
+        //TODO on diagram size changed
+        mDiagramSize.setHeight(mDiagramSize.height() + 1);
+        drawSilhouette();
+    }
+
+    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
+    int TODO2; // owner->parentTreeItem();
+    QRect rect = owner->rect();
+    owner->setRect(rect);
+    update();
+}
+
+ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
+{
     ShapeItem* expandedItem = Q_NULLPTR;
     foreach (ShapeItem* item, mCommands)
     {
@@ -672,11 +737,6 @@ void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
         {
             continue;
         }
-
-        int x = item->cell().x();
-        int y = item->cell().y();
-        int x1 = newItem->cell().x();
-        int y1 = newItem->cell().y();
 
         // if element is in the new elements column and below it
         if (item->cell().x() == newItem->cell().x() && item->cell().y() >= newItem->cell().y())
@@ -699,106 +759,28 @@ void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
         }
     }
 
-    if (expandedItem)
+    return expandedItem;
+}
+
+void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
+{
+    QPoint position = item->position();
+    position.setX(position.x() + xShift * mItem.width());
+    position.setY(position.y() + yShift * mItem.height());
+    item->setPosition(position);
+
+    QPoint cell = item->cell();
+    cell.setX(cell.x() + xShift);
+    cell.setY(cell.y() + yShift);
+    item->setCell(cell);
+
+    QRect rect = item->rect();
+    rect.setTop(rect.top() + topShift);
+    rect.setBottom(rect.bottom() + bottomShift);
+    item->setRect(rect);
+
+    if (topShift != bottomShift) // rect size changed, update path
     {
-        // shift items between new inserded and expanded
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
-
-            if (item->cell().x() == newItem->cell().x())
-            {
-                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
-                {
-                    QPoint position = item->position();
-                    position.setY(position.y() + mItem.height());
-                    item->setPosition(position);
-
-                    QPoint cell = item->cell();
-                    cell.setY(cell.y() + 1);
-                    item->setCell(cell);
-
-                    QRect rect = item->rect();
-                    rect.setTop(rect.top() + 1);
-                    item->setRect(rect);
-
-                    qDebug("3 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
-                }
-            }
-        }
-
-        // has expanded item, just reduce its rect, and update its path
-        // diagram size does not changed
-        QRect expRect = expandedItem->rect();
-        expRect.setTop(expRect.top() + 1);
-        expandedItem->setRect(expRect);
-
-        expandedItem->setPath(createPath(expandedItem));
+        item->setPath(createPath(item));
     }
-    else // no expanded item in the column, shift items below the inserted in all columns
-    {
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
-
-            if (item->cell().y() >= newItem->cell().y())
-            {
-                // shift items below the added one down by 1 cell in own column
-                if (item->cell().x() == newItem->cell().x())
-                {
-                    QPoint position = item->position();
-                    position.setY(position.y() + mItem.height());
-                    item->setPosition(position);
-
-                    QPoint cell = item->cell();
-                    cell.setY(cell.y() + 1);
-                    item->setCell(cell);
-
-                    QRect rect = item->rect();
-                    rect.setTop(rect.top() + 1);
-                    rect.setBottom(rect.bottom() + 1);
-                    item->setRect(rect);
-
-                    qDebug("2 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
-                }
-                else // expand the rect of the lowest item in all other columns
-                {
-                    if (item->cell().y() == (mDiagramSize.height() - 1))
-                    {
-                        QPoint position = item->position();
-                        position.setY(position.y() + mItem.height());
-                        item->setPosition(position);
-
-                        QPoint cell = item->cell();
-                        cell.setY(cell.y() + 1);
-                        item->setCell(cell);
-
-                        QRect rect = item->rect();
-                        rect.setBottom(rect.bottom() + 1);
-                        item->setRect(rect);
-
-                        qDebug("1 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
-
-                        item->setPath(createPath(item));
-                    }
-                }
-            }
-        }
-
-        //TODO on diagram size changed
-        mDiagramSize.setHeight(mDiagramSize.height() + 1);
-        drawSilhouette();
-    }
-
-    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
-    int TODO2; // owner->parentTreeItem();
-    QRect rect = owner->rect();
-    owner->setRect(rect);
-    update();
 }

@@ -54,7 +54,7 @@ private:
 
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
-    QPainterPath createPath(ShapeItem* item);
+    QPainterPath createPath(ShapeItem* item) const;
     QList<ValencyPoint> createValencyPoints(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
@@ -62,6 +62,9 @@ private:
     void addText(ShapeItem* item);
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
     bool isBranchExist(Command* goToBranchCmd);
+
+    ShapeItem* findExpandedItem(ShapeItem* newItem) const;
+    void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
     QPointF mOrigin;
     QSizeF mItem;
