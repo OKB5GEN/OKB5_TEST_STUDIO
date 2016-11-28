@@ -193,9 +193,9 @@ Command* Cyclogram::createCommand(ShapeTypes type)
         //TODO not implemented
     case ShapeTypes::ACTION:{} break;
     case ShapeTypes::QUESTION:{} break;
-    case ShapeTypes::CHOICE:{} break;
+    case ShapeTypes::SWITCH:{} break;
     case ShapeTypes::CASE:{} break;
-    case ShapeTypes::INSERTION:{} break;
+    case ShapeTypes::SUBPROGRAM:{} break;
     case ShapeTypes::SHELF:{} break;
     case ShapeTypes::PARAMS:{} break;
     case ShapeTypes::FOR_BEGIN:{} break;
@@ -205,7 +205,6 @@ Command* Cyclogram::createCommand(ShapeTypes type)
     case ShapeTypes::START_TIMER:{} break;
     case ShapeTypes::SYNCHRONIZER:{} break;
     case ShapeTypes::PARALLEL_PROCESS:{} break;
-    case ShapeTypes::CONCURRENT_PROCESS:{} break;
     default:
         break;
     }

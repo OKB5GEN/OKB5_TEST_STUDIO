@@ -5,19 +5,17 @@
 enum class ShapeTypes
 {
     // IMPLEMENTED >>>
+
+    // NOT IMPLEMENTED >>>
     TERMINATOR,
     BRANCH_BEGIN,
     GO_TO_BRANCH,
     DELAY,
-
-    // NOT IMPLEMENTED >>>
     ACTION,
     QUESTION,
-    CHOICE,
+    SWITCH,
     CASE,
-    INSERTION,
-    SHELF,
-    PARAMS,
+    SUBPROGRAM,
     FOR_BEGIN,
     FOR_END,
     OUTPUT,
@@ -25,7 +23,9 @@ enum class ShapeTypes
     START_TIMER,
     SYNCHRONIZER,
     PARALLEL_PROCESS,
-    CONCURRENT_PROCESS,
+
+    PARAMS,
+    SHELF,
 
     SHAPES_COUNT // always must be last
 };
