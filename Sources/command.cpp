@@ -73,3 +73,18 @@ void Command::setRole(int role)
     mRole = role;
 }
 
+void Command::insertCommand(Command* newCmd, int role)
+{
+    int TODO; // непонятно как эти роли должны передаваться при вставке
+    // роль - это актуально только для ветвлений
+    for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
+    {
+        if (mNextCommands[i]->role() == role)
+        {
+            newCmd->setRole(role);
+            newCmd->addCommand(mNextCommands[i], 0);
+            mNextCommands[i] = newCmd;
+            break;
+        }
+    }
+}

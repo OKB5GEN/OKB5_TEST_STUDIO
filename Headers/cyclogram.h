@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include "Headers/cell.h"
+#include "Headers/shapetypes.h"
 
 class Command;
 
@@ -22,6 +23,7 @@ public:
     void resume();
 
     Command* first() const;
+    Command* createCommand(ShapeTypes type);
 
 private slots:
     void onCommandFinished(Command* cmd);

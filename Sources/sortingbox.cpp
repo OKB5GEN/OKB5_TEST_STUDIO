@@ -47,6 +47,8 @@ void SortingBox::clear()
 {
     qDeleteAll(mCommands);
     qDeleteAll(mSihlouette);
+
+    mCurrentCyclogram = Q_NULLPTR;
 }
 
 bool SortingBox::event(QEvent *event)
@@ -247,12 +249,11 @@ int SortingBox::updateButtonGeometry(QToolButton *button, int x, int y)
 }
 */
 
-void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
+ShapeItem* SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
 {
     QPoint pos(mOrigin.x() + cell.x() * mItem.width(), mOrigin.y() + cell.y() * mItem.height());
 
-    int TODO; //неправильная логика расширения размеров циклограммы при вставке в середину, тут только случай вставки в конец!!!
-
+    int TODO; //update diagram size if adding is to the end of the diagram, REMOVE FROM THIS METHOD
     if (cell.x() + 1 > mDiagramSize.width())
     {
         mDiagramSize.setWidth(cell.x() + 1);
@@ -265,18 +266,17 @@ void SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
 
     ShapeItem* shapeItem = new ShapeItem();
     shapeItem->setCommand(cmd);
-    shapeItem->setPath(createPath(cmd));
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setPosition(pos);
     shapeItem->setColor(QColor::fromRgba(0xffffffff));
     shapeItem->setCell(cell);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
+    shapeItem->setPath(createPath(shapeItem));
     shapeItem->setValencyPoints(createValencyPoints(cmd));
     addText(shapeItem);
     mCommands.append(shapeItem);
 
-    int TODO2; // перенести апдейт куда-то попозже, чтобы можно было создать формы пачкой, а потом проапдейтить
-    update();
+    return shapeItem;
 }
 
 void SortingBox::addText(ShapeItem* item)
@@ -374,11 +374,13 @@ void SortingBox::load(Cyclogram* cyclogram)
         return;
     }
 
+    mCurrentCyclogram = cyclogram;
     QPoint parentCell(0, 0);
     createCommandShape(first, parentCell);
     addChildCommands(first, parentCell);
 
     drawSilhouette();
+    update();
 }
 
 void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
@@ -435,22 +437,25 @@ bool SortingBox::isBranchExist(Command* goToBranchCmd)
     return false;
 }
 
-QPainterPath SortingBox::createPath(Command* cmd)
+QPainterPath SortingBox::createPath(ShapeItem* item)
 {
-    ShapeTypes type = cmd->type();
+    ShapeTypes type = item->command()->type();
     QPainterPath path;
+
+    QRect itemRect = item->rect();
+    QPoint cell = item->cell();
 
     switch (type)
     {
     case ShapeTypes::TERMINATOR:
         {
-            QRectF rect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height());
-            qreal xRadius = (mItem.height() - 2 * CELL.height()) / 2;
-            qreal yRadius = (mItem.height() - 2 * CELL.height()) / 2;
-            path.addRoundedRect(rect, xRadius, yRadius);
+            qreal yOffset = (cell.y() - itemRect.top()) * mItem.height();
+            qreal radius = (mItem.height() - 2 * CELL.height()) / 2;
+            QRectF rect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), 2 * radius);
+            path.addRoundedRect(rect, radius, radius);
 
             // connector
-            CmdTitle* titleCmd = qobject_cast<CmdTitle*>(cmd);
+            CmdTitle* titleCmd = qobject_cast<CmdTitle*>(item->command());
             if (titleCmd)
             {
                 if (titleCmd->titleType() == CmdTitle::BEGIN)
@@ -458,10 +463,10 @@ QPainterPath SortingBox::createPath(Command* cmd)
                     path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
                     path.lineTo(mItem.width() / 2, mItem.height());
                 }
-                else
+                else // END terminator
                 {
                     path.moveTo(mItem.width() / 2, CELL.height());
-                    path.lineTo(mItem.width() / 2, 0);
+                    path.lineTo(mItem.width() / 2, -yOffset);
                 }
             }
         }
@@ -518,14 +523,16 @@ QPainterPath SortingBox::createPath(Command* cmd)
         break;
     }
 
-    if (cmd->type() != ShapeTypes::TERMINATOR)
+    if (type != ShapeTypes::TERMINATOR)
     {
+        qreal yOffset = (cell.y() - itemRect.top()) * mItem.height();
+
         // lower connector
         path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
         path.lineTo(mItem.width() / 2, mItem.height());
         // upper connector
         path.moveTo(mItem.width() / 2, CELL.height());
-        path.lineTo(mItem.width() / 2, 0);
+        path.lineTo(mItem.width() / 2, -yOffset);
     }
 
     return path;
@@ -637,82 +644,161 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
 void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
 {
     ShapeItem* owner = point.owner();
-
     Command* cmd = owner->command();
-    QRect rect = owner->rect();
-    QPoint cell = owner->cell();
-    QPoint pos = owner->position();
 
-    /*
-    for (int i = 0, sz = mShapeItems.size(); i < sz; ++i)
+    // 1. Create new command
+    Command* newCmd = mCurrentCyclogram->createCommand(type);
+    if (!newCmd)
     {
-        if (i == shapeAddItemIndex) // skip add item index
+        return;
+    }
+
+    // 2. Update command tree connections
+    cmd->insertCommand(newCmd, point.role());
+
+    // 3. Add new command shape item to cyclogram view
+    QPoint newCmdCell = owner->cell();
+    newCmdCell.setY(newCmdCell.y() + 1);
+    int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
+    ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
+
+    // 4. Update commands positions below and to the right of the inserted command shape
+
+    // 4.1 Find "expanded" elements in the insertion column, if it exist, just reduce the expanded element rect height
+    ShapeItem* expandedItem = Q_NULLPTR;
+    foreach (ShapeItem* item, mCommands)
+    {
+        if (item == newItem) // skip added item
         {
             continue;
         }
 
-        ShapeTypes type = mShapeItems[i].type();
-        QPoint cell = mShapeItems[i].cell();
+        int x = item->cell().x();
+        int y = item->cell().y();
+        int x1 = newItem->cell().x();
+        int y1 = newItem->cell().y();
 
-        if (id < ShapeTypes::DRAKON_ELEMENTS_COUNT && cell.y() >= pos.y() && cell.x() == pos.x()) // TODO: Х - только для сдвига по столбцу
+        // if element is in the new elements column and below it
+        if (item->cell().x() == newItem->cell().x() && item->cell().y() >= newItem->cell().y())
         {
-            QPoint position = mShapeItems[i].position();
-            position.setY(position.y() + mItem.height());
-            mShapeItems[i].setPosition(position);
-            qDebug("Set shape %i pos to (%i; %i)", int(id), position.x(), position.y());
+            // if it is an "expanded" item
+            if (item->rect().height() > 1)
+            {
+                if (expandedItem)
+                {
+                    if (expandedItem->rect().top() > item->rect().top())
+                    {
+                        expandedItem = item;
+                    }
+                }
+                else
+                {
+                    expandedItem = item;
+                }
+            }
         }
     }
 
-    addItem(id, pos, text);
-    mDiagramSize.setHeight(mDiagramSize.height() + 1);
+    if (expandedItem)
+    {
+        // shift items between new inserded and expanded
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
 
-    connectItems(pos, QPoint(pos.x(), pos.y() + 1), 0);
+            if (item->cell().x() == newItem->cell().x())
+            {
+                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
+                {
+                    QPoint position = item->position();
+                    position.setY(position.y() + mItem.height());
+                    item->setPosition(position);
 
-    drawSilhouette();
+                    QPoint cell = item->cell();
+                    cell.setY(cell.y() + 1);
+                    item->setCell(cell);
 
-    //TODO update connectors
+                    QRect rect = item->rect();
+                    rect.setTop(rect.top() + 1);
+                    item->setRect(rect);
+
+                    qDebug("3 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
+                }
+            }
+        }
+
+        // has expanded item, just reduce its rect, and update its path
+        // diagram size does not changed
+        QRect expRect = expandedItem->rect();
+        expRect.setTop(expRect.top() + 1);
+        expandedItem->setRect(expRect);
+
+        expandedItem->setPath(createPath(expandedItem));
+    }
+    else // no expanded item in the column, shift items below the inserted in all columns
+    {
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
+
+            if (item->cell().y() >= newItem->cell().y())
+            {
+                // shift items below the added one down by 1 cell in own column
+                if (item->cell().x() == newItem->cell().x())
+                {
+                    QPoint position = item->position();
+                    position.setY(position.y() + mItem.height());
+                    item->setPosition(position);
+
+                    QPoint cell = item->cell();
+                    cell.setY(cell.y() + 1);
+                    item->setCell(cell);
+
+                    QRect rect = item->rect();
+                    rect.setTop(rect.top() + 1);
+                    rect.setBottom(rect.bottom() + 1);
+                    item->setRect(rect);
+
+                    qDebug("2 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
+                }
+                else // expand the rect of the lowest item in all other columns
+                {
+                    if (item->cell().y() == (mDiagramSize.height() - 1))
+                    {
+                        QPoint position = item->position();
+                        position.setY(position.y() + mItem.height());
+                        item->setPosition(position);
+
+                        QPoint cell = item->cell();
+                        cell.setY(cell.y() + 1);
+                        item->setCell(cell);
+
+                        QRect rect = item->rect();
+                        rect.setBottom(rect.bottom() + 1);
+                        item->setRect(rect);
+
+                        qDebug("1 Set item %s rect(%i, %i, %ix%i)", qUtf8Printable(item->command()->text()), rect.left(), rect.bottom(), rect.width(), rect.height());
+
+                        item->setPath(createPath(item));
+                    }
+                }
+            }
+        }
+
+        //TODO on diagram size changed
+        mDiagramSize.setHeight(mDiagramSize.height() + 1);
+        drawSilhouette();
+    }
+
+    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
+    int TODO2; // owner->parentTreeItem();
+    QRect rect = owner->rect();
+    owner->setRect(rect);
     update();
-    */
-
-    /* Как добавлять команду в циклограмму (мысли вслух)?
-     *
-     * 1. Команда добавляется в точку валентности
-     * 2. Точка валентности принадлежит команде
-     * 3. Поэтому снчала надо создать команду в логике, а потом правильно ее отрисовать
-     * 4. Создание команды в логике - это:
-     *    - создать новый объект
-     *    - в качестве следующей команды впихнуть в него next-команду, привязанную к точке валентности
-     *    - команде-владельцу точки валентности в качестве next прописать новую команду
-     * 5. После этого мы имеем команду в логике и теперь ее надо правильно отобразить в циклограмме
-     * 6. Предположительно в параметрах команды должен появиться параметр "Прямоугольник в графике", размером от top-left ячейки до bottom-right
-     * 7. Этот прямоугольник задает область расположения команды
-     * 8. Сама команда всегда расположена в левом нижнем углу своего прямоугольника (допустим)
-     * 9. От нее до top-left ячейки веритикально рисуется линия (сейчас пока просто полклетки по прямой рисуется).
-     * 10. При этом cell и position (надо избавиться от двух сущностей - либо в ячейках считать либо в позициях) двигается на 1 строчку вниз
-     * 11. При добавлении новой команды также нужно пробежаться по всем остальным командам
-     * 12. Все команды, которые расположены на одной высоте по Y сдвигаются на однй строчку вниз, при этом их top-left остается прежним
-     *
-     * При отрисовке QUESTION будут свои свистопляски, но пока для упрощения забьем и сделаем линейно-бранчевые циклограммы
-     *
-     * Если коротко, то с QUESION (как и SWITCH-CASE) надо будет как-то мониторить стрелку ветвления и делать хитрожопую логику ее отрисовки
-     * Логика точек валентности при этом будет завязана на то является ли ее хозяином QUESION, кто яаляется следующей командой
-     * Наприммер, если хозяин - это IF-QUESTION, а след команда - GO_TO_BRANCH, то сюда можно вставить GO_TO_BRANCH и при вставке разорвать петлю IF'а
-     *
-     * Наиболее вероятно то, что QUESTION потребует хранения какой-то информации о дереве подобъектов
-     * Rect этого QUESTION'а будет bounding rect'ом этого дерева команд
-     * При добавлении команды нужно проверять не состоит ли команда в дереве какого-то QUESTIONа
-     * Если состояит, то надо обновить rect'ы всех QUESTION'ов куда входит команда
-     *
-     * В итоге рисовать коннектторя надо по следующему алгоритму:
-     * Есть Rect команды
-     * - от ячейки, где находится position команды рисуем вверх линию от (position + CELL.height()) до top rect'а
-     * - при этом по пути до top rectа проверяем нет ли в ячейке команды (если есть, то рисование прекращаем) - это для QUESTION'а типа CYCLE
-     * - от ячейки position + mItem.height - CELL.height рисуем линию вниз до bottom rect'а
-     * - опять же если по пути встречаем команду в ячейке, то рисование прекращаем - опять актуально для QUESTION'а
-     * - QUESTION по Х всегда находтся в левом столбце своего rectа, по Y же может плавать в зависимости от наполнения веток дерева
-     * - Дополнительно для QUESTION'а нужно отрисовывать стрелку
-     *
-     *
-    */
-
 }

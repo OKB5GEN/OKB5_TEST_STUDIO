@@ -23,6 +23,7 @@ public:
 
     const QList<Command*>& nextCommands() const;
     void addCommand(Command* cmd, int role = 0);
+    void insertCommand(Command* newCmd, int role = 0);
 
     int role() const;
     void setRole(int role);

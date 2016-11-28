@@ -32,65 +32,12 @@ ShapeItem* ValencyPoint::owner() const
     return mOwner;
 }
 
-/*
-
-QPainterPath ValencyPoint::textPath() const
+void ValencyPoint::setRole(int role)
 {
-    return mTextPath;
+    mRole = role;
 }
 
-QPoint ValencyPoint::position() const
+int ValencyPoint::role() const
 {
-    return mPosition;
+    return mRole;
 }
-
-QString ValencyPoint::toolTip() const
-{
-    return mToolTip;
-}
-
-void ValencyPoint::setTextPath(const QPainterPath &path)
-{
-    mTextPath = path;
-}
-
-void ValencyPoint::setToolTip(const QString &toolTip)
-{
-    mToolTip = toolTip;
-}
-
-void ValencyPoint::setPosition(const QPoint &position)
-{
-    mPosition = position;
-}
-
-void ValencyPoint::setFlags(uint32_t flags)
-{
-    mFlags = flags;
-}
-
-uint32_t ValencyPoint::flags() const
-{
-    return mFlags;
-}
-
-QPoint ValencyPoint::cell() const
-{
-    return mCell;
-}
-
-void ValencyPoint::setCell(const QPoint &position)
-{
-    mCell = position;
-}
-
-void ValencyPoint::setCommand(Command* command)
-{
-    mCommand = command;
-}
-
-Command* ValencyPoint::command() const
-{
-    return mCommand;
-}
-*/

@@ -44,7 +44,7 @@ private:
 
     //int updateButtonGeometry(QToolButton *button, int x, int y);
 
-    void createCommandShape(Command* cmd, const QPoint& cell);
+    ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point);
     bool isCyclogramEndBranch(Command* cmd) const;
     void addCommand(ShapeTypes type, const ValencyPoint& point);
@@ -54,7 +54,7 @@ private:
 
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
-    QPainterPath createPath(Command* cmd);
+    QPainterPath createPath(ShapeItem* item);
     QList<ValencyPoint> createValencyPoints(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
@@ -77,6 +77,8 @@ private:
 
     ShapeAddDialog * mShapeAddDialog;
     ShapeEditDialog * mShapeEditDialog;
+
+    Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };
 
 #endif

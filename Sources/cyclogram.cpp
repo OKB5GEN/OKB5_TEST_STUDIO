@@ -153,3 +153,57 @@ void Cyclogram::createPair(Command* parent, Command* child)
 {
     parent->addCommand(child);
 }
+
+Command* Cyclogram::createCommand(ShapeTypes type)
+{
+    int TODO; // pass command parameters
+    Command* cmd = Q_NULLPTR;
+
+
+    switch (type)
+    {
+    case ShapeTypes::TERMINATOR:
+        {
+            cmd = new CmdTitle(CmdTitle::BEGIN, this);
+        }
+        break;
+    case ShapeTypes::BRANCH_BEGIN:
+        {
+            cmd = new CmdStateStart("NEW_BRANCH", this);
+        }
+        break;
+    case ShapeTypes::GO_TO_BRANCH:
+        {
+            cmd = new CmdSetState("NEW_BRANCH", this);
+        }
+        break;
+    case ShapeTypes::DELAY:
+        {
+            CmdDelay* newCmd = new CmdDelay(this);
+            int TODO2;
+            newCmd->setDelay(10);
+            cmd = newCmd;
+        }
+        break;
+        //TODO not implemented
+    case ShapeTypes::ACTION:{} break;
+    case ShapeTypes::QUESTION:{} break;
+    case ShapeTypes::CHOICE:{} break;
+    case ShapeTypes::CASE:{} break;
+    case ShapeTypes::INSERTION:{} break;
+    case ShapeTypes::SHELF:{} break;
+    case ShapeTypes::PARAMS:{} break;
+    case ShapeTypes::FOR_BEGIN:{} break;
+    case ShapeTypes::FOR_END:{} break;
+    case ShapeTypes::OUTPUT:{} break;
+    case ShapeTypes::INPUT:{} break;
+    case ShapeTypes::START_TIMER:{} break;
+    case ShapeTypes::SYNCHRONIZER:{} break;
+    case ShapeTypes::PARALLEL_PROCESS:{} break;
+    case ShapeTypes::CONCURRENT_PROCESS:{} break;
+    default:
+        break;
+    }
+
+    return cmd;
+}
