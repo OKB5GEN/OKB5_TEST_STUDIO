@@ -4,6 +4,7 @@
 #include "Headers/sortingbox.h"
 #include "Headers/shapeadddialog.h"
 #include "Headers/shapeeditdialog.h"
+
 #include "Headers/cyclogram.h"
 #include "Headers/cell.h"
 #include "Headers/command.h"

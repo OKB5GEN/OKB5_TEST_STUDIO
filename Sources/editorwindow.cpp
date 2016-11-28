@@ -8,15 +8,21 @@
 #include "Headers/monitor_auto.h"
 #include "Headers/cyclogram.h"
 
+#include "Headers/cyclogram_end_dialog.h"
+
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
 {
     mRenderArea = new SortingBox();
     mCyclogram = new Cyclogram(this);
 
+    mCyclogramEndDialog = new CyclogramEndDialog(this);
+
     // TODO cyclogram loading
     mCyclogram->createDefault();
     mRenderArea->load(mCyclogram);
+
+    connect(mCyclogram, SIGNAL(finished()), this, SLOT(onCyclogramFinish()));
 
     //connect(); // connect signals and slots of GUI (SortingBox TODO rename)) and Logics (Cyclogram)
 
@@ -406,6 +412,11 @@ void EditorWindow::addAutoMonitor()
 {
     MonitorAuto* dialog = new MonitorAuto(this);
     dialog->show();
+}
+
+void EditorWindow::onCyclogramFinish()
+{
+    mCyclogramEndDialog->exec();
 }
 
 #ifndef QT_NO_SESSIONMANAGER

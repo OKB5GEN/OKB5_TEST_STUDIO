@@ -90,6 +90,7 @@ void Cyclogram::onCommandFinished(Command* cmd)
     else
     {
         stop();
+        emit finished();
     }
 }
 

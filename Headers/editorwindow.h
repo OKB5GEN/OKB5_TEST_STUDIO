@@ -13,6 +13,7 @@ QT_END_NAMESPACE
 class RenderArea;
 class SortingBox;
 class Cyclogram;
+class CyclogramEndDialog;
 
 class EditorWindow : public QMainWindow
 {
@@ -42,6 +43,8 @@ private slots:
     void addManualMonitor();
     void addAutoMonitor();
 
+    void onCyclogramFinish();
+
 #ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
 #endif
@@ -59,6 +62,8 @@ private:
     Cyclogram* mCyclogram;
 
     SortingBox *mRenderArea;
+
+    CyclogramEndDialog * mCyclogramEndDialog;
 
     //QPlainTextEdit *textEdit;
     QString mCurFile;

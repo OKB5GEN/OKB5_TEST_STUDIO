@@ -78,6 +78,7 @@ private:
 
     QFont mFont;
 
+    // TODO move dialogs to main window
     ShapeAddDialog * mShapeAddDialog;
     ShapeEditDialog * mShapeEditDialog;
 

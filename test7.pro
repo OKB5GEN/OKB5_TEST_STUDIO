@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     Sources/monitor_auto.cpp \
     Sources/monitor_manual.cpp \
     Sources/commands/cmd_title.cpp \
-    Sources/valency_point.cpp
+    Sources/valency_point.cpp \
+    Sources/cyclogram_end_dialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -87,7 +88,8 @@ HEADERS  += mainwindow.h \
     Headers/monitor_auto.h \
     Headers/monitor_manual.h \
     Headers/commands/cmd_title.h \
-    Headers/valency_point.h
+    Headers/valency_point.h \
+    Headers/cyclogram_end_dialog.h
 
 
 FORMS    += mainwindow.ui

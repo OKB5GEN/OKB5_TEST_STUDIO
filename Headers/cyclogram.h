@@ -48,5 +48,6 @@ private:
 
 signals:
     void changed();
+    void finished();
 };
 #endif // CYCLOGRAM_H
