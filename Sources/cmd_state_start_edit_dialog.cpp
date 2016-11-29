@@ -1,10 +1,8 @@
+#include <QtWidgets>
+
 #include "Headers/cmd_state_start_edit_dialog.h"
 #include "Headers/commands/cmd_state_start.h"
 #include "Headers/cyclogram.h"
-
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QLineEdit>
 
 CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     QDialog(parent)
@@ -32,8 +30,9 @@ CmdStateStartEditDialog::~CmdStateStartEditDialog()
 
 }
 
-void CmdStateStartEditDialog::setCommand(CmdStateStart * command)
+void CmdStateStartEditDialog::setCommands(CmdStateStart * command, const QList<Command*>& otherBranches)
 {
+    mOtherBranches = otherBranches;
     mCommand = command;
     mLineEdit->setText(command->text());
 }
@@ -42,6 +41,15 @@ void CmdStateStartEditDialog::onAccept()
 {
     if (mCommand)
     {
+        foreach (Command* cmd, mOtherBranches)
+        {
+            if (cmd->text() == mLineEdit->text())
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Branch with such name already exist!\nTry another name"));
+                return;
+            }
+        }
+
         mCommand->setText(mLineEdit->text());
     }
 

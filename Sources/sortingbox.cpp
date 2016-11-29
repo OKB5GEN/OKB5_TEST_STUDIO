@@ -669,7 +669,16 @@ void SortingBox::showEditDialog(ShapeItem *item)
         case ShapeTypes::BRANCH_BEGIN:
             {
                 CmdStateStartEditDialog* d = qobject_cast<CmdStateStartEditDialog*>(dialog);
-                d->setCommand(qobject_cast<CmdStateStart*>(item->command()));
+                QList<Command*> commands;
+                foreach (ShapeItem* it, mCommands)
+                {
+                    if (it->command()->type() == ShapeTypes::BRANCH_BEGIN && it->command() != item->command())
+                    {
+                        commands.push_back(it->command());
+                    }
+                }
+
+                d->setCommands(qobject_cast<CmdStateStart*>(item->command()), commands);
             }
             break;
 
@@ -677,11 +686,11 @@ void SortingBox::showEditDialog(ShapeItem *item)
             {
                 CmdSetStateEditDialog* d = qobject_cast<CmdSetStateEditDialog*>(dialog);
                 QList<Command*> commands;
-                foreach (ShapeItem* item, mCommands)
+                foreach (ShapeItem* it, mCommands)
                 {
-                    if (item->command()->type() == ShapeTypes::BRANCH_BEGIN)
+                    if (it->command()->type() == ShapeTypes::BRANCH_BEGIN)
                     {
-                        commands.push_back(item->command());
+                        commands.push_back(it->command());
                     }
                 }
 

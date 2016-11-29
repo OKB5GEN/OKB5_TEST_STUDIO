@@ -8,6 +8,7 @@ class QLineEdit;
 QT_END_NAMESPACE
 
 class CmdStateStart;
+class Command;
 
 class CmdStateStartEditDialog : public QDialog
 {
@@ -17,12 +18,13 @@ public:
     CmdStateStartEditDialog(QWidget * parent);
     ~CmdStateStartEditDialog();
 
-    void setCommand(CmdStateStart* command);
+    void setCommands(CmdStateStart* command, const QList<Command*>& otherBranches);
 
 private slots:
     void onAccept();
 
 private:
+    QList<Command*> mOtherBranches;
     QLineEdit* mLineEdit;
     CmdStateStart* mCommand;
 };
