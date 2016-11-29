@@ -71,6 +71,9 @@ void Cyclogram::run()
         mState = RUNNING;
         connect(mFirst, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*)));
         mCurrent = mFirst;
+
+        qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
+
         mCurrent->run();
     }
 }
@@ -79,11 +82,14 @@ void Cyclogram::onCommandFinished(Command* cmd)
 {
     if (cmd != Q_NULLPTR)
     {
+        qDebug("[%s] Command %s finished", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
+
         mCurrent = cmd;
         connect(mCurrent, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on command creation
 
         if (mState == RUNNING)
         {
+            qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
             mCurrent->run();
         }
     }
@@ -186,8 +192,6 @@ Command* Cyclogram::createCommand(ShapeTypes type)
     case ShapeTypes::DELAY:
         {
             CmdDelay* newCmd = new CmdDelay(this);
-            int TODO2;
-            newCmd->setDelay(10);
             cmd = newCmd;
         }
         break;

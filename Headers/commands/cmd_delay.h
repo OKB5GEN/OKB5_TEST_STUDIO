@@ -19,7 +19,8 @@ public:
     void pause() override;
     void resume() override;
 
-    void setDelay(int seconds);
+    void setDelay(int hours, int minutes, int seconds, int msec);
+    int delay() const; // milliseconds
 
 private slots:
     void finish();
@@ -27,5 +28,6 @@ private slots:
 private:
     QTimer* mTimer;
     int mDelay; // msec
+    int mTimeLeft;
 };
 #endif // CMD_DELAY_H

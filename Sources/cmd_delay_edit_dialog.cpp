@@ -1,6 +1,7 @@
 #include <QtWidgets>
 
 #include "Headers/cmd_delay_edit_dialog.h"
+#include "Headers/commands/cmd_delay.h"
 
 namespace
 {
@@ -9,7 +10,12 @@ namespace
 }
 
 CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
-    QDialog(parent)
+    QDialog(parent),
+    mCommand(Q_NULLPTR),
+    mHours(0),
+    mMinutes(0),
+    mSeconds(0),
+    mMSeconds(0)
 {
     if (parent != Q_NULLPTR)
     {
@@ -19,141 +25,25 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
                     WIDTH, HEIGHT);
     }
 
+    QGridLayout * layout = new QGridLayout(this);
 
-    QVBoxLayout * vLayout = new QVBoxLayout(this);
+    mHSpin = addItem(layout, tr("Hours"), 0, 23, SLOT(onHoursChanged(int)));
+    mMSpin = addItem(layout, tr("Minutes"), 1, 59, SLOT(onMinutesChanged(int)));
+    mSSpin = addItem(layout, tr("Seconds"), 2, 59, SLOT(onSecondsChanged(int)));
+    mMSSpin = addItem(layout, tr("Milliseconds"), 3, 999, SLOT(onMilliSecondsChanged(int)));
 
-    {// value to monitor select
-        QHBoxLayout *hLayout = new QHBoxLayout(this);
-        QComboBox* comboBox = new QComboBox(this);
-        comboBox->addItem("Current voltage");
-        comboBox->addItem("Temperature 1");
-        comboBox->addItem("Temperature 2");
-        comboBox->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-        hLayout->addWidget(comboBox);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
+    layout->addWidget(buttonBox, 4, 2);
 
-        QLabel* activeCaption = new QLabel(this);
-        activeCaption->setText("Current value, Units");
-        activeCaption->setAlignment(Qt::AlignLeft);
-        activeCaption->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        hLayout->addWidget(activeCaption);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-        QLineEdit* lineEdit = new QLineEdit(this);
-        lineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        lineEdit->setAlignment(Qt::AlignRight);
-        lineEdit->setText(QString::number(0));
-        lineEdit->setReadOnly(true);
-        hLayout->addWidget(lineEdit);
-
-        vLayout->addLayout(hLayout);
-    }
-
-    { // current value
-        QHBoxLayout* hLayout = new QHBoxLayout(this);
-        hLayout->setAlignment(Qt::AlignLeft);
-
-        // play button
-        /*
-        QToolButton* playBtn = new QToolButton(this);
-        playBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-        playBtn->setIcon(QIcon(":/images/media-play-32.png"));
-        playBtn->setIconSize(QSize(64, 64));
-        connect(playBtn, SIGNAL(clicked()), this, SLOT(onPlayClicked()));
-        hLayout->addWidget(playBtn);
-
-        // pause button
-        QToolButton* pauseBtn = new QToolButton(this);
-        pauseBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-        pauseBtn->setIcon(QIcon(":/images/media-pause-32.png"));
-        pauseBtn->setIconSize(QSize(64, 64));
-        connect(pauseBtn, SIGNAL(clicked()), this, SLOT(onPauseClicked()));
-        hLayout->addWidget(pauseBtn);
-
-        // stop button
-        QToolButton* stopBtn = new QToolButton(this);
-        stopBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-        stopBtn->setIcon(QIcon(":/images/media-stop-32.png"));
-        stopBtn->setIconSize(QSize(64, 64));
-        connect(stopBtn, SIGNAL(clicked()), this, SLOT(onStopClicked()));
-        hLayout->addWidget(stopBtn);
-        */
-
-        hLayout->addStretch();
-
-        // value restrictions group box
-        QGroupBox *groupBox = new QGroupBox(tr("Restrictions"), this);
-        groupBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
-
-        QGridLayout* boxLayout = new QGridLayout(this);
-
-        QCheckBox* activeBox1 = new QCheckBox(this);
-        activeBox1->setChecked(false);
-        activeBox1->setText("Min");
-        activeBox1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        boxLayout->addWidget(activeBox1, 0, 0);
-
-        QLineEdit* lineEdit1 = new QLineEdit(this);
-        lineEdit1->setValidator(new QIntValidator(this));
-        lineEdit1->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        lineEdit1->setText(QString::number(0));
-        lineEdit1->setEnabled(false);
-        lineEdit1->setAlignment(Qt::AlignRight);
-        boxLayout->addWidget(lineEdit1, 0, 1);
-
-        QCheckBox* activeBox2 = new QCheckBox(this);
-        activeBox2->setChecked(false);
-        activeBox2->setText("Max");
-        activeBox2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        boxLayout->addWidget(activeBox2, 1, 0);
-
-        QLineEdit* lineEdit2 = new QLineEdit(this);
-        lineEdit2->setValidator(new QIntValidator(this));
-        lineEdit2->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        lineEdit2->setText(QString::number(0));
-        lineEdit2->setEnabled(false);
-        lineEdit2->setAlignment(Qt::AlignRight);
-        boxLayout->addWidget(lineEdit2, 1, 1);
-
-        groupBox->setLayout(boxLayout);
-
-        hLayout->addWidget(groupBox);
-        vLayout->addLayout(hLayout);
-    }
-
-    { // refresh period
-        QHBoxLayout* hLayout = new QHBoxLayout(this);
-        hLayout->setAlignment(Qt::AlignLeft);
-
-        QLabel* activeLabel = new QLabel(this);
-        activeLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        activeLabel->setText("Refresh period, sec");
-        hLayout->addWidget(activeLabel);
-
-        QLineEdit* timeEdit = new QLineEdit(this);
-        timeEdit->setAlignment(Qt::AlignRight);
-        //timeEdit->setValidator(new QIntValidator(MIN_UPDATE_INTERVAL, MAX_UPDATE_INTERVAL, this));
-        //timeEdit->setText(QString::number(MIN_UPDATE_INTERVAL));
-        timeEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        hLayout->addWidget(timeEdit);
-
-        connect(timeEdit, SIGNAL(textChanged(QString)), this, SLOT(setUpdatePeriod(QString)));
-
-        QCheckBox* activeBox = new QCheckBox(this);
-        activeBox->setChecked(true);
-        activeBox->setText("Show plot");
-        activeBox->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        connect(activeBox, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
-        hLayout->addWidget(activeBox);
-
-        //mPlotCheckBox = activeBox;
-
-        hLayout->addStretch();
-        vLayout->addLayout(hLayout);
-    }
-
-    vLayout->addStretch();
-
-    setLayout(vLayout);
+    setLayout(layout);
     setWindowTitle("Edit Delay Command");
+
+    adjustSize();
+    setFixedSize(sizeHint());
+    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 CmdDelayEditDialog::~CmdDelayEditDialog()
@@ -163,5 +53,80 @@ CmdDelayEditDialog::~CmdDelayEditDialog()
 
 void CmdDelayEditDialog::setCommand(CmdDelay* command)
 {
+    mCommand = command;
 
+    if (mCommand)
+    {
+        int delay = mCommand->delay();
+        mHours = delay / 3600 / 1000;
+        delay -= mHours * 3600 * 1000;
+        mMinutes = delay / 60 / 1000;
+        delay -= mMinutes * 60 * 1000;
+        mSeconds = delay / 1000;
+        delay -= mSeconds * 1000;
+        mMSeconds = delay;
+
+        mHSpin->setValue(mHours);
+        mMSpin->setValue(mMinutes);
+        mSSpin->setValue(mSeconds);
+        mMSSpin->setValue(mMSeconds);
+    }
+}
+
+void CmdDelayEditDialog::onHoursChanged(int hours)
+{
+    mHours = hours;
+}
+
+void CmdDelayEditDialog::onMinutesChanged(int minutes)
+{
+    mMinutes = minutes;
+}
+
+void CmdDelayEditDialog::onSecondsChanged(int seconds)
+{
+    mSeconds = seconds;
+}
+
+void CmdDelayEditDialog::onMilliSecondsChanged(int mseconds)
+{
+    mMSeconds = mseconds;
+}
+
+QSpinBox* CmdDelayEditDialog::addItem(QGridLayout* layout, const QString& text, int row, int max, const char* onChange)
+{
+    int column = 0;
+
+    QLabel* label = new QLabel(this);
+    label->setText(text);
+    layout->addWidget(label, row, column);
+
+    QSpinBox* spinBox = new QSpinBox(this);
+    spinBox->setRange(0, max);
+    spinBox->setValue(0);
+    spinBox->setFixedWidth(50);
+    layout->addWidget(spinBox, row, column + 1);
+
+    QSlider* slider = new QSlider(this);
+    slider->setRange(0, max);
+    slider->setValue(0);
+    slider->setOrientation(Qt::Horizontal);
+    layout->addWidget(slider, row, column + 2);
+
+    connect(slider, SIGNAL(valueChanged(int)), spinBox, SLOT(setValue(int)));
+    connect(slider, SIGNAL(valueChanged(int)), this, onChange);
+    connect(spinBox, SIGNAL(valueChanged(int)), slider, SLOT(setValue(int)));
+    connect(spinBox, SIGNAL(valueChanged(int)), this, onChange);
+
+    return spinBox;
+}
+
+void CmdDelayEditDialog::onAccept()
+{
+    if (mCommand)
+    {
+        mCommand->setDelay(mHours, mMinutes, mSeconds, mMSeconds);
+    }
+
+    accept();
 }

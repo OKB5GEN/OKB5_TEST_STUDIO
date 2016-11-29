@@ -814,10 +814,5 @@ void SortingBox::showEditDialog(ShapeItem *item)
 
     dialog->exec();
 
-    int TODO; // move text path updaintg in shape item
-    if (dialog->result() == QDialog::Accepted)
-    {
-        addText(item);
-    }
-
+    addText(item);
 }

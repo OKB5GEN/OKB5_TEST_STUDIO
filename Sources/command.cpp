@@ -18,8 +18,6 @@ Command::~Command()
 
 void Command::run()
 {
-    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
-
     if (mNextCommands.empty())
     {
         emit onFinished(Q_NULLPTR);

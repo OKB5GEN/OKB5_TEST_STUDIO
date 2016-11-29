@@ -3,35 +3,48 @@
 #include <QTime>
 
 CmdDelay::CmdDelay(QObject* parent):
-    Command(ShapeTypes::DELAY, parent)
+    Command(ShapeTypes::DELAY, parent),
+    mTimeLeft(0)
 {
     mTimer = new QTimer(this);
-    //mTimer->setSingleShot(true);
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(finish()));
-    setDelay(0);
+    setDelay(0, 0, 0, 0);
 }
 
 void CmdDelay::run()
 {
-    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
-
-    if (!mTimer->isActive() && mDelay > 0)
+    if (!mTimer->isActive())
     {
-        mTimer->start(mDelay);
+        if (mDelay > 0)
+        {
+            if (mTimeLeft > 0) // resume execution
+            {
+                mTimer->start(mTimeLeft);
+            }
+            else
+            {
+                mTimer->start(mDelay);
+            }
+
+        }
+        else
+        {
+            finish();
+        }
     }
 }
 
 void CmdDelay::stop()
 {
-    mDelay = mTimer->remainingTime();
+    mTimeLeft = 0;
     mTimer->stop();
-    int TODO; // теоретически возможно, что mDelay == 0, а сигнал еще не посылался или уже послался
 }
 
 void CmdDelay::pause()
 {
     stop();
+    mTimeLeft = mTimer->remainingTime();
 }
 
 void CmdDelay::resume()
@@ -41,9 +54,7 @@ void CmdDelay::resume()
 
 void CmdDelay::finish()
 {
-    qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text()));
-
-    mTimer->stop(); // to not restart timer again
+    stop();
     if (mNextCommands.empty())
     {
         emit onFinished(Q_NULLPTR);
@@ -51,11 +62,55 @@ void CmdDelay::finish()
     }
 
     emit onFinished(mNextCommands[0]);
-
 }
 
-void CmdDelay::setDelay(int seconds)
+int CmdDelay::delay() const
 {
-     mDelay = seconds * 1000;
-     mText = tr("Wait:%1 s").arg(QString::number(seconds));
+    return mDelay;
+}
+
+void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
+{
+     mDelay = (hours * 3600 + minutes * 60 + seconds) * 1000 + msec;
+     mText = tr("Wait:");
+     if (hours > 0)
+     {
+         mText += QString::number(hours);
+         mText += tr("h");
+     }
+
+     if (minutes > 0)
+     {
+         mText += QString::number(minutes);
+         mText += tr("m");
+     }
+
+     if (hours > 0)
+     {
+         return;
+     }
+
+     if (seconds > 0)
+     {
+         mText += QString::number(seconds);
+         mText += tr("s");
+     }
+
+     if (minutes > 0)
+     {
+         return;
+     }
+
+     if (msec > 0)
+     {
+         mText += QString::number(msec);
+         mText += tr("ms");
+         return;
+     }
+
+     if (seconds == 0)
+     {
+         mText += QString::number(seconds);
+         mText += tr("s");
+     }
 }
