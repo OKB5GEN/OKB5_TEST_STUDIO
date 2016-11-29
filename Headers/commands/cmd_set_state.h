@@ -10,6 +10,9 @@ class CmdSetState: public Command
 public:
     CmdSetState(const QString& name, QObject * parent);
 
+public slots:
+    void setText(const QString& text);
+
 private:
 };
 

@@ -5,3 +5,10 @@ CmdSetState::CmdSetState(const QString& name, QObject * parent):
 {
     mText = name;
 }
+
+void CmdSetState::setText(const QString& text)
+{
+    mText = text;
+    emit textChanged(mText);
+}
+

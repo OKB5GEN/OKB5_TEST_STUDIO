@@ -12,9 +12,10 @@
 
 #include "Headers/cmd_delay_edit_dialog.h"
 #include "Headers/commands/cmd_delay.h"
-
 #include "Headers/cmd_state_start_edit_dialog.h"
 #include "Headers/commands/cmd_state_start.h"
+#include "Headers/cmd_set_state_edit_dialog.h"
+#include "Headers/commands/cmd_set_state.h"
 
 SortingBox::SortingBox():
     mDiagramSize(0, 0)
@@ -24,6 +25,7 @@ SortingBox::SortingBox():
 
     mEditDialogs[ShapeTypes::DELAY] = new CmdDelayEditDialog(this);
     mEditDialogs[ShapeTypes::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
+    mEditDialogs[ShapeTypes::GO_TO_BRANCH] = new CmdSetStateEditDialog(this);
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -670,6 +672,23 @@ void SortingBox::showEditDialog(ShapeItem *item)
                 d->setCommand(qobject_cast<CmdStateStart*>(item->command()));
             }
             break;
+
+        case ShapeTypes::GO_TO_BRANCH:
+            {
+                CmdSetStateEditDialog* d = qobject_cast<CmdSetStateEditDialog*>(dialog);
+                QList<Command*> commands;
+                foreach (ShapeItem* item, mCommands)
+                {
+                    if (item->command()->type() == ShapeTypes::BRANCH_BEGIN)
+                    {
+                        commands.push_back(item->command());
+                    }
+                }
+
+                d->setCommands(qobject_cast<CmdSetState*>(item->command()), commands);
+            }
+            break;
+
         default:
             break;
         }

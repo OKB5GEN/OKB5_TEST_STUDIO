@@ -53,7 +53,8 @@ SOURCES += main.cpp\
     Sources/valency_point.cpp \
     Sources/cyclogram_end_dialog.cpp \
     Sources/cmd_delay_edit_dialog.cpp \
-    Sources/cmd_state_start_edit_dialog.cpp
+    Sources/cmd_state_start_edit_dialog.cpp \
+    Sources/cmd_set_state_edit_dialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -93,7 +94,8 @@ HEADERS  += mainwindow.h \
     Headers/valency_point.h \
     Headers/cyclogram_end_dialog.h \
     Headers/cmd_delay_edit_dialog.h \
-    Headers/cmd_state_start_edit_dialog.h
+    Headers/cmd_state_start_edit_dialog.h \
+    Headers/cmd_set_state_edit_dialog.h
 
 
 FORMS    += mainwindow.ui

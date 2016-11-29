@@ -6,7 +6,6 @@ CmdStateStart::CmdStateStart(const QString& name, QObject * parent):
     mText = name;
 }
 
-
 void CmdStateStart::setText(const QString& text)
 {
     mText = text;
