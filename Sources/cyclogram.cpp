@@ -40,13 +40,30 @@ void Cyclogram::createDefault()
     createPair(delay2, toBranch3);
     createPair(toBranch3, branch3);
     createPair(branch3, end);
+
+    mCommands.push_back(begin);
+    mCommands.push_back(branch1);
+    mCommands.push_back(delay1);
+    mCommands.push_back(toBranch2);
+    mCommands.push_back(branch2);
+    mCommands.push_back(delay2);
+    mCommands.push_back(toBranch3);
+    mCommands.push_back(branch3);
+    mCommands.push_back(end);
+
 #else
     // empty silhouette
     CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
-    CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
-    CmdSetState* toBranch2 = new CmdSetState("BRANCH2", this);
-    CmdStateStart* branch2 = new CmdStateStart("BRANCH2", this);
+    CmdStateStart* branch1 = new CmdStateStart("Start", this);
+    CmdSetState* toBranch2 = new CmdSetState("End", this);
+    CmdStateStart* branch2 = new CmdStateStart("End", this);
     CmdTitle* end = new CmdTitle(CmdTitle::END, this);
+
+    mCommands.push_back(begin);
+    mCommands.push_back(branch1);
+    mCommands.push_back(toBranch2);
+    mCommands.push_back(branch2);
+    mCommands.push_back(end);
 
     createPair(begin, branch1);
     createPair(branch1, toBranch2);
@@ -69,7 +86,7 @@ void Cyclogram::run()
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
         mState = RUNNING;
-        connect(mFirst, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*)));
+        connect(mFirst, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         mCurrent = mFirst;
 
         qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
@@ -85,7 +102,7 @@ void Cyclogram::onCommandFinished(Command* cmd)
         qDebug("[%s] Command %s finished", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
 
         mCurrent = cmd;
-        connect(mCurrent, SIGNAL(onFinished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on command creation
+        connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on command creation
 
         if (mState == RUNNING)
         {
@@ -145,6 +162,7 @@ void Cyclogram::clear()
     mFirst = Q_NULLPTR;
     mCurrent = Q_NULLPTR;
     mLast = Q_NULLPTR;
+    mCommands.clear();
 }
 
 void Cyclogram::deleteCommandTree(Command* cmd)
@@ -214,5 +232,16 @@ Command* Cyclogram::createCommand(ShapeTypes type)
         break;
     }
 
+    if (cmd)
+    {
+        mCommands.push_back(cmd);
+    }
+
     return cmd;
+}
+
+
+const QList<Command*>& Cyclogram::commands() const
+{
+    return mCommands;
 }

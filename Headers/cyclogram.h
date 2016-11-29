@@ -25,6 +25,8 @@ public:
     Command* first() const;
     Command* createCommand(ShapeTypes type);
 
+    const QList<Command*>& commands() const;
+
 private slots:
     void onCommandFinished(Command* cmd);
 
@@ -45,6 +47,8 @@ private:
     Command* mLast = Q_NULLPTR;
     Command* mCurrent = Q_NULLPTR;
     State mState = STOPPED;
+
+    QList<Command*> mCommands;
 
 signals:
     void changed();

@@ -4,13 +4,13 @@
 // List of all DRAKON icons
 enum class ShapeTypes
 {
-    // IMPLEMENTED >>>
-
-    // NOT IMPLEMENTED >>>
-    TERMINATOR,
-    BRANCH_BEGIN,
-    GO_TO_BRANCH,
     DELAY,
+    BRANCH_BEGIN,
+
+    // NOT OR PARTIALLY IMPLEMENTED >>>
+    TERMINATOR,
+    GO_TO_BRANCH,
+
     ACTION,
     QUESTION,
     SWITCH,

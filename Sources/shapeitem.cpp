@@ -1,6 +1,28 @@
 #include <QtWidgets>
 
 #include "Headers/shapeitem.h"
+#include "Headers/command.h"
+
+#include "Headers/commands/cmd_title.h"
+
+namespace
+{
+    static const QSizeF CELL = QSizeF(30, 30);
+    static const int CELLS_PER_ITEM_V = 4;
+    static const int CELLS_PER_ITEM_H = 8;
+}
+
+QSizeF ShapeItem::smItemSize = QSizeF(30 * 8, 30 * 4);
+
+ShapeItem::ShapeItem(QObject* parent):
+    QObject(parent),
+    mCommand(Q_NULLPTR)
+{
+    //smItemSize = QSizeF(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V);
+
+    mFont.setPointSize(14);
+    mFont.setFamily("Arial");
+}
 
 QPainterPath ShapeItem::path() const
 {
@@ -74,7 +96,20 @@ void ShapeItem::setCell(const QPoint &position)
 
 void ShapeItem::setCommand(Command* command)
 {
+    if (mCommand)
+    {
+        disconnect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+    }
+
+    if (command->type() == ShapeTypes::DELAY)
+    {
+        int i = 0;
+    }
+
     mCommand = command;
+    connect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+
+    onTextChanged(mCommand->text());
 }
 
 Command* ShapeItem::command() const
@@ -104,4 +139,126 @@ void ShapeItem::setRect(const QRect& rect)
 QRect ShapeItem::rect() const
 {
     return mRect;
+}
+
+void ShapeItem::onTextChanged(const QString& text)
+{
+    QPainterPath textPath;
+    QFontMetrics fm(mFont);
+    QRect textRect = fm.boundingRect(text);
+    qreal x = (smItemSize.width() - textRect.width()) / 2;
+    qreal y = (smItemSize.height() + textRect.height()) / 2;
+    textPath.addText(x, y, mFont, text);
+    mTextPath = textPath;
+}
+
+QSizeF ShapeItem::itemSize()
+{
+    return smItemSize;
+}
+
+QSizeF ShapeItem::cellSize()
+{
+    return CELL;
+}
+
+void ShapeItem::createPath()
+{
+    ShapeTypes type = command()->type();
+    QPainterPath path;
+
+    QRect itemRect = rect();
+    QPoint cell = mCell;
+
+    switch (type)
+    {
+    case ShapeTypes::TERMINATOR:
+        {
+            qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
+            qreal radius = (smItemSize.height() - 2 * CELL.height()) / 2;
+            QRectF rect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), 2 * radius);
+            path.addRoundedRect(rect, radius, radius);
+
+            // connector
+            CmdTitle* titleCmd = qobject_cast<CmdTitle*>(command());
+            if (titleCmd)
+            {
+                if (titleCmd->titleType() == CmdTitle::BEGIN)
+                {
+                    path.moveTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
+                    path.lineTo(smItemSize.width() / 2, smItemSize.height());
+                }
+                else // END terminator
+                {
+                    path.moveTo(smItemSize.width() / 2, CELL.height());
+                    path.lineTo(smItemSize.width() / 2, -yOffset);
+                }
+            }
+        }
+        break;
+    case ShapeTypes::BRANCH_BEGIN:
+        {
+            path.moveTo(CELL.width(), CELL.height());
+            path.lineTo(CELL.width(), smItemSize.height() - CELL.height() * 3 / 2);
+            path.lineTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() - CELL.height() * 3 / 2);
+            path.lineTo(smItemSize.width() - CELL.width(), CELL.height());
+            path.lineTo(CELL.width(), CELL.height());
+        }
+        break;
+    case ShapeTypes::GO_TO_BRANCH:
+        {
+            path.moveTo(CELL.width(), CELL.height() * 3 / 2);
+            path.lineTo(CELL.width(), smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - CELL.width(), CELL.height() * 3 / 2);
+            path.lineTo(smItemSize.width() / 2, CELL.height());
+            path.lineTo(CELL.width(), CELL.height() * 3 / 2);
+        }
+        break;
+    case ShapeTypes::ACTION:
+        {
+            path.addRect(QRect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), smItemSize.height() - 2 * CELL.height()));
+        }
+        break;
+    case ShapeTypes::DELAY:
+        {
+            path.moveTo(CELL.width(), CELL.height());
+            path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - CELL.width(), CELL.height());
+            path.lineTo(CELL.width(), CELL.height());
+        }
+        break;
+
+    case ShapeTypes::QUESTION:
+        {
+            int TODO; // very complex logics for QUESTION connections drawing will be here
+
+            path.moveTo(CELL.width(), smItemSize.height() / 2);
+            path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
+            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
+            path.lineTo(smItemSize.width() - 2 * CELL.width(), CELL.height());
+            path.lineTo(CELL.width() * 2, CELL.height());
+            path.lineTo(CELL.width(), smItemSize.height() / 2);
+        }
+        break;
+    default:
+        break;
+    }
+
+    if (type != ShapeTypes::TERMINATOR)
+    {
+        qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
+
+        // lower connector
+        path.moveTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
+        path.lineTo(smItemSize.width() / 2, smItemSize.height());
+        // upper connector
+        path.moveTo(smItemSize.width() / 2, CELL.height());
+        path.lineTo(smItemSize.width() / 2, -yOffset);
+    }
+
+    mPath = path;
 }

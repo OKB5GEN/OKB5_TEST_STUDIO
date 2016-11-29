@@ -1,6 +1,6 @@
 #include <QtWidgets>
 #include <QDebug>
-#include <stdlib.h>
+
 #include "Headers/sortingbox.h"
 #include "Headers/shapeadddialog.h"
 #include "Headers/shapeeditdialog.h"
@@ -13,31 +13,24 @@
 #include "Headers/cmd_delay_edit_dialog.h"
 #include "Headers/commands/cmd_delay.h"
 
-namespace
-{
-    static const QSizeF CELL = QSizeF(30, 30);
-    static const int CELLS_PER_ITEM_V = 4;
-    static const int CELLS_PER_ITEM_H = 8;
-}
+#include "Headers/cmd_state_start_edit_dialog.h"
+#include "Headers/commands/cmd_state_start.h"
 
 SortingBox::SortingBox():
-    mItem(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V),
     mDiagramSize(0, 0)
 {
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
 
     mEditDialogs[ShapeTypes::DELAY] = new CmdDelayEditDialog(this);
-
-    mFont.setPointSize(16);
-    mFont.setFamily("Arial");
+    mEditDialogs[ShapeTypes::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
     mSelectedItem = 0;
 
     // Set cyclogram origin
-    mOrigin.setX(mItem.width() / 4);
+    mOrigin.setX(ShapeItem::itemSize().width() / 4);
     mOrigin.setY(0);
 
     setWindowTitle(tr("Tool Tips"));
@@ -89,13 +82,6 @@ bool SortingBox::event(QEvent *event)
 
 void SortingBox::resizeEvent(QResizeEvent * /* event */)
 {
-    //int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
-    //int x = width() - margin;
-    //int y = height() - margin;
-
-    //y = updateButtonGeometry(newCircleButton, x, y);
-    //y = updateButtonGeometry(newSquareButton, x, y);
-    //updateButtonGeometry(newTriangleButton, x, y);
 }
 
 void SortingBox::paintEvent(QPaintEvent * /* event */)
@@ -239,19 +225,10 @@ void SortingBox::moveItemTo(const QPoint &pos)
     mPreviousPosition = pos;
     update();
 }
-/*
-int SortingBox::updateButtonGeometry(QToolButton *button, int x, int y)
-{
-    QSize size = button->sizeHint();
-    button->setGeometry(x - size.rwidth(), y - size.rheight(), size.rwidth(), size.rheight());
-
-    return y - size.rheight() - style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing);
-}
-*/
 
 ShapeItem* SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
 {
-    QPoint pos(mOrigin.x() + cell.x() * mItem.width(), mOrigin.y() + cell.y() * mItem.height());
+    QPoint pos(mOrigin.x() + cell.x() * ShapeItem::itemSize().width(), mOrigin.y() + cell.y() * ShapeItem::itemSize().height());
 
     int TODO; //update diagram size if adding is to the end of the diagram, REMOVE FROM THIS METHOD
     if (cell.x() + 1 > mDiagramSize.width())
@@ -264,32 +241,18 @@ ShapeItem* SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
         mDiagramSize.setHeight(cell.y() + 1);
     }
 
-    ShapeItem* shapeItem = new ShapeItem();
+    ShapeItem* shapeItem = new ShapeItem(this);
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setPosition(pos);
     shapeItem->setColor(QColor::fromRgba(0xffffffff));
     shapeItem->setCell(cell);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
-    shapeItem->setPath(createPath(shapeItem));
+    shapeItem->createPath();
     shapeItem->setValencyPoints(createValencyPoints(cmd));
-    addText(shapeItem);
     mCommands.append(shapeItem);
 
     return shapeItem;
-}
-
-void SortingBox::addText(ShapeItem* item)
-{
-    int TODO; // move it to the shape item
-
-    QPainterPath textPath;
-    QFontMetrics fm(mFont);
-    QRect textRect = fm.boundingRect(item->command()->text());
-    qreal x = (mItem.width() - textRect.width()) / 2;
-    qreal y = (mItem.height() + textRect.height()) / 2;
-    textPath.addText(x, y, mFont, item->command()->text());
-    item->setTextPath(textPath);
 }
 
 void SortingBox::drawSilhouette()
@@ -299,8 +262,8 @@ void SortingBox::drawSilhouette()
     mSihlouette.clear();
 
     QPoint bottomRight(INT_MIN, INT_MIN);
-    QPoint bottomLeft(mOrigin.x(), mDiagramSize.height() * mItem.height());
-    QPoint topLeft(mOrigin.x(), mOrigin.y() + mItem.height());
+    QPoint bottomLeft(mOrigin.x(), mDiagramSize.height() * ShapeItem::itemSize().height());
+    QPoint topLeft(mOrigin.x(), mOrigin.y() + ShapeItem::itemSize().height());
     QPoint topRight(INT_MIN, INT_MAX);
 
     QPainterPath silhouette;
@@ -309,17 +272,17 @@ void SortingBox::drawSilhouette()
     {
         if (shapeItem->command()->type() == ShapeTypes::GO_TO_BRANCH)
         {
-            qreal x = shapeItem->position().x() + mItem.width() / 2;
+            qreal x = shapeItem->position().x() + ShapeItem::itemSize().width() / 2;
             if (x > bottomRight.x())
             {
-                qreal y = shapeItem->position().y() + mItem.height();
+                qreal y = shapeItem->position().y() + ShapeItem::itemSize().height();
                 bottomRight.setX(x);
                 bottomRight.setY(y);
             }
         }
         else if (shapeItem->command()->type() == ShapeTypes::BRANCH_BEGIN)
         {
-            qreal x = shapeItem->position().x() + mItem.width() / 2;
+            qreal x = shapeItem->position().x() + ShapeItem::itemSize().width() / 2;
             if (x > topRight.x())
             {
                 qreal y = shapeItem->position().y();
@@ -334,7 +297,7 @@ void SortingBox::drawSilhouette()
     silhouette.lineTo(topLeft);
     silhouette.lineTo(topRight);
 
-    ShapeItem* sihlouetteItem = new ShapeItem();
+    ShapeItem* sihlouetteItem = new ShapeItem(this);
     sihlouetteItem->setPath(silhouette);
     sihlouetteItem->setPosition(QPoint(0, 0));
     sihlouetteItem->setColor(QColor::fromRgba(0x00ffffff));
@@ -342,14 +305,14 @@ void SortingBox::drawSilhouette()
     // draw arrow
     QPainterPath arrow;
     QPoint pos;
-    pos.setX(topLeft.x() + mItem.width() / 2);
+    pos.setX(topLeft.x() + ShapeItem::itemSize().width() / 2);
     pos.setY(topLeft.y());
     arrow.moveTo(pos);
-    arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() + CELL.height() / 4));
-    arrow.lineTo(QPoint(pos.x() - CELL.width(), pos.y() - CELL.height() / 4));
+    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
+    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
     arrow.lineTo(pos);
 
-    ShapeItem* arrowItem = new ShapeItem();
+    ShapeItem* arrowItem = new ShapeItem(this);
     arrowItem->setPath(arrow);
     arrowItem->setPosition(QPoint(0, 0));
     arrowItem->setColor(QColor::fromRgba(0xff000000));
@@ -437,107 +400,6 @@ bool SortingBox::isBranchExist(Command* goToBranchCmd)
     return false;
 }
 
-QPainterPath SortingBox::createPath(ShapeItem* item) const
-{
-    ShapeTypes type = item->command()->type();
-    QPainterPath path;
-
-    QRect itemRect = item->rect();
-    QPoint cell = item->cell();
-
-    switch (type)
-    {
-    case ShapeTypes::TERMINATOR:
-        {
-            qreal yOffset = (cell.y() - itemRect.top()) * mItem.height();
-            qreal radius = (mItem.height() - 2 * CELL.height()) / 2;
-            QRectF rect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), 2 * radius);
-            path.addRoundedRect(rect, radius, radius);
-
-            // connector
-            CmdTitle* titleCmd = qobject_cast<CmdTitle*>(item->command());
-            if (titleCmd)
-            {
-                if (titleCmd->titleType() == CmdTitle::BEGIN)
-                {
-                    path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
-                    path.lineTo(mItem.width() / 2, mItem.height());
-                }
-                else // END terminator
-                {
-                    path.moveTo(mItem.width() / 2, CELL.height());
-                    path.lineTo(mItem.width() / 2, -yOffset);
-                }
-            }
-        }
-        break;
-    case ShapeTypes::BRANCH_BEGIN:
-        {
-            path.moveTo(CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), mItem.height() - CELL.height() * 3 / 2);
-            path.lineTo(mItem.width() / 2, mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), mItem.height() - CELL.height() * 3 / 2);
-            path.lineTo(mItem.width() - CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), CELL.height());
-        }
-        break;
-    case ShapeTypes::GO_TO_BRANCH:
-        {
-            path.moveTo(CELL.width(), CELL.height() * 3 / 2);
-            path.lineTo(CELL.width(), mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), CELL.height() * 3 / 2);
-            path.lineTo(mItem.width() / 2, CELL.height());
-            path.lineTo(CELL.width(), CELL.height() * 3 / 2);
-        }
-        break;
-    case ShapeTypes::ACTION:
-        {
-            path.addRect(QRect(CELL.width(), CELL.height(), mItem.width() - 2 * CELL.width(), mItem.height() - 2 * CELL.height()));
-        }
-        break;
-    case ShapeTypes::DELAY:
-        {
-            path.moveTo(CELL.width(), CELL.height());
-            path.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), CELL.height());
-        }
-        break;
-
-    case ShapeTypes::QUESTION:
-        {
-            int TODO; // very complex logics for QUESTION connections drawing will be here
-
-            path.moveTo(CELL.width(), mItem.height() / 2);
-            path.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), mItem.height() / 2);
-            path.lineTo(mItem.width() - 2 * CELL.width(), CELL.height());
-            path.lineTo(CELL.width() * 2, CELL.height());
-            path.lineTo(CELL.width(), mItem.height() / 2);
-        }
-        break;
-    default:
-        break;
-    }
-
-    if (type != ShapeTypes::TERMINATOR)
-    {
-        qreal yOffset = (cell.y() - itemRect.top()) * mItem.height();
-
-        // lower connector
-        path.moveTo(mItem.width() / 2, mItem.height() - CELL.height());
-        path.lineTo(mItem.width() / 2, mItem.height());
-        // upper connector
-        path.moveTo(mItem.width() / 2, CELL.height());
-        path.lineTo(mItem.width() / 2, -yOffset);
-    }
-
-    return path;
-}
-
 QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
 {
     //
@@ -566,12 +428,12 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
     case ShapeTypes::ACTION:
     case ShapeTypes::DELAY:
         {
-            ValencyPoint point = createPoint(QPointF(mItem.width() / 2, mItem.height()));
+            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()));
             points.push_back(point);
 
             if (type == ShapeTypes::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
             {
-                ValencyPoint point = createPoint(QPointF(mItem.width(), 0));
+                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0));
                 points.push_back(point);
             }
         }
@@ -603,7 +465,7 @@ ValencyPoint SortingBox::createPoint(const QPointF& point)
     QPainterPath path;
 
     qreal crossSize = 0.6;
-    qreal radius = qMin(CELL.width(), CELL.height()) / 2;
+    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 2;
     path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
     path.moveTo(0, -radius * crossSize);
     path.lineTo(0, radius * crossSize);
@@ -767,8 +629,8 @@ ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
 void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
 {
     QPoint position = item->position();
-    position.setX(position.x() + xShift * mItem.width());
-    position.setY(position.y() + yShift * mItem.height());
+    position.setX(position.x() + xShift * ShapeItem::itemSize().width());
+    position.setY(position.y() + yShift * ShapeItem::itemSize().height());
     item->setPosition(position);
 
     QPoint cell = item->cell();
@@ -783,10 +645,9 @@ void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int
 
     if (topShift != bottomShift) // rect size changed, update path
     {
-        item->setPath(createPath(item));
+        item->createPath();
     }
 }
-
 
 void SortingBox::showEditDialog(ShapeItem *item)
 {
@@ -802,6 +663,13 @@ void SortingBox::showEditDialog(ShapeItem *item)
                 d->setCommand(qobject_cast<CmdDelay*>(item->command()));
             }
             break;
+
+        case ShapeTypes::BRANCH_BEGIN:
+            {
+                CmdStateStartEditDialog* d = qobject_cast<CmdStateStartEditDialog*>(dialog);
+                d->setCommand(qobject_cast<CmdStateStart*>(item->command()));
+            }
+            break;
         default:
             break;
         }
@@ -813,6 +681,4 @@ void SortingBox::showEditDialog(ShapeItem *item)
     }
 
     dialog->exec();
-
-    addText(item);
 }

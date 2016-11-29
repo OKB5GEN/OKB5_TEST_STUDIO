@@ -20,11 +20,11 @@ void Command::run()
 {
     if (mNextCommands.empty())
     {
-        emit onFinished(Q_NULLPTR);
+        emit finished(Q_NULLPTR);
         return;
     }
 
-    emit onFinished(mNextCommands[0]);
+    emit finished(mNextCommands[0]);
 }
 
 void Command::stop()
@@ -63,7 +63,18 @@ void Command::addCommand(Command* cmd, int role /*= 0*/)
     {
         cmd->setRole(role);
         mNextCommands.push_back(cmd);
+
+        if (mType == ShapeTypes::GO_TO_BRANCH && cmd->type() == ShapeTypes::BRANCH_BEGIN)
+        {
+            connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+        }
     }
+}
+
+void Command::onNextCmdTextChanged(const QString& text)
+{
+    mText = text;
+    emit textChanged(mText);
 }
 
 int Command::role() const
@@ -78,7 +89,6 @@ void Command::setRole(int role)
 
 void Command::insertCommand(Command* newCmd, int role)
 {
-    int i = 0;
     int TODO; // непонятно как эти роли должны передаваться при вставке
     // роль - это актуально только для ветвлений
     for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
@@ -91,6 +101,24 @@ void Command::insertCommand(Command* newCmd, int role)
             break;
         }
     }
+}
 
-    int j = 0;
+void Command::replaceCommand(Command *newCmd, int role)
+{
+    int TODO; // непонятно как эти роли должны передаваться при замене
+    // роль - это актуально только для ветвлений
+    for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
+    {
+        if (mNextCommands[i]->role() == role)
+        {
+            if (mType == ShapeTypes::GO_TO_BRANCH && newCmd->type() == ShapeTypes::BRANCH_BEGIN)
+            {
+                disconnect(mNextCommands[i], SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+                connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            }
+
+            mNextCommands[i] = newCmd;
+            break;
+        }
+    }
 }

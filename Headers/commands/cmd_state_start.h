@@ -9,6 +9,10 @@ class CmdStateStart: public Command
 
 public:
     CmdStateStart(const QString& name, QObject * parent);
+
+public slots:
+    void setText(const QString& text);
+
 private:
 };
 

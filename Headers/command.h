@@ -24,12 +24,14 @@ public:
     const QList<Command*>& nextCommands() const;
     void addCommand(Command* cmd, int role = 0);
     void insertCommand(Command* newCmd, int role = 0);
+    void replaceCommand(Command* newCmd, int role = 0);
 
     int role() const;
     void setRole(int role);
 
 signals:
-    void onFinished(Command* nextCmd); // must be sent on command finish
+    void finished(Command* nextCmd); // must be sent on command finish
+    void textChanged(const QString& text);
 
 protected:
     ShapeTypes mType;
@@ -38,8 +40,10 @@ protected:
 
     QList<Command*> mNextCommands;
 
-private:
+private slots:
+    void onNextCmdTextChanged(const QString& text);
 
+private:
 };
 
 #endif // COMMAND_H

@@ -57,11 +57,11 @@ void CmdDelay::finish()
     stop();
     if (mNextCommands.empty())
     {
-        emit onFinished(Q_NULLPTR);
+        emit finished(Q_NULLPTR);
         return;
     }
 
-    emit onFinished(mNextCommands[0]);
+    emit finished(mNextCommands[0]);
 }
 
 int CmdDelay::delay() const
@@ -113,4 +113,6 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
          mText += QString::number(seconds);
          mText += tr("s");
      }
+
+     emit textChanged(mText);
 }

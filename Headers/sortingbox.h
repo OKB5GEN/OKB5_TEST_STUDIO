@@ -43,8 +43,6 @@ private:
     void clear();
     void drawSilhouette();
 
-    //int updateButtonGeometry(QToolButton *button, int x, int y);
-
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point);
     bool isCyclogramEndBranch(Command* cmd) const;
@@ -55,12 +53,10 @@ private:
 
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
-    QPainterPath createPath(ShapeItem* item) const;
     QList<ValencyPoint> createValencyPoints(Command* cmd);
 
     void moveItemTo(const QPoint &pos);
 
-    void addText(ShapeItem* item);
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
     bool isBranchExist(Command* goToBranchCmd);
 
@@ -70,7 +66,6 @@ private:
     void showEditDialog(ShapeItem* item);
 
     QPointF mOrigin;
-    QSizeF mItem;
     QSize mDiagramSize;
 
     QList<ShapeItem*> mCommands;
@@ -78,8 +73,6 @@ private:
 
     QPoint mPreviousPosition;
     ShapeItem * mSelectedItem;
-
-    QFont mFont;
 
     // TODO move dialogs to main window
     ShapeAddDialog * mShapeAddDialog;
