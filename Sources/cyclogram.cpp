@@ -7,6 +7,7 @@
 #include "Headers/commands/cmd_set_state.h"
 #include "Headers/commands/cmd_title.h"
 #include "Headers/commands/cmd_delay.h"
+#include "Headers/commands/cmd_action.h"
 
 //#define USE_CUSTOM_SIHLOUETTE
 
@@ -244,12 +245,16 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
         break;
     case DRAKON::DELAY:
         {
-            CmdDelay* newCmd = new CmdDelay(this);
-            cmd = newCmd;
+            cmd = new CmdDelay(this);
         }
         break;
+    case DRAKON::ACTION:
+        {
+            cmd = new CmdAction(this);
+        }
+        break;
+
         //TODO not implemented
-    case DRAKON::ACTION:{} break;
     case DRAKON::QUESTION:{} break;
     case DRAKON::SWITCH:{} break;
     case DRAKON::CASE:{} break;
@@ -274,7 +279,6 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
 
     return cmd;
 }
-
 
 const QList<Command*>& Cyclogram::commands() const
 {

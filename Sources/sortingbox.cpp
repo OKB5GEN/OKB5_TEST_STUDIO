@@ -2,7 +2,7 @@
 #include <QDebug>
 
 #include "Headers/sortingbox.h"
-#include "Headers/shapeadddialog.h"
+#include "Headers/shape_add_dialog.h"
 #include "Headers/shapeeditdialog.h"
 
 #include "Headers/cyclogram.h"
@@ -145,11 +145,12 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         ValencyPoint point;
         if (hasValencyPointAt(event->pos(), point))
         {
+            mShapeAddDialog->setValencyPoint(point);
             mShapeAddDialog->exec();
+
             if (mShapeAddDialog->result() == QDialog::Accepted)
             {
-                DRAKON::IconType shapeType = mShapeAddDialog->shapeType();
-                addCommand(shapeType, point);
+                addCommand(mShapeAddDialog->shapeType(), point);
             }
         }
     }
@@ -430,12 +431,12 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
     case DRAKON::ACTION:
     case DRAKON::DELAY:
         {
-            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()));
+            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()), 0);
             points.push_back(point);
 
             if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
             {
-                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0));
+                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0), 1);
                 points.push_back(point);
             }
         }
@@ -462,7 +463,7 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
     return points;
 }
 
-ValencyPoint SortingBox::createPoint(const QPointF& point)
+ValencyPoint SortingBox::createPoint(const QPointF& point, int role)
 {
     QPainterPath path;
 
@@ -479,6 +480,7 @@ ValencyPoint SortingBox::createPoint(const QPointF& point)
     ValencyPoint vPoint;
     vPoint.setPath(path);
     vPoint.setColor(QColor::fromRgba(0xff00ff00));
+    vPoint.setRole(role);
 
     return vPoint;
 }
@@ -523,6 +525,18 @@ void SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
     cmd->insertCommand(newCmd, point.role());
 
     // 3. Add new command shape item to cyclogram view
+
+    if (type == DRAKON::BRANCH_BEGIN)
+    {
+        int TODO; //
+        // create new branch to the right of the ponits' owner command tree
+        //kjhsdfgkjdsfgkjhjdfgkhjkdfkjh;
+    }
+    else
+    {
+        // create new chape below the points' owner
+    }
+
     QPoint newCmdCell = owner->cell();
     newCmdCell.setY(newCmdCell.y() + 1);
     int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right

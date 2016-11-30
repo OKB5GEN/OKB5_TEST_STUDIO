@@ -33,7 +33,6 @@ SOURCES += main.cpp\
     Sources/commands/cmd_cycle_while.cpp \
     Sources/commands/cmd_delay.cpp \
     Sources/commands/cmd_parallel_process.cpp \
-    Sources/commands/cmd_send_msg_ok_fail.cpp \
     Sources/commands/cmd_send_msg_result.cpp \
     Sources/commands/cmd_send_msg_result_fail.cpp \
     Sources/commands/cmd_set_state.cpp \
@@ -44,7 +43,6 @@ SOURCES += main.cpp\
     Sources/renderarea.cpp \
     Sources/shapeitem.cpp \
     Sources/sortingbox.cpp \
-    Sources/shapeadddialog.cpp \
     Sources/shapeeditdialog.cpp \
     Sources/monitordialog.cpp \
     Sources/monitor_auto.cpp \
@@ -54,7 +52,9 @@ SOURCES += main.cpp\
     Sources/cyclogram_end_dialog.cpp \
     Sources/cmd_delay_edit_dialog.cpp \
     Sources/cmd_state_start_edit_dialog.cpp \
-    Sources/cmd_set_state_edit_dialog.cpp
+    Sources/cmd_set_state_edit_dialog.cpp \
+    Sources/shape_add_dialog.cpp \
+    Sources/commands/cmd_action.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -72,7 +72,6 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_cycle_while.h \
     Headers/commands/cmd_delay.h \
     Headers/commands/cmd_parallel_process.h \
-    Headers/commands/cmd_send_msg_ok_fail.h \
     Headers/commands/cmd_send_msg_result.h \
     Headers/commands/cmd_send_msg_result_fail.h \
     Headers/commands/cmd_set_state.h \
@@ -84,7 +83,6 @@ HEADERS  += mainwindow.h \
     Headers/renderarea.h \
     Headers/shapeitem.h \
     Headers/sortingbox.h \
-    Headers/shapeadddialog.h \
     Headers/shapetypes.h \
     Headers/shapeeditdialog.h \
     Headers/monitordialog.h \
@@ -95,7 +93,9 @@ HEADERS  += mainwindow.h \
     Headers/cyclogram_end_dialog.h \
     Headers/cmd_delay_edit_dialog.h \
     Headers/cmd_state_start_edit_dialog.h \
-    Headers/cmd_set_state_edit_dialog.h
+    Headers/cmd_set_state_edit_dialog.h \
+    Headers/shape_add_dialog.h \
+    Headers/commands/cmd_action.h
 
 
 FORMS    += mainwindow.ui

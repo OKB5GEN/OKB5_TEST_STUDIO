@@ -44,7 +44,7 @@ private:
     void drawSilhouette();
 
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
-    ValencyPoint createPoint(const QPointF& point);
+    ValencyPoint createPoint(const QPointF& point, int role);
     bool isCyclogramEndBranch(Command* cmd) const;
     void addCommand(DRAKON::IconType type, const ValencyPoint& point);
 

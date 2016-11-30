@@ -12,10 +12,10 @@ public:
     {
         DELAY,
         BRANCH_BEGIN,
+        GO_TO_BRANCH,
 
         // NOT OR PARTIALLY IMPLEMENTED >>>
         TERMINATOR,
-        GO_TO_BRANCH,
 
         ACTION,
         QUESTION,
