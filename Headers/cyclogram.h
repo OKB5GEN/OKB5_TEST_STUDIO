@@ -13,6 +13,13 @@ class Cyclogram: public QObject
     Q_OBJECT
 
 public:
+    enum State
+    {
+        STOPPED,
+        RUNNING,
+        PAUSED
+    };
+
     Cyclogram(QObject * parent);
 
     void createDefault();
@@ -26,6 +33,7 @@ public:
     Command* createCommand(DRAKON::IconType type);
 
     const QList<Command*>& commands() const;
+    State state() const;
 
 private slots:
     void onCommandFinished(Command* cmd);
@@ -36,13 +44,6 @@ private:
     void deleteCommandTree(Command* cmd);
     void deleteCommand(Command* cmd);
     void createPair(Command* parent, Command* child);
-
-    enum State // TODO correct cyclogram start/pause/stop -ing
-    {
-        STOPPED,
-        RUNNING,
-        PAUSED
-    };
 
     Command* mFirst = Q_NULLPTR;
     Command* mLast = Q_NULLPTR;

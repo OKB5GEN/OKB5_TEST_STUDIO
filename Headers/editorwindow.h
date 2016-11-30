@@ -36,7 +36,6 @@ private slots:
     void documentWasModified();
 
     void runCyclogram();
-    void pauseCyclogram();
     void stopCyclogram();
     void addMonitor();
 
@@ -67,5 +66,11 @@ private:
 
     //QPlainTextEdit *textEdit;
     QString mCurFile;
+
+    QAction* mRunAct;
+    QAction* mStopAct;
+
+    QIcon mPlayIcon;
+    QIcon mPauseIcon;
 };
 #endif // EDITORWINDOW_H

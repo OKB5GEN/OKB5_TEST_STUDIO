@@ -46,8 +46,9 @@ void CmdDelay::stop()
 
 void CmdDelay::pause()
 {
+    int timeLeft = mTimer->remainingTime();
     stop();
-    mTimeLeft = mTimer->remainingTime();
+    mTimeLeft = timeLeft;
 }
 
 void CmdDelay::resume()

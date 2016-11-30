@@ -215,29 +215,25 @@ void EditorWindow::createActions()
     QMenu *runMenu = menuBar()->addMenu(tr("&Run"));
     QToolBar *runToolBar = addToolBar(tr("Run"));
 
-    const QIcon runIcon = QIcon(":/images/media-play-32.png");
-    QAction *runAct = new QAction(runIcon, tr("Run"), this);
-    //runAct->setShortcuts(QKeySequence::New);
-    runAct->setStatusTip(tr("Runs the cyclogram"));
-    connect(runAct, &QAction::triggered, this, &EditorWindow::runCyclogram);
-    runMenu->addAction(runAct);
-    runToolBar->addAction(runAct);
+    mPlayIcon = QIcon(":/images/media-play-54.png");
+    mPauseIcon = QIcon(":/images/media-pause-54.png");
 
-    const QIcon pauseIcon = QIcon(":/images/media-pause-32.png");
-    QAction *pauseAct = new QAction(pauseIcon, tr("Pause"), this);
-    //pauseAct->setShortcuts(QKeySequence::New);
-    pauseAct->setStatusTip(tr("Pauses the cyclogram"));
-    connect(pauseAct, &QAction::triggered, this, &EditorWindow::pauseCyclogram);
-    runMenu->addAction(pauseAct);
-    runToolBar->addAction(pauseAct);
+    mRunAct = new QAction(mPlayIcon, tr("Run"), this);
+    //mRunAct->setShortcuts(QKeySequence::New);
+    mRunAct->setStatusTip(tr("Execute cyclogram"));
+    connect(mRunAct, &QAction::triggered, this, &EditorWindow::runCyclogram);
+    runMenu->addAction(mRunAct);
+    runToolBar->addAction(mRunAct);
 
-    const QIcon stopIcon = QIcon(":/images/media-stop-32.png");
-    QAction *stopAct = new QAction(stopIcon, tr("Stop"), this);
+    QIcon stopIcon = QIcon(":/images/media-stop-54.png");
+    mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
-    stopAct->setStatusTip(tr("Stops the cyclogram"));
-    connect(stopAct, &QAction::triggered, this, &EditorWindow::stopCyclogram);
-    runMenu->addAction(stopAct);
-    runToolBar->addAction(stopAct);
+    mStopAct->setStatusTip(tr("Stop cyclogram execution"));
+    connect(mStopAct, &QAction::triggered, this, &EditorWindow::stopCyclogram);
+    runMenu->addAction(mStopAct);
+    runToolBar->addAction(mStopAct);
+
+    stopCyclogram();
 
     QMenu *monitorMenu = menuBar()->addMenu(tr("&Monitor"));
     QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
@@ -380,40 +376,61 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 
 void EditorWindow::runCyclogram()
 {
-    mCyclogram->run();
-}
+    if (mCyclogram->state() == Cyclogram::STOPPED)
+    {
+        mRunAct->setIcon(mPauseIcon);
+        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
+        mCyclogram->run();
+    }
+    else if (mCyclogram->state() == Cyclogram::RUNNING)
+    {
+        mRunAct->setIcon(mPlayIcon);
+        mRunAct->setStatusTip(tr("Execute cyclogram"));
+        mCyclogram->pause();
+    }
+    else if (mCyclogram->state() == Cyclogram::PAUSED)
+    {
+        mRunAct->setIcon(mPauseIcon);
+        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
+        mCyclogram->resume();
+    }
 
-void EditorWindow::pauseCyclogram()
-{
-    mCyclogram->pause();
+    mStopAct->setEnabled(true);
 }
 
 void EditorWindow::stopCyclogram()
 {
     mCyclogram->stop();
+
+    mRunAct->setIcon(mPlayIcon);
+    mRunAct->setStatusTip(tr("Execute cyclogram"));
+    mStopAct->setEnabled(false);
 }
 
 void EditorWindow::addMonitor()
 {
     MonitorDialog* dialog = new MonitorDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
-    //dialog->exec();
 }
 
 void EditorWindow::addManualMonitor()
 {
     MonitorManual* dialog = new MonitorManual(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
 void EditorWindow::addAutoMonitor()
 {
     MonitorAuto* dialog = new MonitorAuto(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
 void EditorWindow::onCyclogramFinish()
 {
+    stopCyclogram();
     mCyclogramEndDialog->exec();
 }
 

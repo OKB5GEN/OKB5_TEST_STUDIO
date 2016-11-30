@@ -156,7 +156,6 @@ void Cyclogram::stop()
 
     mState = STOPPED;
     mCurrent = mFirst;
-
 }
 
 void Cyclogram::pause()
@@ -182,6 +181,11 @@ Command* Cyclogram::first() const
     return mFirst;
 }
 
+Cyclogram::State Cyclogram::state() const
+{
+    return mState;
+}
+
 void Cyclogram::clear()
 {
     if (mFirst)
@@ -197,6 +201,7 @@ void Cyclogram::clear()
 
 void Cyclogram::deleteCommandTree(Command* cmd)
 {
+    int TODO; // use QObject parent-child system for command tree hierarchy storage i ne ebi mosk s velosipedami;)
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
         deleteCommandTree(cmd->nextCommands()[i]);
