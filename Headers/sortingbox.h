@@ -46,7 +46,7 @@ private:
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point);
     bool isCyclogramEndBranch(Command* cmd) const;
-    void addCommand(ShapeTypes type, const ValencyPoint& point);
+    void addCommand(DRAKON::IconType type, const ValencyPoint& point);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
@@ -78,7 +78,7 @@ private:
     ShapeAddDialog * mShapeAddDialog;
     ShapeEditDialog * mShapeEditDialog;
 
-    QMap<ShapeTypes, QDialog*> mEditDialogs;
+    QMap<DRAKON::IconType, QDialog*> mEditDialogs;
 
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };

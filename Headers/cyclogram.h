@@ -23,12 +23,13 @@ public:
     void resume();
 
     Command* first() const;
-    Command* createCommand(ShapeTypes type);
+    Command* createCommand(DRAKON::IconType type);
 
     const QList<Command*>& commands() const;
 
 private slots:
     void onCommandFinished(Command* cmd);
+    void runCurrentCommand();
 
 private:
     void clear();

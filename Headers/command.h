@@ -10,7 +10,7 @@ class Command: public QObject
     Q_OBJECT
 
 public:
-    Command(ShapeTypes type, QObject * parent);
+    Command(DRAKON::IconType type, QObject * parent);
     virtual ~Command();
 
     virtual void run();
@@ -19,7 +19,7 @@ public:
     virtual void resume();
 
     virtual QString text() const;
-    ShapeTypes type() const;
+    DRAKON::IconType type() const;
 
     const QList<Command*>& nextCommands() const;
     void addCommand(Command* cmd, int role = 0);
@@ -34,7 +34,7 @@ signals:
     void textChanged(const QString& text);
 
 protected:
-    ShapeTypes mType;
+    DRAKON::IconType mType;
     QString mText;
     int mRole;
 

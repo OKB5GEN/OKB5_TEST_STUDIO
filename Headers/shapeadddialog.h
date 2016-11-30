@@ -13,7 +13,7 @@ public:
     ShapeAddDialog(QWidget * parent);
     ~ShapeAddDialog();
 
-    ShapeTypes shapeType() const;
+    DRAKON::IconType shapeType() const;
 
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
@@ -22,7 +22,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    ShapeTypes mShapeType;
+    DRAKON::IconType mShapeType;
 
 };
 

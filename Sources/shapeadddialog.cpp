@@ -16,9 +16,10 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
+    int TODO;
     // TODO Create widget with tabs/filtering to create shapes
     // вероятно это будет прокручиваемый список/таблица из элементов-иконок циклограммы (тут надо подумать над дизайном)
-    mShapeType = ShapeTypes::DELAY;
+    mShapeType = DRAKON::DELAY;
 }
 
 ShapeAddDialog::~ShapeAddDialog()
@@ -26,7 +27,7 @@ ShapeAddDialog::~ShapeAddDialog()
 
 }
 
-ShapeTypes ShapeAddDialog::shapeType() const
+DRAKON::IconType ShapeAddDialog::shapeType() const
 {
     return mShapeType;
 }

@@ -101,11 +101,6 @@ void ShapeItem::setCommand(Command* command)
         disconnect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
     }
 
-    if (command->type() == ShapeTypes::DELAY)
-    {
-        int i = 0;
-    }
-
     mCommand = command;
     connect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 
@@ -164,7 +159,7 @@ QSizeF ShapeItem::cellSize()
 
 void ShapeItem::createPath()
 {
-    ShapeTypes type = command()->type();
+    DRAKON::IconType type = command()->type();
     QPainterPath path;
 
     QRect itemRect = rect();
@@ -172,7 +167,7 @@ void ShapeItem::createPath()
 
     switch (type)
     {
-    case ShapeTypes::TERMINATOR:
+    case DRAKON::TERMINATOR:
         {
             qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
             qreal radius = (smItemSize.height() - 2 * CELL.height()) / 2;
@@ -196,7 +191,7 @@ void ShapeItem::createPath()
             }
         }
         break;
-    case ShapeTypes::BRANCH_BEGIN:
+    case DRAKON::BRANCH_BEGIN:
         {
             path.moveTo(CELL.width(), CELL.height());
             path.lineTo(CELL.width(), smItemSize.height() - CELL.height() * 3 / 2);
@@ -206,7 +201,7 @@ void ShapeItem::createPath()
             path.lineTo(CELL.width(), CELL.height());
         }
         break;
-    case ShapeTypes::GO_TO_BRANCH:
+    case DRAKON::GO_TO_BRANCH:
         {
             path.moveTo(CELL.width(), CELL.height() * 3 / 2);
             path.lineTo(CELL.width(), smItemSize.height() - CELL.height());
@@ -216,12 +211,12 @@ void ShapeItem::createPath()
             path.lineTo(CELL.width(), CELL.height() * 3 / 2);
         }
         break;
-    case ShapeTypes::ACTION:
+    case DRAKON::ACTION:
         {
             path.addRect(QRect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), smItemSize.height() - 2 * CELL.height()));
         }
         break;
-    case ShapeTypes::DELAY:
+    case DRAKON::DELAY:
         {
             path.moveTo(CELL.width(), CELL.height());
             path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
@@ -231,7 +226,7 @@ void ShapeItem::createPath()
         }
         break;
 
-    case ShapeTypes::QUESTION:
+    case DRAKON::QUESTION:
         {
             int TODO; // very complex logics for QUESTION connections drawing will be here
 
@@ -248,7 +243,7 @@ void ShapeItem::createPath()
         break;
     }
 
-    if (type != ShapeTypes::TERMINATOR)
+    if (type != DRAKON::TERMINATOR)
     {
         qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
 

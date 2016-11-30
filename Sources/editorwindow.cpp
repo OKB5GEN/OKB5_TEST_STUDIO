@@ -24,8 +24,6 @@ EditorWindow::EditorWindow()
 
     connect(mCyclogram, SIGNAL(finished()), this, SLOT(onCyclogramFinish()));
 
-    //connect(); // connect signals and slots of GUI (SortingBox TODO rename)) and Logics (Cyclogram)
-
     //setCentralWidget(textEdit);
     setCentralWidget(mRenderArea); // takes control over renderArea
 

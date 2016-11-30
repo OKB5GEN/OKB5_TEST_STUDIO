@@ -1,4 +1,6 @@
 #include <QTime>
+#include <QTimer>
+#include <QMetaEnum>
 
 #include "Headers/cyclogram.h"
 #include "Headers/commands/cmd_state_start.h"
@@ -10,6 +12,22 @@
 
 namespace
 {
+    static const int COMMAND_RUN_INTERVAL = 10;
+
+    void LogCmd(Command* cmd, const QString& state)
+    {
+        static QMetaEnum metaEnum;
+        if (metaEnum.keyCount() == 0)
+        {
+            metaEnum = QMetaEnum::fromType<DRAKON::IconType>();
+        }
+
+        QString text(metaEnum.valueToKey(cmd->type()));
+        text += ":";
+        text += cmd->text();
+
+        qDebug("[%s] Command %s %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text), qUtf8Printable(state));
+    }
 }
 
 Cyclogram::Cyclogram(QObject * parent):
@@ -81,52 +99,64 @@ void Cyclogram::createDefault()
 
 void Cyclogram::run()
 {
+    qDebug("==================================");
     qDebug("[%s] Cyclogram started", qUtf8Printable(QTime::currentTime().toString()));
+    qDebug("==================================");
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
         mState = RUNNING;
-        connect(mFirst, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         mCurrent = mFirst;
 
-        qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
-
-        mCurrent->run();
+        runCurrentCommand();
     }
 }
 
 void Cyclogram::onCommandFinished(Command* cmd)
 {
+    disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+    LogCmd(mCurrent, "finished");
+
     if (cmd != Q_NULLPTR)
     {
-        qDebug("[%s] Command %s finished", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
-
         mCurrent = cmd;
-        connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*))); // TODO must be called on command creation
 
         if (mState == RUNNING)
         {
-            qDebug("[%s] Run command %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(mCurrent->text()));
-            mCurrent->run();
+            QTimer::singleShot(COMMAND_RUN_INTERVAL, this, SLOT(runCurrentCommand())); // to avoid direct slot after signal calling run next command after short timeout
         }
     }
     else
     {
+        qDebug("==================================");
+        qDebug("[%s] Cyclogram finished", qUtf8Printable(QTime::currentTime().toString()));
+        qDebug("==================================");
         stop();
         emit finished();
     }
 }
 
+void Cyclogram::runCurrentCommand()
+{
+    if (mCurrent)
+    {
+        LogCmd(mCurrent, "started");
+        connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+        mCurrent->run();
+    }
+}
+
 void Cyclogram::stop()
 {
-    qDebug("[%s] Cyclogram finished", qUtf8Printable(QTime::currentTime().toString()));
-
     if (mState == RUNNING || mState == PAUSED)
     {
+        disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         mCurrent->stop();
-        mState = STOPPED;
-        mCurrent = mFirst;
     }
+
+    mState = STOPPED;
+    mCurrent = mFirst;
+
 }
 
 void Cyclogram::pause()
@@ -185,49 +215,49 @@ void Cyclogram::createPair(Command* parent, Command* child)
     parent->addCommand(child);
 }
 
-Command* Cyclogram::createCommand(ShapeTypes type)
+Command* Cyclogram::createCommand(DRAKON::IconType type)
 {
     int TODO; // pass command parameters
     Command* cmd = Q_NULLPTR;
 
     switch (type)
     {
-    case ShapeTypes::TERMINATOR:
+    case DRAKON::TERMINATOR:
         {
             cmd = new CmdTitle(CmdTitle::BEGIN, this);
         }
         break;
-    case ShapeTypes::BRANCH_BEGIN:
+    case DRAKON::BRANCH_BEGIN:
         {
             cmd = new CmdStateStart("NEW_BRANCH", this);
         }
         break;
-    case ShapeTypes::GO_TO_BRANCH:
+    case DRAKON::GO_TO_BRANCH:
         {
             cmd = new CmdSetState("NEW_BRANCH", this);
         }
         break;
-    case ShapeTypes::DELAY:
+    case DRAKON::DELAY:
         {
             CmdDelay* newCmd = new CmdDelay(this);
             cmd = newCmd;
         }
         break;
         //TODO not implemented
-    case ShapeTypes::ACTION:{} break;
-    case ShapeTypes::QUESTION:{} break;
-    case ShapeTypes::SWITCH:{} break;
-    case ShapeTypes::CASE:{} break;
-    case ShapeTypes::SUBPROGRAM:{} break;
-    case ShapeTypes::SHELF:{} break;
-    case ShapeTypes::PARAMS:{} break;
-    case ShapeTypes::FOR_BEGIN:{} break;
-    case ShapeTypes::FOR_END:{} break;
-    case ShapeTypes::OUTPUT:{} break;
-    case ShapeTypes::INPUT:{} break;
-    case ShapeTypes::START_TIMER:{} break;
-    case ShapeTypes::SYNCHRONIZER:{} break;
-    case ShapeTypes::PARALLEL_PROCESS:{} break;
+    case DRAKON::ACTION:{} break;
+    case DRAKON::QUESTION:{} break;
+    case DRAKON::SWITCH:{} break;
+    case DRAKON::CASE:{} break;
+    case DRAKON::SUBPROGRAM:{} break;
+    case DRAKON::SHELF:{} break;
+    case DRAKON::PARAMS:{} break;
+    case DRAKON::FOR_BEGIN:{} break;
+    case DRAKON::FOR_END:{} break;
+    case DRAKON::OUTPUT:{} break;
+    case DRAKON::INPUT:{} break;
+    case DRAKON::START_TIMER:{} break;
+    case DRAKON::SYNCHRONIZER:{} break;
+    case DRAKON::PARALLEL_PROCESS:{} break;
     default:
         break;
     }

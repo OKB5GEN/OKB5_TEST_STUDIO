@@ -3,10 +3,11 @@
 #include <QTime>
 
 CmdDelay::CmdDelay(QObject* parent):
-    Command(ShapeTypes::DELAY, parent),
+    Command(DRAKON::DELAY, parent),
     mTimeLeft(0)
 {
     mTimer = new QTimer(this);
+    mTimer->setSingleShot(true);
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(finish()));
     setDelay(0, 0, 0, 0);
@@ -14,24 +15,26 @@ CmdDelay::CmdDelay(QObject* parent):
 
 void CmdDelay::run()
 {
-    if (!mTimer->isActive())
+    if (mTimer->remainingTime() > 0)
     {
-        if (mDelay > 0)
-        {
-            if (mTimeLeft > 0) // resume execution
-            {
-                mTimer->start(mTimeLeft);
-            }
-            else
-            {
-                mTimer->start(mDelay);
-            }
+        return;
+    }
 
+    if (mDelay > 0)
+    {
+        if (mTimeLeft > 0) // resume execution
+        {
+            mTimer->start(mTimeLeft);
         }
         else
         {
-            finish();
+            mTimer->start(mDelay);
         }
+
+    }
+    else
+    {
+        finish();
     }
 }
 

@@ -1,7 +1,7 @@
 #include "Headers/commands/cmd_title.h"
 
 CmdTitle::CmdTitle(CmdTitle::TitleType type, QObject * parent):
-    Command(ShapeTypes::TERMINATOR, parent),
+    Command(DRAKON::TERMINATOR, parent),
     mTitleType(type)
 {
     if (mTitleType == CmdTitle::BEGIN)

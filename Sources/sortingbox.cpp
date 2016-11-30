@@ -23,9 +23,9 @@ SortingBox::SortingBox():
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
 
-    mEditDialogs[ShapeTypes::DELAY] = new CmdDelayEditDialog(this);
-    mEditDialogs[ShapeTypes::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
-    mEditDialogs[ShapeTypes::GO_TO_BRANCH] = new CmdSetStateEditDialog(this);
+    mEditDialogs[DRAKON::DELAY] = new CmdDelayEditDialog(this);
+    mEditDialogs[DRAKON::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
+    mEditDialogs[DRAKON::GO_TO_BRANCH] = new CmdSetStateEditDialog(this);
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -148,7 +148,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
             mShapeAddDialog->exec();
             if (mShapeAddDialog->result() == QDialog::Accepted)
             {
-                ShapeTypes shapeType = mShapeAddDialog->shapeType();
+                DRAKON::IconType shapeType = mShapeAddDialog->shapeType();
                 addCommand(shapeType, point);
             }
         }
@@ -272,7 +272,7 @@ void SortingBox::drawSilhouette()
 
     foreach (ShapeItem* shapeItem, mCommands)
     {
-        if (shapeItem->command()->type() == ShapeTypes::GO_TO_BRANCH)
+        if (shapeItem->command()->type() == DRAKON::GO_TO_BRANCH)
         {
             qreal x = shapeItem->position().x() + ShapeItem::itemSize().width() / 2;
             if (x > bottomRight.x())
@@ -282,7 +282,7 @@ void SortingBox::drawSilhouette()
                 bottomRight.setY(y);
             }
         }
-        else if (shapeItem->command()->type() == ShapeTypes::BRANCH_BEGIN)
+        else if (shapeItem->command()->type() == DRAKON::BRANCH_BEGIN)
         {
             qreal x = shapeItem->position().x() + ShapeItem::itemSize().width() / 2;
             if (x > topRight.x())
@@ -334,7 +334,7 @@ void SortingBox::load(Cyclogram* cyclogram)
 
     Command* first = cyclogram->first();
 
-    if (!first || first->type() != ShapeTypes::TERMINATOR)
+    if (!first || first->type() != DRAKON::TERMINATOR)
     {
         return;
     }
@@ -361,7 +361,7 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
         Command* cmd = nextCommands[0];
         QPoint cell(parentCell.x(), parentCell.y() + 1);
 
-        if (cmd->type() == ShapeTypes::BRANCH_BEGIN && parentCmd->type() == ShapeTypes::GO_TO_BRANCH) // not first branch
+        if (cmd->type() == DRAKON::BRANCH_BEGIN && parentCmd->type() == DRAKON::GO_TO_BRANCH) // not first branch
         {
             cell.setX(mDiagramSize.width());
             cell.setY(1);
@@ -369,7 +369,7 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
 
         createCommandShape(cmd, cell);
 
-        if (cmd->type() == ShapeTypes::GO_TO_BRANCH)
+        if (cmd->type() == DRAKON::GO_TO_BRANCH)
         {
             if (!isBranchExist(cmd))
             {
@@ -393,7 +393,7 @@ bool SortingBox::isBranchExist(Command* goToBranchCmd)
     foreach (ShapeItem* shape, mCommands)
     {
         Command* command = shape->command();
-        if (command->type() == ShapeTypes::BRANCH_BEGIN && command->text() == goToBranchCmd->text())
+        if (command->type() == DRAKON::BRANCH_BEGIN && command->text() == goToBranchCmd->text())
         {
             return true;
         }
@@ -422,18 +422,18 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
 
     QList<ValencyPoint> points;
 
-    ShapeTypes type = cmd->type();
+    DRAKON::IconType type = cmd->type();
 
     switch (type)
     {
-    case ShapeTypes::BRANCH_BEGIN:
-    case ShapeTypes::ACTION:
-    case ShapeTypes::DELAY:
+    case DRAKON::BRANCH_BEGIN:
+    case DRAKON::ACTION:
+    case DRAKON::DELAY:
         {
             ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()));
             points.push_back(point);
 
-            if (type == ShapeTypes::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
+            if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
             {
                 ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0));
                 points.push_back(point);
@@ -441,7 +441,7 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
         }
         break;
 
-    case ShapeTypes::QUESTION:
+    case DRAKON::QUESTION:
         {
             int TODO; // very complex logics will be here
         /*
@@ -485,11 +485,11 @@ ValencyPoint SortingBox::createPoint(const QPointF& point)
 
 bool SortingBox::isCyclogramEndBranch(Command* cmd) const
 {
-    if (cmd->type() == ShapeTypes::TERMINATOR)
+    if (cmd->type() == DRAKON::TERMINATOR)
     {
         return true;
     }
-    else if (cmd->type() == ShapeTypes::GO_TO_BRANCH)
+    else if (cmd->type() == DRAKON::GO_TO_BRANCH)
     {
         return false; // do not search further
     }
@@ -505,7 +505,7 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-void SortingBox::addCommand(ShapeTypes type, const ValencyPoint& point)
+void SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
 {
     ShapeItem* owner = point.owner();
     Command* cmd = owner->command();
@@ -659,20 +659,20 @@ void SortingBox::showEditDialog(ShapeItem *item)
     {
         switch (item->command()->type())
         {
-        case ShapeTypes::DELAY:
+        case DRAKON::DELAY:
             {
                 CmdDelayEditDialog* d = qobject_cast<CmdDelayEditDialog*>(dialog);
                 d->setCommand(qobject_cast<CmdDelay*>(item->command()));
             }
             break;
 
-        case ShapeTypes::BRANCH_BEGIN:
+        case DRAKON::BRANCH_BEGIN:
             {
                 CmdStateStartEditDialog* d = qobject_cast<CmdStateStartEditDialog*>(dialog);
                 QList<Command*> commands;
                 foreach (ShapeItem* it, mCommands)
                 {
-                    if (it->command()->type() == ShapeTypes::BRANCH_BEGIN && it->command() != item->command())
+                    if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != item->command())
                     {
                         commands.push_back(it->command());
                     }
@@ -682,13 +682,13 @@ void SortingBox::showEditDialog(ShapeItem *item)
             }
             break;
 
-        case ShapeTypes::GO_TO_BRANCH:
+        case DRAKON::GO_TO_BRANCH:
             {
                 CmdSetStateEditDialog* d = qobject_cast<CmdSetStateEditDialog*>(dialog);
                 QList<Command*> commands;
                 foreach (ShapeItem* it, mCommands)
                 {
-                    if (it->command()->type() == ShapeTypes::BRANCH_BEGIN)
+                    if (it->command()->type() == DRAKON::BRANCH_BEGIN)
                     {
                         commands.push_back(it->command());
                     }

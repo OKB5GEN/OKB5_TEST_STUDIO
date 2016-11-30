@@ -2,8 +2,7 @@
 
 #include "Headers/command.h"
 
-
-Command::Command(ShapeTypes type, QObject * parent):
+Command::Command(DRAKON::IconType type, QObject * parent):
     QObject(parent),
     mType(type),
     mRole(0)
@@ -42,7 +41,7 @@ void Command::resume()
 
 }
 
-ShapeTypes Command::type() const
+DRAKON::IconType Command::type() const
 {
     return mType;
 }
@@ -64,7 +63,7 @@ void Command::addCommand(Command* cmd, int role /*= 0*/)
         cmd->setRole(role);
         mNextCommands.push_back(cmd);
 
-        if (mType == ShapeTypes::GO_TO_BRANCH && cmd->type() == ShapeTypes::BRANCH_BEGIN)
+        if (mType == DRAKON::GO_TO_BRANCH && cmd->type() == DRAKON::BRANCH_BEGIN)
         {
             connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
         }
@@ -111,7 +110,7 @@ void Command::replaceCommand(Command *newCmd, int role)
     {
         if (mNextCommands[i]->role() == role)
         {
-            if (mType == ShapeTypes::GO_TO_BRANCH && newCmd->type() == ShapeTypes::BRANCH_BEGIN)
+            if (mType == DRAKON::GO_TO_BRANCH && newCmd->type() == DRAKON::BRANCH_BEGIN)
             {
                 disconnect(mNextCommands[i], SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
                 connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
