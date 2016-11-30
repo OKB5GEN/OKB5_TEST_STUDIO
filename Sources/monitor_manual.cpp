@@ -24,6 +24,7 @@ MonitorManual::MonitorManual(QWidget * parent):
 
 
     mLayout = new QVBoxLayout(this);
+    setLayout(mLayout);
 
     QHBoxLayout* hLayout = new QHBoxLayout(this);
     hLayout->setAlignment(Qt::AlignLeft);
@@ -235,7 +236,6 @@ MonitorManual::MonitorManual(QWidget * parent):
     layout->addStretch();
     */
 
-    setLayout(mLayout);
     setWindowTitle("Manual Monitor");
 
     updateUI();

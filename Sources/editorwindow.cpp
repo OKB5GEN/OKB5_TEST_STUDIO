@@ -10,6 +10,11 @@
 
 #include "Headers/cyclogram_end_dialog.h"
 
+namespace
+{
+    static const int TOOLBAR_ICON_SIZE = 64;
+}
+
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
 {
@@ -29,6 +34,7 @@ EditorWindow::EditorWindow()
 
     createActions();
     createStatusBar();
+
 
     readSettings();
 
@@ -214,9 +220,10 @@ void EditorWindow::createActions()
 */
     QMenu *runMenu = menuBar()->addMenu(tr("&Run"));
     QToolBar *runToolBar = addToolBar(tr("Run"));
+    runToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-    mPlayIcon = QIcon(":/images/media-play-54.png");
-    mPauseIcon = QIcon(":/images/media-pause-54.png");
+    mPlayIcon = QIcon(":/images/button-play.png");
+    mPauseIcon = QIcon(":/images/button-pause.png");
 
     mRunAct = new QAction(mPlayIcon, tr("Run"), this);
     //mRunAct->setShortcuts(QKeySequence::New);
@@ -225,7 +232,7 @@ void EditorWindow::createActions()
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
 
-    QIcon stopIcon = QIcon(":/images/media-stop-54.png");
+    QIcon stopIcon = QIcon(":/images/button-stop.png");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
     mStopAct->setStatusTip(tr("Stop cyclogram execution"));
@@ -237,6 +244,7 @@ void EditorWindow::createActions()
 
     QMenu *monitorMenu = menuBar()->addMenu(tr("&Monitor"));
     QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
+    monitorToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
     const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
