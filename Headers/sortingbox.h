@@ -46,7 +46,7 @@ private:
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, int role);
     bool isCyclogramEndBranch(Command* cmd) const;
-    void addCommand(DRAKON::IconType type, const ValencyPoint& point);
+    ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
@@ -59,8 +59,11 @@ private:
 
     void addChildCommands(Command* parentCmd, const QPoint& parentCell);
     bool isBranchExist(Command* goToBranchCmd);
+    QString generateBranchName() const;
 
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
+    ShapeItem* findNextBranch(const QPoint& cell) const;
+    ShapeItem* addNewBranch(ShapeItem* item);
     void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
     void showEditDialog(ShapeItem* item);

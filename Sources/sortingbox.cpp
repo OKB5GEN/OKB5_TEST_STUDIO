@@ -507,38 +507,32 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-void SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
+ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
 {
-    ShapeItem* owner = point.owner();
-    Command* cmd = owner->command();
+    int role = point.role();
+    if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
+    {
+        return addNewBranch(point.owner());
+    }
 
     // 1. Create new command
     Command* newCmd = mCurrentCyclogram->createCommand(type);
     if (!newCmd)
     {
-        return;
+        return Q_NULLPTR;
     }
 
-    int role = point.role();
+    ShapeItem* owner = point.owner();
+    Command* cmd = owner->command();
 
     // 2. Update command tree connections
-    cmd->insertCommand(newCmd, point.role());
+    cmd->insertCommand(newCmd, role);
 
     // 3. Add new command shape item to cyclogram view
-
-    if (type == DRAKON::BRANCH_BEGIN)
-    {
-        int TODO; //
-        // create new branch to the right of the ponits' owner command tree
-        //kjhsdfgkjdsfgkjhjdfgkhjkdfkjh;
-    }
-    else
-    {
-        // create new chape below the points' owner
-    }
-
     QPoint newCmdCell = owner->cell();
+    // create new chape below the points' owner
     newCmdCell.setY(newCmdCell.y() + 1);
+
     int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
     ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
 
@@ -572,33 +566,44 @@ void SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
     }
     else // no expanded item in the column, shift items below the inserted in all columns
     {
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
+        if (owner->command()->type() == DRAKON::BRANCH_BEGIN && newItem->command()->type() == DRAKON::GO_TO_BRANCH)
+        {// new branch creation
 
-            if (item->cell().y() >= newItem->cell().y())
+            int y = newItem->cell().y();
+            int h = mDiagramSize.height();
+            int shift = h - y - 1;
+            updateItemGeometry(newItem, 0, shift, 0, shift);
+        }
+        else // new item in branch adding
+        {
+            foreach (ShapeItem* item, mCommands)
             {
-                // shift items below the added one down by 1 cell in own column
-                if (item->cell().x() == newItem->cell().x())
+                if (item == newItem) // skip added item
                 {
-                    updateItemGeometry(item, 0, 1, 1, 1);
+                    continue;
                 }
-                else // expand the rect of the lowest item in all other columns
+
+                if (item->cell().y() >= newItem->cell().y())
                 {
-                    if (item->cell().y() == (mDiagramSize.height() - 1))
+                    // shift items below the added one down by 1 cell in own column
+                    if (item->cell().x() == newItem->cell().x())
                     {
-                        updateItemGeometry(item, 0, 1, 0, 1);
+                        updateItemGeometry(item, 0, 1, 1, 1);
+                    }
+                    else // expand the rect of the lowest item in all other columns
+                    {
+                        if (item->cell().y() == (mDiagramSize.height() - 1))
+                        {
+                            updateItemGeometry(item, 0, 1, 0, 1);
+                        }
                     }
                 }
             }
-        }
 
-        //TODO on diagram size changed
-        mDiagramSize.setHeight(mDiagramSize.height() + 1);
-        drawSilhouette();
+            //TODO on diagram size changed
+            mDiagramSize.setHeight(mDiagramSize.height() + 1);
+            drawSilhouette();
+        }
     }
 
     // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
@@ -606,6 +611,96 @@ void SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
     QRect rect = owner->rect();
     owner->setRect(rect);
     update();
+
+    return newItem;
+}
+
+ShapeItem* SortingBox::addNewBranch(ShapeItem* item)
+{
+    // create new branch to the right of the item command tree
+    QPoint newCmdCell = item->cell();
+    ShapeItem* nextBranch = findNextBranch(newCmdCell);
+    newCmdCell.setX(nextBranch->cell().x());
+
+    // 1. Create and add BRANCH_BEGIN item
+    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::BRANCH_BEGIN);
+    if (!newCmd)
+    {
+        return Q_NULLPTR;
+    }
+
+
+    QString name = generateBranchName();
+
+    // do not create links to new branch
+    // Update commands positions to the right of the inserted branch
+    int xNext = nextBranch->cell().x();
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it->cell().x() >= xNext)
+        {
+            updateItemGeometry(it, 1, 0, 0, 0);
+        }
+    }
+
+    ShapeItem* newBranchItem = createCommandShape(newCmd, newCmdCell);
+
+    // 2. Create and add GO_TO_BRANCH item to the created branch
+    ShapeItem* goToBranchItem = addCommand(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(0));
+
+    // by default new branch is linked to itself
+    goToBranchItem->command()->addCommand(newBranchItem->command());
+
+    //generate unique branch name
+    CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);
+    cmd->setText(name);
+
+    mDiagramSize.setWidth(mDiagramSize.width() + 1);
+    drawSilhouette();
+
+    update();
+
+    return newBranchItem;
+}
+
+QString SortingBox::generateBranchName() const
+{
+    QList<ShapeItem*> existingBranches;
+
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it->command()->type() == DRAKON::BRANCH_BEGIN)
+        {
+            existingBranches.push_back(it);
+        }
+    }
+
+    QString prefix = tr("New Branch");
+    QString name = prefix;
+    bool nameGenerated = false;
+    int i = 1;
+    while (!nameGenerated)
+    {
+        bool exist = false;
+        foreach (ShapeItem* it, existingBranches)
+        {
+            if (it->command()->text() == name)
+            {
+                exist = true;
+                break;
+            }
+        }
+
+        nameGenerated = !exist;
+
+        if (!nameGenerated)
+        {
+            name = prefix + QString(" ") + QString::number(i);
+            ++i;
+        }
+    }
+
+    return name;
 }
 
 ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
@@ -642,6 +737,27 @@ ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
     return expandedItem;
 }
 
+ShapeItem* SortingBox::findNextBranch(const QPoint& cell) const
+{
+    ShapeItem* item = Q_NULLPTR;
+    int column = INT_MAX;
+
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it->command()->type() == DRAKON::BRANCH_BEGIN)
+        {
+            int x = it->cell().x();
+            if (x > cell.x() && x < column)
+            {
+                column = x;
+                item = it;
+            }
+        }
+    }
+
+    return item;
+}
+
 void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
 {
     QPoint position = item->position();
@@ -657,6 +773,8 @@ void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int
     QRect rect = item->rect();
     rect.setTop(rect.top() + topShift);
     rect.setBottom(rect.bottom() + bottomShift);
+    rect.setLeft(rect.left() + xShift);
+    rect.setRight(rect.right() + xShift);
     item->setRect(rect);
 
     if (topShift != bottomShift) // rect size changed, update path

@@ -126,6 +126,21 @@ void ShapeItem::setValencyPoints(const QList<ValencyPoint>& points)
     }
 }
 
+ValencyPoint ShapeItem::valencyPoint(int role) const
+{
+    ValencyPoint point;
+    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+    {
+        if (role == mValencyPoints[i].role())
+        {
+            return mValencyPoints[i];
+        }
+    }
+
+    int TODO; // make point not found notification
+    return point;
+}
+
 void ShapeItem::setRect(const QRect& rect)
 {
     mRect = rect;

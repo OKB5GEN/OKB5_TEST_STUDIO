@@ -46,6 +46,7 @@ public:
     QPoint cell() const;
     Command* command() const;
     const QList<ValencyPoint>& valencyPoints() const;
+    ValencyPoint valencyPoint(int role) const;
     QRect rect() const;
 
     static QSizeF itemSize();
