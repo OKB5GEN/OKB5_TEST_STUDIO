@@ -142,16 +142,23 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
         }
         */
 
-        ValencyPoint point;
-        if (hasValencyPointAt(event->pos(), point))
+        if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
         {
-            mShapeAddDialog->setValencyPoint(point);
-            mShapeAddDialog->exec();
+            return;
+        }
 
-            if (mShapeAddDialog->result() == QDialog::Accepted)
-            {
-                addCommand(mShapeAddDialog->shapeType(), point);
-            }
+        ValencyPoint point;
+        if (!hasValencyPointAt(event->pos(), point))
+        {
+            return;
+        }
+
+        mShapeAddDialog->setValencyPoint(point);
+        mShapeAddDialog->exec();
+
+        if (mShapeAddDialog->result() == QDialog::Accepted)
+        {
+            addCommand(mShapeAddDialog->shapeType(), point);
         }
     }
 }
@@ -162,6 +169,11 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
+        if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
+        {
+            return; // to not edit cyclogram while it is executed
+        }
+
         int index = commandAt(event->pos());
         if (index == -1)
         {
