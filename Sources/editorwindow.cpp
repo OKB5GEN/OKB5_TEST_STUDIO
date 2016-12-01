@@ -123,6 +123,8 @@ void EditorWindow::documentWasModified()
 
 void EditorWindow::createActions()
 {
+    // uncomment to create file menu
+    /*
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
     fileToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
@@ -162,6 +164,7 @@ void EditorWindow::createActions()
     QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
+    */
 
     /*
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));

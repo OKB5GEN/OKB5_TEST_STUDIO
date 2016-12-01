@@ -38,6 +38,8 @@ SortingBox::SortingBox():
 
     setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
+
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 SortingBox::~SortingBox()
@@ -90,6 +92,41 @@ bool SortingBox::event(QEvent *event)
 
 void SortingBox::resizeEvent(QResizeEvent * /* event */)
 {
+}
+
+void SortingBox::keyPressEvent(QKeyEvent *event)
+{
+    bool processed = true;
+
+    switch (event->key())
+    {
+    case Qt::Key_Delete:
+        {
+            if (mSelectedItem)
+            {
+                if (mSelectedItem->command()->flags() & Command::Deletable)
+                {
+                    ShapeItem* item = mSelectedItem;
+                    clearSelection();
+                    deleteCommand(item);
+                }
+                else
+                {
+                    int TODO; // show dialog that item can not be deleted
+                }
+            }
+        }
+        break;
+
+    default:
+        processed = false;
+        break;
+    }
+
+    if (!processed)
+    {
+        QWidget::keyPressEvent(event);
+    }
 }
 
 void SortingBox::paintEvent(QPaintEvent * /* event */)
@@ -590,6 +627,11 @@ ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& poi
     newCmdCell.setY(newCmdCell.y() + 1);
 
     int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
+    /* Мысли вслух по добавлению QUESTION
+     * 1. При редактировании QUESTIONа можно указать следующую команду для ветки вправо (любая команда слева от question)
+     * 2. Можно указать ТОЛЬКО на команду, расположенную в столбце слева (вероятно)
+     * 3. QUESION, если вставляется в самый правый столбец бранча, увеличивает его ширину на 1
+    */
     ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
 
     // 4. Update commands positions below and to the right of the inserted command shape
@@ -671,6 +713,55 @@ ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& poi
     return newItem;
 }
 
+void SortingBox::deleteCommand(ShapeItem* item)
+{
+    int TODO; // first try to do simple command deletion (linear comand inside some branch)
+
+    switch (item->command()->type())
+    {
+    case DRAKON::ACTION:
+    case DRAKON::DELAY:
+        {
+            /* Как удалять эти формы?
+             * ВАРИАНТ 1
+             * 1. Перенастраиваем команды предыдущей ЗАМЕНЯЕМ свою команду
+             * 2. Увеличивам rect последующей команды, уменьшая ее top на размер rect'а удаляемой команды!
+             * 3. Top команды будет равен топу удаляемой команды
+             * 4. Обновляем шейп последующей команды
+             * 5. Еще учитываем, что если наша ветка самая длинная (хз как это понять), то надо как-то обновить DiagramSize
+             * 6. Вероятно, если рект команды не равен ее cell, то с остальными ветками нихеРРРРа не делаем (типа наша короче)
+             * 7. Если размер ректа команды совпадает с cell'ом, то проверяем есть ли еще команды в строке
+             * 8. Есть - это те, у которых rect 1x1 и cell в той же строчке
+             * 9. Если команд нет, то двигаем вверх все, что ниже удаляемого cell'а
+             * 6. Удаляем ShapeItem из списка команд
+             * 7. Удаляем ShapeItem сам
+             *
+             * ВАРИАНТ2
+             * Вообще надо/не надо ужимать алгоритм можно понять так:
+             * 1. У бранча должен быть рект
+             * 2. Рект бранча от положения его шейпа до положения следущего бранч бегина
+             * 3. Если в каждой строчке бранча, в котором удаляется элемент, после его удаления остается хотя бы одна команда
+             * то остальные бранчи не трогаем, высота диаграммы не меняется
+             * 4. Если после удаления есть пустые строчки в бранче удаления, то чекаем остальные бранчи
+             * 5. Если нет ни одного бранча, в каждой строке которого есть команда, то ужимаем бранч
+             *
+             * По идее у нас снизу должна жать "пружина": удалили команду - поджали бранч
+             * Поджали - это типа удалили команду, та, что ниже, сохряняет топ но селл и боттом двигается на 1 вверх
+             *
+             * ПРАВИЛО НА БУДУЩЕЕ
+             *
+            */
+
+
+            int TODO2; // possibly update parent QUESTION command rect here
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 ShapeItem* SortingBox::addNewBranch(ShapeItem* item)
 {
     // create new branch to the right of the item command tree
@@ -684,7 +775,6 @@ ShapeItem* SortingBox::addNewBranch(ShapeItem* item)
     {
         return Q_NULLPTR;
     }
-
 
     QString name = generateBranchName();
 

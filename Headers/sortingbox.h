@@ -35,6 +35,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
     void load(Cyclogram* cyclogram);
@@ -51,6 +52,7 @@ private:
     ValencyPoint createPoint(const QPointF& point, int role);
     bool isCyclogramEndBranch(Command* cmd) const;
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point);
+    void deleteCommand(ShapeItem* item);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);

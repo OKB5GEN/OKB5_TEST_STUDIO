@@ -5,7 +5,8 @@
 Command::Command(DRAKON::IconType type, QObject * parent):
     QObject(parent),
     mType(type),
-    mRole(0)
+    mRole(0),
+    mFlags(0)
 {
 
 }
@@ -49,6 +50,16 @@ DRAKON::IconType Command::type() const
 QString Command::text() const
 {
     return mText;
+}
+
+void Command::setFlags(uint32_t flags)
+{
+    mFlags = flags;
+}
+
+uint32_t Command::flags() const
+{
+    return mFlags;
 }
 
 const QList<Command*>& Command::nextCommands() const

@@ -74,16 +74,6 @@ void ShapeItem::setColor(const QColor &color)
     mColor = color;
 }
 
-void ShapeItem::setFlags(uint32_t flags)
-{
-    mFlags = flags;
-}
-
-uint32_t ShapeItem::flags() const
-{
-    return mFlags;
-}
-
 QPoint ShapeItem::cell() const
 {
     return mCell;

@@ -3,6 +3,7 @@
 CmdAction::CmdAction(QObject* parent):
     Command(DRAKON::ACTION, parent)
 {
+    mFlags = Command::All;
 }
 
 void CmdAction::run()

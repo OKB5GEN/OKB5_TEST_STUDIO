@@ -17,13 +17,6 @@ class ShapeItem: public QObject
 public:
     ShapeItem(QObject* parent);
 
-    enum ShapeFlags
-    {
-        Selectable  = 0x00000001,
-        Movable     = 0x00000002,
-        Editable    = 0x00000004
-    };
-
     void createPath();
 
     void setPath(const QPainterPath &path);
@@ -31,7 +24,6 @@ public:
     void setToolTip(const QString &toolTip);
     void setPosition(const QPoint &position);
     void setColor(const QColor &color);
-    void setFlags(uint32_t flags);
     void setCell(const QPoint &position);
     void setCommand(Command* command);
     void setValencyPoints(const QList<ValencyPoint>& points);
@@ -44,7 +36,6 @@ public:
     QPoint position() const;
     QColor color() const;
     QString toolTip() const;
-    uint32_t flags() const;
     QPoint cell() const;
     Command* command() const;
     const QList<ValencyPoint>& valencyPoints() const;
@@ -70,8 +61,6 @@ private:
     QFont mFont; // font for writing texts
 
     static QSizeF smItemSize;
-
-    uint32_t mFlags = 0; // ShapeFlags here, by default the shape is not interactive
 
     Command* mCommand = Q_NULLPTR; // data pointer for the command logics
 };

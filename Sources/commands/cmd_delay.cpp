@@ -11,6 +11,8 @@ CmdDelay::CmdDelay(QObject* parent):
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(finish()));
     setDelay(0, 0, 0, 0);
+
+    mFlags = Command::All;
 }
 
 void CmdDelay::run()
