@@ -32,7 +32,8 @@ namespace
 }
 
 Cyclogram::Cyclogram(QObject * parent):
-    QObject(parent)
+    QObject(parent),
+    mState(STOPPED)
 {
 }
 
@@ -106,9 +107,8 @@ void Cyclogram::run()
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
-        mState = RUNNING;
         mCurrent = mFirst;
-
+        setState(RUNNING);
         runCurrentCommand();
     }
 }
@@ -155,8 +155,8 @@ void Cyclogram::stop()
         mCurrent->stop();
     }
 
-    mState = STOPPED;
     mCurrent = mFirst;
+    setState(STOPPED);
 }
 
 void Cyclogram::pause()
@@ -164,7 +164,7 @@ void Cyclogram::pause()
     if (mState == RUNNING)
     {
         mCurrent->pause();
-        mState = PAUSED;
+        setState(PAUSED);
     }
 }
 
@@ -173,7 +173,7 @@ void Cyclogram::resume()
     if (mState == PAUSED)
     {
         mCurrent->resume();
-        mState = RUNNING;
+        setState(RUNNING);
     }
 }
 
@@ -283,4 +283,10 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
 const QList<Command*>& Cyclogram::commands() const
 {
     return mCommands;
+}
+
+void Cyclogram::setState(State state)
+{
+    mState = state;
+    emit stateChanged(mState);
 }

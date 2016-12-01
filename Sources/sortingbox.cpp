@@ -29,6 +29,7 @@ SortingBox::SortingBox():
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
+    mMovingItem = 0;
     mSelectedItem = 0;
 
     // Set cyclogram origin
@@ -41,13 +42,18 @@ SortingBox::SortingBox():
 
 SortingBox::~SortingBox()
 {
-    clear();
+    clear(true);
 }
 
-void SortingBox::clear()
+void SortingBox::clear(bool onDestroy)
 {
     qDeleteAll(mCommands);
     qDeleteAll(mSihlouette);
+
+    if (!onDestroy && mCurrentCyclogram)
+    {
+        disconnect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    }
 
     mCurrentCyclogram = Q_NULLPTR;
 }
@@ -103,6 +109,7 @@ void SortingBox::drawItems(QList<ShapeItem*>& items, QPainter& painter)
         painter.translate(shapeItem->position());
         painter.setBrush(shapeItem->color());
         painter.drawPath(shapeItem->path());
+        painter.setBrush(QColor::fromRgba(0xff000000));
         painter.drawPath(shapeItem->textPath());
         painter.translate(-shapeItem->position());
     }
@@ -126,39 +133,56 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        int TODO; // if click is inside command create command copy and drag it with cursor
-
-        /*
-        int TODO; // split shapes on movable selectable
-        bool movable = false;
-        bool selectable = false;
-
-        if (selectable)
-        {
-            mSelectedItem = &mShapeItems[index];
-            mPreviousPosition = event->pos();
-            mShapeItems.move(index, mShapeItems.size() - 1);
-            update();
-        }
-        */
-
+        // no interaction while cyclogram running
         if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
         {
             return;
         }
 
+        // check valency point tap first
         ValencyPoint point;
-        if (!hasValencyPointAt(event->pos(), point))
+        if (hasValencyPointAt(event->pos(), point))
         {
-            return;
+            clearSelection();
+
+            mShapeAddDialog->setValencyPoint(point);
+            mShapeAddDialog->exec();
+
+            if (mShapeAddDialog->result() == QDialog::Accepted)
+            {
+                addCommand(mShapeAddDialog->shapeType(), point);
+            }
         }
-
-        mShapeAddDialog->setValencyPoint(point);
-        mShapeAddDialog->exec();
-
-        if (mShapeAddDialog->result() == QDialog::Accepted)
+        else // if no valency point click, check command shape click
         {
-            addCommand(mShapeAddDialog->shapeType(), point);
+            int index = commandAt(event->pos());
+            if (index >= 0)
+            {
+                ShapeItem* clickedItem = mCommands[index];
+
+                /*
+                int TODO1; // split shapes on movable and selectable
+                if (clickedItem->isMovable())
+                {
+                    int TODO2; // create command shape copy and drag it under cursor
+                    mMovingItem = clickedItem;
+                    mPreviousPosition = event->pos();
+                    mCommands.move(index, mCommands.size() - 1);
+                }
+                */
+
+                if (!mSelectedItem || mSelectedItem != clickedItem)
+                {
+                    clearSelection(false);
+                    mSelectedItem = clickedItem;
+                    mSelectedItem->setSelected(true);
+                    update();
+                }
+            }
+            else
+            {
+                clearSelection();
+            }
         }
     }
 }
@@ -186,7 +210,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
 
 void SortingBox::mouseMoveEvent(QMouseEvent *event)
 {
-    if (mSelectedItem && (event->buttons() & Qt::LeftButton))
+    if (mMovingItem && (event->buttons() & Qt::LeftButton))
     {
         moveItemTo(event->pos());
     }
@@ -194,10 +218,10 @@ void SortingBox::mouseMoveEvent(QMouseEvent *event)
 
 void SortingBox::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mSelectedItem && event->button() == Qt::LeftButton)
+    if (mMovingItem && event->button() == Qt::LeftButton)
     {
         moveItemTo(event->pos());
-        mSelectedItem = 0;
+        mMovingItem = 0;
     }
 }
 
@@ -236,7 +260,7 @@ bool SortingBox::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 void SortingBox::moveItemTo(const QPoint &pos)
 {
     QPoint offset = pos - mPreviousPosition;
-    mSelectedItem->setPosition(mSelectedItem->position() + offset);
+    mMovingItem->setPosition(mMovingItem->position() + offset);
     mPreviousPosition = pos;
     update();
 }
@@ -353,12 +377,32 @@ void SortingBox::load(Cyclogram* cyclogram)
     }
 
     mCurrentCyclogram = cyclogram;
+    connect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+
     QPoint parentCell(0, 0);
     createCommandShape(first, parentCell);
     addChildCommands(first, parentCell);
 
     drawSilhouette();
     update();
+}
+
+void SortingBox::onCyclogramStateChanged(int state)
+{
+    clearSelection();
+}
+
+void SortingBox::clearSelection(bool needUpdate)
+{
+    if (mSelectedItem)
+    {
+        mSelectedItem->setSelected(false);
+        mSelectedItem = 0;
+        if (needUpdate)
+        {
+            update();
+        }
+    }
 }
 
 void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)

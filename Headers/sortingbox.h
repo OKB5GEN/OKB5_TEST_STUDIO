@@ -39,9 +39,13 @@ protected:
 public slots:
     void load(Cyclogram* cyclogram);
 
+private slots:
+    void onCyclogramStateChanged(int state);
+
 private:
-    void clear();
+    void clear(bool onDestroy = false);
     void drawSilhouette();
+    void clearSelection(bool needUpdate = true);
 
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, int role);
@@ -75,6 +79,7 @@ private:
     QList<ShapeItem*> mSihlouette; // sihlouette (TODO temporary)
 
     QPoint mPreviousPosition;
+    ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;
 
     // TODO move dialogs to main window

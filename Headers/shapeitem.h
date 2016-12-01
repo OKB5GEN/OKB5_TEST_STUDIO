@@ -37,6 +37,8 @@ public:
     void setValencyPoints(const QList<ValencyPoint>& points);
     void setRect(const QRect& rect);
 
+    void setSelected(bool selected);
+
     QPainterPath path() const;
     QPainterPath textPath() const;
     QPoint position() const;

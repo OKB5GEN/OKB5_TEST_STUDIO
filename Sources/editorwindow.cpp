@@ -34,7 +34,6 @@ EditorWindow::EditorWindow()
     createActions();
     createStatusBar();
 
-
     readSettings();
 
     QGuiApplication::setFallbackSessionManagementEnabled(false);

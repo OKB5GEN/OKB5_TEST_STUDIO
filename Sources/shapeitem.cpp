@@ -272,3 +272,8 @@ void ShapeItem::createPath()
 
     mPath = path;
 }
+
+void ShapeItem::setSelected(bool selected)
+{
+    setColor(selected ? QColor::fromRgba(0xff00ff00) : QColor::fromRgba(0xffffffff));
+}

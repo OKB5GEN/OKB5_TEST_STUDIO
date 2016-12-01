@@ -44,6 +44,7 @@ private:
     void deleteCommandTree(Command* cmd);
     void deleteCommand(Command* cmd);
     void createPair(Command* parent, Command* child);
+    void setState(State state);
 
     Command* mFirst = Q_NULLPTR;
     Command* mLast = Q_NULLPTR;
@@ -55,5 +56,6 @@ private:
 signals:
     void changed();
     void finished();
+    void stateChanged(int state);
 };
 #endif // CYCLOGRAM_H
