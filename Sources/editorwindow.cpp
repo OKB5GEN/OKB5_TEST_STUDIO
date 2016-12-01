@@ -23,7 +23,6 @@ EditorWindow::EditorWindow()
 
     mCyclogramEndDialog = new CyclogramEndDialog(this);
 
-    // TODO cyclogram loading
     mCyclogram->createDefault();
     mRenderArea->load(mCyclogram);
 
@@ -38,10 +37,8 @@ EditorWindow::EditorWindow()
 
     readSettings();
 
-#ifndef QT_NO_SESSIONMANAGER
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &EditorWindow::commitData);
-#endif
 
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
@@ -64,18 +61,17 @@ void EditorWindow::closeEvent(QCloseEvent *event)
 
 void EditorWindow::newFile()
 {
-    /*
     if (maybeSave())
     {
+        int TODO; // create new cyclogram
+
         //textEdit->clear();
         setCurrentFile(QString());
     }
-    */
 }
 
 void EditorWindow::open()
 {
-    /*
     if (maybeSave())
     {
         QString fileName = QFileDialog::getOpenFileName(this);
@@ -83,21 +79,19 @@ void EditorWindow::open()
         {
             loadFile(fileName);
         }
-    }*/
+    }
 }
 
 bool EditorWindow::save()
 {
-    return true;
-    /*
-    if (curFile.isEmpty())
+    if (mCurFile.isEmpty())
     {
         return saveAs();
     }
     else
     {
-        return saveFile(curFile);
-    }*/
+        return saveFile(mCurFile);
+    }
 }
 
 bool EditorWindow::saveAs()
@@ -123,23 +117,26 @@ void EditorWindow::about()
 
 void EditorWindow::documentWasModified()
 {
-    //setWindowModified(textEdit->document()->isModified());
+    bool isModified = true; // TODO check cyclogram modified
+
+    setWindowModified(isModified);
 }
 
 void EditorWindow::createActions()
 {
-    /*
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
-    const QIcon newIcon = QIcon::fromTheme("document-new", QIcon(":/images/new.png"));
+    fileToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+
+    QIcon newIcon = QIcon(":/images/new.png");
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new file"));
+    newAct->setStatusTip(tr("Create a new cyclogram"));
     connect(newAct, &QAction::triggered, this, &EditorWindow::newFile);
     fileMenu->addAction(newAct);
     fileToolBar->addAction(newAct);
 
-    const QIcon openIcon = QIcon::fromTheme("document-open", QIcon(":/images/open.png"));
+    QIcon openIcon = QIcon(":/images/open.png");
     QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
@@ -147,7 +144,7 @@ void EditorWindow::createActions()
     fileMenu->addAction(openAct);
     fileToolBar->addAction(openAct);
 
-    const QIcon saveIcon = QIcon::fromTheme("document-save", QIcon(":/images/save.png"));
+    QIcon saveIcon = QIcon(":/images/save.png");
     QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
@@ -155,7 +152,7 @@ void EditorWindow::createActions()
     fileMenu->addAction(saveAct);
     fileToolBar->addAction(saveAct);
 
-    const QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
+    QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
     QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &EditorWindow::saveAs);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
@@ -165,9 +162,9 @@ void EditorWindow::createActions()
     const QIcon exitIcon = QIcon::fromTheme("application-exit");
     QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
     exitAct->setShortcuts(QKeySequence::Quit);
-
     exitAct->setStatusTip(tr("Exit the application"));
 
+    /*
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     QToolBar *editToolBar = addToolBar(tr("Edit"));
 
@@ -222,8 +219,8 @@ void EditorWindow::createActions()
     QToolBar *runToolBar = addToolBar(tr("Run"));
     runToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-    mPlayIcon = QIcon(":/images/button-play.png");
-    mPauseIcon = QIcon(":/images/button-pause.png");
+    mPlayIcon = QIcon(":/images/play.png");
+    mPauseIcon = QIcon(":/images/pause.png");
 
     mRunAct = new QAction(mPlayIcon, tr("Run"), this);
     //mRunAct->setShortcuts(QKeySequence::New);
@@ -232,7 +229,7 @@ void EditorWindow::createActions()
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
 
-    QIcon stopIcon = QIcon(":/images/button-stop.png");
+    QIcon stopIcon = QIcon(":/images/stop.png");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
     mStopAct->setStatusTip(tr("Stop cyclogram execution"));
@@ -290,10 +287,12 @@ void EditorWindow::writeSettings()
 
 bool EditorWindow::maybeSave()
 {
-    return true; // TODO
+    bool isModified = true; // TODO is cyclogram modified
 
-//    if (!textEdit->document()->isModified())
-//        return true;
+    if (!isModified)
+    {
+        return true;
+    }
 
     const QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Application"),
                                tr("The document has been modified.\n"
@@ -317,20 +316,15 @@ void EditorWindow::loadFile(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        QMessageBox::warning(this, tr("Application"), tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return;
     }
 
-    QTextStream in(&file);
-#ifndef QT_NO_CURSOR
+    //QTextStream in(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
+
     //textEdit->setPlainText(in.readAll());
-#ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
-#endif
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
@@ -341,21 +335,16 @@ bool EditorWindow::saveFile(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName),
-                                  file.errorString()));
+        QMessageBox::warning(this, tr("Application"), tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
 
-    QTextStream out(&file);
-#ifndef QT_NO_CURSOR
+
+    //QTextStream out(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
+
     //out << textEdit->toPlainText();
-#ifndef QT_NO_CURSOR
     QApplication::restoreOverrideCursor();
-#endif
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File saved"), 2000);
@@ -442,7 +431,6 @@ void EditorWindow::onCyclogramFinish()
     mCyclogramEndDialog->exec();
 }
 
-#ifndef QT_NO_SESSIONMANAGER
 void EditorWindow::commitData(QSessionManager &manager)
 {
     if (manager.allowsInteraction())
@@ -461,4 +449,4 @@ void EditorWindow::commitData(QSessionManager &manager)
         }
     }
 }
-#endif
+

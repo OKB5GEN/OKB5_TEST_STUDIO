@@ -6,13 +6,12 @@
     <file>images/open.png</file>
     <file>images/paste.png</file>
     <file>images/save.png</file>
-    <file>images/brick.png</file>
     <file>images/media-pause-32.png</file>
     <file>images/media-play-32.png</file>
     <file>images/media-stop-32.png</file>
-    <file>images/button-pause.png</file>
-    <file>images/button-play.png</file>
-    <file>images/button-stop.png</file>
+    <file>images/pause.png</file>
+    <file>images/play.png</file>
+    <file>images/stop.png</file>
     <file>images/monitor_auto.png</file>
     <file>images/monitor_manual.png</file>
     <file>images/edit_add.png</file>

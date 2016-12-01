@@ -44,9 +44,7 @@ private slots:
 
     void onCyclogramFinish();
 
-#ifndef QT_NO_SESSIONMANAGER
     void commitData(QSessionManager &);
-#endif
 
 private:
     void createActions();
