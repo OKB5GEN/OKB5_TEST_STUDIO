@@ -1,7 +1,7 @@
 #include <QtWidgets>
 #include <QDebug>
 
-#include "Headers/sortingbox.h"
+#include "Headers/cyclogram_widget.h"
 #include "Headers/shape_add_dialog.h"
 #include "Headers/shapeeditdialog.h"
 
@@ -17,7 +17,7 @@
 #include "Headers/cmd_set_state_edit_dialog.h"
 #include "Headers/commands/cmd_set_state.h"
 
-SortingBox::SortingBox():
+CyclogramWidget::CyclogramWidget():
     mDiagramSize(0, 0)
 {
     mShapeAddDialog = new ShapeAddDialog(this);
@@ -42,12 +42,12 @@ SortingBox::SortingBox():
     setFocusPolicy(Qt::ClickFocus);
 }
 
-SortingBox::~SortingBox()
+CyclogramWidget::~CyclogramWidget()
 {
     clear(true);
 }
 
-void SortingBox::clear(bool onDestroy)
+void CyclogramWidget::clear(bool onDestroy)
 {
     qDeleteAll(mCommands);
     qDeleteAll(mSihlouette);
@@ -60,7 +60,7 @@ void SortingBox::clear(bool onDestroy)
     mCurrentCyclogram = Q_NULLPTR;
 }
 
-bool SortingBox::event(QEvent *event)
+bool CyclogramWidget::event(QEvent *event)
 {
     if (event->type() == QEvent::ToolTip)
     {
@@ -90,11 +90,11 @@ bool SortingBox::event(QEvent *event)
     return QWidget::event(event);
 }
 
-void SortingBox::resizeEvent(QResizeEvent * /* event */)
+void CyclogramWidget::resizeEvent(QResizeEvent * /* event */)
 {
 }
 
-void SortingBox::keyPressEvent(QKeyEvent *event)
+void CyclogramWidget::keyPressEvent(QKeyEvent *event)
 {
     bool processed = true;
 
@@ -153,7 +153,7 @@ void SortingBox::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void SortingBox::paintEvent(QPaintEvent * /* event */)
+void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -162,7 +162,7 @@ void SortingBox::paintEvent(QPaintEvent * /* event */)
     drawItems(mCommands, painter);
 }
 
-void SortingBox::drawItems(QList<ShapeItem*>& items, QPainter& painter)
+void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
 {
     // draw commands shapes first
     foreach (ShapeItem* shapeItem, items)
@@ -190,7 +190,7 @@ void SortingBox::drawItems(QList<ShapeItem*>& items, QPainter& painter)
     }
 }
 
-void SortingBox::mousePressEvent(QMouseEvent *event)
+void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
@@ -248,7 +248,7 @@ void SortingBox::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
+void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     //remember that mousePressEvent will be called first!
 
@@ -269,7 +269,7 @@ void SortingBox::mouseDoubleClickEvent(QMouseEvent *event)
     }
 }
 
-void SortingBox::mouseMoveEvent(QMouseEvent *event)
+void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (mMovingItem && (event->buttons() & Qt::LeftButton))
     {
@@ -277,7 +277,7 @@ void SortingBox::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void SortingBox::mouseReleaseEvent(QMouseEvent *event)
+void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMovingItem && event->button() == Qt::LeftButton)
     {
@@ -286,7 +286,7 @@ void SortingBox::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-int SortingBox::commandAt(const QPoint &pos)
+int CyclogramWidget::commandAt(const QPoint &pos)
 {
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
@@ -300,7 +300,7 @@ int SortingBox::commandAt(const QPoint &pos)
     return -1;
 }
 
-bool SortingBox::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
+bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 {
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
@@ -318,7 +318,7 @@ bool SortingBox::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
     return false;
 }
 
-void SortingBox::moveItemTo(const QPoint &pos)
+void CyclogramWidget::moveItemTo(const QPoint &pos)
 {
     QPoint offset = pos - mPreviousPosition;
     mMovingItem->setPosition(mMovingItem->position() + offset);
@@ -326,7 +326,7 @@ void SortingBox::moveItemTo(const QPoint &pos)
     update();
 }
 
-ShapeItem* SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
+ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
 {
     QPoint pos(mOrigin.x() + cell.x() * ShapeItem::itemSize().width(), mOrigin.y() + cell.y() * ShapeItem::itemSize().height());
 
@@ -355,7 +355,7 @@ ShapeItem* SortingBox::createCommandShape(Command* cmd, const QPoint& cell)
     return shapeItem;
 }
 
-void SortingBox::drawSilhouette()
+void CyclogramWidget::drawSilhouette()
 {
     int TODO; // not good handling
     qDeleteAll(mSihlouette);
@@ -421,7 +421,7 @@ void SortingBox::drawSilhouette()
     mSihlouette.push_back(arrowItem);
 }
 
-void SortingBox::load(Cyclogram* cyclogram)
+void CyclogramWidget::load(Cyclogram* cyclogram)
 {
     clear();
 
@@ -448,12 +448,12 @@ void SortingBox::load(Cyclogram* cyclogram)
     update();
 }
 
-void SortingBox::onCyclogramStateChanged(int state)
+void CyclogramWidget::onCyclogramStateChanged(int state)
 {
     clearSelection();
 }
 
-bool SortingBox::canBeDeleted(ShapeItem* item) const
+bool CyclogramWidget::canBeDeleted(ShapeItem* item) const
 {
     if (mCurrentCyclogram->state() == Cyclogram::STOPPED)
     {
@@ -488,7 +488,7 @@ bool SortingBox::canBeDeleted(ShapeItem* item) const
     return false;
 }
 
-void SortingBox::clearSelection(bool needUpdate)
+void CyclogramWidget::clearSelection(bool needUpdate)
 {
     if (mSelectedItem)
     {
@@ -501,7 +501,7 @@ void SortingBox::clearSelection(bool needUpdate)
     }
 }
 
-void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
+void CyclogramWidget::addChildCommands(Command* parentCmd, const QPoint& parentCell)
 {
     QList<Command*> nextCommands = parentCmd->nextCommands();
     if (nextCommands.empty())
@@ -541,7 +541,7 @@ void SortingBox::addChildCommands(Command* parentCmd, const QPoint& parentCell)
     }
 }
 
-bool SortingBox::isBranchExist(Command* goToBranchCmd)
+bool CyclogramWidget::isBranchExist(Command* goToBranchCmd)
 {
     foreach (ShapeItem* shape, mCommands)
     {
@@ -555,7 +555,7 @@ bool SortingBox::isBranchExist(Command* goToBranchCmd)
     return false;
 }
 
-QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
+QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
 {
     //
     // Valency points general rules
@@ -615,7 +615,7 @@ QList<ValencyPoint> SortingBox::createValencyPoints(Command* cmd)
     return points;
 }
 
-ValencyPoint SortingBox::createPoint(const QPointF& point, int role)
+ValencyPoint CyclogramWidget::createPoint(const QPointF& point, int role)
 {
     QPainterPath path;
 
@@ -637,7 +637,7 @@ ValencyPoint SortingBox::createPoint(const QPointF& point, int role)
     return vPoint;
 }
 
-bool SortingBox::isCyclogramEndBranch(Command* cmd) const
+bool CyclogramWidget::isCyclogramEndBranch(Command* cmd) const
 {
     if (cmd->type() == DRAKON::TERMINATOR)
     {
@@ -659,7 +659,7 @@ bool SortingBox::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& point)
+ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point)
 {
     int role = point.role();
     if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
@@ -779,7 +779,7 @@ ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& poi
     return newItem;
 }
 
-void SortingBox::deleteCommand(ShapeItem* item)
+void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
     bool deleteShape = true;
 
@@ -939,7 +939,7 @@ void SortingBox::deleteCommand(ShapeItem* item)
     }
 }
 
-ShapeItem* SortingBox::addNewBranch(ShapeItem* item)
+ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 {
     // create new branch to the right of the item command tree
     QPoint newCmdCell = item->cell();
@@ -986,7 +986,7 @@ ShapeItem* SortingBox::addNewBranch(ShapeItem* item)
     return newBranchItem;
 }
 
-QString SortingBox::generateBranchName() const
+QString CyclogramWidget::generateBranchName() const
 {
     QList<ShapeItem*> existingBranches;
 
@@ -1026,7 +1026,7 @@ QString SortingBox::generateBranchName() const
     return name;
 }
 
-ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
+ShapeItem* CyclogramWidget::findExpandedItem(ShapeItem* newItem) const
 {
     ShapeItem* expandedItem = Q_NULLPTR;
     foreach (ShapeItem* item, mCommands)
@@ -1060,7 +1060,7 @@ ShapeItem* SortingBox::findExpandedItem(ShapeItem* newItem) const
     return expandedItem;
 }
 
-ShapeItem* SortingBox::findNextBranch(const QPoint& cell) const
+ShapeItem* CyclogramWidget::findNextBranch(const QPoint& cell) const
 {
     ShapeItem* item = Q_NULLPTR;
     int column = INT_MAX;
@@ -1081,7 +1081,7 @@ ShapeItem* SortingBox::findNextBranch(const QPoint& cell) const
     return item;
 }
 
-void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
+void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
 {
     QPoint position = item->position();
     position.setX(position.x() + xShift * ShapeItem::itemSize().width());
@@ -1106,7 +1106,7 @@ void SortingBox::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int
     }
 }
 
-void SortingBox::showEditDialog(ShapeItem *item)
+void CyclogramWidget::showEditDialog(ShapeItem *item)
 {
     QDialog* dialog = mEditDialogs.value(item->command()->type(), Q_NULLPTR);
 

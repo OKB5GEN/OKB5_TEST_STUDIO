@@ -2,7 +2,7 @@
 
 #include "Headers/editorwindow.h"
 #include "Headers/renderarea.h"
-#include "Headers/sortingbox.h"
+#include "Headers/cyclogram_widget.h"
 #include "Headers/monitordialog.h"
 #include "Headers/monitor_manual.h"
 #include "Headers/monitor_auto.h"
@@ -18,18 +18,18 @@ namespace
 EditorWindow::EditorWindow()
     //: textEdit(new QPlainTextEdit)
 {
-    mRenderArea = new SortingBox();
+    mCyclogramWidget = new CyclogramWidget();
     mCyclogram = new Cyclogram(this);
 
     mCyclogramEndDialog = new CyclogramEndDialog(this);
 
     mCyclogram->createDefault();
-    mRenderArea->load(mCyclogram);
+    mCyclogramWidget->load(mCyclogram);
 
     connect(mCyclogram, SIGNAL(finished()), this, SLOT(onCyclogramFinish()));
 
     //setCentralWidget(textEdit);
-    setCentralWidget(mRenderArea); // takes control over renderArea
+    setCentralWidget(mCyclogramWidget); // takes control over renderArea
 
     createActions();
     createStatusBar();
@@ -42,7 +42,7 @@ EditorWindow::EditorWindow()
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
 
-    setWindowTitle(tr("ЭТО СПАРТАААА!!!!"));
+    setWindowTitle(tr("OKB5 Test Studio"));
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)

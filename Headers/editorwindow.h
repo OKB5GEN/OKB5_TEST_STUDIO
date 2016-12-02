@@ -11,7 +11,7 @@ class QSessionManager;
 QT_END_NAMESPACE
 
 class RenderArea;
-class SortingBox;
+class CyclogramWidget;
 class Cyclogram;
 class CyclogramEndDialog;
 
@@ -57,9 +57,7 @@ private:
     QString strippedName(const QString &fullFileName);
 
     Cyclogram* mCyclogram;
-
-    SortingBox *mRenderArea;
-
+    CyclogramWidget *mCyclogramWidget;
     CyclogramEndDialog * mCyclogramEndDialog;
 
     //QPlainTextEdit *textEdit;

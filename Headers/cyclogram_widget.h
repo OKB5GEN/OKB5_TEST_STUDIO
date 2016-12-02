@@ -1,5 +1,5 @@
-#ifndef SORTINGBOX_H
-#define SORTINGBOX_H
+#ifndef CYCLOGRAM_WIDGET_H
+#define CYCLOGRAM_WIDGET_H
 
 #include <QWidget>
 #include <QMap>
@@ -19,13 +19,13 @@ class ShapeEditDialog;
 class Cyclogram;
 class Command;
 
-class SortingBox : public QWidget
+class CyclogramWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    SortingBox();
-    ~SortingBox();
+    CyclogramWidget();
+    ~CyclogramWidget();
 
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
@@ -94,4 +94,4 @@ private:
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };
 
-#endif
+#endif //CYCLOGRAM_WIDGET_H

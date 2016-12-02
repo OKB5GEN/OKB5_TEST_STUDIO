@@ -1,5 +1,5 @@
 #include "Headers/shapeeditdialog.h"
-#include "Headers/sortingbox.h"
+#include "Headers/cyclogram_widget.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

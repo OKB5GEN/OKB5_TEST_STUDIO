@@ -1,5 +1,5 @@
 #include "Headers/shape_add_dialog.h"
-#include "Headers/sortingbox.h"
+#include "Headers/cyclogram_widget.h"
 #include "Headers/command.h"
 
 #include <QDialogButtonBox>
