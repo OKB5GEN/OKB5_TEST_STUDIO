@@ -8,7 +8,7 @@ class CmdSetState: public Command
     Q_OBJECT
 
 public:
-    CmdSetState(const QString& name, QObject * parent);
+    CmdSetState(QObject * parent);
 
 public slots:
     void setText(const QString& text);

@@ -214,7 +214,6 @@ void Cyclogram::deleteCommand(Command* cmd)
 
 Command* Cyclogram::createCommand(DRAKON::IconType type)
 {
-    int TODO; // pass command parameters
     Command* cmd = Q_NULLPTR;
 
     switch (type)
@@ -226,12 +225,12 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
         break;
     case DRAKON::BRANCH_BEGIN:
         {
-            cmd = new CmdStateStart("NEW_BRANCH", this);
+            cmd = new CmdStateStart(this);
         }
         break;
     case DRAKON::GO_TO_BRANCH:
         {
-            cmd = new CmdSetState("NEW_BRANCH", this);
+            cmd = new CmdSetState(this);
         }
         break;
     case DRAKON::DELAY:
