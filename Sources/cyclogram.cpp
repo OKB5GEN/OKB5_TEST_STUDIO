@@ -186,6 +186,7 @@ void Cyclogram::clear()
 void Cyclogram::deleteCommandTree(Command* cmd)
 {
     int TODO; // use QObject parent-child system for command tree hierarchy storage i ne ebi mosk s velosipedami;)
+    // авотхрен, потому что непонятно что делать с началами=концами веток, чтобы не сносилась вся циклограмма целиком
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
         deleteCommandTree(cmd->nextCommands()[i]);
