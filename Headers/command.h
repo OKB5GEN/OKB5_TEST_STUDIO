@@ -38,9 +38,11 @@ public:
 
     int role() const;
     uint32_t flags() const;
+    Command* parentCommand() const;
 
     void setRole(int role);
     void setFlags(uint32_t flags);
+    void setParentCommand(Command* cmd);
 
 signals:
     void finished(Command* nextCmd); // must be sent on command finish
@@ -53,6 +55,7 @@ protected:
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
     QList<Command*> mNextCommands;
+    Command* mParentCommand;
 
 private slots:
     void onNextCmdTextChanged(const QString& text);

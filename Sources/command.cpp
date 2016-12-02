@@ -6,7 +6,8 @@ Command::Command(DRAKON::IconType type, QObject * parent):
     QObject(parent),
     mType(type),
     mRole(0),
-    mFlags(0)
+    mFlags(0),
+    mParentCommand(Q_NULLPTR) // TODO BRANCH_BEGIN has not parent command
 {
 
 }
@@ -71,12 +72,18 @@ void Command::addCommand(Command* cmd, int role /*= 0*/)
 {
     if (cmd)
     {
+        if (cmd->type() != DRAKON::BRANCH_BEGIN)
+        {
+            cmd->setParentCommand(this);
+        }
+
         cmd->setRole(role);
         mNextCommands.push_back(cmd);
 
         if (mType == DRAKON::GO_TO_BRANCH && cmd->type() == DRAKON::BRANCH_BEGIN)
         {
             connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            onNextCmdTextChanged(cmd->text());
         }
     }
 }
@@ -97,7 +104,17 @@ void Command::setRole(int role)
     mRole = role;
 }
 
-void Command::insertCommand(Command* newCmd, int role)
+void Command::setParentCommand(Command* cmd)
+{
+    mParentCommand = cmd;
+}
+
+Command* Command::parentCommand() const
+{
+    return mParentCommand;
+}
+
+void Command::insertCommand(Command* newCmd, int role) // new command inserted to valency point
 {
     int TODO; // непонятно как эти роли должны передаваться при вставке
     // роль - это актуально только для ветвлений
@@ -105,6 +122,7 @@ void Command::insertCommand(Command* newCmd, int role)
     {
         if (mNextCommands[i]->role() == role)
         {
+            newCmd->setParentCommand(this);
             newCmd->setRole(role);
             newCmd->addCommand(mNextCommands[i], 0);
             mNextCommands[i] = newCmd;
@@ -125,6 +143,10 @@ void Command::replaceCommand(Command *newCmd, int role)
             {
                 disconnect(mNextCommands[i], SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
                 connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            }
+            else
+            {
+                newCmd->setParentCommand(this);
             }
 
             mNextCommands[i] = newCmd;

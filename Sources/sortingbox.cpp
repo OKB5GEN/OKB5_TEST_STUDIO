@@ -722,6 +722,55 @@ void SortingBox::deleteCommand(ShapeItem* item)
     case DRAKON::ACTION:
     case DRAKON::DELAY:
         {
+            int TODO3; // this is only for one-column branches! QUESTION/CASE will require some refactor
+            ShapeItem* expandedItem = findExpandedItem(item);
+
+            if (expandedItem)
+            {
+                // not the longest branch ->
+                // 1. Shift up items below that need to be deleted (with except of expandedItem)
+                // 2. Expand the rect of expandedItem by 1 to top
+                foreach (ShapeItem* it, mCommands)
+                {
+                    if (it == item)
+                    {
+                        continue;
+                    }
+
+                    // if element is in the deleted elements column and below it
+                    if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
+                    {
+                        int h = item->rect().height();
+                        if (it != expandedItem)
+                        {
+                            updateItemGeometry(it, 0, -h, -h, -h);
+                        }
+                        else
+                        {
+                            updateItemGeometry(it, 0, 0, -h, 0);
+                        }
+                    }
+                }
+
+                // 3. Delete command from cyclogram
+                mCurrentCyclogram->deleteCommand(item->command());
+
+                // 4. Delete shape item
+                for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+                {
+                    if (mCommands[i] == item)
+                    {
+                        ShapeItem* tmp = mCommands.takeAt(i);
+                        tmp->deleteLater();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                // one of the longest branches (or the longes one)
+            }
+
             /* Как удалять эти формы?
              * ВАРИАНТ 1
              * 1. Перенастраиваем команды предыдущей ЗАМЕНЯЕМ свою команду
@@ -754,6 +803,12 @@ void SortingBox::deleteCommand(ShapeItem* item)
 
 
             int TODO2; // possibly update parent QUESTION command rect here
+        }
+        break;
+
+    case DRAKON::QUESTION:
+        {
+            int TODO2; // QUESTION deletion possibly will be magic ;)
         }
         break;
 

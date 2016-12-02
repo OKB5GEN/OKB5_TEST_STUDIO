@@ -9,8 +9,6 @@
 #include "Headers/commands/cmd_delay.h"
 #include "Headers/commands/cmd_action.h"
 
-//#define USE_CUSTOM_SIHLOUETTE
-
 namespace
 {
     static const int COMMAND_RUN_INTERVAL = 10;
@@ -41,55 +39,40 @@ void Cyclogram::createDefault()
 {
     clear();
 
-#ifdef USE_CUSTOM_SIHLOUETTE
-    CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
-    CmdStateStart* branch1 = new CmdStateStart("BRANCH1", this);
-    CmdDelay* delay1 = new CmdDelay(this);
-    CmdSetState* toBranch2 = new CmdSetState("BRANCH2", this);
-    CmdStateStart* branch2 = new CmdStateStart("BRANCH2", this);
-    CmdDelay* delay2 = new CmdDelay(this);
-    CmdSetState* toBranch3 = new CmdSetState("BRANCH3", this);
-    CmdStateStart* branch3 = new CmdStateStart("BRANCH3", this);
-    CmdTitle* end = new CmdTitle(CmdTitle::END, this);
-
-    createPair(begin, branch1);
-    createPair(branch1, delay1);
-    createPair(delay1, toBranch2);
-    createPair(toBranch2, branch2);
-    createPair(branch2, delay2);
-    createPair(delay2, toBranch3);
-    createPair(toBranch3, branch3);
-    createPair(branch3, end);
-
-    mCommands.push_back(begin);
-    mCommands.push_back(branch1);
-    mCommands.push_back(delay1);
-    mCommands.push_back(toBranch2);
-    mCommands.push_back(branch2);
-    mCommands.push_back(delay2);
-    mCommands.push_back(toBranch3);
-    mCommands.push_back(branch3);
-    mCommands.push_back(end);
-
-#else
     // empty silhouette
-    CmdTitle* begin = new CmdTitle(CmdTitle::BEGIN, this);
-    CmdStateStart* branch1 = new CmdStateStart("Start", this);
-    CmdSetState* toBranch2 = new CmdSetState("End", this);
-    CmdStateStart* branch2 = new CmdStateStart("End", this);
-    CmdTitle* end = new CmdTitle(CmdTitle::END, this);
+    Command* begin = createCommand(DRAKON::TERMINATOR);
+    {
+        CmdTitle* tmp = qobject_cast<CmdTitle*>(begin);
+        tmp->setTitleType(CmdTitle::BEGIN);
+    }
 
-    mCommands.push_back(begin);
-    mCommands.push_back(branch1);
-    mCommands.push_back(toBranch2);
-    mCommands.push_back(branch2);
-    mCommands.push_back(end);
+    Command* branch1 = createCommand(DRAKON::BRANCH_BEGIN);
+    {
+        CmdStateStart* tmp = qobject_cast<CmdStateStart*>(branch1);
+        tmp->setText(tr("Start"));
+    }
 
-    createPair(begin, branch1);
-    createPair(branch1, toBranch2);
-    createPair(toBranch2, branch2);
-    createPair(branch2, end);
-#endif
+    Command* toBranch2 = createCommand(DRAKON::GO_TO_BRANCH);
+    {
+
+    }
+
+    Command* branch2 = createCommand(DRAKON::BRANCH_BEGIN);
+    {
+        CmdStateStart* tmp = qobject_cast<CmdStateStart*>(branch2);
+        tmp->setText(tr("End"));
+    }
+
+    Command* end = createCommand(DRAKON::TERMINATOR);
+    {
+        CmdTitle* tmp = qobject_cast<CmdTitle*>(end);
+        tmp->setTitleType(CmdTitle::END);
+    }
+
+    begin->addCommand(branch1);
+    branch1->addCommand(toBranch2);
+    toBranch2->addCommand(branch2);
+    branch2->addCommand(end);
 
     mFirst = begin;
     mLast = end;
@@ -213,12 +196,20 @@ void Cyclogram::deleteCommandTree(Command* cmd)
 
 void Cyclogram::deleteCommand(Command* cmd)
 {
-    int TODO; // connect parent and child commands to each other
-}
+    int TODO; // this is valid for one-column branches only!
+    Command* parentCmd = cmd->parentCommand();
+    Command* nextCmd = cmd->nextCommands()[0]; // TODO QUESTION deletion
+    parentCmd->replaceCommand(nextCmd, nextCmd->role());
 
-void Cyclogram::createPair(Command* parent, Command* child)
-{
-    parent->addCommand(child);
+    for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+    {
+        if (mCommands[i] == cmd)
+        {
+            Command* tmp = mCommands.takeAt(i);
+            tmp->deleteLater();
+            break;
+        }
+    }
 }
 
 Command* Cyclogram::createCommand(DRAKON::IconType type)
@@ -230,7 +221,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
     {
     case DRAKON::TERMINATOR:
         {
-            cmd = new CmdTitle(CmdTitle::BEGIN, this);
+            cmd = new CmdTitle(this);
         }
         break;
     case DRAKON::BRANCH_BEGIN:

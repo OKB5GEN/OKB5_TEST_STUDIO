@@ -9,8 +9,8 @@
 
 CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     QDialog(parent),
-    mCommand(Q_NULLPTR),
-    mCurrentIndex(-1)
+    mCurrentIndex(-1),
+    mCommand(Q_NULLPTR)
 {
     QGridLayout * layout = new QGridLayout(this);
 

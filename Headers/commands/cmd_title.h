@@ -14,8 +14,9 @@ public:
         END
     };
 
-    CmdTitle(TitleType type, QObject * parent);
+    CmdTitle(QObject * parent);
 
+    void setTitleType(TitleType type);
     TitleType titleType() const;
 
 private:

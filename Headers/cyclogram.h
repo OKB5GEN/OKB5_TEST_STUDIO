@@ -35,6 +35,8 @@ public:
     const QList<Command*>& commands() const;
     State state() const;
 
+    void deleteCommand(Command* cmd);
+
 private slots:
     void onCommandFinished(Command* cmd);
     void runCurrentCommand();
@@ -42,8 +44,6 @@ private slots:
 private:
     void clear();
     void deleteCommandTree(Command* cmd);
-    void deleteCommand(Command* cmd);
-    void createPair(Command* parent, Command* child);
     void setState(State state);
 
     Command* mFirst = Q_NULLPTR;
