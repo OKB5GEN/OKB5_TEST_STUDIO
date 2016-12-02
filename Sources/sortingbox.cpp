@@ -619,7 +619,14 @@ ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& poi
     Command* cmd = owner->command();
 
     // 2. Update command tree connections
-    cmd->insertCommand(newCmd, role);
+    if (cmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
+    {
+        cmd->addCommand(newCmd, role);
+    }
+    else
+    {
+        cmd->insertCommand(newCmd, role);
+    }
 
     // 3. Add new command shape item to cyclogram view
     QPoint newCmdCell = owner->cell();
@@ -715,6 +722,8 @@ ShapeItem* SortingBox::addCommand(DRAKON::IconType type, const ValencyPoint& poi
 
 void SortingBox::deleteCommand(ShapeItem* item)
 {
+    bool deleteShape = true;
+
     int TODO; // first try to do simple command deletion (linear comand inside some branch)
 
     switch (item->command()->type())
@@ -751,69 +760,123 @@ void SortingBox::deleteCommand(ShapeItem* item)
                         }
                     }
                 }
-
-                // 3. Delete command from cyclogram
-                mCurrentCyclogram->deleteCommand(item->command());
-
-                // 4. Delete shape item
-                for (int i = 0, sz = mCommands.size(); i < sz; ++i)
-                {
-                    if (mCommands[i] == item)
-                    {
-                        ShapeItem* tmp = mCommands.takeAt(i);
-                        tmp->deleteLater();
-                        break;
-                    }
-                }
             }
             else
             {
-                // one of the longest branches (or the longes one)
+                int TODO4; // this is only for one-column branches system! QUESTION/CASE will require some refactor
+
+                bool isLongestColumn = true;
+                QList<ShapeItem*> otherGoToBranchCommands;
+                ShapeItem* ownGoToBranchItem = Q_NULLPTR;
+
+                foreach (ShapeItem* it, mCommands)
+                {
+                    // it is GO_TO_BRANCH or cyclogram end TERMINATOR
+                    if (it->command()->type() == DRAKON::GO_TO_BRANCH || (it->command()->type() == DRAKON::TERMINATOR && it->cell().y() > 0))
+                    {
+                        if (it->cell().x() != item->cell().x())
+                        {
+                            otherGoToBranchCommands.push_back(it);
+
+                            if (isLongestColumn && it->rect().height() == 1)
+                            {
+                                isLongestColumn = false;
+                            }
+                        }
+                        else
+                        {
+                            ownGoToBranchItem = it;
+                        }
+                    }
+                }
+
+                if (isLongestColumn)
+                {
+                    // reduce GO_TO_BRANCH commands rect in other columns
+
+                    // Shift up ALL items below that need to be deleted (including GO_TO_BRANCH command)
+                    foreach (ShapeItem* it, mCommands)
+                    {
+                        if (it == item)
+                        {
+                            continue;
+                        }
+
+                        // if element is in the deleted elements column and below it
+                        if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
+                        {
+                            int h = item->rect().height();
+                            updateItemGeometry(it, 0, -h, -h, -h);
+                        }
+                    }
+
+                    // reduce size of the terminating commands in other columns
+
+                    int h = item->rect().height();
+                    foreach (ShapeItem* it, otherGoToBranchCommands)
+                    {
+                        updateItemGeometry(it, 0, -h, 0, -h);
+                    }
+
+                    // diagram size reduced
+                    mDiagramSize.setHeight(mDiagramSize.height() - h);
+                }
+                else
+                {
+                    // TODO almost copypaste of if expandedItem
+                    // just delete command and expand rect of the columns GO_TO_BRANCH item
+                    foreach (ShapeItem* it, mCommands)
+                    {
+                        if (it == item)
+                        {
+                            continue;
+                        }
+
+                        // if element is in the deleted elements column and below it
+                        if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
+                        {
+                            int h = item->rect().height();
+                            if (it != ownGoToBranchItem)
+                            {
+                                updateItemGeometry(it, 0, -h, -h, -h);
+                            }
+                            else
+                            {
+                                updateItemGeometry(it, 0, 0, -h, 0);
+                            }
+                        }
+                    }
+                }
             }
-
-            /* Как удалять эти формы?
-             * ВАРИАНТ 1
-             * 1. Перенастраиваем команды предыдущей ЗАМЕНЯЕМ свою команду
-             * 2. Увеличивам rect последующей команды, уменьшая ее top на размер rect'а удаляемой команды!
-             * 3. Top команды будет равен топу удаляемой команды
-             * 4. Обновляем шейп последующей команды
-             * 5. Еще учитываем, что если наша ветка самая длинная (хз как это понять), то надо как-то обновить DiagramSize
-             * 6. Вероятно, если рект команды не равен ее cell, то с остальными ветками нихеРРРРа не делаем (типа наша короче)
-             * 7. Если размер ректа команды совпадает с cell'ом, то проверяем есть ли еще команды в строке
-             * 8. Есть - это те, у которых rect 1x1 и cell в той же строчке
-             * 9. Если команд нет, то двигаем вверх все, что ниже удаляемого cell'а
-             * 6. Удаляем ShapeItem из списка команд
-             * 7. Удаляем ShapeItem сам
-             *
-             * ВАРИАНТ2
-             * Вообще надо/не надо ужимать алгоритм можно понять так:
-             * 1. У бранча должен быть рект
-             * 2. Рект бранча от положения его шейпа до положения следущего бранч бегина
-             * 3. Если в каждой строчке бранча, в котором удаляется элемент, после его удаления остается хотя бы одна команда
-             * то остальные бранчи не трогаем, высота диаграммы не меняется
-             * 4. Если после удаления есть пустые строчки в бранче удаления, то чекаем остальные бранчи
-             * 5. Если нет ни одного бранча, в каждой строке которого есть команда, то ужимаем бранч
-             *
-             * По идее у нас снизу должна жать "пружина": удалили команду - поджали бранч
-             * Поджали - это типа удалили команду, та, что ниже, сохряняет топ но селл и боттом двигается на 1 вверх
-             *
-             * ПРАВИЛО НА БУДУЩЕЕ
-             *
-            */
-
 
             int TODO2; // possibly update parent QUESTION command rect here
         }
         break;
 
-    case DRAKON::QUESTION:
+    default:
         {
-            int TODO2; // QUESTION deletion possibly will be magic ;)
+            qDebug("Try to delete non-deleatable");
+            deleteShape = false;
         }
         break;
+    }
 
-    default:
-        break;
+    if (deleteShape)
+    {
+        mCurrentCyclogram->deleteCommand(item->command());
+
+        for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+        {
+            if (mCommands[i] == item)
+            {
+                ShapeItem* tmp = mCommands.takeAt(i);
+                tmp->deleteLater();
+                break;
+            }
+        }
+
+        drawSilhouette();
+        update();
     }
 }
 
