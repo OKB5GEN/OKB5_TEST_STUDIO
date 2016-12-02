@@ -30,6 +30,7 @@ public:
     void resume();
 
     Command* first() const;
+    Command* current() const;
     Command* createCommand(DRAKON::IconType type);
 
     const QList<Command*>& commands() const;

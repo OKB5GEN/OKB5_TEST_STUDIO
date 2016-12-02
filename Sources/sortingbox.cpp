@@ -106,13 +106,37 @@ void SortingBox::keyPressEvent(QKeyEvent *event)
             {
                 if (mSelectedItem->command()->flags() & Command::Deletable)
                 {
-                    ShapeItem* item = mSelectedItem;
-                    clearSelection();
-                    deleteCommand(item);
+                    if (canBeDeleted(mSelectedItem))
+                    {
+                        ShapeItem* item = mSelectedItem;
+                        clearSelection();
+                        deleteCommand(item);
+                    }
+                    else
+                    {
+                        int TODO; // show message that item can not be deleted in current cyclogram state ()
+                    }
                 }
                 else
                 {
-                    int TODO; // show dialog that item can not be deleted
+                    int TODO; // show dialog that item can not be deleted, because it is not deletable
+                }
+            }
+        }
+        break;
+
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        {
+            if (mSelectedItem)
+            {
+                if (mSelectedItem->command()->flags() & Command::Editable)
+                {
+                    showEditDialog(mSelectedItem);
+                }
+                else
+                {
+                    int TODO; // show dialog that item is not ediable
                 }
             }
         }
@@ -427,6 +451,41 @@ void SortingBox::load(Cyclogram* cyclogram)
 void SortingBox::onCyclogramStateChanged(int state)
 {
     clearSelection();
+}
+
+bool SortingBox::canBeDeleted(ShapeItem* item) const
+{
+    if (mCurrentCyclogram->state() == Cyclogram::STOPPED)
+    {
+        if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+        {
+            // 1. START branch never can be deleted
+            // 2. END branch never can be deleted
+            int TODO; //temporary: can'not delete branches in STOPPED cyclogram state
+            return false;
+        }
+
+        return true;
+    }
+
+    if (mCurrentCyclogram->state() == Cyclogram::PAUSED)
+    {
+        if (item->command() == mCurrentCyclogram->current())
+        {
+            return false; // current running command can not be deleted
+        }
+
+        if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+        {
+            // 1. if branch to be deleted contains current running command, it can not be deleted
+            // 2. END branch never can be deleted
+            int TODO;
+
+            return false; //temporary: can'not delete branches in PAUSED cyclogram state
+        }
+    }
+
+    return false;
 }
 
 void SortingBox::clearSelection(bool needUpdate)

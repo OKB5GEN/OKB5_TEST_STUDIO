@@ -3,6 +3,7 @@
 CmdSetState::CmdSetState(QObject * parent):
     Command(DRAKON::GO_TO_BRANCH, parent)
 {
+     mFlags = (Command::Selectable | Command::Editable);
 }
 
 void CmdSetState::setText(const QString& text)

@@ -6,7 +6,7 @@ Command::Command(DRAKON::IconType type, QObject * parent):
     QObject(parent),
     mType(type),
     mRole(0),
-    mFlags(0),
+    mFlags(Command::All),
     mParentCommand(Q_NULLPTR) // TODO BRANCH_BEGIN has not parent command
 {
 

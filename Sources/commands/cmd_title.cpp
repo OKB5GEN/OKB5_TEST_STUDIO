@@ -3,6 +3,7 @@
 CmdTitle::CmdTitle(QObject * parent):
     Command(DRAKON::TERMINATOR, parent)
 {
+    mFlags = (Selectable | Editable);
 }
 
 CmdTitle::TitleType CmdTitle::titleType() const
@@ -20,6 +21,7 @@ void CmdTitle::setTitleType(CmdTitle::TitleType type)
     }
     else
     {
+
          mText = tr("FINISH");
     }
 }

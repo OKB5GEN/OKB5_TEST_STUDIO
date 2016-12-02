@@ -47,6 +47,7 @@ private:
     void clear(bool onDestroy = false);
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
+    bool canBeDeleted(ShapeItem* item) const;
 
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, int role);

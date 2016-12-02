@@ -165,6 +165,11 @@ Command* Cyclogram::first() const
     return mFirst;
 }
 
+Command* Cyclogram::current() const
+{
+    return mCurrent;
+}
+
 Cyclogram::State Cyclogram::state() const
 {
     return mState;
