@@ -21,7 +21,7 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Go To Branch");
+    setWindowTitle("Set Next Branch");
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -40,8 +40,18 @@ void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Comma
     mComboBox->clear();
     mBranches = branches;
 
-    Command* nextCmd = mCommand->nextCommands()[0];
-    mCurrentIndex = -1;
+    Command* nextCmd = Q_NULLPTR;
+
+    if (!mCommand->hasError())
+    {
+        nextCmd = mCommand->nextCommands()[0];
+        mCurrentIndex = -1;
+    }
+    else
+    {
+        mCurrentIndex = 0;
+    }
+
     int i = 0;
     foreach (Command* cmd, branches)
     {
@@ -62,7 +72,8 @@ void CmdSetStateEditDialog::onAccept()
     if (mCommand)
     {
         int index = mComboBox->currentIndex();
-        if (index != mCurrentIndex)
+
+        if (mCommand->hasError() || index != mCurrentIndex)
         {
             mCommand->replaceCommand(mBranches[index]);
             mCommand->setText(mBranches[index]->text());

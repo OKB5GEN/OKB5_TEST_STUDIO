@@ -141,6 +141,27 @@ void Command::insertCommand(Command* newCmd, int role) // new command inserted t
 
 void Command::replaceCommand(Command *newCmd, int role)
 {
+    int TODO2; // possibly make virtual and move to DRAKON::GO_TO_BRANCH class
+
+    if (mType == DRAKON::GO_TO_BRANCH)
+    {
+        if (!newCmd)  // branch deletion
+        {
+            mNextCommands.clear();
+            setErrorStatus(true);
+            return;
+        }
+
+        if (mNextCommands.empty() && hasError()) // error fixing after branch deletion
+        {
+            newCmd->setRole(role); //TODO possibly not?
+            mNextCommands.push_back(newCmd);
+            connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            setErrorStatus(false);
+            return;
+        }
+    }
+
     int TODO; // непонятно как эти роли должны передаваться при замене
     // роль - это актуально только для ветвлений
     for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
