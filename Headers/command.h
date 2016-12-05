@@ -15,7 +15,7 @@ public:
         Selectable  = 0x00000001,
         Movable     = 0x00000002,
         Editable    = 0x00000004,
-        Deletable   = 0x00000080,
+        Deletable   = 0x00000008,
 
         All = (Selectable | Movable | Editable | Deletable),
     };

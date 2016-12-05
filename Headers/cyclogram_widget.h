@@ -55,7 +55,7 @@ private:
     bool isCyclogramEndBranch(Command* cmd) const;
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point);
 
-    bool canBeDeleted(ShapeItem* item) const;
+    bool canBeDeleted(ShapeItem* item, QString& error) const;
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 

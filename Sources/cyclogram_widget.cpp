@@ -107,22 +107,31 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
         {
             if (mSelectedItem)
             {
-                if (mSelectedItem->command()->flags() & Command::Deletable)
+                QString errorDesc;
+                if (canBeDeleted(mSelectedItem, errorDesc))
                 {
-                    if (canBeDeleted(mSelectedItem))
+                    bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
+                    QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
+                    QString text = tr("Are you sure that you want to delete ");
+                    if (isBranch)
+                    {
+                        text += tr("entire branch with all its commands?");
+                    }
+                    else
+                    {
+                        text += tr("this command?");
+                    }
+
+                    if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
                     {
                         ShapeItem* item = mSelectedItem;
                         clearSelection();
                         deleteCommand(item);
                     }
-                    else
-                    {
-                        int TODO; // show message that item can not be deleted in current cyclogram state ()
-                    }
                 }
                 else
                 {
-                    int TODO; // show dialog that item can not be deleted, because it is not deletable
+                    QMessageBox::warning(this, tr("Command deletion"), tr("Command can not be deleted!\nReason: ") + errorDesc);
                 }
             }
         }
@@ -133,13 +142,13 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
         {
             if (mSelectedItem)
             {
-                if (mSelectedItem->command()->flags() & Command::Editable)
+                if ((mSelectedItem->command()->flags() & Command::Editable) != 0)
                 {
                     showEditDialog(mSelectedItem->command());
                 }
                 else
                 {
-                    int TODO; // show dialog that item is not ediable
+                    QMessageBox::warning(this, tr("Command editing"), tr("Command is not editable"));
                 }
             }
         }
@@ -462,53 +471,77 @@ void CyclogramWidget::onCyclogramStateChanged(int state)
     clearSelection();
 }
 
-bool CyclogramWidget::canBeDeleted(ShapeItem* item) const
+bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
 {
-    if (mCurrentCyclogram->state() == Cyclogram::STOPPED)
+    // item marked as "not deletable"
+    if ((item->command()->flags() & Command::Deletable) == 0)
     {
-        if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+        error = tr("Command is not deletable");
+        return false;
+    }
+
+    // nothing can be deleted in running cyclogram
+    if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
+    {
+        error = tr("THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!");
+        return false;
+    }
+
+    if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+    {
+        // START and END branches never can be deleted
+        Command* startBranch = mCurrentCyclogram->first();
+
+        // check is start branch trying to delete
+        if (startBranch->nextCommands()[0] == item->command())
         {
-            // START and END branches never can be deleted
-            Command* first = mCurrentCyclogram->first();
-
-            // check is start branch trying to delete
-            if (first->nextCommands()[0] == item->command())
-            {
-                return false;
-            }
-
-            Command* cmd = mCurrentCyclogram->last()->parentCommand();
-
-            while (cmd->type() != DRAKON::BRANCH_BEGIN)
-            {
-                cmd = cmd->parentCommand();
-            }
-
-            // check is end branch trying to delete
-            return (cmd != item->command());
+            error = tr("Start branch never can be deleted");
+            return false;
         }
 
-        return true;
+        Command* lastBranch = mCurrentCyclogram->last()->parentCommand();
+
+        while (lastBranch->type() != DRAKON::BRANCH_BEGIN)
+        {
+            lastBranch = lastBranch->parentCommand();
+        }
+
+        // check is end branch trying to delete
+        if (lastBranch == item->command())
+        {
+            error = tr("End branch never can be deleted");
+            return false;
+        }
     }
 
     if (mCurrentCyclogram->state() == Cyclogram::PAUSED)
     {
+        // current running command can not be deleted
         if (item->command() == mCurrentCyclogram->current())
         {
-            return false; // current running command can not be deleted
+            error = tr("Current running command can not be deleted");
+            return false;
         }
 
+        // branch of current command can not be deleted
         if (item->command()->type() == DRAKON::BRANCH_BEGIN)
         {
-            // 1. if branch to be deleted contains current running command, it can not be deleted
-            // 2. END branch never can be deleted
-            int TODO;
+            Command* currentBranch = mCurrentCyclogram->current()->parentCommand();
 
-            return false; //temporary: can'not delete branches in PAUSED cyclogram state
+            while (currentBranch->type() != DRAKON::BRANCH_BEGIN)
+            {
+                currentBranch = currentBranch->parentCommand();
+            }
+
+            if (currentBranch == item->command())
+            {
+                error = tr("Has running command in this branch");
+                return false;
+            }
         }
     }
 
-    return false;
+    return true;
 }
 
 void CyclogramWidget::clearSelection(bool needUpdate)

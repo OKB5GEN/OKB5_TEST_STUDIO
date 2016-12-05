@@ -10,12 +10,7 @@ CommandErrorDialog::CommandErrorDialog(QWidget * parent):
     mLabel = new QLabel(this);
     layout->addWidget(mLabel, 0, 0);
 
-    //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
-
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No, Qt::Horizontal, this);
-    //buttonBox->addButton(tr("Yes"), QDialogButtonBox::AcceptRole);
-    //buttonBox->addButton(tr("No"), QDialogButtonBox::RejectRole);
-
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
