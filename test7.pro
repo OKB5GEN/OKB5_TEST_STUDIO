@@ -39,11 +39,6 @@ SOURCES += main.cpp\
     Sources/commands/cmd_state_start.cpp \
     Sources/commands/cmd_sub_program.cpp \
     Sources/commands/cmd_switch.cpp \
-    Sources/editorwindow.cpp \
-    Sources/renderarea.cpp \
-    Sources/shapeitem.cpp \
-    Sources/shapeeditdialog.cpp \
-    Sources/monitordialog.cpp \
     Sources/monitor_auto.cpp \
     Sources/monitor_manual.cpp \
     Sources/commands/cmd_title.cpp \
@@ -54,7 +49,13 @@ SOURCES += main.cpp\
     Sources/cmd_set_state_edit_dialog.cpp \
     Sources/shape_add_dialog.cpp \
     Sources/commands/cmd_action.cpp \
-    Sources/cyclogram_widget.cpp
+    Sources/cyclogram_widget.cpp \
+    Sources/shape_item.cpp \
+    Sources/editor_window.cpp \
+    Sources/monitor_dialog.cpp \
+    Sources/render_area.cpp \
+    Sources/shape_edit_dialog.cpp \
+    Sources/command_error_dialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -79,12 +80,6 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_sub_program.h \
     Headers/commands/cmd_switch.h \
     Headers/command.h \
-    Headers/editorwindow.h \
-    Headers/renderarea.h \
-    Headers/shapeitem.h \
-    Headers/shapetypes.h \
-    Headers/shapeeditdialog.h \
-    Headers/monitordialog.h \
     Headers/monitor_auto.h \
     Headers/monitor_manual.h \
     Headers/commands/cmd_title.h \
@@ -95,7 +90,14 @@ HEADERS  += mainwindow.h \
     Headers/cmd_set_state_edit_dialog.h \
     Headers/shape_add_dialog.h \
     Headers/commands/cmd_action.h \
-    Headers/cyclogram_widget.h
+    Headers/cyclogram_widget.h \
+    Headers/shape_item.h \
+    Headers/editor_window.h \
+    Headers/shape_types.h \
+    Headers/monitor_dialog.h \
+    Headers/render_area.h \
+    Headers/shape_edit_dialog.h \
+    Headers/command_error_dialog.h
 
 
 FORMS    += mainwindow.ui

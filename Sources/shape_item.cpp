@@ -1,6 +1,6 @@
 #include <QtWidgets>
 
-#include "Headers/shapeitem.h"
+#include "Headers/shape_item.h"
 #include "Headers/command.h"
 
 #include "Headers/commands/cmd_title.h"
@@ -12,7 +12,7 @@ namespace
     static const int CELLS_PER_ITEM_H = 8;
 }
 
-QSizeF ShapeItem::smItemSize = QSizeF(30 * 8, 30 * 4);
+QSizeF ShapeItem::smItemSize = QSizeF(30 * 8, 30 * 4); // TODO make function for initialization
 
 ShapeItem::ShapeItem(QObject* parent):
     QObject(parent),
@@ -89,12 +89,15 @@ void ShapeItem::setCommand(Command* command)
     if (mCommand)
     {
         disconnect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+        disconnect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
     }
 
     mCommand = command;
     connect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+    connect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
 
     onTextChanged(mCommand->text());
+    onErrorStatusChanged(mCommand->hasError());
 }
 
 Command* ShapeItem::command() const
@@ -150,6 +153,11 @@ void ShapeItem::onTextChanged(const QString& text)
     qreal y = (smItemSize.height() + textRect.height()) / 2;
     textPath.addText(x, y, mFont, text);
     mTextPath = textPath;
+}
+
+void ShapeItem::onErrorStatusChanged(bool status)
+{
+    setColor(status ? QColor::fromRgba(0xffff0000) : QColor::fromRgba(0xffffffff));
 }
 
 QSizeF ShapeItem::itemSize()
@@ -265,5 +273,12 @@ void ShapeItem::createPath()
 
 void ShapeItem::setSelected(bool selected)
 {
-    setColor(selected ? QColor::fromRgba(0xff00ff00) : QColor::fromRgba(0xffffffff));
+    if (selected)
+    {
+        setColor(QColor::fromRgba(0xff00ff00));
+    }
+    else
+    {
+        onErrorStatusChanged(mCommand->hasError());
+    }
 }

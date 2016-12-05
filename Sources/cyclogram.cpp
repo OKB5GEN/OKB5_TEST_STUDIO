@@ -165,6 +165,11 @@ Command* Cyclogram::first() const
     return mFirst;
 }
 
+Command* Cyclogram::last() const
+{
+    return mLast;
+}
+
 Command* Cyclogram::current() const
 {
     return mCurrent;
@@ -191,7 +196,7 @@ void Cyclogram::clear()
 void Cyclogram::deleteCommandTree(Command* cmd)
 {
     int TODO; // use QObject parent-child system for command tree hierarchy storage i ne ebi mosk s velosipedami;)
-    // авотхрен, потому что непонятно что делать с началами=концами веток, чтобы не сносилась вся циклограмма целиком
+    // авотхрен, потому что непонятно что делать с началами-концами веток, чтобы не сносилась вся циклограмма целиком
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
         deleteCommandTree(cmd->nextCommands()[i]);
@@ -285,4 +290,17 @@ void Cyclogram::setState(State state)
 {
     mState = state;
     emit stateChanged(mState);
+}
+
+Command* Cyclogram::validate() const
+{
+    foreach (Command* command, mCommands)
+    {
+        if (command->hasError())
+        {
+            return command;
+        }
+    }
+
+    return Q_NULLPTR;
 }

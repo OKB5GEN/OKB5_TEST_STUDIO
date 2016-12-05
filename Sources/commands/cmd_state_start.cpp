@@ -8,6 +8,7 @@ CmdStateStart::CmdStateStart(QObject * parent):
 
 void CmdStateStart::setText(const QString& text)
 {
+    //mText = tr("State '%1'").arg(text);
     mText = text;
     emit textChanged(mText);
 }

@@ -1,4 +1,4 @@
-#include "Headers/shapeeditdialog.h"
+#include "Headers/shape_edit_dialog.h"
 #include "Headers/cyclogram_widget.h"
 
 #include <QDialogButtonBox>

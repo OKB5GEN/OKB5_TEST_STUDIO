@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QList>
 #include "Headers/cell.h"
-#include "Headers/shapetypes.h"
+#include "Headers/shape_types.h"
 
 class Command;
 
@@ -30,6 +30,7 @@ public:
     void resume();
 
     Command* first() const;
+    Command* last() const;
     Command* current() const;
     Command* createCommand(DRAKON::IconType type);
 
@@ -37,6 +38,8 @@ public:
     State state() const;
 
     void deleteCommand(Command* cmd);
+
+    Command* validate() const; //
 
 private slots:
     void onCommandFinished(Command* cmd);

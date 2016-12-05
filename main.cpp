@@ -5,7 +5,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
-#include "Headers/editorwindow.h"
+#include "Headers/editor_window.h"
 
 int main(int argc, char *argv[])
 {

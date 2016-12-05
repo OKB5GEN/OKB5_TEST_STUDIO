@@ -21,7 +21,6 @@ void CmdTitle::setTitleType(CmdTitle::TitleType type)
     }
     else
     {
-
          mText = tr("FINISH");
     }
 }

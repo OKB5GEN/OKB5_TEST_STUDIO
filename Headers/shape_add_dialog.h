@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QMap>
 
-#include "Headers/shapetypes.h"
+#include "Headers/shape_types.h"
 
 QT_BEGIN_NAMESPACE
 class QComboBox;

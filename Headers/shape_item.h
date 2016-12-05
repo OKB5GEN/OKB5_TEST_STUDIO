@@ -1,5 +1,5 @@
-#ifndef SHAPEITEM_H
-#define SHAPEITEM_H
+#ifndef SHAPE_ITEM_H
+#define SHAPE_ITEM_H
 
 #include <QColor>
 #include <QPainterPath>
@@ -28,7 +28,6 @@ public:
     void setCommand(Command* command);
     void setValencyPoints(const QList<ValencyPoint>& points);
     void setRect(const QRect& rect);
-
     void setSelected(bool selected);
 
     QPainterPath path() const;
@@ -47,6 +46,7 @@ public:
 
 private slots:
     void onTextChanged(const QString& text);
+    void onErrorStatusChanged(bool status);
 
 private:
     QPainterPath mPath; // shape path
@@ -65,4 +65,4 @@ private:
     Command* mCommand = Q_NULLPTR; // data pointer for the command logics
 };
 
-#endif
+#endif //SHAPE_ITEM_H

@@ -3,7 +3,8 @@
 
 #include "Headers/cyclogram_widget.h"
 #include "Headers/shape_add_dialog.h"
-#include "Headers/shapeeditdialog.h"
+#include "Headers/shape_edit_dialog.h"
+#include "Headers/command_error_dialog.h"
 
 #include "Headers/cyclogram.h"
 #include "Headers/cell.h"
@@ -132,7 +133,7 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
             {
                 if (mSelectedItem->command()->flags() & Command::Editable)
                 {
-                    showEditDialog(mSelectedItem);
+                    showEditDialog(mSelectedItem->command());
                 }
                 else
                 {
@@ -265,7 +266,7 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
             return;
         }
 
-        showEditDialog(mCommands[index]);
+        showEditDialog(mCommands[index]->command());
     }
 }
 
@@ -345,7 +346,6 @@ ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setPosition(pos);
-    shapeItem->setColor(QColor::fromRgba(0xffffffff));
     shapeItem->setCell(cell);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
     shapeItem->createPath();
@@ -459,10 +459,24 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item) const
     {
         if (item->command()->type() == DRAKON::BRANCH_BEGIN)
         {
-            // 1. START branch never can be deleted
-            // 2. END branch never can be deleted
-            int TODO; //temporary: can'not delete branches in STOPPED cyclogram state
-            return false;
+            // START and END branches never can be deleted
+            Command* first = mCurrentCyclogram->first();
+
+            // check is start branch trying to delete
+            if (first->nextCommands()[0] == item->command())
+            {
+                return false;
+            }
+
+            Command* cmd = mCurrentCyclogram->last()->parentCommand();
+
+            while (cmd->type() != DRAKON::BRANCH_BEGIN)
+            {
+                cmd = cmd->parentCommand();
+            }
+
+            // check is end branch trying to delete
+            return (cmd != item->command());
         }
 
         return true;
@@ -912,6 +926,13 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
         }
         break;
 
+    case DRAKON::BRANCH_BEGIN:
+        {
+            deleteBranch(item);
+            deleteShape = false;
+        }
+        break;
+
     default:
         {
             qDebug("Try to delete non-deleatable");
@@ -922,6 +943,7 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
 
     if (deleteShape)
     {
+        int TODO10; // move contents to function
         mCurrentCyclogram->deleteCommand(item->command());
 
         for (int i = 0, sz = mCommands.size(); i < sz; ++i)
@@ -937,6 +959,21 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
         drawSilhouette();
         update();
     }
+}
+
+void CyclogramWidget::deleteBranch(ShapeItem* item)
+{
+    int TODO; // this only working for one-column branches, QUESTION/CASE command adding will require some refactoring
+    /* Как удалить бранч?
+     *
+     * 1. Рекурсивно киляем команду и все чайлдовые команды
+     * 2. Если чайлдовая команда - GO_TO_BRANCH, то удаляем только ее и не удаляем чайлдов
+     * 3. Киляем шейпы, попутно высчитывая оффсет, на который надо будет сдвинуть бранчи справа
+     * 4. Также высичтываем оффсет, на который надо поднять команды ниже (например удаляем самый длинный бранч)
+     * 5. Также надо пробежать оставшиеся GO_TO_BRANCH и, если они ссылаются на удаляемый,
+     * то окрасить их в красный и не давать запускать циклограмму (зачатки валидатора наверное)
+     * 6. Добавить перед запуском циклограммы проверку валидации
+    */
 }
 
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
@@ -1106,18 +1143,18 @@ void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift
     }
 }
 
-void CyclogramWidget::showEditDialog(ShapeItem *item)
+void CyclogramWidget::showEditDialog(Command *command)
 {
-    QDialog* dialog = mEditDialogs.value(item->command()->type(), Q_NULLPTR);
+    QDialog* dialog = mEditDialogs.value(command->type(), Q_NULLPTR);
 
     if (dialog) // show custom dialog
     {
-        switch (item->command()->type())
+        switch (command->type())
         {
         case DRAKON::DELAY:
             {
                 CmdDelayEditDialog* d = qobject_cast<CmdDelayEditDialog*>(dialog);
-                d->setCommand(qobject_cast<CmdDelay*>(item->command()));
+                d->setCommand(qobject_cast<CmdDelay*>(command));
             }
             break;
 
@@ -1127,13 +1164,13 @@ void CyclogramWidget::showEditDialog(ShapeItem *item)
                 QList<Command*> commands;
                 foreach (ShapeItem* it, mCommands)
                 {
-                    if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != item->command())
+                    if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != command)
                     {
                         commands.push_back(it->command());
                     }
                 }
 
-                d->setCommands(qobject_cast<CmdStateStart*>(item->command()), commands);
+                d->setCommands(qobject_cast<CmdStateStart*>(command), commands);
             }
             break;
 
@@ -1149,7 +1186,7 @@ void CyclogramWidget::showEditDialog(ShapeItem *item)
                     }
                 }
 
-                d->setCommands(qobject_cast<CmdSetState*>(item->command()), commands);
+                d->setCommands(qobject_cast<CmdSetState*>(command), commands);
             }
             break;
 
@@ -1159,9 +1196,23 @@ void CyclogramWidget::showEditDialog(ShapeItem *item)
     }
     else // show default dialog
     {
-        mShapeEditDialog->setCommand(item->command());
+        mShapeEditDialog->setCommand(command);
         dialog = mShapeEditDialog;
     }
 
     dialog->exec();
+}
+
+void CyclogramWidget::showValidationError(Command* cmd)
+{
+    CommandErrorDialog* dialog = new CommandErrorDialog(this);
+    dialog->setText(cmd->text());
+    dialog->exec();
+
+    if (dialog->result() == QDialog::Accepted)
+    {
+        showEditDialog(cmd);
+    }
+
+    dialog->deleteLater();
 }

@@ -7,7 +7,8 @@ Command::Command(DRAKON::IconType type, QObject * parent):
     mType(type),
     mRole(0),
     mFlags(Command::All),
-    mParentCommand(Q_NULLPTR) // TODO BRANCH_BEGIN has not parent command
+    mParentCommand(Q_NULLPTR),
+    mHasError(false)
 {
 
 }
@@ -111,7 +112,14 @@ void Command::setParentCommand(Command* cmd)
 
 Command* Command::parentCommand() const
 {
+    int TODO; // неясно которую из команд считать парентовой в случае если сверху находится развилка QUESTION или SWICH-CASE, вероятно будет тоже массив, как и "nextCommands"
     return mParentCommand;
+}
+
+
+bool Command::hasError() const
+{
+    return mHasError;
 }
 
 void Command::insertCommand(Command* newCmd, int role) // new command inserted to valency point
@@ -153,4 +161,10 @@ void Command::replaceCommand(Command *newCmd, int role)
             break;
         }
     }
+}
+
+void Command::setErrorStatus(bool status)
+{
+    mHasError = status;
+    emit errorStatusChanged(mHasError);
 }

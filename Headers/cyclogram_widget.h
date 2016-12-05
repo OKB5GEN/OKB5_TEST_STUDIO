@@ -4,8 +4,8 @@
 #include <QWidget>
 #include <QMap>
 
-#include "Headers/shapetypes.h"
-#include "Headers/shapeitem.h"
+#include "Headers/shape_types.h"
+#include "Headers/shape_item.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -27,6 +27,10 @@ public:
     CyclogramWidget();
     ~CyclogramWidget();
 
+public slots:
+    void load(Cyclogram* cyclogram);
+    void showValidationError(Command* cmd);
+
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
@@ -37,9 +41,6 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
-public slots:
-    void load(Cyclogram* cyclogram);
-
 private slots:
     void onCyclogramStateChanged(int state);
 
@@ -47,13 +48,15 @@ private:
     void clear(bool onDestroy = false);
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
-    bool canBeDeleted(ShapeItem* item) const;
 
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, int role);
     bool isCyclogramEndBranch(Command* cmd) const;
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point);
+
+    bool canBeDeleted(ShapeItem* item) const;
     void deleteCommand(ShapeItem* item);
+    void deleteBranch(ShapeItem* item);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
@@ -73,7 +76,7 @@ private:
     ShapeItem* addNewBranch(ShapeItem* item);
     void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
-    void showEditDialog(ShapeItem* item);
+    void showEditDialog(Command* command);
 
     QPointF mOrigin;
     QSize mDiagramSize;

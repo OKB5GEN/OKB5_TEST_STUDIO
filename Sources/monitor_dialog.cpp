@@ -1,4 +1,4 @@
-#include "Headers/monitordialog.h"
+#include "Headers/monitor_dialog.h"
 #include "qcustomplot.h"
 
 #include <QtWidgets>

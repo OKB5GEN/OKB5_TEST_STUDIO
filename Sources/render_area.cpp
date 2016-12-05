@@ -1,4 +1,4 @@
-#include "Headers/renderarea.h"
+#include "Headers/render_area.h"
 
 #include <QPainter>
 

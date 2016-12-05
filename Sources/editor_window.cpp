@@ -1,9 +1,9 @@
 #include <QtWidgets>
 
-#include "Headers/editorwindow.h"
-#include "Headers/renderarea.h"
+#include "Headers/editor_window.h"
+#include "Headers/render_area.h"
 #include "Headers/cyclogram_widget.h"
-#include "Headers/monitordialog.h"
+#include "Headers/monitor_dialog.h"
 #include "Headers/monitor_manual.h"
 #include "Headers/monitor_auto.h"
 #include "Headers/cyclogram.h"
@@ -375,6 +375,14 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 
 void EditorWindow::runCyclogram()
 {
+    Command* errorCmd = mCyclogram->validate();
+    if (errorCmd)
+    {
+        mCyclogramWidget->showValidationError(errorCmd);
+        qDebug("Cyclogram validation failed");
+        return;
+    }
+
     if (mCyclogram->state() == Cyclogram::STOPPED)
     {
         mRunAct->setIcon(mPauseIcon);

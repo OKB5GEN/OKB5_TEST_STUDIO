@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QSize>
-#include "Headers/shapetypes.h"
+#include "Headers/shape_types.h"
 
 class Command: public QObject
 {
@@ -39,28 +39,33 @@ public:
     int role() const;
     uint32_t flags() const;
     Command* parentCommand() const;
+    bool hasError() const;
 
     void setRole(int role);
     void setFlags(uint32_t flags);
     void setParentCommand(Command* cmd);
 
 signals:
-    void finished(Command* nextCmd); // must be sent on command finish
+    void finished(Command* nextCmd);
     void textChanged(const QString& text);
+    void errorStatusChanged(bool status); //true - has error, false - no error/error fixed
 
 protected:
+    void setErrorStatus(bool status); //true - has error, false - no error/error fixed
+
     DRAKON::IconType mType;
     QString mText;
     int mRole;
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
     QList<Command*> mNextCommands;
-    Command* mParentCommand;
+    Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
 
 private slots:
     void onNextCmdTextChanged(const QString& text);
 
 private:
+    bool mHasError;
 };
 
 #endif // COMMAND_H
