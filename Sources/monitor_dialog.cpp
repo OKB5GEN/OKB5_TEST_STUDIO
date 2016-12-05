@@ -220,7 +220,7 @@ MonitorDialog::MonitorDialog(QWidget * parent):
     layout->addStretch();
 
     setLayout(layout);
-    setWindowTitle("Monitor");
+    setWindowTitle(tr("Monitor"));
 
     updateUI();
 }

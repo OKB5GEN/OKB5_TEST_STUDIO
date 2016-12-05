@@ -37,7 +37,7 @@ CyclogramWidget::CyclogramWidget():
     mOrigin.setX(ShapeItem::itemSize().width() / 4);
     mOrigin.setY(0);
 
-    setWindowTitle(tr("Tool Tips"));
+    //setWindowTitle(tr("Tool Tips"));
     resize(1000, 600);
 
     setFocusPolicy(Qt::ClickFocus);

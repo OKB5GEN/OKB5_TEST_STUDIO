@@ -236,7 +236,7 @@ MonitorManual::MonitorManual(QWidget * parent):
     layout->addStretch();
     */
 
-    setWindowTitle("Manual Monitor");
+    setWindowTitle(tr("Manual Monitor"));
 
     updateUI();
 }

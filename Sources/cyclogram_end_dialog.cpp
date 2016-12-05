@@ -18,7 +18,7 @@ CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Cyclogram finished");
+    setWindowTitle(tr("Cyclogram finished"));
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

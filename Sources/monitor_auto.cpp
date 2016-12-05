@@ -168,7 +168,7 @@ MonitorAuto::MonitorAuto(QWidget * parent):
     vLayout->addStretch();
 
     setLayout(vLayout);
-    setWindowTitle("Monitor");
+    setWindowTitle(tr("Monitor"));
 
     updateUI();
 }

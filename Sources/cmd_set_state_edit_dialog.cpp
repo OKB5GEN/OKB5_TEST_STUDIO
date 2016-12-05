@@ -21,7 +21,7 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Set Next Branch");
+    setWindowTitle(tr("Set Next Branch"));
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

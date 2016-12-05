@@ -17,7 +17,7 @@ CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Branch Begin");
+    setWindowTitle(tr("Set Branch Name"));
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

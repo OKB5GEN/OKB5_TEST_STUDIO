@@ -18,7 +18,7 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Go To Branch");
+    setWindowTitle(tr("Add Command"));
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));

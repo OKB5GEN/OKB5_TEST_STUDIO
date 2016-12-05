@@ -39,7 +39,7 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     setLayout(layout);
-    setWindowTitle("Edit Delay Command");
+    setWindowTitle(tr("Set Delay"));
 
     adjustSize();
     setFixedSize(sizeHint());

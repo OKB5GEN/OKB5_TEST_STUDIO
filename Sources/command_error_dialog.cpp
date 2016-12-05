@@ -19,7 +19,7 @@ CommandErrorDialog::CommandErrorDialog(QWidget * parent):
     layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle("Error");
+    setWindowTitle(tr("Cyclogram Error"));
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
