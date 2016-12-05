@@ -195,8 +195,17 @@ void Cyclogram::clear()
 
 void Cyclogram::deleteCommandTree(Command* cmd)
 {
-    int TODO; // use QObject parent-child system for command tree hierarchy storage i ne ebi mosk s velosipedami;)
-    // авотхрен, потому что непонятно что делать с началами-концами веток, чтобы не сносилась вся циклограмма целиком
+    emit deleted(cmd);
+
+    for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+    {
+        if (mCommands[i] == cmd)
+        {
+            mCommands.takeAt(i);
+            break;
+        }
+    }
+
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
         deleteCommandTree(cmd->nextCommands()[i]);
@@ -205,8 +214,16 @@ void Cyclogram::deleteCommandTree(Command* cmd)
     cmd->deleteLater();
 }
 
-void Cyclogram::deleteCommand(Command* cmd)
+void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 {
+    if (recursive)
+    {
+        deleteCommandTree(cmd);
+        return;
+    }
+
+    emit deleted(cmd);
+
     int TODO; // this is valid for one-column branches only!
     Command* parentCmd = cmd->parentCommand();
     Command* nextCmd = cmd->nextCommands()[0]; // TODO QUESTION deletion

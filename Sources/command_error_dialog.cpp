@@ -12,9 +12,9 @@ CommandErrorDialog::CommandErrorDialog(QWidget * parent):
 
     //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
-    buttonBox->addButton(tr("Yes"), QDialogButtonBox::AcceptRole);
-    buttonBox->addButton(tr("No"), QDialogButtonBox::RejectRole);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No, Qt::Horizontal, this);
+    //buttonBox->addButton(tr("Yes"), QDialogButtonBox::AcceptRole);
+    //buttonBox->addButton(tr("No"), QDialogButtonBox::RejectRole);
 
     layout->addWidget(buttonBox, 1, 0);
 
@@ -32,5 +32,5 @@ CommandErrorDialog::~CommandErrorDialog()
 
 void CommandErrorDialog::setText(const QString& text)
 {
-    mLabel->setText(tr("Command %1 has errors. Would you like to fix it?").arg(text));
+    mLabel->setText(tr("Command '%1' has errors. Would you like to fix it?").arg(text));
 }

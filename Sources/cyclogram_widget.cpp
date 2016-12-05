@@ -19,7 +19,8 @@
 #include "Headers/commands/cmd_set_state.h"
 
 CyclogramWidget::CyclogramWidget():
-    mDiagramSize(0, 0)
+    mDiagramSize(0, 0),
+    mCurrentCyclogram(Q_NULLPTR)
 {
     mShapeAddDialog = new ShapeAddDialog(this);
     mShapeEditDialog = new ShapeEditDialog(this);
@@ -56,6 +57,7 @@ void CyclogramWidget::clear(bool onDestroy)
     if (!onDestroy && mCurrentCyclogram)
     {
         disconnect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
     }
 
     mCurrentCyclogram = Q_NULLPTR;
@@ -437,8 +439,15 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
         return;
     }
 
+    if (mCurrentCyclogram)
+    {
+        disconnect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+    }
+
     mCurrentCyclogram = cyclogram;
     connect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
     QPoint parentCell(0, 0);
     createCommandShape(first, parentCell);
@@ -943,37 +952,119 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
 
     if (deleteShape)
     {
-        int TODO10; // move contents to function
-        mCurrentCyclogram->deleteCommand(item->command());
-
-        for (int i = 0, sz = mCommands.size(); i < sz; ++i)
-        {
-            if (mCommands[i] == item)
-            {
-                ShapeItem* tmp = mCommands.takeAt(i);
-                tmp->deleteLater();
-                break;
-            }
-        }
-
+        mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
         drawSilhouette();
         update();
+    }
+}
+
+void CyclogramWidget::removeShape(Command* command)
+{
+    for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+    {
+        if (mCommands[i]->command() == command)
+        {
+            ShapeItem* tmp = mCommands.takeAt(i);
+            tmp->deleteLater();
+            break;
+        }
     }
 }
 
 void CyclogramWidget::deleteBranch(ShapeItem* item)
 {
     int TODO; // this only working for one-column branches, QUESTION/CASE command adding will require some refactoring
-    /* Как удалить бранч?
-     *
-     * 1. Рекурсивно киляем команду и все чайлдовые команды
-     * 2. Если чайлдовая команда - GO_TO_BRANCH, то удаляем только ее и не удаляем чайлдов
-     * 3. Киляем шейпы, попутно высчитывая оффсет, на который надо будет сдвинуть бранчи справа
-     * 4. Также высичтываем оффсет, на который надо поднять команды ниже (например удаляем самый длинный бранч)
-     * 5. Также надо пробежать оставшиеся GO_TO_BRANCH и, если они ссылаются на удаляемый,
-     * то окрасить их в красный и не давать запускать циклограмму (зачатки валидатора наверное)
-     * 6. Добавить перед запуском циклограммы проверку валидации
-    */
+
+    bool isLongestColumn = true;
+    QList<ShapeItem*> otherGoToBranchCommands;
+    ShapeItem* ownGoToBranchItem = Q_NULLPTR;
+
+    // find out is deleting branch the longest one
+    foreach (ShapeItem* it, mCommands)
+    {
+        // it is GO_TO_BRANCH or cyclogram end TERMINATOR
+        if (it->command()->type() == DRAKON::GO_TO_BRANCH || (it->command()->type() == DRAKON::TERMINATOR && it->cell().y() > 0))
+        {
+            if (it->cell().x() != item->cell().x())
+            {
+                otherGoToBranchCommands.push_back(it);
+
+                if (isLongestColumn && it->rect().height() == 1)
+                {
+                    isLongestColumn = false;
+                }
+            }
+            else
+            {
+                ownGoToBranchItem = it;
+            }
+        }
+    }
+
+    int yOffset = 0;
+
+    if (isLongestColumn) // the longes one
+    {
+        // reduce GO_TO_BRANCH commands rect in other columns by the second longest branch expansion size
+        // find set second branch by length (it has the lowest height)
+        int minHeight = INT_MAX;
+        ShapeItem* secondMinBranch = Q_NULLPTR;
+
+        foreach (ShapeItem* it, otherGoToBranchCommands)
+        {
+            if (it->rect().height() < minHeight)
+            {
+                minHeight = it->rect().height();
+                secondMinBranch = it;
+            }
+        }
+
+        yOffset = minHeight - 1;
+    }
+
+    // shrink other columns size
+    // update links to the deleted branch
+    foreach (ShapeItem* it, otherGoToBranchCommands)
+    {
+        updateItemGeometry(it, 0, -yOffset, 0, -yOffset);
+
+        // if other GO_TO_BRANCH commands refer to deleting branch, set error status on them
+        const QList<Command*>& next = it->command()->nextCommands();
+        if (!next.empty() && next[0] == item->command()) // first check is for TERMINATOR, cause it never has any next commands
+        {
+            it->command()->replaceCommand(Q_NULLPTR);
+        }
+    }
+
+    // diagram size reduced
+    mDiagramSize.setHeight(mDiagramSize.height() - yOffset);
+
+    int w = item->rect().width();
+
+    // Anyway shift to the left all branches right to deleting one
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it == item)
+        {
+            continue;
+        }
+
+        if (it->cell().x() > item->cell().x())
+        {
+            updateItemGeometry(it, -w, 0, 0, 0);
+        }
+    }
+
+    mDiagramSize.setWidth(mDiagramSize.height() - w);
+
+    // kill all shapes and commands, belonging to deleting branch
+    ownGoToBranchItem->command()->replaceCommand(Q_NULLPTR); // to block further tree deletion
+    mCurrentCyclogram->deleteCommand(item->command(), true);
+
+    drawSilhouette();
+    update();
+
+    int TODO5; // make control over command by shape (delete shape = delete command)
 }
 
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)

@@ -37,7 +37,7 @@ public:
     const QList<Command*>& commands() const;
     State state() const;
 
-    void deleteCommand(Command* cmd);
+    void deleteCommand(Command* cmd, bool recursive = false);
 
     Command* validate() const; //
 
@@ -61,5 +61,6 @@ signals:
     void changed();
     void finished();
     void stateChanged(int state);
+    void deleted(Command* cmd);
 };
 #endif // CYCLOGRAM_H

@@ -43,6 +43,7 @@ protected:
 
 private slots:
     void onCyclogramStateChanged(int state);
+    void removeShape(Command* command);
 
 private:
     void clear(bool onDestroy = false);
