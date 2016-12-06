@@ -8,6 +8,7 @@
 #include "Headers/commands/cmd_title.h"
 #include "Headers/commands/cmd_delay.h"
 #include "Headers/commands/cmd_action.h"
+#include "Headers/commands/cmd_action_math.h"
 
 #include "Headers/variable_controller.h"
 
@@ -296,9 +297,17 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
             cmd = new CmdDelay(this);
         }
         break;
-    case DRAKON::ACTION:
+    case DRAKON::ACTION_MATH:
         {
-            cmd = new CmdAction(this);
+            CmdActionMath* tmp = new CmdActionMath(this);
+            tmp->setVariableController(mVarController);
+            cmd = tmp;
+        }
+        break;
+
+    case DRAKON::ACTION_MODULE:
+        {
+            //cmd = new CmdActionModule(this);
         }
         break;
 

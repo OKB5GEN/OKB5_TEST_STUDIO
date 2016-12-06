@@ -11,6 +11,8 @@
 #include "Headers/command.h"
 #include "Headers/commands/cmd_title.h"
 
+#include "Headers/cmd_action_math_edit_dialog.h"
+#include "Headers/commands/cmd_action_math.h"
 #include "Headers/cmd_delay_edit_dialog.h"
 #include "Headers/commands/cmd_delay.h"
 #include "Headers/cmd_state_start_edit_dialog.h"
@@ -28,6 +30,7 @@ CyclogramWidget::CyclogramWidget():
     mEditDialogs[DRAKON::DELAY] = new CmdDelayEditDialog(this);
     mEditDialogs[DRAKON::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
     mEditDialogs[DRAKON::GO_TO_BRANCH] = new CmdSetStateEditDialog(this);
+    mEditDialogs[DRAKON::ACTION_MATH] = new CmdActionMathEditDialog(this);
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -636,7 +639,8 @@ QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
     switch (type)
     {
     case DRAKON::BRANCH_BEGIN:
-    case DRAKON::ACTION:
+    case DRAKON::ACTION_MATH:
+    case DRAKON::ACTION_MODULE:
     case DRAKON::DELAY:
         {
             ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()), 0);
@@ -843,7 +847,8 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
 
     switch (item->command()->type())
     {
-    case DRAKON::ACTION:
+    case DRAKON::ACTION_MATH:
+    case DRAKON::ACTION_MODULE:
     case DRAKON::DELAY:
         {
             int TODO3; // this is only for one-column branches! QUESTION/CASE will require some refactor
@@ -1279,6 +1284,13 @@ void CyclogramWidget::showEditDialog(Command *command)
             {
                 CmdDelayEditDialog* d = qobject_cast<CmdDelayEditDialog*>(dialog);
                 d->setCommand(qobject_cast<CmdDelay*>(command));
+            }
+            break;
+
+        case DRAKON::ACTION_MATH:
+            {
+                CmdActionMathEditDialog* d = qobject_cast<CmdActionMathEditDialog*>(dialog);
+                d->setCommand(qobject_cast<CmdActionMath*>(command));
             }
             break;
 

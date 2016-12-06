@@ -48,10 +48,12 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     switch (item->command()->type())
     {
     case DRAKON::DELAY:
-    case DRAKON::ACTION:
+    case DRAKON::ACTION_MATH:
+    //case DRAKON::ACTION_MODULE:
         {
             mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
-            mComboBox->addItem(tr("Action"), QVariant(int(DRAKON::ACTION)));
+            mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
+            //mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
 
             mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
         }
@@ -62,7 +64,8 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
             if (point.role() == 0) // add usual command
             {
                 mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
-                mComboBox->addItem(tr("Action"), QVariant(int(DRAKON::ACTION)));
+                mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
+                //mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MODULE)));
 
                 mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
             }

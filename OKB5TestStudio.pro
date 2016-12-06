@@ -27,13 +27,11 @@ SOURCES += main.cpp\
     Sources/cyclogram.cpp \
     Sources/cell.cpp \
     Sources/commands/cmd_case.cpp \
-    Sources/commands/cmd_check_condition.cpp \
     Sources/commands/cmd_cycle_do_while.cpp \
     Sources/commands/cmd_cycle_for.cpp \
     Sources/commands/cmd_cycle_while.cpp \
     Sources/commands/cmd_delay.cpp \
     Sources/commands/cmd_parallel_process.cpp \
-    Sources/commands/cmd_send_msg_result.cpp \
     Sources/commands/cmd_send_msg_result_fail.cpp \
     Sources/commands/cmd_set_state.cpp \
     Sources/commands/cmd_state_start.cpp \
@@ -56,7 +54,10 @@ SOURCES += main.cpp\
     Sources/render_area.cpp \
     Sources/shape_edit_dialog.cpp \
     Sources/command_error_dialog.cpp \
-    Sources/variable_controller.cpp
+    Sources/variable_controller.cpp \
+    Sources/commands/cmd_question.cpp \
+    Sources/commands/cmd_action_math.cpp \
+    Sources/cmd_action_math_edit_dialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -68,13 +69,11 @@ HEADERS  += mainwindow.h \
     Headers/cyclogram.h \
     Headers/cell.h \
     Headers/commands/cmd_case.h \
-    Headers/commands/cmd_check_condition.h \
     Headers/commands/cmd_cycle_do_while.h \
     Headers/commands/cmd_cycle_for.h \
     Headers/commands/cmd_cycle_while.h \
     Headers/commands/cmd_delay.h \
     Headers/commands/cmd_parallel_process.h \
-    Headers/commands/cmd_send_msg_result.h \
     Headers/commands/cmd_send_msg_result_fail.h \
     Headers/commands/cmd_set_state.h \
     Headers/commands/cmd_state_start.h \
@@ -99,7 +98,10 @@ HEADERS  += mainwindow.h \
     Headers/render_area.h \
     Headers/shape_edit_dialog.h \
     Headers/command_error_dialog.h \
-    Headers/variable_controller.h
+    Headers/variable_controller.h \
+    Headers/commands/cmd_question.h \
+    Headers/commands/cmd_action_math.h \
+    Headers/cmd_action_math_edit_dialog.h
 
 
 FORMS    += mainwindow.ui

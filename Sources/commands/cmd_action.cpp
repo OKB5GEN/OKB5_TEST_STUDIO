@@ -1,7 +1,7 @@
 #include "Headers/commands/cmd_action.h"
 
-CmdAction::CmdAction(QObject* parent):
-    Command(DRAKON::ACTION, parent)
+CmdAction::CmdAction(DRAKON::IconType type, QObject* parent):
+    Command(type, parent)
 {
 
 }
@@ -33,4 +33,14 @@ void CmdAction::finish()
     }
 
     emit finished(mNextCommands[0]);
+}
+
+void CmdAction::setVariableController(VariableController* controller)
+{
+    mVarCtrl = controller;
+}
+
+VariableController* CmdAction::variableController() const
+{
+    return mVarCtrl;
 }

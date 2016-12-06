@@ -3,7 +3,11 @@
 VariableController::VariableController(QObject* parent):
     QObject(parent)
 {
-
+    int TODO; // temporary
+    addVariable("I", 0);
+    addVariable("J", 1);
+    addVariable("K", 2);
+    addVariable("N", 3);
 }
 
 VariableController::~VariableController()

@@ -3,20 +3,28 @@
 
 #include "Headers/command.h"
 
+class VariableController;
+
 class CmdAction: public Command
 {
     Q_OBJECT
 
 public:
-    CmdAction(QObject* parent);
+    CmdAction(DRAKON::IconType type, QObject* parent);
+
+    void setVariableController(VariableController* controller);
+    VariableController* variableController() const;
 
     void run() override;
     void stop() override;
     void pause() override;
     void resume() override;
 
-private slots:
+protected slots:
     void finish();
+
+protected:
+    VariableController* mVarCtrl;
 
 private:
 };

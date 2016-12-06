@@ -17,7 +17,9 @@ public:
         // NOT OR PARTIALLY IMPLEMENTED >>>
         TERMINATOR,
 
-        ACTION,
+        ACTION_MATH,
+        ACTION_MODULE,
+
         QUESTION,
         SWITCH,
         CASE,

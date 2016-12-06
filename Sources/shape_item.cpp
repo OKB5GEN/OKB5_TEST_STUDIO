@@ -224,7 +224,8 @@ void ShapeItem::createPath()
             path.lineTo(CELL.width(), CELL.height() * 3 / 2);
         }
         break;
-    case DRAKON::ACTION:
+    case DRAKON::ACTION_MATH:
+    case DRAKON::ACTION_MODULE:
         {
             path.addRect(QRect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), smItemSize.height() - 2 * CELL.height()));
         }
