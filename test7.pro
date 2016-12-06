@@ -55,7 +55,8 @@ SOURCES += main.cpp\
     Sources/monitor_dialog.cpp \
     Sources/render_area.cpp \
     Sources/shape_edit_dialog.cpp \
-    Sources/command_error_dialog.cpp
+    Sources/command_error_dialog.cpp \
+    Sources/variable_controller.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -97,7 +98,8 @@ HEADERS  += mainwindow.h \
     Headers/monitor_dialog.h \
     Headers/render_area.h \
     Headers/shape_edit_dialog.h \
-    Headers/command_error_dialog.h
+    Headers/command_error_dialog.h \
+    Headers/variable_controller.h
 
 
 FORMS    += mainwindow.ui

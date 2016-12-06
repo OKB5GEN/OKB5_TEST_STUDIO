@@ -9,6 +9,8 @@
 #include "Headers/commands/cmd_delay.h"
 #include "Headers/commands/cmd_action.h"
 
+#include "Headers/variable_controller.h"
+
 /* Переменные циклограммы (мысли вслух)
  * 1. Каждая циклограмма может иметь свои переменные
  * 2. Переменные видны только в пределах своей циклограммы (за пределамы не видны)
@@ -60,6 +62,7 @@ Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
     mState(STOPPED)
 {
+    mVarController = new VariableController(this);
 }
 
 void Cyclogram::createDefault()
@@ -347,4 +350,9 @@ Command* Cyclogram::validate() const
     }
 
     return Q_NULLPTR;
+}
+
+VariableController* Cyclogram::varCtrl() const
+{
+    return mVarController;
 }

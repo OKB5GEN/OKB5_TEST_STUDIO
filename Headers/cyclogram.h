@@ -3,10 +3,12 @@
 
 #include <QObject>
 #include <QList>
+
 #include "Headers/cell.h"
 #include "Headers/shape_types.h"
 
 class Command;
+class VariableController;
 
 class Cyclogram: public QObject
 {
@@ -41,6 +43,8 @@ public:
 
     Command* validate() const; //
 
+    VariableController* varCtrl() const;
+
 private slots:
     void onCommandFinished(Command* cmd);
     void runCurrentCommand();
@@ -56,6 +60,8 @@ private:
     State mState = STOPPED;
 
     QList<Command*> mCommands;
+
+    VariableController* mVarController;
 
 signals:
     void changed();
