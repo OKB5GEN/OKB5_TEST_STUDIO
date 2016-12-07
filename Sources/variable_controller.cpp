@@ -15,40 +15,62 @@ VariableController::~VariableController()
 
 }
 
-const QMap<QString, qreal>& VariableController::variables() const
+const QMap<QString, qreal>& VariableController::variables(Container container) const
 {
-    return mVariables;
-}
-
-qreal VariableController::variable(const QString& name, const qreal& defaultValue/* = -1*/) const
-{
-    return mVariables.value(name, defaultValue);
-}
-
-void VariableController::setVariable(const QString& name, qreal value)
-{
-    if (mVariables.contains(name))
+    if (container == Current)
     {
-        mVariables[name] = value;
+        return mCurrent;
+    }
+
+    return mInitial;
+}
+
+qreal VariableController::variable(const QString& name, qreal defaultValue/* = -1*/, Container container) const
+{
+    if (container == Current)
+    {
+        return mCurrent.value(name, defaultValue);
+    }
+    else if (container == Initial)
+    {
+        return mInitial.value(name, defaultValue);
+    }
+
+    return defaultValue;
+}
+
+void VariableController::setVariable(const QString& name, qreal value, Container container)
+{
+    QMap<QString, qreal>& cont = (container == Current) ? mCurrent : mInitial;
+
+    if (cont.contains(name))
+    {
+        cont[name] = value;
     }
 }
 
 void VariableController::addVariable(const QString& name, qreal value)
 {
-    mVariables[name] = value;
+    mInitial[name] = value;
+    mCurrent[name] = value;
 }
 
 void VariableController::removeVariable(const QString& name)
 {
-    mVariables.remove(name);
+    mInitial.remove(name);
+    mCurrent.remove(name);
 }
 
 bool VariableController::isVariableExist(const QString& name) const
 {
-    return mVariables.contains(name);
+    // it is enough to check initial values container, cause all containers are synchronized
+    return mInitial.contains(name);
 }
 
 void VariableController::restart()
 {
+    mCurrent.clear();
 
+    mCurrent = mInitial; // perform deep copy of the container
+    mCurrent.detach();
 }
