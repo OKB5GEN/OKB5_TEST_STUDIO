@@ -4,10 +4,10 @@ VariableController::VariableController(QObject* parent):
     QObject(parent)
 {
     int TODO; // temporary
-    addVariable("I", 0);
-    addVariable("J", 1);
-    addVariable("K", 2);
-    addVariable("N", 3);
+    //addVariable("I", 0);
+    //addVariable("J", 1);
+    //addVariable("K", 2);
+    //addVariable("N", 3);
 }
 
 VariableController::~VariableController()
@@ -46,6 +46,7 @@ void VariableController::setVariable(const QString& name, qreal value, Container
     if (cont.contains(name))
     {
         cont[name] = value;
+        emit valueChanged(name, value);
     }
 }
 
@@ -53,12 +54,14 @@ void VariableController::addVariable(const QString& name, qreal value)
 {
     mInitial[name] = value;
     mCurrent[name] = value;
+    emit variableAdded(name, value);
 }
 
 void VariableController::removeVariable(const QString& name)
 {
     mInitial.remove(name);
     mCurrent.remove(name);
+    emit variableRemoved(name);
 }
 
 bool VariableController::isVariableExist(const QString& name) const

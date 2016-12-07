@@ -31,6 +31,11 @@ public:
 public slots:
     void restart();
 
+signals:
+    void variableAdded(const QString& name, qreal value);
+    void variableRemoved(const QString& name);
+    void valueChanged(const QString& name, qreal value);
+
 private:
     QMap<QString, qreal> mCurrent;
     QMap<QString, qreal> mInitial;
