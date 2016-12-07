@@ -18,5 +18,6 @@
     <file>images/edit_add.png</file>
     <file>images/edit_remove.png</file>
     <file>images/contents-256.png</file>
+    <file>images/variable.png</file>
 </qresource>
 </RCC>

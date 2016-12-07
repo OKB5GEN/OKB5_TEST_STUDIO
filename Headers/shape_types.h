@@ -10,20 +10,20 @@ class DRAKON: public QObject
 public:
     enum IconType
     {
-        DELAY,
+        TERMINATOR,
         BRANCH_BEGIN,
         GO_TO_BRANCH,
+        ACTION_MATH,
+        DELAY,
 
         // NOT OR PARTIALLY IMPLEMENTED >>>
-        TERMINATOR,
-
-        ACTION_MATH,
         ACTION_MODULE,
-
         QUESTION,
+
+        SUBPROGRAM,
+
         SWITCH,
         CASE,
-        SUBPROGRAM,
         FOR_BEGIN,
         FOR_END,
         OUTPUT,
@@ -32,8 +32,7 @@ public:
         SYNCHRONIZER,
         PARALLEL_PROCESS,
 
-        PARAMS,
-        SHELF,
+        SHELF, // subprogram input (top), subprogram output (bottom)
 
         SHAPES_COUNT // always must be last
     };

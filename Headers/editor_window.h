@@ -36,9 +36,11 @@ private slots:
     void documentWasModified();
 
     void runCyclogram();
+    void runOneCommand();
     void stopCyclogram();
     void addMonitor();
 
+    void addVariablesMonitor();
     void addManualMonitor();
     void addAutoMonitor();
 
@@ -65,6 +67,7 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
+    QAction* mRunOneCmdAct;
 
     QIcon mPlayIcon;
     QIcon mPauseIcon;

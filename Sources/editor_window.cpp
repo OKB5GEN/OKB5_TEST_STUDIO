@@ -231,6 +231,14 @@ void EditorWindow::createActions()
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
 
+    QIcon runOneCmdIcon = QIcon(":/images/step_forward.png");
+    mRunOneCmdAct = new QAction(runOneCmdIcon, tr("Run"), this);
+    //mRunOneCmdAct->setShortcuts(QKeySequence::New);
+    mRunOneCmdAct->setStatusTip(tr("Run one command"));
+    connect(mRunOneCmdAct, &QAction::triggered, this, &EditorWindow::runOneCommand);
+    runMenu->addAction(mRunOneCmdAct);
+    runToolBar->addAction(mRunOneCmdAct);
+
     QIcon stopIcon = QIcon(":/images/stop.png");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
@@ -244,6 +252,13 @@ void EditorWindow::createActions()
     QMenu *monitorMenu = menuBar()->addMenu(tr("&Monitor"));
     QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
     monitorToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+
+    const QIcon addVariablesIcon = QIcon(":/images/variable.png");
+    QAction *addVariablesAct = new QAction(addVariablesIcon, tr("Add variable monitor"), this);
+    addVariablesAct->setStatusTip(tr("Add variables monitor"));
+    connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
+    monitorMenu->addAction(addVariablesAct);
+    monitorToolBar->addAction(addVariablesAct);
 
     const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
@@ -405,6 +420,11 @@ void EditorWindow::runCyclogram()
     mStopAct->setEnabled(true);
 }
 
+void EditorWindow::runOneCommand()
+{
+    int TODO;
+}
+
 void EditorWindow::stopCyclogram()
 {
     mCyclogram->stop();
@@ -419,6 +439,11 @@ void EditorWindow::addMonitor()
     MonitorDialog* dialog = new MonitorDialog(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+void EditorWindow::addVariablesMonitor()
+{
+    int TODO;
 }
 
 void EditorWindow::addManualMonitor()

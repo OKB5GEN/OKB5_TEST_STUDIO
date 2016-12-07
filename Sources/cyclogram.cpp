@@ -335,7 +335,6 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
     case DRAKON::CASE:{} break;
     case DRAKON::SUBPROGRAM:{} break;
     case DRAKON::SHELF:{} break;
-    case DRAKON::PARAMS:{} break;
     case DRAKON::FOR_BEGIN:{} break;
     case DRAKON::FOR_END:{} break;
     case DRAKON::OUTPUT:{} break;
