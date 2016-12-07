@@ -14,6 +14,7 @@ class RenderArea;
 class CyclogramWidget;
 class Cyclogram;
 class CyclogramEndDialog;
+class VariablesWindow;
 
 class EditorWindow : public QMainWindow
 {
@@ -25,7 +26,7 @@ public:
     void loadFile(const QString &fileName);
 
 protected:
-    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void newFile();
@@ -60,7 +61,8 @@ private:
 
     Cyclogram* mCyclogram;
     CyclogramWidget *mCyclogramWidget;
-    CyclogramEndDialog * mCyclogramEndDialog;
+
+    VariablesWindow* mVariablesWindow;
 
     //QPlainTextEdit *textEdit;
     QString mCurFile;

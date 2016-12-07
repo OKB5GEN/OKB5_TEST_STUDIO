@@ -153,6 +153,8 @@ void ShapeItem::onTextChanged(const QString& text)
     qreal y = (smItemSize.height() + textRect.height()) / 2;
     textPath.addText(x, y, mFont, text);
     mTextPath = textPath;
+
+    emit changed();
 }
 
 void ShapeItem::onErrorStatusChanged(bool status)

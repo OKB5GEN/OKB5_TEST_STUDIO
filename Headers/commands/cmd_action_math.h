@@ -47,6 +47,10 @@ public:
     QString variableName(OperandID operand) const;
     qreal value(OperandID operand) const;
 
+private slots:
+    void onNameChanged(const QString& newName, const QString& oldName) override;
+    void onVariableRemoved(const QString& name) override;
+
 private:
     struct OperandData
     {

@@ -26,6 +26,7 @@ public:
     // add/remove actions are performed for all variable containers
     void addVariable(const QString& name, qreal value);
     void removeVariable(const QString& name);
+    void renameVariable(const QString& newName, const QString& oldName);
     bool isVariableExist(const QString& name) const;
 
 public slots:
@@ -34,7 +35,8 @@ public slots:
 signals:
     void variableAdded(const QString& name, qreal value);
     void variableRemoved(const QString& name);
-    void valueChanged(const QString& name, qreal value);
+    void valueChanged(const QString& name, qreal value, int container);
+    void nameChanged(const QString& newName, const QString& oldName);
 
 private:
     QMap<QString, qreal> mCurrent;

@@ -230,3 +230,37 @@ void CmdActionMath::updateText()
 
     emit textChanged(mText);
 }
+
+void CmdActionMath::onNameChanged(const QString& newName, const QString& oldName)
+{
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        if (mOperands[i].type == Variable && mOperands[i].variable == oldName)
+        {
+            mOperands[i].variable = newName; // just change name
+        }
+    }
+
+    updateText();
+}
+
+void CmdActionMath::onVariableRemoved(const QString& name)
+{
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        if (mOperands[i].type == Variable && mOperands[i].variable == name)
+        {
+            if (i == Operand2 && mOperation == Assign)
+            {
+                // do nothing
+            }
+            else
+            {
+                mOperands[i].type = OperandNotSet;
+                mOperands[i].variable.clear();
+            }
+        }
+    }
+
+    updateText();
+}

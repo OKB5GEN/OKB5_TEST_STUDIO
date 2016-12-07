@@ -44,6 +44,9 @@ public:
     static QSizeF itemSize();
     static QSizeF cellSize();
 
+signals:
+    void changed();
+
 private slots:
     void onTextChanged(const QString& text);
     void onErrorStatusChanged(bool status);

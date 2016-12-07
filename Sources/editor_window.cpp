@@ -9,19 +9,19 @@
 #include "Headers/cyclogram.h"
 
 #include "Headers/cyclogram_end_dialog.h"
+#include "Headers/variables_window.h"
 
 namespace
 {
     static const int TOOLBAR_ICON_SIZE = 64;
 }
 
-EditorWindow::EditorWindow()
+EditorWindow::EditorWindow():
+    mVariablesWindow(Q_NULLPTR)
     //: textEdit(new QPlainTextEdit)
 {
     mCyclogramWidget = new CyclogramWidget();
     mCyclogram = new Cyclogram(this);
-
-    mCyclogramEndDialog = new CyclogramEndDialog(this);
 
     mCyclogram->createDefault();
     mCyclogramWidget->load(mCyclogram);
@@ -443,7 +443,13 @@ void EditorWindow::addMonitor()
 
 void EditorWindow::addVariablesMonitor()
 {
-    int TODO;
+    if (!mVariablesWindow)
+    {
+        mVariablesWindow = new VariablesWindow(this);
+    }
+
+    mVariablesWindow->setVariableController(mCyclogram->varCtrl());
+    mVariablesWindow->show();
 }
 
 void EditorWindow::addManualMonitor()
@@ -462,17 +468,20 @@ void EditorWindow::addAutoMonitor()
 
 void EditorWindow::onCyclogramFinish(const QString& errorText)
 {
+    CyclogramEndDialog * dialog = new CyclogramEndDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     stopCyclogram();
+
     if (!errorText.isEmpty())
     {
-        mCyclogramEndDialog->setText(errorText);
+        dialog->setText(errorText);
     }
     else
     {
-        mCyclogramEndDialog->setText(tr("Cyclogram execution finished"));
+        dialog->setText(tr("Cyclogram execution finished"));
     }
 
-    mCyclogramEndDialog->exec();
+    dialog->exec();
 }
 
 void EditorWindow::commitData(QSessionManager &manager)

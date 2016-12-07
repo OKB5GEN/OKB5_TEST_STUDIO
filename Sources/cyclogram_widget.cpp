@@ -366,6 +366,8 @@ ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
     shapeItem->setValencyPoints(createValencyPoints(cmd));
     mCommands.append(shapeItem);
 
+    connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
+
     return shapeItem;
 }
 
@@ -464,9 +466,7 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     QPoint parentCell(0, 0);
     createCommandShape(first, parentCell);
     addChildCommands(first, parentCell);
-
-    drawSilhouette();
-    update();
+    onNeedUpdate();
 }
 
 void CyclogramWidget::onCyclogramStateChanged(int state)
@@ -826,7 +826,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 
             //TODO on diagram size changed
             mDiagramSize.setHeight(mDiagramSize.height() + 1);
-            drawSilhouette();
+            onNeedUpdate();
         }
     }
 
@@ -991,8 +991,6 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
     if (deleteShape)
     {
         mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
-        drawSilhouette();
-        update();
     }
 }
 
@@ -1007,6 +1005,14 @@ void CyclogramWidget::removeShape(Command* command)
             break;
         }
     }
+
+    onNeedUpdate();
+}
+
+void CyclogramWidget::onNeedUpdate()
+{
+    drawSilhouette();
+    update();
 }
 
 void CyclogramWidget::deleteBranch(ShapeItem* item)
@@ -1098,10 +1104,6 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     // kill all shapes and commands, belonging to deleting branch
     ownGoToBranchItem->command()->replaceCommand(Q_NULLPTR); // to block further tree deletion
     mCurrentCyclogram->deleteCommand(item->command(), true);
-
-    drawSilhouette();
-    update();
-
     int TODO5; // make control over command by shape (delete shape = delete command)
 }
 
@@ -1145,9 +1147,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     cmd->setText(name);
 
     mDiagramSize.setWidth(mDiagramSize.width() + 1);
-    drawSilhouette();
-
-    update();
+    onNeedUpdate();
 
     return newBranchItem;
 }

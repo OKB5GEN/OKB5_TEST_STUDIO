@@ -22,6 +22,8 @@ public:
 
 protected slots:
     void finish();
+    virtual void onNameChanged(const QString& newName, const QString& oldName);
+    virtual void onVariableRemoved(const QString& name);
 
 protected:
     VariableController* mVarCtrl;
