@@ -145,11 +145,61 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
         mOper2Box->clear();
         mResultBox->clear();
 
-        mOper1Box->addItems(mCommand->variableController()->variables().keys());
-        mOper2Box->addItems(mCommand->variableController()->variables().keys());
-        mResultBox->addItems(mCommand->variableController()->variables().keys());
+        VariableController* vc = mCommand->variableController();
+        mOper1Box->addItems(vc->variables().keys());
+        mOper2Box->addItems(vc->variables().keys());
+        mResultBox->addItems(vc->variables().keys());
 
-        int TODO; // fill GUI with command current parameters
+        int index = mOperationBox->findData(QVariant(int(mCommand->operation())));
+        if (index != -1)
+        {
+            mOperationBox->setCurrentIndex(index);
+        }
+
+        updateComponent(CmdActionMath::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
+        updateComponent(CmdActionMath::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
+        updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper1NumBtn);
+    }
+}
+
+void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)
+{
+    VariableController* vc = mCommand->variableController();
+    CmdActionMath::OperandID op = CmdActionMath::OperandID(operand);
+
+    if (mCommand->operandType(op) == CmdActionMath::Variable)
+    {
+        if (boxBtn)
+        {
+            boxBtn->toggle();
+        }
+
+        QString name = mCommand->variableName(op);
+        if (vc->isVariableExist(name))
+        {
+            int index = box->findText(name);
+            if (index != -1)
+            {
+                box->setCurrentIndex(index);
+            }
+        }
+    }
+    else if (mCommand->operandType(op) == CmdActionMath::Number)
+    {
+        if (lineEditBtn)
+        {
+            lineEditBtn->toggle();
+        }
+
+        if (lineEdit)
+        {
+            lineEdit->setText(QString::number(mCommand->value(op)));
+        }
+    }
+
+    if (op == CmdActionMath::Operand2)
+    {
+        mTwoOperandsCheckBox->setChecked(mCommand->operation() != CmdActionMath::Assign);
     }
 }
 
@@ -157,7 +207,49 @@ void CmdActionMathEditDialog::onAccept()
 {
     if (mCommand)
     {
-        int TODO; // set current GUI state to command parameters
+        if (mTwoOperandsCheckBox->isChecked())
+        {
+            CmdActionMath::Operation operation = CmdActionMath::Operation(mOperationBox->currentData().toInt());
+
+            if (mOper2VarBtn->isChecked())
+            {
+                QString oper2Var = mOper2Box->currentText();
+                mCommand->setOperand(CmdActionMath::Operand2, oper2Var);
+            }
+            else
+            {
+                qreal oper2Val = mOper2Num->text().toDouble();
+
+                // division by zero protection
+                if (operation == CmdActionMath::Divide && oper2Val == 0)
+                {
+                    QMessageBox::warning(this, tr("Error"), tr("Division by zero detected!"));
+                    return;
+                }
+
+                mCommand->setOperand(CmdActionMath::Operand2, oper2Val);
+            }
+
+            mCommand->setOperation(operation);
+        }
+        else
+        {
+            mCommand->setOperation(CmdActionMath::Assign);
+        }
+
+        QString resultVar = mResultBox->currentText();
+        mCommand->setOperand(CmdActionMath::Result, resultVar);
+
+        if (mOper1VarBtn->isChecked())
+        {
+            QString oper1Var = mOper1Box->currentText();
+            mCommand->setOperand(CmdActionMath::Operand1, oper1Var);
+        }
+        else
+        {
+            qreal oper1Val = mOper1Num->text().toDouble();
+            mCommand->setOperand(CmdActionMath::Operand1, oper1Val);
+        }
     }
 
     accept();

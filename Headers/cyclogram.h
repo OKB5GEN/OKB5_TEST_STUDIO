@@ -47,6 +47,7 @@ public:
 
 private slots:
     void onCommandFinished(Command* cmd);
+    void onCriticalError(Command* cmd);
     void runCurrentCommand();
 
 private:
@@ -65,7 +66,7 @@ private:
 
 signals:
     void changed();
-    void finished();
+    void finished(const QString& error);
     void stateChanged(int state);
     void deleted(Command* cmd);
 };

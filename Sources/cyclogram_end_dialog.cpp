@@ -7,10 +7,9 @@ CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
 {
     QGridLayout * layout = new QGridLayout(this);
 
-    int TODO; // remove line edit its just for testing
-    QLabel* label = new QLabel(this);
-    label->setText(tr("ПОТРАЧЕНО"));
-    layout->addWidget(label, 0, 0);
+    mLabel = new QLabel(this);
+    mLabel->setText(tr("ПОТРАЧЕНО"));
+    layout->addWidget(mLabel, 0, 0);
 
     //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 
@@ -27,4 +26,9 @@ CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
 CyclogramEndDialog::~CyclogramEndDialog()
 {
 
+}
+
+void CyclogramEndDialog::setText(const QString& text)
+{
+    mLabel->setText(text);
 }

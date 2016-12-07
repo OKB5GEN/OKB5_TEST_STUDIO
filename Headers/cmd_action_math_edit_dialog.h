@@ -27,10 +27,6 @@ public:
 private slots:
     void onAccept();
 
-    ///
-    /// \brief onCheckBoxStateChanged
-    /// \param state
-    ///
     void onCheckBoxStateChanged(int state);
     void onOper1VarBtnStateChanged(bool toggled);
     void onOper1NumBtnStateChanged(bool toggled);
@@ -39,6 +35,7 @@ private slots:
 
 private:
     void setupUI();
+    void updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn);
 
     CmdActionMath* mCommand;
 

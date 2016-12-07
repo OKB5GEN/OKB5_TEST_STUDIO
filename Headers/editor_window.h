@@ -42,7 +42,7 @@ private slots:
     void addManualMonitor();
     void addAutoMonitor();
 
-    void onCyclogramFinish();
+    void onCyclogramFinish(const QString& errorText);
 
     void commitData(QSessionManager &);
 

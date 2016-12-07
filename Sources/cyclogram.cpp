@@ -121,6 +121,7 @@ void Cyclogram::run()
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
+        mVarController->restart();
         mCurrent = mFirst;
         setState(RUNNING);
         runCurrentCommand();
@@ -130,6 +131,7 @@ void Cyclogram::run()
 void Cyclogram::onCommandFinished(Command* cmd)
 {
     disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+    disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "finished");
 
     if (cmd != Q_NULLPTR)
@@ -147,8 +149,22 @@ void Cyclogram::onCommandFinished(Command* cmd)
         qDebug("[%s] Cyclogram finished", qUtf8Printable(QTime::currentTime().toString()));
         qDebug("==================================");
         stop();
-        emit finished();
+        emit finished("");
     }
+}
+
+void Cyclogram::onCriticalError(Command* cmd)
+{
+    disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+    disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
+    LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
+
+    qDebug("==================================");
+    qDebug("[%s] Cyclogram stopped due to critical runtime error", qUtf8Printable(QTime::currentTime().toString()));
+    qDebug("==================================");
+
+    stop();
+    emit finished(tr("Critical error occured: ") + cmd->errorDesc());
 }
 
 void Cyclogram::runCurrentCommand()
@@ -157,6 +173,7 @@ void Cyclogram::runCurrentCommand()
     {
         LogCmd(mCurrent, "started");
         connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+        connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
         mCurrent->run();
     }
 }
@@ -166,6 +183,7 @@ void Cyclogram::stop()
     if (mState == RUNNING || mState == PAUSED)
     {
         disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+        disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
         mCurrent->stop();
     }
 

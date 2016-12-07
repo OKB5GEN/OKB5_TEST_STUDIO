@@ -26,7 +26,7 @@ EditorWindow::EditorWindow()
     mCyclogram->createDefault();
     mCyclogramWidget->load(mCyclogram);
 
-    connect(mCyclogram, SIGNAL(finished()), this, SLOT(onCyclogramFinish()));
+    connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
 
     //setCentralWidget(textEdit);
     setCentralWidget(mCyclogramWidget); // takes control over renderArea
@@ -435,9 +435,18 @@ void EditorWindow::addAutoMonitor()
     dialog->show();
 }
 
-void EditorWindow::onCyclogramFinish()
+void EditorWindow::onCyclogramFinish(const QString& errorText)
 {
     stopCyclogram();
+    if (!errorText.isEmpty())
+    {
+        mCyclogramEndDialog->setText(errorText);
+    }
+    else
+    {
+        mCyclogramEndDialog->setText(tr("Cyclogram execution finished"));
+    }
+
     mCyclogramEndDialog->exec();
 }
 

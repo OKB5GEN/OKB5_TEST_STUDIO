@@ -22,7 +22,8 @@ void CmdActionMath::run()
     {
         if (mOperands[i].type == Variable)
         {
-            mOperands[i].value = mVarCtrl->variable(mOperands[i].variable);
+            qreal v = mVarCtrl->variable(mOperands[i].variable);
+            mOperands[i].value = v;
         }
     }
 
@@ -39,7 +40,16 @@ void CmdActionMath::run()
         mOperands[Result].value = mOperands[Operand1].value * mOperands[Operand2].value;
         break;
     case Divide:
-        mOperands[Result].value = mOperands[Operand1].value / mOperands[Operand2].value;
+        if (mOperands[Operand2].value != 0)
+        {
+            mOperands[Result].value = mOperands[Operand1].value / mOperands[Operand2].value;
+        }
+        else
+        {
+            mErrorText = tr("Division by zero in runtime");
+            emit criticalError(this);
+        }
+
         break;
     case Assign:
         mOperands[Result].value = mOperands[Operand1].value;
@@ -217,4 +227,6 @@ void CmdActionMath::updateText()
     {
         setErrorStatus(!isValid);
     }
+
+    emit textChanged(mText);
 }

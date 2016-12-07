@@ -19,6 +19,9 @@ public:
     void removeVariable(const QString& name);
     bool isVariableExist(const QString& name) const;
 
+public slots:
+    void restart();
+
 private:
     QMap<QString, qreal> mVariables;
 };

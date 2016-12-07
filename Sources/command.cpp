@@ -49,9 +49,14 @@ DRAKON::IconType Command::type() const
     return mType;
 }
 
-QString Command::text() const
+const QString& Command::text() const
 {
     return mText;
+}
+
+const QString& Command::errorDesc() const
+{
+    return mErrorText;
 }
 
 void Command::setFlags(uint32_t flags)

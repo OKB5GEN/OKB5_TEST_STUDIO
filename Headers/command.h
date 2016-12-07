@@ -28,7 +28,8 @@ public:
     virtual void pause();
     virtual void resume();
 
-    virtual QString text() const;
+    const QString& text() const;
+    const QString& errorDesc() const;
     DRAKON::IconType type() const;
 
     const QList<Command*>& nextCommands() const;
@@ -49,12 +50,14 @@ signals:
     void finished(Command* nextCmd);
     void textChanged(const QString& text);
     void errorStatusChanged(bool status); //true - has error, false - no error/error fixed
+    void criticalError(Command* cmd); // cmd - where the critical error occured
 
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed
 
     DRAKON::IconType mType;
     QString mText;
+    QString mErrorText;
     int mRole;
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 

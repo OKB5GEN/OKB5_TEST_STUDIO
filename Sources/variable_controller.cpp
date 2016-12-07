@@ -47,3 +47,8 @@ bool VariableController::isVariableExist(const QString& name) const
 {
     return mVariables.contains(name);
 }
+
+void VariableController::restart()
+{
+
+}
