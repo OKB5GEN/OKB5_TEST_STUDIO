@@ -54,6 +54,8 @@ void CmdActionMathEditDialog::setupUI()
     equalSign->setText("=");
     layout->addWidget(equalSign, 0, 2, 2, 1);
 
+    mValidator = new QDoubleValidator(this);
+
     // Operand 1 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand1Box = new QGroupBox(this);
     mOperand1Box->setTitle(tr("Operand 1"));
@@ -63,7 +65,7 @@ void CmdActionMathEditDialog::setupUI()
     mOper1NumBtn = new QRadioButton(this);
     mOper1Box = new QComboBox(this);
     mOper1Num = new QLineEdit(this);
-    mOper1Num->setValidator(new QDoubleValidator(this));
+    mOper1Num->setValidator(mValidator);
 
     box1layout->addWidget(mOper1VarBtn, 0, 0, 1, 1);
     box1layout->addWidget(mOper1NumBtn, 1, 0, 1, 1);
@@ -101,7 +103,7 @@ void CmdActionMathEditDialog::setupUI()
     mOper2NumBtn = new QRadioButton(this);
     mOper2Box = new QComboBox(this);
     mOper2Num = new QLineEdit(this);
-    mOper2Num->setValidator(new QDoubleValidator(this));
+    mOper2Num->setValidator(mValidator);
 
     box2layout->addWidget(mOper2VarBtn, 0, 0, 1, 1);
     box2layout->addWidget(mOper2NumBtn, 1, 0, 1, 1);
@@ -158,7 +160,7 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
 
         updateComponent(CmdActionMath::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
         updateComponent(CmdActionMath::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
-        updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper1NumBtn);
+        updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
     }
 }
 
@@ -171,7 +173,7 @@ void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLine
     {
         if (boxBtn)
         {
-            boxBtn->toggle();
+            boxBtn->setChecked(true);
         }
 
         QString name = mCommand->variableName(op);
@@ -188,7 +190,7 @@ void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLine
     {
         if (lineEditBtn)
         {
-            lineEditBtn->toggle();
+            lineEditBtn->setChecked(true);
         }
 
         if (lineEdit)
@@ -218,7 +220,7 @@ void CmdActionMathEditDialog::onAccept()
             }
             else
             {
-                qreal oper2Val = mOper2Num->text().toDouble();
+                qreal oper2Val = mOper2Num->text().replace(",", ".").toDouble();
 
                 // division by zero protection
                 if (operation == CmdActionMath::Divide && oper2Val == 0)
@@ -247,7 +249,7 @@ void CmdActionMathEditDialog::onAccept()
         }
         else
         {
-            qreal oper1Val = mOper1Num->text().toDouble();
+            qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
             mCommand->setOperand(CmdActionMath::Operand1, oper1Val);
         }
     }

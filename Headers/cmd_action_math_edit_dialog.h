@@ -9,6 +9,7 @@ class QCheckBox;
 class QRadioButton;
 class QLineEdit;
 class QGroupBox;
+class QDoubleValidator;
 QT_END_NAMESPACE
 
 
@@ -56,6 +57,8 @@ private:
 
     QGroupBox* mOperand1Box;
     QGroupBox* mOperand2Box;
+
+    QDoubleValidator* mValidator;
 };
 
 #endif // CMD_ACTION_MATH_EDIT_DIALOG_H

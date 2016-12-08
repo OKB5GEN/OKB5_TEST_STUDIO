@@ -50,6 +50,8 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     connect(mRemoveBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
     layout->addWidget(mRemoveBtn, 1, 5, 1, 1);
 
+    mValidator = new QDoubleValidator(this);
+
     setLayout(layout);
     setWindowTitle(tr("Variables"));
 }
@@ -180,7 +182,7 @@ void VariablesWindow::onInitialValueChanged()
         return;
     }
 
-    qreal value = valueLineEdit->text().toDouble();
+    qreal value = valueLineEdit->text().replace(",", ".").toDouble();
 
     // find out variable name
     QString name;
@@ -244,14 +246,14 @@ void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, q
     QString initial = QString::number(initialValue);
     QLineEdit* lineEditInitial = new QLineEdit();
     lineEditInitial->setText(initial);
-    lineEditInitial->setValidator(new QDoubleValidator());
+    lineEditInitial->setValidator(mValidator);
     mTableWidget->setCellWidget(row, 1, lineEditInitial);
     connect(lineEditInitial, SIGNAL(editingFinished()), this, SLOT(onInitialValueChanged()));
 
     QString current = QString::number(currentValue);
     QLineEdit* lineEditCurrent = new QLineEdit();
     lineEditCurrent->setText(current);
-    lineEditCurrent->setValidator(new QDoubleValidator());
+    lineEditCurrent->setValidator(mValidator);
     lineEditCurrent->setReadOnly(true);
     mTableWidget->setCellWidget(row, 2, lineEditCurrent);
     //connect(lineEditCurrent, SIGNAL(editingFinished()), this, SLOT(onCurrentValueChanged()));

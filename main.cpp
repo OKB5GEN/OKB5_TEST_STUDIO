@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-#include <QApplication>
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
@@ -21,6 +20,8 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     parser.addPositionalArgument("file", "The file to open.");
     parser.process(app);
+
+    QLocale::setDefault(QLocale::c());
 
     EditorWindow mainWin;
     if (!parser.positionalArguments().isEmpty())
