@@ -5,9 +5,10 @@
 
 QT_BEGIN_NAMESPACE
 class QTableWidget;
+class QToolButton;
 QT_END_NAMESPACE
 
-class VariableController;
+class Cyclogram;
 
 class VariablesWindow: public QDialog
 {
@@ -17,7 +18,7 @@ public:
     VariablesWindow(QWidget * parent);
     ~VariablesWindow();
 
-    void setVariableController(VariableController * controller);
+    void setCyclogram(Cyclogram * cyclogram);
 
 protected:
 
@@ -27,17 +28,18 @@ private slots:
 
     void onNameChanged();
     void onInitialValueChanged();
-    //void onCurrentValueChanged();
+    void onTableSelectionChanged();
 
     void onValueChanged(const QString& name, qreal value, int container);
 
 private:
     void addRow(int row, const QString& name, qreal initialValue, qreal currentValue);
-    void removeRow(int row);
+    void updateTableSize();
 
     QTableWidget* mTableWidget;
+    QToolButton* mRemoveBtn;
 
-    VariableController* mController;
+    Cyclogram* mCyclogram;
 };
 
 #endif // VARIABLES_WINDOW_H

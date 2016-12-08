@@ -1,4 +1,5 @@
 #include "Headers/variables_window.h"
+#include "Headers/cyclogram.h"
 #include "Headers/variable_controller.h"
 
 #include <QtWidgets>
@@ -21,7 +22,14 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     list.append(tr("Initial"));
     list.append(tr("Current"));
     mTableWidget->setHorizontalHeaderLabels(list);
-    mTableWidget->setFixedWidth(mTableWidget->sizeHint().width());
+
+    mTableWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    mTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    //mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    connect(mTableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onTableSelectionChanged()));
+    updateTableSize();
 
     layout->addWidget(mTableWidget, 0, 0, 5, 5);
 
@@ -34,12 +42,13 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     layout->addWidget(addBtn, 0, 5, 1, 1);
 
     // pause button
-    QToolButton* removeBtn = new QToolButton(this);
-    removeBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-    removeBtn->setIcon(QIcon(":/images/edit_remove.png"));
-    removeBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
-    connect(removeBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
-    layout->addWidget(removeBtn, 1, 5, 1, 1);
+    mRemoveBtn = new QToolButton(this);
+    mRemoveBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mRemoveBtn->setIcon(QIcon(":/images/edit_remove.png"));
+    mRemoveBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mRemoveBtn->setEnabled(false);
+    connect(mRemoveBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
+    layout->addWidget(mRemoveBtn, 1, 5, 1, 1);
 
     setLayout(layout);
     setWindowTitle(tr("Variables"));
@@ -50,22 +59,26 @@ VariablesWindow::~VariablesWindow()
 
 }
 
-void VariablesWindow::setVariableController(VariableController * controller)
+void VariablesWindow::setCyclogram(Cyclogram * cyclogram)
 {
-    mController = controller;
+    mCyclogram = cyclogram;
 
     mTableWidget->clearContents();
     mTableWidget->setRowCount(0);
 
-    connect(mController, SIGNAL(valueChanged(const QString&,qreal,int)), this, SLOT(onValueChanged(const QString&,qreal,int)));
+    VariableController* controller = mCyclogram->varCtrl();
 
-    foreach (QString key, mController->variables().keys())
+    connect(controller, SIGNAL(valueChanged(const QString&,qreal,int)), this, SLOT(onValueChanged(const QString&,qreal,int)));
+
+    foreach (QString key, controller->variables().keys())
     {
         int index = mTableWidget->rowCount();
-        qreal initial = mController->variable(key, -1, VariableController::Initial);
-        qreal current = mController->variable(key, -1, VariableController::Current);
+        qreal initial = controller->variable(key, -1, VariableController::Initial);
+        qreal current = controller->variable(key, -1, VariableController::Current);
         addRow(index, key, initial, current);
     }
+
+    updateTableSize();
 }
 
 void VariablesWindow::onAddClicked()
@@ -73,24 +86,58 @@ void VariablesWindow::onAddClicked()
     QString prefix = "V";
     QString name = prefix;
     int index = 0;
+    VariableController* controller = mCyclogram->varCtrl();
 
-    while (mController->isVariableExist(name))
+    while (controller->isVariableExist(name))
     {
         ++index;
         name = prefix + QString::number(index);
     }
 
     addRow(mTableWidget->rowCount(), name, 0, 0);
-    mController->addVariable(name, 0);
+    controller->addVariable(name, 0);
+    updateTableSize();
+}
+
+void VariablesWindow::updateTableSize()
+{
+    mTableWidget->resizeColumnsToContents();
+    mTableWidget->setFixedWidth(mTableWidget->horizontalHeader()->length() + mTableWidget->verticalHeader()->width());
+    mTableWidget->update();
 }
 
 void VariablesWindow::onRemoveClicked()
 {
-    int TODO;
+    VariableController* controller = mCyclogram->varCtrl();
+    QItemSelectionModel* selectionModel = mTableWidget->selectionModel();
+
+    QList<int> rowsForDeletion;
+    foreach (QModelIndex index, selectionModel->selectedRows())
+    {
+        rowsForDeletion.append(index.row());
+    }
+
+    qSort(rowsForDeletion);
+    int rowsDeleted = 0;
+
+    foreach (int row, rowsForDeletion)
+    {
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row - rowsDeleted, 0));
+        if (lineEdit)
+        {
+            controller->removeVariable(lineEdit->text());
+            mTableWidget->removeRow(row - rowsDeleted);
+            ++rowsDeleted;
+        }
+    }
+
+    mTableWidget->clearSelection();
+    updateTableSize();
 }
 
 void VariablesWindow::onNameChanged()
 {
+    VariableController* controller = mCyclogram->varCtrl();
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(QObject::sender());
     if (!lineEdit)
     {
@@ -111,7 +158,7 @@ void VariablesWindow::onNameChanged()
         return; // name doesn't changed
     }
 
-    if (mController->isVariableExist(newName))
+    if (controller->isVariableExist(newName))
     {
         // name is not unique, restore old name
         QMessageBox::warning(this, tr("Error"), tr("Variable '%1' already exist").arg(newName));
@@ -120,11 +167,12 @@ void VariablesWindow::onNameChanged()
     }
 
     lineEdit->setProperty(PREV_NAME_PROPERTY, QVariant(newName));
-    mController->renameVariable(newName, oldName);
+    controller->renameVariable(newName, oldName);
 }
 
 void VariablesWindow::onInitialValueChanged()
 {
+    VariableController* controller = mCyclogram->varCtrl();
     QLineEdit* valueLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
     if (!valueLineEdit)
     {
@@ -151,7 +199,7 @@ void VariablesWindow::onInitialValueChanged()
         }
     }
 
-    mController->setVariable(name, value, VariableController::Initial);
+    controller->setVariable(name, value, VariableController::Initial);
 }
 
 void VariablesWindow::onValueChanged(const QString& name, qreal value, int container)
@@ -174,6 +222,13 @@ void VariablesWindow::onValueChanged(const QString& name, qreal value, int conta
             }
         }
     }
+}
+
+void VariablesWindow::onTableSelectionChanged()
+{
+    QItemSelectionModel* selectionModel = mTableWidget->selectionModel();
+    int count = selectionModel->selectedRows().size();
+    mRemoveBtn->setEnabled(count > 0 && (mCyclogram->state() != Cyclogram::RUNNING));
 }
 
 void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, qreal currentValue)
@@ -200,9 +255,4 @@ void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, q
     lineEditCurrent->setReadOnly(true);
     mTableWidget->setCellWidget(row, 2, lineEditCurrent);
     //connect(lineEditCurrent, SIGNAL(editingFinished()), this, SLOT(onCurrentValueChanged()));
-}
-
-void VariablesWindow::removeRow(int row)
-{
-    int TODO;
 }

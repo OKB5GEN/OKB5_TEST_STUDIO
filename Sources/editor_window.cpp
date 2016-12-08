@@ -304,7 +304,7 @@ void EditorWindow::writeSettings()
 
 bool EditorWindow::maybeSave()
 {
-    bool isModified = true; // TODO is cyclogram modified
+    bool isModified = false; // TODO is cyclogram modified
 
     if (!isModified)
     {
@@ -448,7 +448,7 @@ void EditorWindow::addVariablesMonitor()
         mVariablesWindow = new VariablesWindow(this);
     }
 
-    mVariablesWindow->setVariableController(mCyclogram->varCtrl());
+    mVariablesWindow->setCyclogram(mCyclogram);
     mVariablesWindow->show();
 }
 
