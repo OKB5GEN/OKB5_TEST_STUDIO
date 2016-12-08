@@ -47,6 +47,8 @@ public:
     void setParentCommand(Command* cmd);
     void setActive(bool active);
 
+    void setExecutionDelay(int msec);
+
 signals:
     void finished(Command* nextCmd);
     void textChanged(const QString& text);
@@ -63,11 +65,14 @@ protected:
     int mRole;
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
+    int mExecutionDelay;
+
     QList<Command*> mNextCommands;
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
 
 private slots:
     void onNextCmdTextChanged(const QString& text);
+    void end();
 
 private:
     bool mHasError;

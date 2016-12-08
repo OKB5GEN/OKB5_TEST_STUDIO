@@ -33,7 +33,7 @@ public:
     void pause();
     void resume();
 
-    void setExecuteOneCmd(bool enable);
+    //void setExecuteOneCmd(bool enable);
 
     Command* first() const;
     Command* last() const;
@@ -68,7 +68,7 @@ private:
 
     VariableController* mVarController;
 
-    bool mExecuteOneCmd;
+    //bool mExecuteOneCmd;
 
 signals:
     void changed();

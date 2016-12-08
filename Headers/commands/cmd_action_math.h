@@ -50,6 +50,7 @@ public:
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;
+    void execute();
 
 private:
     struct OperandData

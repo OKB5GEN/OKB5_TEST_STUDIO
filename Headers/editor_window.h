@@ -70,7 +70,7 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
-    QAction* mRunOneCmdAct;
+    //QAction* mRunOneCmdAct;
 
     QIcon mPlayIcon;
     QIcon mPauseIcon;

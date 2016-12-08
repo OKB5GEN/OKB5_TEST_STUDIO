@@ -61,8 +61,8 @@ namespace
 
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
-    mState(STOPPED),
-    mExecuteOneCmd(false)
+    mState(STOPPED)
+//  , mExecuteOneCmd(false)
 {
     mVarController = new VariableController(this);
 }
@@ -193,6 +193,7 @@ void Cyclogram::stop()
 {
     if (mState == RUNNING || mState == PAUSED)
     {
+        mCurrent->setActive(false);
         disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
         mCurrent->stop();
@@ -219,11 +220,12 @@ void Cyclogram::resume()
         setState(RUNNING);
     }
 }
-
+/*
 void Cyclogram::setExecuteOneCmd(bool enable)
 {
     mExecuteOneCmd = enable;
 }
+*/
 
 Command* Cyclogram::first() const
 {

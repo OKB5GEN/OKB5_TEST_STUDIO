@@ -1,6 +1,12 @@
 #include <QTime>
+#include <QTimer>
 
 #include "Headers/command.h"
+
+namespace
+{
+    static const int EXECUTION_DELAY = 50;
+}
 
 Command::Command(DRAKON::IconType type, QObject * parent):
     QObject(parent),
@@ -8,9 +14,10 @@ Command::Command(DRAKON::IconType type, QObject * parent):
     mRole(0),
     mFlags(Command::All),
     mParentCommand(Q_NULLPTR),
-    mHasError(false)
+    mHasError(false),
+    mExecutionDelay(0)
 {
-
+    setExecutionDelay(EXECUTION_DELAY);
 }
 
 Command::~Command()
@@ -19,6 +26,18 @@ Command::~Command()
 }
 
 void Command::run()
+{
+    if (mExecutionDelay > 0)
+    {
+        QTimer::singleShot(mExecutionDelay, this, SLOT(end()));
+    }
+    else
+    {
+        end();
+    }
+}
+
+void Command::end()
 {
     if (mNextCommands.empty())
     {
@@ -198,4 +217,9 @@ void Command::setErrorStatus(bool status)
 {
     mHasError = status;
     emit errorStatusChanged(mHasError);
+}
+
+void Command::setExecutionDelay(int msec)
+{
+    mExecutionDelay = msec;
 }

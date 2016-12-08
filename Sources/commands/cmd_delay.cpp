@@ -30,7 +30,6 @@ void CmdDelay::run()
         {
             mTimer->start(mDelay);
         }
-
     }
     else
     {

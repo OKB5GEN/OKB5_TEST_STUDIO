@@ -1,6 +1,8 @@
 #include "Headers/commands/cmd_action.h"
 #include "Headers/variable_controller.h"
 
+#include <QTimer>
+
 CmdAction::CmdAction(DRAKON::IconType type, QObject* parent):
     Command(type, parent)
 {
@@ -9,7 +11,14 @@ CmdAction::CmdAction(DRAKON::IconType type, QObject* parent):
 
 void CmdAction::run()
 {
-    finish();
+    if (mExecutionDelay > 0)
+    {
+        QTimer::singleShot(mExecutionDelay, this, SLOT(finish()));
+    }
+    else
+    {
+        finish();
+    }
 }
 
 void CmdAction::finish()

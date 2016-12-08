@@ -232,13 +232,14 @@ void EditorWindow::createActions()
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
 
+    /*
     QIcon runOneCmdIcon = QIcon(":/images/step_forward.png");
     mRunOneCmdAct = new QAction(runOneCmdIcon, tr("Run"), this);
     //mRunOneCmdAct->setShortcuts(QKeySequence::New);
     mRunOneCmdAct->setStatusTip(tr("Run one command"));
     connect(mRunOneCmdAct, &QAction::triggered, this, &EditorWindow::runOneCommand);
     runMenu->addAction(mRunOneCmdAct);
-    runToolBar->addAction(mRunOneCmdAct);
+    runToolBar->addAction(mRunOneCmdAct);*/
 
     QIcon stopIcon = QIcon(":/images/stop.png");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
@@ -401,22 +402,22 @@ void EditorWindow::runCyclogram()
 
     if (mCyclogram->state() == Cyclogram::STOPPED)
     {
-        mCyclogram->setExecuteOneCmd(false);
-        mRunOneCmdAct->setEnabled(false);
+        //mCyclogram->setExecuteOneCmd(false);
+        //mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->run();
     }
     else if (mCyclogram->state() == Cyclogram::RUNNING)
     {
-        mRunOneCmdAct->setEnabled(true);
+        //mRunOneCmdAct->setEnabled(true);
         mRunAct->setIcon(mPlayIcon);
         mRunAct->setStatusTip(tr("Execute cyclogram"));
         mCyclogram->pause();
     }
     else if (mCyclogram->state() == Cyclogram::PAUSED)
     {
-        mRunOneCmdAct->setEnabled(false);
+        //mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->resume();
@@ -427,6 +428,7 @@ void EditorWindow::runCyclogram()
 
 void EditorWindow::runOneCommand()
 {
+    /*
     Command* errorCmd = mCyclogram->validate();
     if (errorCmd)
     {
@@ -453,11 +455,12 @@ void EditorWindow::runOneCommand()
     }
 
     mStopAct->setEnabled(true);
+    */
 }
 
 void EditorWindow::stopCyclogram()
 {
-    mCyclogram->setExecuteOneCmd(false);
+    //mCyclogram->setExecuteOneCmd(false);
 
     mCyclogram->stop();
 
@@ -465,7 +468,7 @@ void EditorWindow::stopCyclogram()
     mRunAct->setStatusTip(tr("Execute cyclogram"));
     mStopAct->setEnabled(false);
 
-    mRunOneCmdAct->setEnabled(true);
+    //mRunOneCmdAct->setEnabled(true);
     mRunAct->setEnabled(true);
 }
 
@@ -525,7 +528,7 @@ void EditorWindow::onCyclogramStateChanged(int state)
     {
         mRunAct->setIcon(mPlayIcon);
         mRunAct->setStatusTip(tr("Execute cyclogram"));
-        mRunOneCmdAct->setEnabled(true);
+        //mRunOneCmdAct->setEnabled(true);
     }
 }
 

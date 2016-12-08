@@ -1,6 +1,8 @@
 #include "Headers/commands/cmd_action_math.h"
 #include "Headers/variable_controller.h"
 
+#include <QTimer>
+
 CmdActionMath::OperandData::OperandData()
 {
     type = OperandNotSet;
@@ -16,6 +18,18 @@ CmdActionMath::CmdActionMath(QObject* parent):
 }
 
 void CmdActionMath::run()
+{
+    if (mExecutionDelay > 0)
+    {
+        QTimer::singleShot(mExecutionDelay, this, SLOT(execute()));
+    }
+    else
+    {
+        execute();
+    }
+}
+
+void CmdActionMath::execute()
 {
     // read current values from variable controller
     for (int i = 0; i < OperandsCount; ++i)
