@@ -110,6 +110,11 @@ void Command::setRole(int role)
     mRole = role;
 }
 
+void Command::setActive(bool active)
+{
+    emit activeStateChanged(active);
+}
+
 void Command::setParentCommand(Command* cmd)
 {
     mParentCommand = cmd;

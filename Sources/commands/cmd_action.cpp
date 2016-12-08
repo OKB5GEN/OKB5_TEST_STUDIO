@@ -12,18 +12,6 @@ void CmdAction::run()
     finish();
 }
 
-void CmdAction::stop()
-{
-}
-
-void CmdAction::pause()
-{
-}
-
-void CmdAction::resume()
-{
-}
-
 void CmdAction::finish()
 {
     stop();

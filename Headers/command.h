@@ -45,12 +45,14 @@ public:
     void setRole(int role);
     void setFlags(uint32_t flags);
     void setParentCommand(Command* cmd);
+    void setActive(bool active);
 
 signals:
     void finished(Command* nextCmd);
     void textChanged(const QString& text);
     void errorStatusChanged(bool status); //true - has error, false - no error/error fixed
     void criticalError(Command* cmd); // cmd - where the critical error occured
+    void activeStateChanged(bool state); // true - command is active cyclogram cmd, false - become inactive
 
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed

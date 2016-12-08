@@ -16,12 +16,15 @@ QSizeF ShapeItem::smItemSize = QSizeF(30 * 8, 30 * 4); // TODO make function for
 
 ShapeItem::ShapeItem(QObject* parent):
     QObject(parent),
-    mCommand(Q_NULLPTR)
+    mCommand(Q_NULLPTR),
+    mActive(false)
 {
     //smItemSize = QSizeF(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V);
 
     mFont.setPointSize(14);
     mFont.setFamily("Arial");
+
+    mActiveColor = QColor::fromRgba(0xff7f7f7f);
 }
 
 QPainterPath ShapeItem::path() const
@@ -41,6 +44,11 @@ QPoint ShapeItem::position() const
 
 QColor ShapeItem::color() const
 {
+    if (mActive)
+    {
+        return mActiveColor;
+    }
+
     return mColor;
 }
 
@@ -90,11 +98,13 @@ void ShapeItem::setCommand(Command* command)
     {
         disconnect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
         disconnect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
+        disconnect(mCommand, SIGNAL(activeStateChanged(bool)), this, SLOT(setActive(bool)));
     }
 
     mCommand = command;
     connect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
     connect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
+    connect(mCommand, SIGNAL(activeStateChanged(bool)), this, SLOT(setActive(bool)));
 
     onTextChanged(mCommand->text());
     onErrorStatusChanged(mCommand->hasError());
@@ -170,6 +180,12 @@ QSizeF ShapeItem::itemSize()
 QSizeF ShapeItem::cellSize()
 {
     return CELL;
+}
+
+void ShapeItem::setActive(bool active)
+{
+    mActive = active;
+    emit changed();
 }
 
 void ShapeItem::createPath()

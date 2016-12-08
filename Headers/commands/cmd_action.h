@@ -16,9 +16,6 @@ public:
     VariableController* variableController() const;
 
     void run() override;
-    void stop() override;
-    void pause() override;
-    void resume() override;
 
 protected slots:
     void finish();

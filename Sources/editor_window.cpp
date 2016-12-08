@@ -27,6 +27,7 @@ EditorWindow::EditorWindow():
     mCyclogramWidget->load(mCyclogram);
 
     connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+    connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     //setCentralWidget(textEdit);
     setCentralWidget(mCyclogramWidget); // takes control over renderArea
@@ -400,18 +401,22 @@ void EditorWindow::runCyclogram()
 
     if (mCyclogram->state() == Cyclogram::STOPPED)
     {
+        mCyclogram->setExecuteOneCmd(false);
+        mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->run();
     }
     else if (mCyclogram->state() == Cyclogram::RUNNING)
     {
+        mRunOneCmdAct->setEnabled(true);
         mRunAct->setIcon(mPlayIcon);
         mRunAct->setStatusTip(tr("Execute cyclogram"));
         mCyclogram->pause();
     }
     else if (mCyclogram->state() == Cyclogram::PAUSED)
     {
+        mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->resume();
@@ -422,16 +427,46 @@ void EditorWindow::runCyclogram()
 
 void EditorWindow::runOneCommand()
 {
-    int TODO;
+    Command* errorCmd = mCyclogram->validate();
+    if (errorCmd)
+    {
+        mCyclogramWidget->showValidationError(errorCmd);
+        qDebug("Cyclogram validation failed");
+        return;
+    }
+
+    if (mCyclogram->state() == Cyclogram::STOPPED)
+    {
+        mCyclogram->setExecuteOneCmd(true);
+        mRunOneCmdAct->setEnabled(false);
+        mRunAct->setIcon(mPauseIcon);
+        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
+        mCyclogram->run();
+    }
+    else if (mCyclogram->state() == Cyclogram::PAUSED)
+    {
+        mCyclogram->setExecuteOneCmd(true);
+        mRunOneCmdAct->setEnabled(false);
+        mRunAct->setIcon(mPauseIcon);
+        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
+        mCyclogram->resume();
+    }
+
+    mStopAct->setEnabled(true);
 }
 
 void EditorWindow::stopCyclogram()
 {
+    mCyclogram->setExecuteOneCmd(false);
+
     mCyclogram->stop();
 
     mRunAct->setIcon(mPlayIcon);
     mRunAct->setStatusTip(tr("Execute cyclogram"));
     mStopAct->setEnabled(false);
+
+    mRunOneCmdAct->setEnabled(true);
+    mRunAct->setEnabled(true);
 }
 
 void EditorWindow::addMonitor()
@@ -482,6 +517,16 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
     }
 
     dialog->exec();
+}
+
+void EditorWindow::onCyclogramStateChanged(int state)
+{
+    if (state == Cyclogram::PAUSED)
+    {
+        mRunAct->setIcon(mPlayIcon);
+        mRunAct->setStatusTip(tr("Execute cyclogram"));
+        mRunOneCmdAct->setEnabled(true);
+    }
 }
 
 void EditorWindow::commitData(QSessionManager &manager)

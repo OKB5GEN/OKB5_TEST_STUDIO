@@ -61,7 +61,8 @@ namespace
 
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
-    mState(STOPPED)
+    mState(STOPPED),
+    mExecuteOneCmd(false)
 {
     mVarController = new VariableController(this);
 }
@@ -130,6 +131,7 @@ void Cyclogram::run()
 
 void Cyclogram::onCommandFinished(Command* cmd)
 {
+    mCurrent->setActive(false);
     disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "finished");
@@ -171,10 +173,19 @@ void Cyclogram::runCurrentCommand()
 {
     if (mCurrent)
     {
-        LogCmd(mCurrent, "started");
         connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
-        mCurrent->run();
+
+//        if (mExecuteOneCmd && QObject::sender())
+//        {
+//            setState(PAUSED);
+//        }
+//        else
+//        {
+            LogCmd(mCurrent, "started");
+            mCurrent->setActive(true);
+            mCurrent->run();
+//        }
     }
 }
 
@@ -207,6 +218,11 @@ void Cyclogram::resume()
         mCurrent->resume();
         setState(RUNNING);
     }
+}
+
+void Cyclogram::setExecuteOneCmd(bool enable)
+{
+    mExecuteOneCmd = enable;
 }
 
 Command* Cyclogram::first() const
@@ -361,6 +377,16 @@ const QList<Command*>& Cyclogram::commands() const
 
 void Cyclogram::setState(State state)
 {
+    static QMetaEnum metaEnum;
+    if (metaEnum.keyCount() == 0)
+    {
+        metaEnum = QMetaEnum::fromType<Cyclogram::State>();
+    }
+
+    QString text(metaEnum.valueToKey(state));
+
+    qDebug("[%s] Cyclogram state changed to %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text));
+
     mState = state;
     emit stateChanged(mState);
 }

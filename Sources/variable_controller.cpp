@@ -84,8 +84,8 @@ bool VariableController::isVariableExist(const QString& name) const
 
 void VariableController::restart()
 {
-    mCurrent.clear();
-
-    mCurrent = mInitial; // perform deep copy of the container
-    mCurrent.detach();
+    foreach (QString key, mInitial.keys())
+    {
+        setVariable(key, variable(key, -1, Initial), Current);
+    }
 }

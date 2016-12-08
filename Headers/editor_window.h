@@ -46,6 +46,7 @@ private slots:
     void addAutoMonitor();
 
     void onCyclogramFinish(const QString& errorText);
+    void onCyclogramStateChanged(int state);
 
     void commitData(QSessionManager &);
 

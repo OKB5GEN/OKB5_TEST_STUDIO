@@ -22,6 +22,8 @@ public:
         PAUSED
     };
 
+    Q_ENUM(State)
+
     Cyclogram(QObject * parent);
 
     void createDefault();
@@ -30,6 +32,8 @@ public:
     void stop();
     void pause();
     void resume();
+
+    void setExecuteOneCmd(bool enable);
 
     Command* first() const;
     Command* last() const;
@@ -63,6 +67,8 @@ private:
     QList<Command*> mCommands;
 
     VariableController* mVarController;
+
+    bool mExecuteOneCmd;
 
 signals:
     void changed();

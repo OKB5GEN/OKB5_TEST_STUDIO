@@ -50,6 +50,7 @@ signals:
 private slots:
     void onTextChanged(const QString& text);
     void onErrorStatusChanged(bool status);
+    void setActive(bool active);
 
 private:
     QPainterPath mPath; // shape path
@@ -58,12 +59,15 @@ private:
     QPoint mCell; // cell, occupied by command shape itself
     QRect mRect; // bounding rect of the command (need for drawing command connections and QUESTION arrow)
     QColor mColor; // color for filling shape background
+    QColor mActiveColor; // color for filling shape background in command active state
     QString mToolTip; // tooltip text for shape
     QList<ValencyPoint> mValencyPoints; // valency points list for this command
 
     QFont mFont; // font for writing texts
 
     static QSizeF smItemSize;
+
+    bool mActive;
 
     Command* mCommand = Q_NULLPTR; // data pointer for the command logics
 };
