@@ -24,7 +24,7 @@ class CyclogramWidget : public QWidget
     Q_OBJECT
 
 public:
-    CyclogramWidget();
+    CyclogramWidget(QWidget* parent);
     ~CyclogramWidget();
 
 public slots:

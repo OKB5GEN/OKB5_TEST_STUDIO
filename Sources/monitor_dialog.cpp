@@ -21,15 +21,6 @@ MonitorDialog::MonitorDialog(QWidget * parent):
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(getCurrentValue()));
 
-    if (parent != Q_NULLPTR)
-    {
-        QPoint parentPos = parent->mapToGlobal(parent->pos());
-        setGeometry(parentPos.x() + parent->width() / 2 - WIDTH / 2,
-                    parentPos.y() + parent->height() / 2 - HEIGHT / 2,
-                    WIDTH, HEIGHT);
-    }
-
-
     QVBoxLayout * layout = new QVBoxLayout(this);
 
     {// value to monitor select

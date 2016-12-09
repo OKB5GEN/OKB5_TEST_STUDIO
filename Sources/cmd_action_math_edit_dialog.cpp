@@ -4,24 +4,10 @@
 #include "Headers/commands/cmd_action_math.h"
 #include "Headers/variable_controller.h"
 
-namespace
-{
-    static const qreal WIDTH = 500;
-    static const qreal HEIGHT = 300;
-}
-
 CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
     QDialog(parent),
     mCommand(Q_NULLPTR)
 {
-    if (parent != Q_NULLPTR)
-    {
-        QPoint parentPos = parent->mapToGlobal(parent->pos());
-        setGeometry(parentPos.x() + parent->width() / 2 - WIDTH / 2,
-                    parentPos.y() + parent->height() / 2 - HEIGHT / 2,
-                    WIDTH, HEIGHT);
-    }
-
     setupUI();
     setWindowTitle(tr("Math operation"));
 
@@ -41,7 +27,7 @@ void CmdActionMathEditDialog::setupUI()
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* resultBox = new QGroupBox(this);
     resultBox->setTitle(tr("Result"));
-    QVBoxLayout* box4layout = new QVBoxLayout(this);
+    QVBoxLayout* box4layout = new QVBoxLayout(resultBox);
     mResultBox = new QComboBox(this);
 
     box4layout->addWidget(mResultBox);
@@ -59,7 +45,7 @@ void CmdActionMathEditDialog::setupUI()
     // Operand 1 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand1Box = new QGroupBox(this);
     mOperand1Box->setTitle(tr("Operand 1"));
-    QGridLayout* box1layout = new QGridLayout(this);
+    QGridLayout* box1layout = new QGridLayout(mOperand1Box);
 
     mOper1VarBtn = new QRadioButton(this);
     mOper1NumBtn = new QRadioButton(this);
@@ -78,7 +64,7 @@ void CmdActionMathEditDialog::setupUI()
     // Operation box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* operationBox = new QGroupBox(this);
     operationBox->setTitle(tr("Operation"));
-    QVBoxLayout* box3layout = new QVBoxLayout(this);
+    QVBoxLayout* box3layout = new QVBoxLayout(operationBox);
     mOperationBox = new QComboBox(this);
     mOperationBox->addItem("+", QVariant(int(CmdActionMath::Add)));
     mOperationBox->addItem("-", QVariant(int(CmdActionMath::Subtract)));
@@ -97,7 +83,7 @@ void CmdActionMathEditDialog::setupUI()
     // Operand 2 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand2Box = new QGroupBox(this);
     mOperand2Box->setTitle(tr("Operand 2"));
-    QGridLayout* box2layout = new QGridLayout(this);
+    QGridLayout* box2layout = new QGridLayout(mOperand2Box);
 
     mOper2VarBtn = new QRadioButton(this);
     mOper2NumBtn = new QRadioButton(this);

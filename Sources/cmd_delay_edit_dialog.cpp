@@ -3,12 +3,6 @@
 #include "Headers/cmd_delay_edit_dialog.h"
 #include "Headers/commands/cmd_delay.h"
 
-namespace
-{
-    static const qreal WIDTH = 500;
-    static const qreal HEIGHT = 300;
-}
-
 CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     QDialog(parent),
     mCommand(Q_NULLPTR),
@@ -17,14 +11,6 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     mSeconds(0),
     mMSeconds(0)
 {
-    if (parent != Q_NULLPTR)
-    {
-        QPoint parentPos = parent->mapToGlobal(parent->pos());
-        setGeometry(parentPos.x() + parent->width() / 2 - WIDTH / 2,
-                    parentPos.y() + parent->height() / 2 - HEIGHT / 2,
-                    WIDTH, HEIGHT);
-    }
-
     QGridLayout * layout = new QGridLayout(this);
 
     mHSpin = addItem(layout, tr("Hours"), 0, 23, SLOT(onHoursChanged(int)));

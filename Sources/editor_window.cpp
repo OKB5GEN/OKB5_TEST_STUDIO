@@ -17,10 +17,13 @@ namespace
 }
 
 EditorWindow::EditorWindow():
-    mVariablesWindow(Q_NULLPTR)
-    //: textEdit(new QPlainTextEdit)
+    mVariablesWindow(Q_NULLPTR),
+    mScaleFactor(1.0)
 {
-    mCyclogramWidget = new CyclogramWidget();
+    mScrollArea = new QScrollArea(this);
+
+
+    mCyclogramWidget = new CyclogramWidget(this);
     mCyclogram = new Cyclogram(this);
 
     mCyclogram->createDefault();
@@ -29,8 +32,11 @@ EditorWindow::EditorWindow():
     connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
     connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
-    //setCentralWidget(textEdit);
-    setCentralWidget(mCyclogramWidget); // takes control over renderArea
+    mScrollArea->setBackgroundRole(QPalette::Dark);
+    mScrollArea->setWidget(mCyclogramWidget);
+    setCentralWidget(mScrollArea);
+
+    //resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
     createActions();
     createStatusBar();

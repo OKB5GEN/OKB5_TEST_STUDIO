@@ -5,24 +5,12 @@
 
 namespace
 {
-    static const qreal WIDTH = 500;
-    static const qreal HEIGHT = 300;
-
     static const qreal BTN_SIZE = 50;
 }
 
 MonitorManual::MonitorManual(QWidget * parent):
     QDialog(parent)
 {
-    if (parent != Q_NULLPTR)
-    {
-        QPoint parentPos = parent->mapToGlobal(parent->pos());
-        setGeometry(parentPos.x() + parent->width() / 2 - WIDTH / 2,
-                    parentPos.y() + parent->height() / 2 - HEIGHT / 2,
-                    WIDTH, HEIGHT);
-    }
-
-
     mLayout = new QVBoxLayout(this);
     setLayout(mLayout);
 

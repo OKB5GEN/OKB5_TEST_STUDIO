@@ -8,6 +8,7 @@ class QAction;
 class QMenu;
 class QPlainTextEdit;
 class QSessionManager;
+class QScrollArea;
 QT_END_NAMESPACE
 
 class RenderArea;
@@ -74,5 +75,8 @@ private:
 
     QIcon mPlayIcon;
     QIcon mPauseIcon;
+
+    QScrollArea * mScrollArea;
+    qreal mScaleFactor;
 };
 #endif // EDITORWINDOW_H

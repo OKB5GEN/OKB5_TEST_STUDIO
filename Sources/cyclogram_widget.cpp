@@ -20,7 +20,8 @@
 #include "Headers/cmd_set_state_edit_dialog.h"
 #include "Headers/commands/cmd_set_state.h"
 
-CyclogramWidget::CyclogramWidget():
+CyclogramWidget::CyclogramWidget(QWidget* parent):
+    QWidget(parent),
     mDiagramSize(0, 0),
     mCurrentCyclogram(Q_NULLPTR)
 {
@@ -34,15 +35,19 @@ CyclogramWidget::CyclogramWidget():
 
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
+
+    QPalette pal(QGuiApplication::palette());
+    pal.setColor(QPalette::Base, QColor::fromRgba(0xffdfdfdf));
+    setPalette(pal);
+
+    setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+
     mMovingItem = 0;
     mSelectedItem = 0;
 
     // Set cyclogram origin
     mOrigin.setX(ShapeItem::itemSize().width() / 4);
     mOrigin.setY(0);
-
-    //setWindowTitle(tr("Tool Tips"));
-    resize(1000, 600);
 
     setFocusPolicy(Qt::ClickFocus);
 }
@@ -1011,6 +1016,12 @@ void CyclogramWidget::removeShape(Command* command)
 
 void CyclogramWidget::onNeedUpdate()
 {
+    //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
+
+    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + mOrigin.x();
+    int h = ShapeItem::itemSize().height() * mDiagramSize.height() + mOrigin.y() + ShapeItem::cellSize().height();
+    resize(w, h);
+
     drawSilhouette();
     update();
 }
@@ -1099,12 +1110,15 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
         }
     }
 
-    mDiagramSize.setWidth(mDiagramSize.height() - w);
+    int TODO5; // make control over command by shape (delete shape = delete command)
+
+    mDiagramSize.setWidth(mDiagramSize.width() - w);
 
     // kill all shapes and commands, belonging to deleting branch
     ownGoToBranchItem->command()->replaceCommand(Q_NULLPTR); // to block further tree deletion
     mCurrentCyclogram->deleteCommand(item->command(), true);
-    int TODO5; // make control over command by shape (delete shape = delete command)
+
+    onNeedUpdate();
 }
 
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
