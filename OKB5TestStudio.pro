@@ -58,7 +58,8 @@ SOURCES += main.cpp\
     Sources/commands/cmd_question.cpp \
     Sources/commands/cmd_action_math.cpp \
     Sources/cmd_action_math_edit_dialog.cpp \
-    Sources/variables_window.cpp
+    Sources/variables_window.cpp \
+    Sources/cmd_question_edit_dialog.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -103,7 +104,8 @@ HEADERS  += mainwindow.h \
     Headers/commands/cmd_question.h \
     Headers/commands/cmd_action_math.h \
     Headers/cmd_action_math_edit_dialog.h \
-    Headers/variables_window.h
+    Headers/variables_window.h \
+    Headers/cmd_question_edit_dialog.h
 
 
 FORMS    += mainwindow.ui

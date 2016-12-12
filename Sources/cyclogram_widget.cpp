@@ -19,6 +19,7 @@
 #include "Headers/commands/cmd_state_start.h"
 #include "Headers/cmd_set_state_edit_dialog.h"
 #include "Headers/commands/cmd_set_state.h"
+#include "Headers/cmd_question_edit_dialog.h"
 #include "Headers/commands/cmd_question.h"
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
@@ -1358,6 +1359,14 @@ void CyclogramWidget::showEditDialog(Command *command)
             }
 
             d->setCommands(qobject_cast<CmdSetState*>(command), commands);
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::QUESTION:
+        {
+            CmdQuestionEditDialog* d = new CmdQuestionEditDialog(this);
+            d->setCommand(qobject_cast<CmdQuestion*>(command));
             dialog = d;
         }
         break;
