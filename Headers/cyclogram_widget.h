@@ -14,8 +14,6 @@ class QToolButton;
 class QDialog;
 QT_END_NAMESPACE
 
-class ShapeAddDialog;
-class ShapeEditDialog;
 class Cyclogram;
 class Command;
 
@@ -92,11 +90,6 @@ private:
     QPoint mPreviousPosition;
     ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;
-
-    // TODO craete dialogs dynamically of move the to main window as main GUI handler
-    ShapeAddDialog * mShapeAddDialog;
-    ShapeEditDialog * mShapeEditDialog;
-    QMap<DRAKON::IconType, QDialog*> mEditDialogs;
 
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };

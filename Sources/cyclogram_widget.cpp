@@ -26,14 +26,6 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mDiagramSize(0, 0),
     mCurrentCyclogram(Q_NULLPTR)
 {
-    mShapeAddDialog = new ShapeAddDialog(this);
-    mShapeEditDialog = new ShapeEditDialog(this);
-
-    mEditDialogs[DRAKON::DELAY] = new CmdDelayEditDialog(this);
-    mEditDialogs[DRAKON::BRANCH_BEGIN] = new CmdStateStartEditDialog(this);
-    mEditDialogs[DRAKON::GO_TO_BRANCH] = new CmdSetStateEditDialog(this);
-    mEditDialogs[DRAKON::ACTION_MATH] = new CmdActionMathEditDialog(this);
-
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
 
@@ -231,13 +223,17 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
         {
             clearSelection();
 
-            mShapeAddDialog->setValencyPoint(point);
-            mShapeAddDialog->exec();
+            ShapeAddDialog* dialog = new ShapeAddDialog(this);
 
-            if (mShapeAddDialog->result() == QDialog::Accepted)
+            dialog->setValencyPoint(point);
+            dialog->exec();
+
+            if (dialog->result() == QDialog::Accepted)
             {
-                addCommand(mShapeAddDialog->shapeType(), point, mShapeAddDialog->param());
+                addCommand(dialog->shapeType(), point, dialog->param());
             }
+
+            dialog->deleteLater();
         }
         else // if no valency point click, check command shape click
         {
@@ -1312,69 +1308,73 @@ void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift
 
 void CyclogramWidget::showEditDialog(Command *command)
 {
-    QDialog* dialog = mEditDialogs.value(command->type(), Q_NULLPTR);
+    QDialog* dialog = Q_NULLPTR;
 
-    if (dialog) // show custom dialog
+    switch (command->type())
     {
-        switch (command->type())
+    case DRAKON::DELAY:
         {
-        case DRAKON::DELAY:
-            {
-                CmdDelayEditDialog* d = qobject_cast<CmdDelayEditDialog*>(dialog);
-                d->setCommand(qobject_cast<CmdDelay*>(command));
-            }
-            break;
-
-        case DRAKON::ACTION_MATH:
-            {
-                CmdActionMathEditDialog* d = qobject_cast<CmdActionMathEditDialog*>(dialog);
-                d->setCommand(qobject_cast<CmdActionMath*>(command));
-            }
-            break;
-
-        case DRAKON::BRANCH_BEGIN:
-            {
-                CmdStateStartEditDialog* d = qobject_cast<CmdStateStartEditDialog*>(dialog);
-                QList<Command*> commands;
-                foreach (ShapeItem* it, mCommands)
-                {
-                    if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != command)
-                    {
-                        commands.push_back(it->command());
-                    }
-                }
-
-                d->setCommands(qobject_cast<CmdStateStart*>(command), commands);
-            }
-            break;
-
-        case DRAKON::GO_TO_BRANCH:
-            {
-                CmdSetStateEditDialog* d = qobject_cast<CmdSetStateEditDialog*>(dialog);
-                QList<Command*> commands;
-                foreach (ShapeItem* it, mCommands)
-                {
-                    if (it->command()->type() == DRAKON::BRANCH_BEGIN)
-                    {
-                        commands.push_back(it->command());
-                    }
-                }
-
-                d->setCommands(qobject_cast<CmdSetState*>(command), commands);
-            }
-            break;
-
-        default:
-            break;
+            CmdDelayEditDialog* d = new CmdDelayEditDialog(this);
+            d->setCommand(qobject_cast<CmdDelay*>(command));
+            dialog = d;
         }
+        break;
+
+    case DRAKON::ACTION_MATH:
+        {
+            CmdActionMathEditDialog* d = new CmdActionMathEditDialog(this);
+            d->setCommand(qobject_cast<CmdActionMath*>(command));
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::BRANCH_BEGIN:
+        {
+            CmdStateStartEditDialog* d = new CmdStateStartEditDialog(this);
+            QList<Command*> commands;
+            foreach (ShapeItem* it, mCommands)
+            {
+                if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != command)
+                {
+                    commands.push_back(it->command());
+                }
+            }
+
+            d->setCommands(qobject_cast<CmdStateStart*>(command), commands);
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::GO_TO_BRANCH:
+        {
+            CmdSetStateEditDialog* d = new CmdSetStateEditDialog(this);
+            QList<Command*> commands;
+            foreach (ShapeItem* it, mCommands)
+            {
+                if (it->command()->type() == DRAKON::BRANCH_BEGIN)
+                {
+                    commands.push_back(it->command());
+                }
+            }
+
+            d->setCommands(qobject_cast<CmdSetState*>(command), commands);
+            dialog = d;
+        }
+        break;
+
+    default:
+        break;
     }
-    else // show default dialog
+
+    if (!dialog) // show default dialog
     {
-        mShapeEditDialog->setCommand(command);
-        dialog = mShapeEditDialog;
+        ShapeEditDialog* shapeEditDialog = new ShapeEditDialog(this);
+        shapeEditDialog->setCommand(command);
+        dialog = shapeEditDialog;
     }
 
     dialog->exec();
+    dialog->deleteLater();
 }
 
 void CyclogramWidget::showValidationError(Command* cmd)
