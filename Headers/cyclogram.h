@@ -38,7 +38,7 @@ public:
     Command* first() const;
     Command* last() const;
     Command* current() const;
-    Command* createCommand(DRAKON::IconType type);
+    Command* createCommand(DRAKON::IconType type, int param = -1);
 
     const QList<Command*>& commands() const;
     State state() const;

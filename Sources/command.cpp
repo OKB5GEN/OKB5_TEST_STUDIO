@@ -146,7 +146,6 @@ Command* Command::parentCommand() const
     return mParentCommand;
 }
 
-
 bool Command::hasError() const
 {
     return mHasError;

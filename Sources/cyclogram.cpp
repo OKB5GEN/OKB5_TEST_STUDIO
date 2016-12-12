@@ -9,6 +9,7 @@
 #include "Headers/commands/cmd_delay.h"
 #include "Headers/commands/cmd_action.h"
 #include "Headers/commands/cmd_action_math.h"
+#include "Headers/commands/cmd_question.h"
 
 #include "Headers/variable_controller.h"
 
@@ -307,7 +308,7 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
     }
 }
 
-Command* Cyclogram::createCommand(DRAKON::IconType type)
+Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
 {
     Command* cmd = Q_NULLPTR;
 
@@ -341,6 +342,23 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
         }
         break;
 
+    case DRAKON::QUESTION:
+        {
+            CmdQuestion* tmp = new CmdQuestion(this);
+            tmp->setVariableController(mVarController);
+
+            if (param == CmdQuestion::IF)
+            {
+                tmp->setQuestionType(CmdQuestion::IF);
+            }
+            else if (param == CmdQuestion::CYCLE)
+            {
+                tmp->setQuestionType(CmdQuestion::CYCLE);
+            }
+
+            cmd = tmp;
+        }
+        break;
     case DRAKON::ACTION_MODULE:
         {
             //cmd = new CmdActionModule(this);
@@ -348,7 +366,6 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
         break;
 
         //TODO not implemented
-    case DRAKON::QUESTION:{} break;
     case DRAKON::SWITCH:{} break;
     case DRAKON::CASE:{} break;
     case DRAKON::SUBPROGRAM:{} break;

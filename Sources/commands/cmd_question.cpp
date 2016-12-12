@@ -1,5 +1,6 @@
 #include "Headers/commands/cmd_question.h"
 #include "Headers/variable_controller.h"
+#include "Headers/valency_point.h"
 
 #include <QTimer>
 
@@ -12,7 +13,8 @@ CmdQuestion::OperandData::OperandData()
 
 CmdQuestion::CmdQuestion(QObject* parent):
     Command(DRAKON::QUESTION, parent),
-    mOperation(Equal)
+    mOperation(Equal),
+    mOrientation(YesDown)
 {
     updateText();
 }
@@ -35,13 +37,13 @@ void CmdQuestion::swapBranches()
     {
         foreach (Command* cmd, mNextCommands)
         {
-            if (cmd->role() == Yes)
+            if (cmd->role() == ValencyPoint::Down)
             {
-                cmd->setRole(No);
+                cmd->setRole(ValencyPoint::Right);
             }
-            else if (cmd->role() == No)
+            else if (cmd->role() == ValencyPoint::Right)
             {
-                cmd->setRole(Yes);
+                cmd->setRole(ValencyPoint::Down);
             }
         }
     }
@@ -94,8 +96,12 @@ void CmdQuestion::execute()
 
     foreach (Command* cmd, mNextCommands)
     {
-        if ((cmd->role() == Yes && result)
-         || (cmd->role() == No && !result))
+        bool cond1 = result && (mOrientation == YesDown) && (cmd->role() == ValencyPoint::Down);
+        bool cond2 = result && (mOrientation == YesRight) && (cmd->role() == ValencyPoint::Right);
+        bool cond3 = !result && (mOrientation == YesDown) && (cmd->role() == ValencyPoint::Right);
+        bool cond4 = !result && (mOrientation == YesRight) && (cmd->role() == ValencyPoint::Down);
+
+        if (cond1 || cond2 || cond3 || cond4)
         {
             emit finished(cmd);
             return;
@@ -107,6 +113,22 @@ void CmdQuestion::setOperation(Operation operation)
 {
     mOperation = operation;
     updateText();
+}
+
+void CmdQuestion::setOrientation(Orientation orientation)
+{
+    if (mOrientation != orientation)
+    {
+        swapBranches();
+    }
+
+    mOrientation = orientation;
+    updateText();
+}
+
+CmdQuestion::Orientation CmdQuestion::orientation() const
+{
+    return mOrientation;
 }
 
 void CmdQuestion::setOperand(OperandID operand, qreal value)
@@ -279,4 +301,14 @@ void CmdQuestion::onVariableRemoved(const QString& name)
     }
 
     updateText();
+}
+
+CmdQuestion::QuestionType CmdQuestion::questionType() const
+{
+    return mQuestionType;
+}
+
+void CmdQuestion::setQuestionType(CmdQuestion::QuestionType type)
+{
+    mQuestionType = type;
 }

@@ -1,13 +1,15 @@
 #include "Headers/shape_add_dialog.h"
 #include "Headers/cyclogram_widget.h"
 #include "Headers/command.h"
+#include "Headers/commands/cmd_question.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QComboBox>
 
 ShapeAddDialog::ShapeAddDialog(QWidget * parent):
-    QDialog(parent)
+    QDialog(parent),
+    mParam(-1)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -49,36 +51,25 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     {
     case DRAKON::DELAY:
     case DRAKON::ACTION_MATH:
-    //case DRAKON::ACTION_MODULE:
+    case DRAKON::QUESTION:
         {
-            mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
-            mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
-            //mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
-
-            mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
+            setDefaultList();
         }
         break;
     case DRAKON::BRANCH_BEGIN:
         {
-            int TODO2; // check valency point data to add branch or some other item
             if (point.role() == 0) // add usual command
             {
-                mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
-                mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
-                //mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MODULE)));
-
-                mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
+                setDefaultList();
             }
             else // add new branch
             {
                 mComboBox->addItem(tr("New Branch"), QVariant(int(DRAKON::BRANCH_BEGIN)));
-
-                mComboBox->setCurrentIndex(0); //Action command by deafult as more frequently used
+                mComboBox->setCurrentIndex(0);
             }
         }
         break;
 /*
-    case DRAKON::QUESTION:
     case DRAKON::SWITCH:
     case DRAKON::CASE:
     case DRAKON::SUBPROGRAM:
@@ -102,4 +93,36 @@ void ShapeAddDialog::onCurrentIndexChanged(int index)
 {
     int shape = mComboBox->itemData(index).toInt();
     mShapeType = DRAKON::IconType(shape);
+
+    if (mShapeType == DRAKON::QUESTION)
+    {
+        if (mComboBox->itemText(index) == tr("Question"))
+        {
+            mParam = CmdQuestion::IF;
+        }
+        else if (mComboBox->itemText(index) == tr("Cycle"))
+        {
+            mParam = CmdQuestion::CYCLE;
+        }
+    }
+    else
+    {
+        mParam = -1;
+    }
 }
+
+ int ShapeAddDialog::param() const
+ {
+     return mParam;
+ }
+
+ void ShapeAddDialog::setDefaultList()
+ {
+     mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
+     mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
+     mComboBox->addItem(tr("Question"), QVariant(int(DRAKON::QUESTION)));
+     mComboBox->addItem(tr("Cycle"), QVariant(int(DRAKON::QUESTION)));
+     //mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
+
+     mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
+ }

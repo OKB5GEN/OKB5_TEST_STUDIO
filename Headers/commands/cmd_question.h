@@ -8,11 +8,16 @@ class CmdQuestion: public Command
     Q_OBJECT
 
 public:
-    enum Role
+    enum QuestionType
     {
-        Yes,
-        No,
-        AfterArrow
+        IF,
+        CYCLE
+    };
+
+    enum Orientation
+    {
+        YesDown,
+        YesRight
     };
 
     enum Operation
@@ -45,16 +50,18 @@ public:
 
     void run() override;
 
+    void setQuestionType(QuestionType type);
     void setOperation(Operation operation);
+    void setOrientation(Orientation operation);
     void setOperand(OperandID operand, qreal value);
     void setOperand(OperandID operand, const QString& variable);
 
     Operation operation() const;
+    Orientation orientation() const;
     OperandType operandType(OperandID operand) const;
     QString variableName(OperandID operand) const;
     qreal value(OperandID operand) const;
-
-    void swapBranches();
+    QuestionType questionType() const;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
@@ -72,8 +79,12 @@ private:
     };
 
     void updateText();
+    void swapBranches();
 
     Operation mOperation;
+    Orientation mOrientation;
     OperandData mOperands[OperandsCount];
+
+    QuestionType mQuestionType;
 };
 #endif // CMD_QUESTION_H

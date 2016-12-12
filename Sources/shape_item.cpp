@@ -4,6 +4,7 @@
 #include "Headers/command.h"
 
 #include "Headers/commands/cmd_title.h"
+#include "Headers/commands/cmd_question.h"
 
 namespace
 {
@@ -25,6 +26,7 @@ ShapeItem::ShapeItem(QObject* parent):
     mFont.setFamily("Arial");
 
     mActiveColor = QColor::fromRgba(0xff7f7f7f);
+    mAdditionalColor = QColor::fromRgba(0x00ffffff);
 }
 
 QPainterPath ShapeItem::path() const
@@ -35,6 +37,16 @@ QPainterPath ShapeItem::path() const
 QPainterPath ShapeItem::textPath() const
 {
     return mTextPath;
+}
+
+QPainterPath ShapeItem::additionalPath() const
+{
+    return mAdditionalPath;
+}
+
+QPainterPath ShapeItem::arrowPath() const
+{
+    return mArrowPath;
 }
 
 QPoint ShapeItem::position() const
@@ -50,6 +62,11 @@ QColor ShapeItem::color() const
     }
 
     return mColor;
+}
+
+QColor ShapeItem::additionalColor() const
+{
+    return mAdditionalColor;
 }
 
 QString ShapeItem::toolTip() const
@@ -164,6 +181,30 @@ void ShapeItem::onTextChanged(const QString& text)
     textPath.addText(x, y, mFont, text);
     mTextPath = textPath;
 
+    if (mCommand && mCommand->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* cmd = qobject_cast<CmdQuestion*>(command());
+        if (cmd)
+        {
+            bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
+
+            QPainterPath additionalText;
+            QFont font;
+            font.setPointSize(10);
+            font.setFamily("Arial");
+
+            qreal x1 = smItemSize.width() - CELL.width();
+            qreal y1 = smItemSize.height() / 2 - CELL.width() * 0.1;
+            additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
+
+            qreal x2 = smItemSize.width() / 2 + CELL.width() / 3;
+            qreal y2 = smItemSize.height() - CELL.height() * 0.6;
+            additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
+
+            mTextPath.addPath(additionalText);
+        }
+    }
+
     emit changed();
 }
 
@@ -260,15 +301,46 @@ void ShapeItem::createPath()
 
     case DRAKON::QUESTION:
         {
-            int TODO; // very complex logics for QUESTION connections drawing will be here
+            CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());
 
-            path.moveTo(CELL.width(), smItemSize.height() / 2);
-            path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
-            path.lineTo(smItemSize.width() - 2 * CELL.width(), CELL.height());
-            path.lineTo(CELL.width() * 2, CELL.height());
-            path.lineTo(CELL.width(), smItemSize.height() / 2);
+            if (questionCmd)
+            {
+                int TODO; // very complex logics for QUESTION connections drawing will be here
+
+                path.moveTo(CELL.width(), smItemSize.height() / 2);
+                path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
+                path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
+                path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
+                path.lineTo(smItemSize.width() - 2 * CELL.width(), CELL.height());
+                path.lineTo(CELL.width() * 2, CELL.height());
+                path.lineTo(CELL.width(), smItemSize.height() / 2);
+
+                QPainterPath addPath;
+                if (questionCmd->questionType() == CmdQuestion::IF)
+                {
+                    addPath.moveTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
+                    addPath.lineTo(smItemSize.width(), smItemSize.height() / 2);
+                    addPath.lineTo(smItemSize.width(), smItemSize.height());
+                    addPath.lineTo(smItemSize.width() / 2, smItemSize.height());
+                }
+                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
+                {
+                    addPath.moveTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
+                    addPath.lineTo(smItemSize.width(), smItemSize.height() / 2);
+                    addPath.lineTo(smItemSize.width(), 0);
+                    addPath.lineTo(smItemSize.width() / 2, 0);
+
+                    QPainterPath arrowPath;
+                    QPoint pos(smItemSize.width() / 2, 0);
+                    arrowPath.moveTo(pos);
+                    arrowPath.lineTo(QPoint(pos.x() + ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
+                    arrowPath.lineTo(QPoint(pos.x() + ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
+                    arrowPath.lineTo(pos);
+                    mArrowPath = arrowPath;
+                }
+
+                mAdditionalPath = addPath;
+            }
         }
         break;
     default:

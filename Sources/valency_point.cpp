@@ -4,7 +4,7 @@
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),
-    mRole(0)
+    mRole(Down)
 {
 }
 
@@ -38,12 +38,12 @@ ShapeItem* ValencyPoint::owner() const
     return mOwner;
 }
 
-void ValencyPoint::setRole(int role)
+void ValencyPoint::setRole(ValencyPoint::Role role)
 {
     mRole = role;
 }
 
-int ValencyPoint::role() const
+ValencyPoint::Role ValencyPoint::role() const
 {
     return mRole;
 }

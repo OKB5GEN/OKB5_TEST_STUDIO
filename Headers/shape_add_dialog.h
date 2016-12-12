@@ -23,16 +23,20 @@ public:
     DRAKON::IconType shapeType() const;
     void setValencyPoint(const ValencyPoint& point);
 
+    int param() const;
+
 private slots:
     void onCurrentIndexChanged(int index);
 
 private:
+    void setDefaultList();
+
     DRAKON::IconType mShapeType;
 
     int mCurrentIndex;
     QComboBox* mComboBox;
 
-    //QMap<int>
+    int mParam;
 };
 
 #endif // SHAPE_ADD_DIALOG_H

@@ -17,8 +17,8 @@ public:
         DELAY,
 
         // NOT OR PARTIALLY IMPLEMENTED >>>
-        ACTION_MODULE,
         QUESTION,
+        ACTION_MODULE,
 
         SUBPROGRAM,
 

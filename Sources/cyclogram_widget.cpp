@@ -19,6 +19,7 @@
 #include "Headers/commands/cmd_state_start.h"
 #include "Headers/cmd_set_state_edit_dialog.h"
 #include "Headers/commands/cmd_set_state.h"
+#include "Headers/commands/cmd_question.h"
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
@@ -192,6 +193,10 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
         painter.drawPath(shapeItem->path());
         painter.setBrush(QColor::fromRgba(0xff000000));
         painter.drawPath(shapeItem->textPath());
+        painter.setBrush(shapeItem->additionalColor());
+        painter.drawPath(shapeItem->additionalPath());
+        painter.setBrush(QColor::fromRgba(0xff000000));
+        painter.drawPath(shapeItem->arrowPath());
         painter.translate(-shapeItem->position());
     }
 
@@ -231,7 +236,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 
             if (mShapeAddDialog->result() == QDialog::Accepted)
             {
-                addCommand(mShapeAddDialog->shapeType(), point);
+                addCommand(mShapeAddDialog->shapeType(), point, mShapeAddDialog->param());
             }
         }
         else // if no valency point click, check command shape click
@@ -648,12 +653,12 @@ QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
     case DRAKON::ACTION_MODULE:
     case DRAKON::DELAY:
         {
-            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()), 0);
+            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() - ShapeItem::cellSize().height() / 2), ValencyPoint::Down);
             points.push_back(point);
 
             if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
             {
-                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0), 1);
+                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0), ValencyPoint::Right);
                 points.push_back(point);
             }
         }
@@ -661,16 +666,30 @@ QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
 
     case DRAKON::QUESTION:
         {
-            int TODO; // very complex logics will be here
-        /*
-            path.moveTo(CELL.width(), mItem.height() / 2);
-            path.lineTo(CELL.width() * 2, mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - 2 * CELL.width(), mItem.height() - CELL.height());
-            path.lineTo(mItem.width() - CELL.width(), mItem.height() / 2);
-            path.lineTo(mItem.width() - 2 * CELL.width(), CELL.height());
-            path.lineTo(CELL.width() * 2, CELL.height());
-            path.lineTo(CELL.width(), mItem.height() / 2);
-            */
+            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
+            if (questionCmd)
+            {
+                ValencyPoint rightPoint = createPoint(QPointF(ShapeItem::itemSize().width(), ShapeItem::itemSize().height() / 2), ValencyPoint::Right);
+                points.push_back(rightPoint);
+
+                if (questionCmd->questionType() == CmdQuestion::IF)
+                {
+                    ValencyPoint downPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() - ShapeItem::cellSize().height() / 2), ValencyPoint::Down);
+                    points.push_back(downPoint);
+
+                    ValencyPoint underArrowPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() + ShapeItem::cellSize().height() / 2), ValencyPoint::UnderArrow);
+                    points.push_back(underArrowPoint);
+
+                }
+                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
+                {
+                    ValencyPoint downPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()), ValencyPoint::Down);
+                    points.push_back(downPoint);
+
+                    ValencyPoint underArrowPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::cellSize().height() / 2), ValencyPoint::UnderArrow);
+                    points.push_back(underArrowPoint);
+                }
+            }
         }
         break;
     default:
@@ -680,12 +699,12 @@ QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
     return points;
 }
 
-ValencyPoint CyclogramWidget::createPoint(const QPointF& point, int role)
+ValencyPoint CyclogramWidget::createPoint(const QPointF& point, ValencyPoint::Role role)
 {
     QPainterPath path;
 
     qreal crossSize = 0.6;
-    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 2;
+    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 3;
     path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
     path.moveTo(0, -radius * crossSize);
     path.lineTo(0, radius * crossSize);
@@ -724,7 +743,7 @@ bool CyclogramWidget::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point)
+ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
 {
     int role = point.role();
     if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
@@ -732,8 +751,13 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
         return addNewBranch(point.owner());
     }
 
+    if (type == DRAKON::QUESTION)
+    {
+        return addQuestion(point, param);
+    }
+
     // 1. Create new command
-    Command* newCmd = mCurrentCyclogram->createCommand(type);
+    Command* newCmd = mCurrentCyclogram->createCommand(type, param);
     if (!newCmd)
     {
         return Q_NULLPTR;
@@ -754,7 +778,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 
     // 3. Add new command shape item to cyclogram view
     QPoint newCmdCell = owner->cell();
-    // create new chape below the points' owner
+    // create new shape below the points' owner
     newCmdCell.setY(newCmdCell.y() + 1);
 
     int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
@@ -1018,7 +1042,7 @@ void CyclogramWidget::onNeedUpdate()
 {
     //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
 
-    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + mOrigin.x();
+    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + mOrigin.x() + ShapeItem::cellSize().width();
     int h = ShapeItem::itemSize().height() * mDiagramSize.height() + mOrigin.y() + ShapeItem::cellSize().height();
     resize(w, h);
 
@@ -1365,4 +1389,155 @@ void CyclogramWidget::showValidationError(Command* cmd)
     }
 
     dialog->deleteLater();
+}
+
+ShapeItem* CyclogramWidget::addQuestion(const ValencyPoint& point, int param)
+{
+    //return Q_NULLPTR; //TODO Temporary
+
+    ValencyPoint::Role role = point.role();
+    // 1. Create new command
+    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::QUESTION, param);
+    if (!newCmd)
+    {
+        return Q_NULLPTR;
+    }
+
+    ShapeItem* owner = point.owner();
+    Command* cmd = owner->command();
+
+    // 2. Update command tree connections
+    cmd->insertCommand(newCmd, role);
+
+
+    /* Закономерности, которые удалось засечь при моделировании:
+     * 1. Независимо от типа вопроса ("Условие" или "Цикл"), добавление команды в "правую" точку валентности увеличивает ширину бранча на 1
+     * 2. Независимо от типа вопроса ("Условие" или "Цикл"), добавление команды в любую точку валентности увеличивает высоту бранча на 1
+     * в тех же ситуациях, что и обычная команда (если в столбце нет "растянутой команды")
+     * 3. Независимо от типа вопроса ("Условие" или "Цикл") команда всегда имеет 3 точки валентности (вниз, вправо и "под стрелкой")
+     * 4. -||- удаление команды сносит саму команду и все, что идет в ее правую ветку
+     *
+
+*/
+
+    /* Как эту поебень отриcовывать?
+     *
+     * 1. Отрисовыватель шейпа может смотреть на то, где расположен шейп следующей команды
+     * 2. По разнице этих ячеек может отрисовваться путь (вниз будет не черточка, а какая-то ломаная линия)
+     *
+*/
+
+    if (param == CmdQuestion::IF)
+    {
+        if (cmd->type() == DRAKON::QUESTION)
+        {
+        }
+        else
+        {
+
+        }
+    }
+    else if (param == CmdQuestion::CYCLE)
+    {
+        if (cmd->type() == DRAKON::QUESTION)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
+    // 3. Add new command shape item to cyclogram view
+    QPoint newCmdCell = owner->cell();
+
+    if (role == ValencyPoint::Down)
+    {
+        // create new shape below the points' owner
+        newCmdCell.setY(newCmdCell.y() + 1);
+    }
+    else if (role == ValencyPoint::Right)
+    {
+        // create new shape below and to the right of the the points' owner
+        newCmdCell.setY(newCmdCell.y() + 1);
+        newCmdCell.setX(newCmdCell.x() + 1); //TODO depends on subtree rect in "down" branch, calculate its rect!
+
+        mDiagramSize.setWidth(mDiagramSize.width() + 1); //TODO unsafe handling
+    }
+    else if (role == ValencyPoint::UnderArrow)
+    {
+        int TODO100; // adding under arrow, complex logic here
+    }
+
+    int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
+
+    ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
+
+    // 4. Update commands positions below and to the right of the inserted command shape
+
+    // 4.1 Find "expanded" elements in the insertion column, if it exist, just reduce the expanded element rect height
+    ShapeItem* expandedItem = findExpandedItem(newItem);
+
+    if (expandedItem)
+    {
+        // shift items between new inserted and found expanded item
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
+
+            if (item->cell().x() == newItem->cell().x())
+            {
+                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
+                {
+                    updateItemGeometry(item, 0, 1, 1, 1);
+                }
+            }
+        }
+
+        // reduce expanded item size
+        updateItemGeometry(expandedItem, 0, 0, 1, 0);
+
+    }
+    else // no expanded item in the column, shift items below the inserted in all columns
+    {
+        foreach (ShapeItem* item, mCommands)
+        {
+            if (item == newItem) // skip added item
+            {
+                continue;
+            }
+
+            if (item->cell().y() >= newItem->cell().y())
+            {
+                // shift items below the added one down by 1 cell in own column
+                if (item->cell().x() == newItem->cell().x())
+                {
+                    updateItemGeometry(item, 0, 1, 1, 1);
+                }
+                else // expand the rect of the lowest item in all other columns
+                {
+                    if (item->cell().y() == (mDiagramSize.height() - 1))
+                    {
+                        updateItemGeometry(item, 0, 1, 0, 1);
+                    }
+                }
+            }
+        }
+
+        //TODO on diagram size changed
+        mDiagramSize.setHeight(mDiagramSize.height() + 1);
+        onNeedUpdate();
+    }
+
+    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
+    int TODO2; // owner->parentTreeItem();
+    QRect rect = owner->rect();
+    owner->setRect(rect);
+    update();
+
+    return newItem;
 }

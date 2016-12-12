@@ -52,9 +52,9 @@ private:
     void clearSelection(bool needUpdate = true);
 
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
-    ValencyPoint createPoint(const QPointF& point, int role);
+    ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
     bool isCyclogramEndBranch(Command* cmd) const;
-    ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point);
+    ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
 
     bool canBeDeleted(ShapeItem* item, QString& error) const;
     void deleteCommand(ShapeItem* item);
@@ -76,6 +76,9 @@ private:
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     ShapeItem* findNextBranch(const QPoint& cell) const;
     ShapeItem* addNewBranch(ShapeItem* item);
+
+    ShapeItem* addQuestion(const ValencyPoint& point, int param);
+
     void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
     void showEditDialog(Command* command);
@@ -90,10 +93,9 @@ private:
     ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;
 
-    // TODO move dialogs to main window
+    // TODO craete dialogs dynamically of move the to main window as main GUI handler
     ShapeAddDialog * mShapeAddDialog;
     ShapeEditDialog * mShapeEditDialog;
-
     QMap<DRAKON::IconType, QDialog*> mEditDialogs;
 
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
