@@ -11,7 +11,7 @@ INCLUDEPATH +=C:\Qt\Tools\mingw482_32\i686-w64-mingw32\include
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-TARGET = test7
+TARGET = OKB5TestStudio
 TEMPLATE = app
 QT += serialport
 CONFIG +=c++11

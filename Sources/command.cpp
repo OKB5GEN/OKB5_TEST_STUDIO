@@ -2,6 +2,7 @@
 #include <QTimer>
 
 #include "Headers/command.h"
+#include "Headers/variable_controller.h"
 
 namespace
 {
@@ -222,4 +223,28 @@ void Command::setErrorStatus(bool status)
 void Command::setExecutionDelay(int msec)
 {
     mExecutionDelay = msec;
+}
+
+void Command::setVariableController(VariableController* controller)
+{
+    mVarCtrl = controller;
+
+    Qt::ConnectionType connection = Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection);
+    connect(mVarCtrl, SIGNAL(nameChanged(const QString&,const QString&)), this, SLOT(onNameChanged(const QString&, const QString&)), connection);
+    connect(mVarCtrl, SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)), connection);
+}
+
+VariableController* Command::variableController() const
+{
+    return mVarCtrl;
+}
+
+void Command::onNameChanged(const QString& newName, const QString& oldName)
+{
+
+}
+
+void Command::onVariableRemoved(const QString& name)
+{
+
 }

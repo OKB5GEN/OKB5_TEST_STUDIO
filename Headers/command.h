@@ -5,6 +5,8 @@
 #include <QSize>
 #include "Headers/shape_types.h"
 
+class VariableController;
+
 class Command: public QObject
 {
     Q_OBJECT
@@ -49,12 +51,19 @@ public:
 
     void setExecutionDelay(int msec);
 
+    void setVariableController(VariableController* controller);
+    VariableController* variableController() const;
+
 signals:
     void finished(Command* nextCmd);
     void textChanged(const QString& text);
     void errorStatusChanged(bool status); //true - has error, false - no error/error fixed
     void criticalError(Command* cmd); // cmd - where the critical error occured
     void activeStateChanged(bool state); // true - command is active cyclogram cmd, false - become inactive
+
+protected slots:
+    virtual void onNameChanged(const QString& newName, const QString& oldName);
+    virtual void onVariableRemoved(const QString& name);
 
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed
@@ -66,6 +75,7 @@ protected:
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
     int mExecutionDelay;
+    VariableController* mVarCtrl;
 
     QList<Command*> mNextCommands;
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
