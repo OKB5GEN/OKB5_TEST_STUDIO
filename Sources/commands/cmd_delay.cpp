@@ -90,6 +90,7 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 
      if (hours > 0)
      {
+         emit textChanged(mText);
          return;
      }
 
@@ -101,6 +102,7 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 
      if (minutes > 0)
      {
+         emit textChanged(mText);
          return;
      }
 
@@ -108,6 +110,7 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
      {
          mText += QString::number(msec);
          mText += tr("ms");
+         emit textChanged(mText);
          return;
      }
 
