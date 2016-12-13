@@ -44,8 +44,8 @@ public:
     ValencyPoint valencyPoint(int role) const;
     QRect rect() const;
 
-    static QSizeF itemSize();
-    static QSizeF cellSize();
+    static const QSizeF& itemSize();
+    static const QSizeF& cellSize();
 
 signals:
     void changed();
@@ -70,8 +70,6 @@ private:
     QList<ValencyPoint> mValencyPoints; // valency points list for this command
 
     QFont mFont; // font for writing texts
-
-    static QSizeF smItemSize;
 
     bool mActive;
 

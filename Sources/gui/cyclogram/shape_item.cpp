@@ -6,22 +6,34 @@
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_question.h"
 
+/* Обобщенные правила редактирования ДРАКОН-схемы:
+ *
+ * 1. В схеме есть ТОЧКИ ВАЛЕНТНОСТИ, АТОМЫ и ЛИАНЫ
+ * 2. АТОМ - это по сути единичная команда циклограммы (ACTION, QUESTION и т.д.)
+ * 3. ТОЧКА ВАЛЕНТНОСТИ - это место в циклограмме, куда могут цепляться АТОМЫ
+ * 4. ТОЧКИ ВАЛЕНТНОСТИ по сути принадлежат какому-о из атомов
+ * 5. Каждая ТОЧКА ВАЛЕНТНОСТИ содержит "матрешку" команд
+ * 6. Матрешка обладает RECT'ом (левый верхний угол + правый нижний)
+ * 7. К каждой точке валентности привязана такая "матрешка"
+ * 8. При вставке в точку валентности новой "матрешки" у нее обновляется RECT
+ * 9. После этого рекурсивно обновляется RECT парентовой "матрешки" и т.д. до самой верхней матрешки
+ * 10. Парентовая матрешка при этом следит за RECTами чайлдовыйх матрешек
+ * 11. Если это УСЛОВИЕ, то ректы "вниз" и "вправо" должны совпадать по высоте
+*/
+
 namespace
 {
-    static const QSizeF CELL = QSizeF(30, 30);
+    static const int CELL_WIDTH = 30;
+    static const int CELL_HEIGHT = 30;
     static const int CELLS_PER_ITEM_V = 4;
     static const int CELLS_PER_ITEM_H = 8;
 }
-
-QSizeF ShapeItem::smItemSize = QSizeF(30 * 8, 30 * 4); // TODO make function for initialization
 
 ShapeItem::ShapeItem(QObject* parent):
     QObject(parent),
     mCommand(Q_NULLPTR),
     mActive(false)
 {
-    //smItemSize = QSizeF(CELL.width() * CELLS_PER_ITEM_H, CELL.height() * CELLS_PER_ITEM_V);
-
     mFont.setPointSize(14);
     mFont.setFamily("Arial");
 
@@ -176,8 +188,8 @@ void ShapeItem::onTextChanged(const QString& text)
     QPainterPath textPath;
     QFontMetrics fm(mFont);
     QRect textRect = fm.boundingRect(text);
-    qreal x = (smItemSize.width() - textRect.width()) / 2;
-    qreal y = (smItemSize.height() + textRect.height()) / 2;
+    qreal x = (itemSize().width() - textRect.width()) / 2;
+    qreal y = (itemSize().height() + textRect.height()) / 2;
     textPath.addText(x, y, mFont, text);
     mTextPath = textPath;
 
@@ -193,12 +205,12 @@ void ShapeItem::onTextChanged(const QString& text)
             font.setPointSize(10);
             font.setFamily("Arial");
 
-            qreal x1 = smItemSize.width() - CELL.width();
-            qreal y1 = smItemSize.height() / 2 - CELL.width() * 0.1;
+            qreal x1 = itemSize().width() - cellSize().width();
+            qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1;
             additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
 
-            qreal x2 = smItemSize.width() / 2 + CELL.width() / 3;
-            qreal y2 = smItemSize.height() - CELL.height() * 0.6;
+            qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
+            qreal y2 = itemSize().height() - cellSize().height() * 0.6;
             additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
 
             mTextPath.addPath(additionalText);
@@ -213,13 +225,15 @@ void ShapeItem::onErrorStatusChanged(bool status)
     setColor(status ? QColor::fromRgba(0xffff0000) : QColor::fromRgba(0xffffffff));
 }
 
-QSizeF ShapeItem::itemSize()
+const QSizeF& ShapeItem::itemSize()
 {
-    return smItemSize;
+    static QSizeF ITEM_SIZE(CELL_WIDTH * CELLS_PER_ITEM_H, CELL_HEIGHT * CELLS_PER_ITEM_V);
+    return ITEM_SIZE;
 }
 
-QSizeF ShapeItem::cellSize()
+const QSizeF& ShapeItem::cellSize()
 {
+    static QSizeF CELL(CELL_WIDTH, CELL_HEIGHT);
     return CELL;
 }
 
@@ -237,13 +251,18 @@ void ShapeItem::createPath()
     QRect itemRect = rect();
     QPoint cell = mCell;
 
+    qreal W = itemSize().width();
+    qreal H = itemSize().height();
+    qreal w = cellSize().width();
+    qreal h = cellSize().height();
+
     switch (type)
     {
     case DRAKON::TERMINATOR:
         {
-            qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
-            qreal radius = (smItemSize.height() - 2 * CELL.height()) / 2;
-            QRectF rect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), 2 * radius);
+            qreal yOffset = (cell.y() - itemRect.top()) * H;
+            qreal radius = (H - 2 * h) / 2;
+            QRectF rect(w, h, W - 2 * w, 2 * radius);
             path.addRoundedRect(rect, radius, radius);
 
             // connector
@@ -252,50 +271,50 @@ void ShapeItem::createPath()
             {
                 if (titleCmd->titleType() == CmdTitle::BEGIN)
                 {
-                    path.moveTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
-                    path.lineTo(smItemSize.width() / 2, smItemSize.height());
+                    path.moveTo(W / 2, H - h);
+                    path.lineTo(W / 2, H);
                 }
                 else // END terminator
                 {
-                    path.moveTo(smItemSize.width() / 2, CELL.height());
-                    path.lineTo(smItemSize.width() / 2, -yOffset);
+                    path.moveTo(W / 2, h);
+                    path.lineTo(W / 2, -yOffset);
                 }
             }
         }
         break;
     case DRAKON::BRANCH_BEGIN:
         {
-            path.moveTo(CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), smItemSize.height() - CELL.height() * 3 / 2);
-            path.lineTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() - CELL.height() * 3 / 2);
-            path.lineTo(smItemSize.width() - CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), CELL.height());
+            path.moveTo(w, h);
+            path.lineTo(w, H - h * 3 / 2);
+            path.lineTo(W / 2, H - h);
+            path.lineTo(W - w, H - h * 3 / 2);
+            path.lineTo(W - w, h);
+            path.lineTo(w, h);
         }
         break;
     case DRAKON::GO_TO_BRANCH:
         {
-            path.moveTo(CELL.width(), CELL.height() * 3 / 2);
-            path.lineTo(CELL.width(), smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - CELL.width(), CELL.height() * 3 / 2);
-            path.lineTo(smItemSize.width() / 2, CELL.height());
-            path.lineTo(CELL.width(), CELL.height() * 3 / 2);
+            path.moveTo(w, h * 3 / 2);
+            path.lineTo(w, H - h);
+            path.lineTo(W - w, H - h);
+            path.lineTo(W - w, h * 3 / 2);
+            path.lineTo(W / 2, h);
+            path.lineTo(w, h * 3 / 2);
         }
         break;
     case DRAKON::ACTION_MATH:
     case DRAKON::ACTION_MODULE:
         {
-            path.addRect(QRect(CELL.width(), CELL.height(), smItemSize.width() - 2 * CELL.width(), smItemSize.height() - 2 * CELL.height()));
+            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
         }
         break;
     case DRAKON::DELAY:
         {
-            path.moveTo(CELL.width(), CELL.height());
-            path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
-            path.lineTo(smItemSize.width() - CELL.width(), CELL.height());
-            path.lineTo(CELL.width(), CELL.height());
+            path.moveTo(w, h);
+            path.lineTo(w * 2, H - h);
+            path.lineTo(W - 2 * w, H - h);
+            path.lineTo(W - w, h);
+            path.lineTo(w, h);
         }
         break;
 
@@ -307,34 +326,34 @@ void ShapeItem::createPath()
             {
                 int TODO; // very complex logics for QUESTION connections drawing will be here
 
-                path.moveTo(CELL.width(), smItemSize.height() / 2);
-                path.lineTo(CELL.width() * 2, smItemSize.height() - CELL.height());
-                path.lineTo(smItemSize.width() - 2 * CELL.width(), smItemSize.height() - CELL.height());
-                path.lineTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
-                path.lineTo(smItemSize.width() - 2 * CELL.width(), CELL.height());
-                path.lineTo(CELL.width() * 2, CELL.height());
-                path.lineTo(CELL.width(), smItemSize.height() / 2);
+                path.moveTo(w, H / 2);
+                path.lineTo(w * 2, H - h);
+                path.lineTo(W - 2 * w, H - h);
+                path.lineTo(W - w, H / 2);
+                path.lineTo(W - 2 * w, h);
+                path.lineTo(w * 2, h);
+                path.lineTo(w, H / 2);
 
                 QPainterPath addPath;
                 if (questionCmd->questionType() == CmdQuestion::IF)
                 {
-                    addPath.moveTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
-                    addPath.lineTo(smItemSize.width(), smItemSize.height() / 2);
-                    addPath.lineTo(smItemSize.width(), smItemSize.height());
-                    addPath.lineTo(smItemSize.width() / 2, smItemSize.height());
+                    addPath.moveTo(W - w, H / 2);
+                    addPath.lineTo(W, H / 2);
+                    addPath.lineTo(W, H);
+                    addPath.lineTo(W / 2, H);
                 }
                 else if (questionCmd->questionType() == CmdQuestion::CYCLE)
                 {
-                    addPath.moveTo(smItemSize.width() - CELL.width(), smItemSize.height() / 2);
-                    addPath.lineTo(smItemSize.width(), smItemSize.height() / 2);
-                    addPath.lineTo(smItemSize.width(), 0);
-                    addPath.lineTo(smItemSize.width() / 2, 0);
+                    addPath.moveTo(W - w, H / 2);
+                    addPath.lineTo(W, H / 2);
+                    addPath.lineTo(W, 0);
+                    addPath.lineTo(W / 2, 0);
 
                     QPainterPath arrowPath;
-                    QPoint pos(smItemSize.width() / 2, 0);
+                    QPoint pos(W / 2, 0);
                     arrowPath.moveTo(pos);
-                    arrowPath.lineTo(QPoint(pos.x() + ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
-                    arrowPath.lineTo(QPoint(pos.x() + ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
+                    arrowPath.lineTo(QPoint(pos.x() + w, pos.y() + h / 4));
+                    arrowPath.lineTo(QPoint(pos.x() + w, pos.y() - h / 4));
                     arrowPath.lineTo(pos);
                     mArrowPath = arrowPath;
                 }
@@ -349,14 +368,14 @@ void ShapeItem::createPath()
 
     if (type != DRAKON::TERMINATOR)
     {
-        qreal yOffset = (cell.y() - itemRect.top()) * smItemSize.height();
+        qreal yOffset = (cell.y() - itemRect.top()) * H;
 
         // lower connector
-        path.moveTo(smItemSize.width() / 2, smItemSize.height() - CELL.height());
-        path.lineTo(smItemSize.width() / 2, smItemSize.height());
+        path.moveTo(W / 2, H - h);
+        path.lineTo(W / 2, H);
         // upper connector
-        path.moveTo(smItemSize.width() / 2, CELL.height());
-        path.lineTo(smItemSize.width() / 2, -yOffset);
+        path.moveTo(W / 2, h);
+        path.lineTo(W / 2, -yOffset);
     }
 
     mPath = path;
