@@ -1,7 +1,7 @@
 #ifndef CMD_SUB_PROGRAM_H
 #define CMD_SUB_PROGRAM_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdSubProgram: public Command
 {

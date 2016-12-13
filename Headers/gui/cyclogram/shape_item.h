@@ -6,7 +6,7 @@
 #include <QPoint>
 #include <QFont>
 
-#include "Headers/valency_point.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 class Command;
 

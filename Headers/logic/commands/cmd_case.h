@@ -1,7 +1,7 @@
 #ifndef CMD_CASE_H
 #define CMD_CASE_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdCase: public Command
 {

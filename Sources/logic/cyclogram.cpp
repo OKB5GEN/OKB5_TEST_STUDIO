@@ -2,16 +2,16 @@
 #include <QTimer>
 #include <QMetaEnum>
 
-#include "Headers/cyclogram.h"
-#include "Headers/commands/cmd_state_start.h"
-#include "Headers/commands/cmd_set_state.h"
-#include "Headers/commands/cmd_title.h"
-#include "Headers/commands/cmd_delay.h"
-#include "Headers/commands/cmd_action.h"
-#include "Headers/commands/cmd_action_math.h"
-#include "Headers/commands/cmd_question.h"
+#include "Headers/logic/cyclogram.h"
+#include "Headers/logic/commands/cmd_state_start.h"
+#include "Headers/logic/commands/cmd_set_state.h"
+#include "Headers/logic/commands/cmd_title.h"
+#include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logic/commands/cmd_action.h"
+#include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/commands/cmd_question.h"
 
-#include "Headers/variable_controller.h"
+#include "Headers/logic/variable_controller.h"
 
 /* Переменные циклограммы (мысли вслух)
  * 1. Каждая циклограмма может иметь свои переменные

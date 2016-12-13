@@ -1,7 +1,7 @@
 #ifndef CMD_TITLE_H
 #define CMD_TITLE_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdTitle: public Command
 {

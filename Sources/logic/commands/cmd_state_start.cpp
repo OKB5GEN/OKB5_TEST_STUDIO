@@ -1,4 +1,4 @@
-#include "Headers/commands/cmd_state_start.h"
+#include "Headers/logic/commands/cmd_state_start.h"
 
 CmdStateStart::CmdStateStart(QObject * parent):
     Command(DRAKON::BRANCH_BEGIN, parent)

@@ -1,4 +1,4 @@
-#include "Headers/commands/cmd_title.h"
+#include "Headers/logic/commands/cmd_title.h"
 
 /* Что надо сделат для реализации переменных?
  *

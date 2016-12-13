@@ -1,7 +1,7 @@
 #ifndef CMD_ACTION_H
 #define CMD_ACTION_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdAction: public Command
 {

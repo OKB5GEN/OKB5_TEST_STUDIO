@@ -1,6 +1,6 @@
-#include "Headers/variables_window.h"
-#include "Headers/cyclogram.h"
-#include "Headers/variable_controller.h"
+#include "Headers/gui/cyclogram/variables_window.h"
+#include "Headers/logic/cyclogram.h"
+#include "Headers/logic/variable_controller.h"
 
 #include <QtWidgets>
 

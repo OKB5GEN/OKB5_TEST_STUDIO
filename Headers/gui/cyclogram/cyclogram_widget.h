@@ -5,7 +5,7 @@
 #include <QMap>
 
 #include "Headers/shape_types.h"
-#include "Headers/shape_item.h"
+#include "Headers/gui/cyclogram/shape_item.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;

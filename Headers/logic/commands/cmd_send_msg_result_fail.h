@@ -1,7 +1,7 @@
 #ifndef CMD_SEND_MSG_RESULT_FAIL_H
 #define CMD_SEND_MSG_RESULT_FAIL_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdSendMsgResultFail: public Command
 {

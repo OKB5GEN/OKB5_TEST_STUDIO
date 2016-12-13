@@ -1,7 +1,7 @@
 #ifndef CMD_ACTION_MATH_H
 #define CMD_ACTION_MATH_H
 
-#include "Headers/commands/cmd_action.h"
+#include "Headers/logic/commands/cmd_action.h"
 
 class CmdActionMath: public CmdAction
 {

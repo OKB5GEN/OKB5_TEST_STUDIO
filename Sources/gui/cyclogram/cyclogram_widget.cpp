@@ -1,26 +1,27 @@
 #include <QtWidgets>
 #include <QDebug>
 
-#include "Headers/cyclogram_widget.h"
-#include "Headers/shape_add_dialog.h"
-#include "Headers/shape_edit_dialog.h"
-#include "Headers/command_error_dialog.h"
+#include "Headers/gui/cyclogram/cyclogram_widget.h"
+#include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/shape_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/command_error_dialog.h"
 
-#include "Headers/cyclogram.h"
-#include "Headers/cell.h"
-#include "Headers/command.h"
-#include "Headers/commands/cmd_title.h"
+#include "Headers/logic/cyclogram.h"
+#include "Headers/logic/command.h"
+#include "Headers/logic/commands/cmd_title.h"
 
-#include "Headers/cmd_action_math_edit_dialog.h"
-#include "Headers/commands/cmd_action_math.h"
-#include "Headers/cmd_delay_edit_dialog.h"
-#include "Headers/commands/cmd_delay.h"
-#include "Headers/cmd_state_start_edit_dialog.h"
-#include "Headers/commands/cmd_state_start.h"
-#include "Headers/cmd_set_state_edit_dialog.h"
-#include "Headers/commands/cmd_set_state.h"
-#include "Headers/cmd_question_edit_dialog.h"
-#include "Headers/commands/cmd_question.h"
+#include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logic/commands/cmd_state_start.h"
+#include "Headers/logic/commands/cmd_set_state.h"
+#include "Headers/logic/commands/cmd_question.h"
+
+#include "Headers/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
+
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),

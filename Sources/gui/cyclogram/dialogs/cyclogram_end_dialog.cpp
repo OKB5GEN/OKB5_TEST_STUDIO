@@ -1,4 +1,4 @@
-#include "Headers/cyclogram_end_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
 
 #include <QtWidgets>
 

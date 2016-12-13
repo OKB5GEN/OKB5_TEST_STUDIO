@@ -1,4 +1,4 @@
-#include "Headers/monitor_auto.h"
+#include "Headers/gui/tools/monitor_auto.h"
 #include "qcustomplot.h"
 
 #include <QtWidgets>

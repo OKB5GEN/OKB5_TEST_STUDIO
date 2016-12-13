@@ -1,4 +1,4 @@
-#include "Headers/command_error_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/command_error_dialog.h"
 
 #include <QtWidgets>
 

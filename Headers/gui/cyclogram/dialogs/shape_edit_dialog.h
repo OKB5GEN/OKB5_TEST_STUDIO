@@ -3,12 +3,6 @@
 
 #include <QDialog>
 
-/*
-QT_BEGIN_NAMESPACE
-class QLineEdit;
-QT_END_NAMESPACE
-*/
-
 class Command;
 
 class ShapeEditDialog : public QDialog
@@ -31,7 +25,6 @@ private slots:
 
 
 private:
-    //QLineEdit* mLineEdit;
 };
 
 #endif // SHAPEEDITDIALOG_H

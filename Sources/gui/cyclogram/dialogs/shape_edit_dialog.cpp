@@ -1,5 +1,4 @@
-#include "Headers/shape_edit_dialog.h"
-#include "Headers/cyclogram_widget.h"
+#include "Headers/gui/cyclogram/dialogs/shape_edit_dialog.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

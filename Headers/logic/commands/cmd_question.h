@@ -1,7 +1,7 @@
 #ifndef CMD_QUESTION_H
 #define CMD_QUESTION_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdQuestion: public Command
 {

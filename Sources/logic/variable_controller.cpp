@@ -1,4 +1,4 @@
-#include "Headers/variable_controller.h"
+#include "Headers/logic/variable_controller.h"
 
 VariableController::VariableController(QObject* parent):
     QObject(parent)

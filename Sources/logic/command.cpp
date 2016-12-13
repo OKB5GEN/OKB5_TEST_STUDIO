@@ -1,8 +1,8 @@
 #include <QTime>
 #include <QTimer>
 
-#include "Headers/command.h"
-#include "Headers/variable_controller.h"
+#include "Headers/logic/command.h"
+#include "Headers/logic/variable_controller.h"
 
 namespace
 {

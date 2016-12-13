@@ -1,10 +1,10 @@
 #include <QtWidgets>
 
-#include "Headers/shape_item.h"
-#include "Headers/command.h"
+#include "Headers/gui/cyclogram/shape_item.h"
+#include "Headers/logic/command.h"
 
-#include "Headers/commands/cmd_title.h"
-#include "Headers/commands/cmd_question.h"
+#include "Headers/logic/commands/cmd_title.h"
+#include "Headers/logic/commands/cmd_question.h"
 
 namespace
 {

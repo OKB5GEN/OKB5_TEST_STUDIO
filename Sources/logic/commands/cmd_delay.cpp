@@ -1,4 +1,4 @@
-#include "Headers/commands/cmd_delay.h"
+#include "Headers/logic/commands/cmd_delay.h"
 #include <QTimer>
 #include <QTime>
 

@@ -1,6 +1,6 @@
 #include <QtWidgets>
 
-#include "Headers/valency_point.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),

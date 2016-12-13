@@ -4,7 +4,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
-#include "Headers/editor_window.h"
+#include "Headers/gui/editor_window.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,22 +34,6 @@ int main(int argc, char *argv[])
 }
 
 /*
-// basic drawing
-#include "window.h"
-
-#include <QApplication>
-
-int main(int argc, char *argv[])
-{
-    Q_INIT_RESOURCE(basicdrawing);
-
-    QApplication app(argc, argv);
-    Window window;
-    window.show();
-    return app.exec();
-}
-*/
-/*
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -64,20 +48,4 @@ int main(int argc, char *argv[])
 }
 */
 
-/*
-#include <QtWidgets>
 
-#include "sortingbox.h"
-
-int main(int argc, char *argv[])
-{
-    Q_INIT_RESOURCE(tooltips);
-
-    QApplication app(argc, argv);
-    qsrand(QTime(0,0,0).secsTo(QTime::currentTime()));
-    SortingBox sortingBox;
-    sortingBox.show();
-    return app.exec();
-}
-
-*/

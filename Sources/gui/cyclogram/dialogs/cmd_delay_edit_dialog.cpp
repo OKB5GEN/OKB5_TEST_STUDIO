@@ -1,7 +1,7 @@
 #include <QtWidgets>
 
-#include "Headers/cmd_delay_edit_dialog.h"
-#include "Headers/commands/cmd_delay.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h"
+#include "Headers/logic/commands/cmd_delay.h"
 
 CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     QDialog(parent),

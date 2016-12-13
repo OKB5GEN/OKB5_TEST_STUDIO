@@ -1,7 +1,7 @@
 #ifndef CMD_STATE_START_H
 #define CMD_STATE_START_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdStateStart: public Command
 {

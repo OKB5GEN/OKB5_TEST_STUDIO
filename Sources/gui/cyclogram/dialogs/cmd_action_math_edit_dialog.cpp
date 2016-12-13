@@ -1,8 +1,8 @@
 #include <QtWidgets>
 
-#include "Headers/cmd_action_math_edit_dialog.h"
-#include "Headers/commands/cmd_action_math.h"
-#include "Headers/variable_controller.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.h"
+#include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/variable_controller.h"
 
 CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
     QDialog(parent),

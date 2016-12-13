@@ -1,15 +1,13 @@
 #include <QtWidgets>
 
-#include "Headers/editor_window.h"
-#include "Headers/render_area.h"
-#include "Headers/cyclogram_widget.h"
-#include "Headers/monitor_dialog.h"
-#include "Headers/monitor_manual.h"
-#include "Headers/monitor_auto.h"
-#include "Headers/cyclogram.h"
+#include "Headers/gui/editor_window.h"
+#include "Headers/gui/cyclogram/cyclogram_widget.h"
+#include "Headers/gui/tools/monitor_manual.h"
+#include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/logic/cyclogram.h"
 
-#include "Headers/cyclogram_end_dialog.h"
-#include "Headers/variables_window.h"
+#include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
+#include "Headers/gui/cyclogram/variables_window.h"
 
 namespace
 {
@@ -476,13 +474,6 @@ void EditorWindow::stopCyclogram()
 
     //mRunOneCmdAct->setEnabled(true);
     mRunAct->setEnabled(true);
-}
-
-void EditorWindow::addMonitor()
-{
-    MonitorDialog* dialog = new MonitorDialog(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
 }
 
 void EditorWindow::addVariablesMonitor()

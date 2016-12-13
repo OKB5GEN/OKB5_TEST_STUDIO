@@ -1,6 +1,6 @@
-#include "Headers/commands/cmd_question.h"
-#include "Headers/variable_controller.h"
-#include "Headers/valency_point.h"
+#include "Headers/logic/commands/cmd_question.h"
+#include "Headers/logic/variable_controller.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 #include <QTimer>
 

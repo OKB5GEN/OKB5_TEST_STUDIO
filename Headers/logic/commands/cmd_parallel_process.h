@@ -1,7 +1,7 @@
 #ifndef CMD_PARALLEL_PROCESS_H
 #define CMD_PARALLEL_PROCESS_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdParallelProcess: public Command
 {

@@ -1,5 +1,4 @@
-#include "Headers/monitor_manual.h"
-#include "qcustomplot.h"
+#include "Headers/gui/tools/monitor_manual.h"
 
 #include <QtWidgets>
 

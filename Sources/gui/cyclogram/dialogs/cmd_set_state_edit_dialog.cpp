@@ -1,7 +1,7 @@
 
-#include "Headers/cmd_set_state_edit_dialog.h"
-#include "Headers/commands/cmd_set_state.h"
-#include "Headers/cyclogram.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
+#include "Headers/logic/commands/cmd_set_state.h"
+#include "Headers/logic/cyclogram.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>

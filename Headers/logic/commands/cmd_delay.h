@@ -1,7 +1,7 @@
 #ifndef CMD_DELAY_H
 #define CMD_DELAY_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 QT_BEGIN_NAMESPACE
 class QTimer;

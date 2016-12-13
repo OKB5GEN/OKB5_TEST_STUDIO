@@ -1,4 +1,4 @@
-#include "Headers/commands/cmd_set_state.h"
+#include "Headers/logic/commands/cmd_set_state.h"
 
 CmdSetState::CmdSetState(QObject * parent):
     Command(DRAKON::GO_TO_BRANCH, parent)

@@ -1,5 +1,5 @@
-#include "Headers/commands/cmd_action_math.h"
-#include "Headers/variable_controller.h"
+#include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
 

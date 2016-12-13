@@ -1,8 +1,8 @@
 #include <QtWidgets>
 
-#include "Headers/cmd_question_edit_dialog.h"
-#include "Headers/commands/cmd_question.h"
-#include "Headers/variable_controller.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
+#include "Headers/logic/commands/cmd_question.h"
+#include "Headers/logic/variable_controller.h"
 
 CmdQuestionEditDialog::CmdQuestionEditDialog(QWidget * parent):
     QDialog(parent),

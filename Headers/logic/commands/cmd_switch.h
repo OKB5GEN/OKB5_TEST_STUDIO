@@ -1,7 +1,7 @@
 #ifndef CMD_SWITCH_H
 #define CMD_SWITCH_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdSwitch: public Command
 {

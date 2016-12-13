@@ -1,7 +1,7 @@
 #ifndef CMD_CYCLE_FOR_H
 #define CMD_CYCLE_FOR_H
 
-#include "Headers/command.h"
+#include "Headers/logic/command.h"
 
 class CmdCycleFor: public Command
 {

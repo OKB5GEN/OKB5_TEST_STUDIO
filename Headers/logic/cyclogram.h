@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QList>
 
-#include "Headers/cell.h"
 #include "Headers/shape_types.h"
 
 class Command;

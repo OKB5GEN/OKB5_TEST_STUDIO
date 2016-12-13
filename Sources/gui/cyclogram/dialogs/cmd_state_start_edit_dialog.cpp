@@ -1,8 +1,8 @@
 #include <QtWidgets>
 
-#include "Headers/cmd_state_start_edit_dialog.h"
-#include "Headers/commands/cmd_state_start.h"
-#include "Headers/cyclogram.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h"
+#include "Headers/logic/commands/cmd_state_start.h"
+#include "Headers/logic/cyclogram.h"
 
 CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     QDialog(parent)

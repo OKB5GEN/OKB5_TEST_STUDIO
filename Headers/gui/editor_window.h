@@ -40,7 +40,6 @@ private slots:
     void runCyclogram();
     void runOneCommand();
     void stopCyclogram();
-    void addMonitor();
 
     void addVariablesMonitor();
     void addManualMonitor();
