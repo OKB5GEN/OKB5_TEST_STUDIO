@@ -22,13 +22,13 @@ public:
     void setPath(const QPainterPath &path);
     void setTextPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
-    void setPosition(const QPoint &position);
     void setColor(const QColor &color);
-    void setCell(const QPoint &position);
+    void setCell(const QPoint &cell);
     void setCommand(Command* command);
     void setValencyPoints(const QList<ValencyPoint>& points);
     void setRect(const QRect& rect);
     void setSelected(bool selected);
+    void setParentShape(ShapeItem* parent);
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -43,9 +43,11 @@ public:
     const QList<ValencyPoint>& valencyPoints() const;
     ValencyPoint valencyPoint(int role) const;
     QRect rect() const;
+    ShapeItem* parentShape() const;
 
     static const QSizeF& itemSize();
     static const QSizeF& cellSize();
+    static const QPointF& origin();
 
 signals:
     void changed();
@@ -56,17 +58,17 @@ private slots:
     void setActive(bool active);
 
 private:
-    QPainterPath mPath; // shape path
-    QPainterPath mTextPath; // path for text iside shape
-    QPainterPath mAdditionalPath; // path for some not-interactive display
-    QPainterPath mArrowPath; // path for arrow drawing
-    QPoint mPosition; // top-left corner of the shape in window coordinates
-    QPoint mCell; // cell, occupied by command shape itself
-    QRect mRect; // bounding rect of the command (need for drawing command connections and QUESTION arrow)
-    QColor mColor; // color for filling shape background
-    QColor mAdditionalColor; // color for filling additional path background
-    QColor mActiveColor; // color for filling shape background in command active state
-    QString mToolTip; // tooltip text for shape
+    QPainterPath mPath;             // shape path
+    QPainterPath mTextPath;         // path for text iside shape
+    QPainterPath mAdditionalPath;   // path for some not-interactive display (arrow line)
+    QPainterPath mArrowPath;        // path for arrow drawing (arrow triangle)
+    QPoint mPosition;               // top-left corner of the shape in window coordinates
+    QPoint mCell;                   // cell, occupied by command shape itself
+    QRect mRect;                    // bounding rect of the command (need for drawing command connections and QUESTION arrow)
+    QColor mColor;                  // color for filling shape background
+    QColor mAdditionalColor;        // color for filling additional path background (hack for connection lines coloring)
+    QColor mActiveColor;            // color for filling shape background in command active state (being executed)
+    QString mToolTip;               // tooltip text for shape
     QList<ValencyPoint> mValencyPoints; // valency points list for this command
 
     QFont mFont; // font for writing texts
@@ -74,6 +76,7 @@ private:
     bool mActive;
 
     Command* mCommand = Q_NULLPTR; // data pointer for the command logics
+    ShapeItem* mParentShape = Q_NULLPTR;
 };
 
 #endif //SHAPE_ITEM_H

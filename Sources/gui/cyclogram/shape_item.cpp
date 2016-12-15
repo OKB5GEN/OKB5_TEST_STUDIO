@@ -32,7 +32,11 @@ namespace
 ShapeItem::ShapeItem(QObject* parent):
     QObject(parent),
     mCommand(Q_NULLPTR),
-    mActive(false)
+    mParentShape(Q_NULLPTR),
+    mActive(false),
+    mPosition(QPoint(0, 0)),
+    mCell(QPoint(0, 0)),
+    mRect(QRect(0, 0, 0, 0))
 {
     mFont.setPointSize(14);
     mFont.setFamily("Arial");
@@ -101,11 +105,6 @@ void ShapeItem::setToolTip(const QString &toolTip)
     mToolTip = toolTip;
 }
 
-void ShapeItem::setPosition(const QPoint &position)
-{
-    mPosition = position;
-}
-
 void ShapeItem::setColor(const QColor &color)
 {
     mColor = color;
@@ -116,9 +115,11 @@ QPoint ShapeItem::cell() const
     return mCell;
 }
 
-void ShapeItem::setCell(const QPoint &position)
+void ShapeItem::setCell(const QPoint &cell)
 {
-    mCell = position;
+    mCell = cell;
+    mPosition.setX(origin().x() + mCell.x() * itemSize().width());
+    mPosition.setY(origin().y() + mCell.y() * itemSize().height());
 }
 
 void ShapeItem::setCommand(Command* command)
@@ -160,7 +161,6 @@ void ShapeItem::setValencyPoints(const QList<ValencyPoint>& points)
 
 ValencyPoint ShapeItem::valencyPoint(int role) const
 {
-    ValencyPoint point;
     for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
     {
         if (role == mValencyPoints[i].role())
@@ -170,7 +170,7 @@ ValencyPoint ShapeItem::valencyPoint(int role) const
     }
 
     int TODO; // make point not found notification
-    return point;
+    return ValencyPoint();
 }
 
 void ShapeItem::setRect(const QRect& rect)
@@ -181,6 +181,16 @@ void ShapeItem::setRect(const QRect& rect)
 QRect ShapeItem::rect() const
 {
     return mRect;
+}
+
+void ShapeItem::setParentShape(ShapeItem* parent)
+{
+    mParentShape = parent;
+}
+
+ShapeItem* ShapeItem::parentShape() const
+{
+    return mParentShape;
 }
 
 void ShapeItem::onTextChanged(const QString& text)
@@ -235,6 +245,12 @@ const QSizeF& ShapeItem::cellSize()
 {
     static QSizeF CELL(CELL_WIDTH, CELL_HEIGHT);
     return CELL;
+}
+
+const QPointF& ShapeItem::origin()
+{
+    static QPointF ORIGIN(itemSize().width() / 4, 0);
+    return ORIGIN;
 }
 
 void ShapeItem::setActive(bool active)
@@ -392,3 +408,4 @@ void ShapeItem::setSelected(bool selected)
         onErrorStatusChanged(mCommand->hasError());
     }
 }
+

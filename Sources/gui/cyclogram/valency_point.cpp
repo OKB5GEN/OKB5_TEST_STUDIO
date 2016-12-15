@@ -4,6 +4,7 @@
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),
+    mAttachedShape(Q_NULLPTR),
     mRole(Down)
 {
 }
@@ -36,6 +37,16 @@ void ValencyPoint::setOwner(ShapeItem* owner)
 ShapeItem* ValencyPoint::owner() const
 {
     return mOwner;
+}
+
+void ValencyPoint::setAttachedShape(ShapeItem* item)
+{
+    mAttachedShape = item;
+}
+
+ShapeItem* ValencyPoint::attachedShape() const
+{
+    return mAttachedShape;
 }
 
 void ValencyPoint::setRole(ValencyPoint::Role role)

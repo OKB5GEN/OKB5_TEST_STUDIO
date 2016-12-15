@@ -15,6 +15,7 @@ Command::Command(DRAKON::IconType type, QObject * parent):
     mRole(0),
     mFlags(Command::All),
     mParentCommand(Q_NULLPTR),
+    mQuestionLink(Q_NULLPTR),
     mHasError(false),
     mExecutionDelay(0)
 {
@@ -144,6 +145,11 @@ Command* Command::parentCommand() const
 {
     int TODO; // неясно которую из команд считать парентовой в случае если сверху находится развилка QUESTION или SWICH-CASE, вероятно будет тоже массив, как и "nextCommands"
     return mParentCommand;
+}
+
+Command* Command::questionLink() const
+{
+    return mQuestionLink;
 }
 
 bool Command::hasError() const

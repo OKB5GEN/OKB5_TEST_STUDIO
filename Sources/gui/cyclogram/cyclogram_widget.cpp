@@ -92,10 +92,6 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mMovingItem = 0;
     mSelectedItem = 0;
 
-    // Set cyclogram origin
-    mOrigin.setX(ShapeItem::itemSize().width() / 4);
-    mOrigin.setY(0);
-
     setFocusPolicy(Qt::ClickFocus);
 }
 
@@ -396,15 +392,13 @@ bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 void CyclogramWidget::moveItemTo(const QPoint &pos)
 {
     QPoint offset = pos - mPreviousPosition;
-    mMovingItem->setPosition(mMovingItem->position() + offset);
+    //mMovingItem->setPosition(mMovingItem->position() + offset); //TODO item moving disabled
     mPreviousPosition = pos;
     update();
 }
 
 ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
 {
-    QPoint pos(mOrigin.x() + cell.x() * ShapeItem::itemSize().width(), mOrigin.y() + cell.y() * ShapeItem::itemSize().height());
-
     int TODO; //update diagram size if adding is to the end of the diagram, REMOVE FROM THIS METHOD
     if (cell.x() + 1 > mDiagramSize.width())
     {
@@ -419,13 +413,29 @@ ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
     ShapeItem* shapeItem = new ShapeItem(this);
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
-    shapeItem->setPosition(pos);
     shapeItem->setCell(cell);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
     shapeItem->createPath();
     shapeItem->setValencyPoints(createValencyPoints(cmd));
     mCommands.append(shapeItem);
 
+    connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
+
+    return shapeItem;
+}
+
+ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
+{
+    ShapeItem* shapeItem = new ShapeItem(this);
+    shapeItem->setCommand(cmd);
+    shapeItem->setToolTip(tr("Tooltip"));
+    shapeItem->setCell(cell);
+    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
+    shapeItem->createPath();
+    shapeItem->setValencyPoints(createValencyPoints(cmd));
+    shapeItem->setParentShape(parentShape);
+
+    mCommands.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
 
     return shapeItem;
@@ -438,8 +448,8 @@ void CyclogramWidget::drawSilhouette()
     mSihlouette.clear();
 
     QPoint bottomRight(INT_MIN, INT_MIN);
-    QPoint bottomLeft(mOrigin.x(), mDiagramSize.height() * ShapeItem::itemSize().height());
-    QPoint topLeft(mOrigin.x(), mOrigin.y() + ShapeItem::itemSize().height());
+    QPoint bottomLeft(ShapeItem::origin().x(), mDiagramSize.height() * ShapeItem::itemSize().height());
+    QPoint topLeft(ShapeItem::origin().x(), ShapeItem::origin().y() + ShapeItem::itemSize().height());
     QPoint topRight(INT_MIN, INT_MAX);
 
     QPainterPath silhouette;
@@ -475,7 +485,6 @@ void CyclogramWidget::drawSilhouette()
 
     ShapeItem* sihlouetteItem = new ShapeItem(this);
     sihlouetteItem->setPath(silhouette);
-    sihlouetteItem->setPosition(QPoint(0, 0));
     sihlouetteItem->setColor(QColor::fromRgba(0x00ffffff));
 
     // draw arrow
@@ -490,7 +499,6 @@ void CyclogramWidget::drawSilhouette()
 
     ShapeItem* arrowItem = new ShapeItem(this);
     arrowItem->setPath(arrow);
-    arrowItem->setPosition(QPoint(0, 0));
     arrowItem->setColor(QColor::fromRgba(0xff000000));
 
     mSihlouette.push_back(sihlouetteItem);
@@ -524,8 +532,16 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     connect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
     QPoint parentCell(0, 0);
+    // old logic >>>
     createCommandShape(first, parentCell);
     addChildCommands(first, parentCell);
+    // <<<
+
+    // new logic >>>
+    //ShapeItem* title = addShape(first, parentCell, 0);
+    //drawChildren(title);
+    // <<<
+
     onNeedUpdate();
 }
 
@@ -1092,8 +1108,8 @@ void CyclogramWidget::onNeedUpdate()
 {
     //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
 
-    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + mOrigin.x() + ShapeItem::cellSize().width();
-    int h = ShapeItem::itemSize().height() * mDiagramSize.height() + mOrigin.y() + ShapeItem::cellSize().height();
+    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + ShapeItem::origin().x() + ShapeItem::cellSize().width();
+    int h = ShapeItem::itemSize().height() * mDiagramSize.height() + ShapeItem::origin().y() + ShapeItem::cellSize().height();
     resize(w, h);
 
     drawSilhouette();
@@ -1337,11 +1353,6 @@ ShapeItem* CyclogramWidget::findNextBranch(const QPoint& cell) const
 
 void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
 {
-    QPoint position = item->position();
-    position.setX(position.x() + xShift * ShapeItem::itemSize().width());
-    position.setY(position.y() + yShift * ShapeItem::itemSize().height());
-    item->setPosition(position);
-
     QPoint cell = item->cell();
     cell.setX(cell.x() + xShift);
     cell.setY(cell.y() + yShift);
@@ -1602,4 +1613,70 @@ ShapeItem* CyclogramWidget::addQuestion(const ValencyPoint& point, int param)
     update();
 
     return newItem;
+}
+
+void CyclogramWidget::drawChildren(ShapeItem* item)
+{
+    Command* cmd = item->command();
+
+    if (cmd->type() == DRAKON::TERMINATOR)
+    {
+        if (!cmd->nextCommands().empty()) // cyclogram begin
+        {
+            // add first branch
+            Command* firstBranch = cmd->nextCommands()[0];
+            QPoint cell = item->cell();
+            cell.setY(cell.y() + 1);
+            ShapeItem* it = addShape(firstBranch, cell, item);
+
+           // mCyclogr
+        }
+
+
+    }
+    else if (cmd->type() == DRAKON::BRANCH_BEGIN)
+    {
+
+    }
+    else
+    {
+
+    }
+///////////////////
+/*    QList<Command*> nextCommands = parentCmd->nextCommands();
+    if (nextCommands.empty())
+    {
+        return;
+    }
+
+    if (nextCommands.size() == 1)
+    {
+        Command* cmd = nextCommands[0];
+        QPoint cell(parentCell.x(), parentCell.y() + 1);
+
+        if (cmd->type() == DRAKON::BRANCH_BEGIN && parentCmd->type() == DRAKON::GO_TO_BRANCH) // not first branch
+        {
+            cell.setX(mDiagramSize.width());
+            cell.setY(1);
+        }
+
+        createCommandShape(cmd, cell);
+
+        if (cmd->type() == DRAKON::GO_TO_BRANCH)
+        {
+            if (!isBranchExist(cmd))
+            {
+                addChildCommands(cmd, cell);
+            }
+        }
+        else
+        {
+            addChildCommands(cmd, cell);
+        }
+
+    }
+    else // QUESTION or SWITCH-CASE command
+    {
+        int TODO;
+    }*/
 }

@@ -49,6 +49,12 @@ private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
 
+    void drawChildren(ShapeItem* item);
+
+    // new cyclogram visualization alogotithm >>>
+    ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
+    // <<<
+
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
     bool isCyclogramEndBranch(Command* cmd) const;
@@ -81,7 +87,6 @@ private:
 
     void showEditDialog(Command* command);
 
-    QPointF mOrigin;
     QSize mDiagramSize;
 
     QList<ShapeItem*> mCommands;

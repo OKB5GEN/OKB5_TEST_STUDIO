@@ -42,6 +42,7 @@ public:
     int role() const;
     uint32_t flags() const;
     Command* parentCommand() const;
+    Command* questionLink() const;
     bool hasError() const;
 
     void setRole(int role);
@@ -79,6 +80,8 @@ protected:
 
     QList<Command*> mNextCommands;
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
+
+    Command* mQuestionLink; // mQuestionLink command cycle arrow links to this command
 
 private slots:
     void onNextCmdTextChanged(const QString& text);
