@@ -138,6 +138,12 @@ void ShapeItem::setCommand(Command* command)
 
     onTextChanged(mCommand->text());
     onErrorStatusChanged(mCommand->hasError());
+
+    mChildShapes.clear();
+    for (int i = 0; i < mCommand->childCommands().size(); ++i)
+    {
+        mChildShapes.push_back(Q_NULLPTR);
+    }
 }
 
 Command* ShapeItem::command() const
@@ -173,8 +179,60 @@ ValencyPoint ShapeItem::valencyPoint(int role) const
     return ValencyPoint();
 }
 
-void ShapeItem::setRect(const QRect& rect)
+void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 {
+    if (mRect == rect)
+    {
+        return; // rect doesn't changed
+    }
+
+    if (pushToChildren)
+    {
+        if (mCommand)
+        {
+            const QList<Command*>& childs = mCommand->childCommands();
+
+            if (childs.empty())
+            {
+                mRect.setBottom(mRect.bottom() + rect.height() - mRect.height());
+                mCell.setY(mCell.y() + rect.height() - mRect.height());
+            }
+            else if (childs.size() == 1)
+            {
+                if (childs[0] != Q_NULLPTR)
+                {
+                    // has one possible child command
+                    QRect newRect = mChildShapes[0]->rect();
+                    newRect.setTop(newRect.top() + 1);
+                    mChildShapes[0]->setRect(newRect, true);
+                }
+            }
+            else if (childs.size() == 3)
+            {
+                // has 3 possible child commands
+                if (mCommand->type() == DRAKON::QUESTION)
+                {
+                    CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+                    if (question->questionType() == CmdQuestion::CYCLE)
+                    {
+
+                    }
+                    else // IF-type
+                    {
+                        if (childs[ValencyPoint::UnderArrow] == Q_NULLPTR)
+                        {// "landed" branches
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     mRect = rect;
 }
 
@@ -191,6 +249,24 @@ void ShapeItem::setParentShape(ShapeItem* parent)
 ShapeItem* ShapeItem::parentShape() const
 {
     return mParentShape;
+}
+
+ShapeItem* ShapeItem::childShape(int index) const
+{
+    if (index > 0 && index < mChildShapes.size())
+    {
+        return mChildShapes.at(index);
+    }
+
+    return Q_NULLPTR;
+}
+
+void ShapeItem::setChildShape(ShapeItem* item, int index)
+{
+    if (index >= 0 && index < mChildShapes.size())
+    {
+        mChildShapes[index] = item;
+    }
 }
 
 void ShapeItem::onTextChanged(const QString& text)
@@ -264,7 +340,6 @@ void ShapeItem::createPath()
     DRAKON::IconType type = command()->type();
     QPainterPath path;
 
-    QRect itemRect = rect();
     QPoint cell = mCell;
 
     qreal W = itemSize().width();
@@ -276,7 +351,7 @@ void ShapeItem::createPath()
     {
     case DRAKON::TERMINATOR:
         {
-            qreal yOffset = (cell.y() - itemRect.top()) * H;
+            qreal yOffset = (cell.y() - mRect.top()) * H;
             qreal radius = (H - 2 * h) / 2;
             QRectF rect(w, h, W - 2 * w, 2 * radius);
             path.addRoundedRect(rect, radius, radius);
@@ -384,7 +459,7 @@ void ShapeItem::createPath()
 
     if (type != DRAKON::TERMINATOR)
     {
-        qreal yOffset = (cell.y() - itemRect.top()) * H;
+        qreal yOffset = (cell.y() - mRect.top()) * H;
 
         // lower connector
         path.moveTo(W / 2, H - h);
@@ -409,3 +484,76 @@ void ShapeItem::setSelected(bool selected)
     }
 }
 
+void ShapeItem::pushDown()
+{
+    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+    {
+        if (mRect.height() > 1) // "expanded shape"
+        {
+            // just reduce own rect height by 1
+            mRect.setTop(mRect.top() + 1);
+        }
+        else // move shape down
+        {
+            mRect.setBottom(mRect.bottom() + 1);
+            mRect.setTop(mRect.top() + 1);
+
+            QPoint cell = mCell;
+            cell.setY(cell.y() + 1);
+            setCell(cell);
+        }
+    }
+    else if (mChildShapes.size() == 1)
+    {
+        QPoint cell = mCell;
+        cell.setY(cell.y() + 1);
+        setCell(cell);
+
+        // tell child to push itself down
+        mChildShapes[0]->pushDown();
+
+        QRect rect = mChildShapes[0]->rect();
+        rect.setTop(rect.top() - 1);
+        setRect(rect, false);
+    }
+    else if (mChildShapes.size() == 3)
+    {
+        int TODO5; // question logic
+    }
+
+    createPath();
+}
+
+void ShapeItem::onChildRectChanged(ShapeItem * shape)
+{
+    if (mCommand && mCommand->type() == DRAKON::TERMINATOR && !mCommand->nextCommands().empty())
+    {
+        // 1. Сюда мы попадаем, когда меняется размер какого-то бранча (а может де-факто не поменяться теоретически)
+        // 2. Сюда мы можем попасть при добавлении команды
+        // 3. Если совкупная ширина бранчей стала больше ректа this'а (добавилась новая команда в какой-то из боковых веток), то ширина поменялась, this-у обновляем рект
+        // 4. Пробегаем по всем бранчам (сортированным слева направо) смотрим cell и width его ректа
+        // 5. Если находим пересечение, то все бранчи начиная с пересекаемого и правее двигаем на дельту-width вправо (например switch-case могли добавить)
+        // 6. Далее смотрим поменялась ли высота бранча
+        // 7. Если бранч стал выше ректа this'a, то считаем, что бранч удлинился и пушим новый рект в остальные бранчи (где-то подрастянется), this-у обновляем рект
+        // 8. Если бранч стал ниже ректа this'а, то проводим тест по другим бранчам на предмет "можно ли их ужать"
+        // 9. Если все бранчи можно ужать до новой высоты, то пушим в них новые ректы и обновляем рект this'а
+        // 10. Если хоть один бранч ужать нельзя, то бранчу, которого поменялась высота ректа пушим текущую высоту this'а
+        int TODO; // custom logic for entire cyclogram size update
+    }
+
+    if (mChildShapes.size() == 1)
+    {
+        QRect rect = shape->rect();
+        rect.setTop(rect.top() - 1);
+        setRect(rect, false);
+
+        if (mParentShape)
+        {
+            mParentShape->onChildRectChanged(this);
+        }
+    }
+    else if (mChildShapes.size() == 3)
+    {
+        int TODO; // custom logic for question
+    }
+}

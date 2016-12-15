@@ -9,17 +9,21 @@ namespace
     static const int EXECUTION_DELAY = 50;
 }
 
-Command::Command(DRAKON::IconType type, QObject * parent):
+Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     QObject(parent),
     mType(type),
     mRole(0),
     mFlags(Command::All),
     mParentCommand(Q_NULLPTR),
-    mQuestionLink(Q_NULLPTR),
     mHasError(false),
     mExecutionDelay(0)
 {
     setExecutionDelay(EXECUTION_DELAY);
+
+    for (int i = 0; i < childCmdCnt; ++i)
+    {
+        mChildCommands.push_back(Q_NULLPTR);
+    }
 }
 
 Command::~Command()
@@ -95,6 +99,11 @@ const QList<Command*>& Command::nextCommands() const
     return mNextCommands;
 }
 
+const QList<Command*>& Command::childCommands() const
+{
+    return mChildCommands;
+}
+
 void Command::addCommand(Command* cmd, int role /*= 0*/)
 {
     if (cmd)
@@ -111,6 +120,11 @@ void Command::addCommand(Command* cmd, int role /*= 0*/)
         {
             connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
             onNextCmdTextChanged(cmd->text());
+        }
+
+        if (mType != DRAKON::GO_TO_BRANCH && mType != DRAKON::TERMINATOR)
+        {
+            setChildCommand(cmd, role);
         }
     }
 }
@@ -147,11 +161,6 @@ Command* Command::parentCommand() const
     return mParentCommand;
 }
 
-Command* Command::questionLink() const
-{
-    return mQuestionLink;
-}
-
 bool Command::hasError() const
 {
     return mHasError;
@@ -165,12 +174,21 @@ void Command::insertCommand(Command* newCmd, int role) // new command inserted t
     {
         if (mNextCommands[i]->role() == role)
         {
+            setChildCommand(newCmd, role);
             newCmd->setParentCommand(this);
             newCmd->setRole(role);
             newCmd->addCommand(mNextCommands[i], 0);
             mNextCommands[i] = newCmd;
             break;
         }
+    }
+}
+
+void Command::setChildCommand(Command* cmd, int role)
+{
+    if (role >= 0 && role < mChildCommands.size())
+    {
+        mChildCommands[role] = cmd;
     }
 }
 

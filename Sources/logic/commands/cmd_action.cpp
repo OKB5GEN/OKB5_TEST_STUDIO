@@ -4,7 +4,7 @@
 #include <QTimer>
 
 CmdAction::CmdAction(DRAKON::IconType type, QObject* parent):
-    Command(type, parent)
+    Command(type, 1, parent)
 {
 
 }

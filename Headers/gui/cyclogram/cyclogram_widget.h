@@ -49,6 +49,7 @@ private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
 
+    void drawCyclogram(ShapeItem* item);
     void drawChildren(ShapeItem* item);
 
     // new cyclogram visualization alogotithm >>>
@@ -58,6 +59,8 @@ private:
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
     bool isCyclogramEndBranch(Command* cmd) const;
+    ShapeItem* addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
+
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
 
     bool canBeDeleted(ShapeItem* item, QString& error) const;

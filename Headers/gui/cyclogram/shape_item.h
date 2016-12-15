@@ -26,9 +26,10 @@ public:
     void setCell(const QPoint &cell);
     void setCommand(Command* command);
     void setValencyPoints(const QList<ValencyPoint>& points);
-    void setRect(const QRect& rect);
+    void setRect(const QRect& rect, bool pushToChildren);
     void setSelected(bool selected);
     void setParentShape(ShapeItem* parent);
+    void setChildShape(ShapeItem* item, int index); //TODO
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -44,10 +45,14 @@ public:
     ValencyPoint valencyPoint(int role) const;
     QRect rect() const;
     ShapeItem* parentShape() const;
+    ShapeItem* childShape(int index) const;
 
     static const QSizeF& itemSize();
     static const QSizeF& cellSize();
     static const QPointF& origin();
+
+    void pushDown();
+    void onChildRectChanged(ShapeItem * shape);
 
 signals:
     void changed();
@@ -77,6 +82,8 @@ private:
 
     Command* mCommand = Q_NULLPTR; // data pointer for the command logics
     ShapeItem* mParentShape = Q_NULLPTR;
+
+    QList<ShapeItem*> mChildShapes;
 };
 
 #endif //SHAPE_ITEM_H

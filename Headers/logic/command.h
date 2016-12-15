@@ -22,7 +22,7 @@ public:
         All = (Selectable | Movable | Editable | Deletable),
     };
 
-    Command(DRAKON::IconType type, QObject * parent);
+    Command(DRAKON::IconType type, int childCmdCnt, QObject * parent);
     virtual ~Command();
 
     virtual void run();
@@ -38,11 +38,15 @@ public:
     void addCommand(Command* cmd, int role = 0);
     void insertCommand(Command* newCmd, int role = 0);
     void replaceCommand(Command* newCmd, int role = 0);
+    void setChildCommand(Command* cmd, int role);
 
     int role() const;
     uint32_t flags() const;
+
     Command* parentCommand() const;
-    Command* questionLink() const;
+
+    const QList<Command*>& childCommands() const;
+
     bool hasError() const;
 
     void setRole(int role);
@@ -81,7 +85,7 @@ protected:
     QList<Command*> mNextCommands;
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
 
-    Command* mQuestionLink; // mQuestionLink command cycle arrow links to this command
+    QList<Command*> mChildCommands; // TODO implement
 
 private slots:
     void onNextCmdTextChanged(const QString& text);

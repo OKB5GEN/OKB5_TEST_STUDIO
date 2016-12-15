@@ -75,6 +75,8 @@
  * Если это не взлетит, то можно тупо перерисовывать циклограмму целиком при каждом изменении (первый вариант очистить-загрузить надо сделать сразу)
 */
 
+#define OLD_LOGIC
+
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mDiagramSize(0, 0),
@@ -280,7 +282,11 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 
             if (dialog->result() == QDialog::Accepted)
             {
+#ifdef OLD_LOGIC
+                addCommandOld(dialog->shapeType(), point, dialog->param());
+#else
                 addCommand(dialog->shapeType(), point, dialog->param());
+#endif
             }
 
             dialog->deleteLater();
@@ -414,7 +420,7 @@ ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setCell(cell);
-    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
+    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
     shapeItem->createPath();
     shapeItem->setValencyPoints(createValencyPoints(cmd));
     mCommands.append(shapeItem);
@@ -430,7 +436,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setCell(cell);
-    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1)); // by initial shape rect matches the occupied cell
+    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
     shapeItem->createPath();
     shapeItem->setValencyPoints(createValencyPoints(cmd));
     shapeItem->setParentShape(parentShape);
@@ -532,16 +538,17 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     connect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
     QPoint parentCell(0, 0);
-    // old logic >>>
+
+#ifdef OLD_LOGIC
     createCommandShape(first, parentCell);
     addChildCommands(first, parentCell);
-    // <<<
-
-    // new logic >>>
-    //ShapeItem* title = addShape(first, parentCell, 0);
-    //drawChildren(title);
-    // <<<
-
+#else
+    ShapeItem* title = addShape(first, parentCell, 0);
+    drawCyclogram(title);
+    QRect rect = title->rect();
+    mDiagramSize.setWidth(rect.width());
+    mDiagramSize.setHeight(rect.height());
+#endif
     onNeedUpdate();
 }
 
@@ -809,7 +816,7 @@ bool CyclogramWidget::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
+ShapeItem* CyclogramWidget::addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
 {
     int role = point.role();
     if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
@@ -927,8 +934,6 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 
     // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
     int TODO2; // owner->parentTreeItem();
-    QRect rect = owner->rect();
-    owner->setRect(rect);
     update();
 
     return newItem;
@@ -1241,7 +1246,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     ShapeItem* newBranchItem = createCommandShape(newCmd, newCmdCell);
 
     // 2. Create and add GO_TO_BRANCH item to the created branch
-    ShapeItem* goToBranchItem = addCommand(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(0));
+    ShapeItem* goToBranchItem = addCommandOld(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(0));
 
     // by default new branch is linked to itself
     goToBranchItem->command()->addCommand(newBranchItem->command());
@@ -1363,7 +1368,7 @@ void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift
     rect.setBottom(rect.bottom() + bottomShift);
     rect.setLeft(rect.left() + xShift);
     rect.setRight(rect.right() + xShift);
-    item->setRect(rect);
+    item->setRect(rect, false);
 
     if (topShift != bottomShift) // rect size changed, update path
     {
@@ -1608,40 +1613,130 @@ ShapeItem* CyclogramWidget::addQuestion(const ValencyPoint& point, int param)
 
     // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
     int TODO2; // owner->parentTreeItem();
-    QRect rect = owner->rect();
-    owner->setRect(rect);
     update();
 
     return newItem;
+}
+
+void CyclogramWidget::drawCyclogram(ShapeItem* item)
+{
+    Command* cmd = item->command();
+
+    if (cmd->type() != DRAKON::TERMINATOR || cmd->nextCommands().empty())
+    {
+        qDebug("Not cyclogram start terminator");
+        return;
+    }
+
+    QList<Command*> branches;
+    mCurrentCyclogram->getBranches(branches);
+
+    int maxHeight = -1;
+    int width = 0;
+
+    QList<ShapeItem*> branchesShapes;
+
+    // draw all branches
+    foreach (Command* it, branches)
+    {
+        QPoint cell;
+        cell.setX(width);
+        cell.setY(item->cell().y() + 1);
+
+        ShapeItem* shape = addShape(it, cell, item);
+        drawChildren(shape);
+        branchesShapes.push_back(shape);
+
+        QRect rect = shape->rect();
+        width += rect.width();
+
+        if (rect.height() > maxHeight)
+        {
+            maxHeight = rect.height();
+        }
+    }
+
+    // adjust branches height
+    foreach (ShapeItem* it, branchesShapes)
+    {
+        QRect rect = it->rect();
+        if (rect.height() < maxHeight)
+        {
+            rect.setBottom(rect.bottom() + maxHeight - rect.height());
+            it->setRect(rect, true);
+        }
+    }
+
+    QRect rect;
+    rect.setRight(width - 1);
+    rect.setBottom(maxHeight);
+    item->setRect(rect, false);
 }
 
 void CyclogramWidget::drawChildren(ShapeItem* item)
 {
     Command* cmd = item->command();
 
-    if (cmd->type() == DRAKON::TERMINATOR)
+    if (cmd->childCommands().empty())
     {
-        if (!cmd->nextCommands().empty()) // cyclogram begin
-        {
-            // add first branch
-            Command* firstBranch = cmd->nextCommands()[0];
-            QPoint cell = item->cell();
-            cell.setY(cell.y() + 1);
-            ShapeItem* it = addShape(firstBranch, cell, item);
+        return; // command has no valency points
+    }
 
-           // mCyclogr
+    if (cmd->childCommands().size() == 1)
+    {
+        if (cmd->childCommands()[0] == Q_NULLPTR)
+        {
+            return; // empty valency point
         }
 
+        QPoint cell = item->cell();
+        cell.setY(cell.y() + 1);
 
+        ShapeItem* shape = addShape(cmd->childCommands()[0], cell, item);
+        item->setChildShape(shape, 0);
+        drawChildren(shape);
+
+        QRect rect = item->rect();
+        rect.setBottom(rect.bottom() + shape->rect().height());
+        rect.setRight(rect.right() + shape->rect().width() - rect.width());
+        item->setRect(rect, false);
     }
-    else if (cmd->type() == DRAKON::BRANCH_BEGIN)
+    else if (cmd->childCommands().size() == 3)
     {
-
+        int i = 0;
     }
-    else
+
+    /*
+
+    switch (cmd->type())
     {
+    case DRAKON::TERMINATOR:
+    case DRAKON::BRANCH_BEGIN:
+    case DRAKON::GO_TO_BRANCH:
+    case DRAKON::ACTION_MATH:
+    case DRAKON::DELAY:
+    case DRAKON::QUESTION:
+    case DRAKON::ACTION_MODULE:
+    case DRAKON::SUBPROGRAM:
+    case DRAKON::SWITCH:
+    case DRAKON::CASE:
+    case DRAKON::FOR_BEGIN:
+    case DRAKON::FOR_END:
+    case DRAKON::OUTPUT:
+    case DRAKON::INPUT:
+    case DRAKON::START_TIMER:
+    case DRAKON::SYNCHRONIZER:
+    case DRAKON::PARALLEL_PROCESS:
+    case DRAKON::SHELF:
 
-    }
+        break;
+    default:
+        {
+
+        }
+        break;
+    }*/
+
 ///////////////////
 /*    QList<Command*> nextCommands = parentCmd->nextCommands();
     if (nextCommands.empty())
@@ -1679,4 +1774,87 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
     {
         int TODO;
     }*/
+}
+
+
+ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
+{
+    int role = point.role();
+    if (type == DRAKON::BRANCH_BEGIN && role == ValencyPoint::Right)
+    {
+        return addNewBranch(point.owner());
+    }
+
+    // 1. Create new command
+    Command* newCmd = mCurrentCyclogram->createCommand(type, param);
+    if (!newCmd)
+    {
+        return Q_NULLPTR;
+    }
+
+    ShapeItem* owner = point.owner();
+    Command* cmd = owner->command();
+
+    // 2. Update command tree connections in logic
+    if (cmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
+    {
+        cmd->addCommand(newCmd, role);
+    }
+    else
+    {
+        cmd->insertCommand(newCmd, role);
+    }
+
+    // 3. Create new shape and add it to diagram
+    ShapeItem* prevChildShape = owner->childShape(role);
+    QPoint newCmdCell;
+
+    //3.1 calculate new shape position
+    if (prevChildShape) // if valency point already has shape connected
+    {
+        newCmdCell.setX(prevChildShape->rect().left());
+        newCmdCell.setY(prevChildShape->rect().top());
+    }
+    else // question branch end command
+    {
+        if (cmd->type() == DRAKON::QUESTION)
+        {
+            int TODO; // depending on role and shape type
+        }
+        else
+        {
+            // create new shape below the points' owner
+            newCmdCell = owner->cell();
+            newCmdCell.setY(newCmdCell.y() + 1);
+        }
+    }
+
+    // 3.2 create shape
+    ShapeItem* newShape = addShape(newCmd, newCmdCell, owner);
+
+    // 3.3 update all rects (child and parent recursively)
+    if (prevChildShape)
+    {
+        // 3.3.1 update shape connections
+        newShape->setChildShape(prevChildShape, role);
+        owner->setChildShape(newShape, role);
+
+        // 3.3.2 update child rects, then parent rects
+        prevChildShape->pushDown();
+        QRect rect = prevChildShape->rect();
+        rect.setTop(rect.top() - 1);
+
+        newShape->setRect(rect, false);
+        owner->onChildRectChanged(newShape);
+    }
+    else // if owner hadn't any child shapes, update only to parent direction (QUESTION-IF branches ending)
+    {
+        int TODO1; //QUESTION
+        owner->setChildShape(newShape, role);
+        owner->onChildRectChanged(newShape);
+    }
+
+    update();
+
+    return newShape;
 }

@@ -104,8 +104,10 @@ void Cyclogram::createDefault()
 
     begin->addCommand(branch1);
     branch1->addCommand(toBranch2);
+    branch1->setChildCommand(toBranch2, 0);
     toBranch2->addCommand(branch2);
     branch2->addCommand(end);
+    branch2->setChildCommand(end, 0);
 
     mFirst = begin;
     mLast = end;
@@ -426,4 +428,32 @@ Command* Cyclogram::validate() const
 VariableController* Cyclogram::varCtrl() const
 {
     return mVarController;
+}
+
+void Cyclogram::getBranches(QList<Command*>& branches) const
+{
+    if (!mFirst || !mLast)
+    {
+        return;
+    }
+
+    // find first and last branches
+    Command* firstBranch = mFirst->nextCommands()[0];
+    Command* lastBranch = mLast->parentCommand(); //TODO parent command
+    while (lastBranch->type() != DRAKON::BRANCH_BEGIN)
+    {
+        lastBranch = lastBranch->parentCommand();
+    }
+
+    // get other branches and draw them
+    foreach (Command* it, mCommands)
+    {
+        if (it->type() == DRAKON::BRANCH_BEGIN && it != firstBranch && it != lastBranch)
+        {
+            branches.push_back(it);
+        }
+    }
+
+    branches.push_front(firstBranch);
+    branches.push_back(lastBranch);
 }

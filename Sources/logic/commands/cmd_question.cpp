@@ -12,7 +12,7 @@ CmdQuestion::OperandData::OperandData()
 //=================================
 
 CmdQuestion::CmdQuestion(QObject* parent):
-    Command(DRAKON::QUESTION, parent),
+    Command(DRAKON::QUESTION, 3, parent),
     mOperation(Equal),
     mOrientation(YesDown)
 {

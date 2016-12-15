@@ -3,7 +3,7 @@
 #include <QTime>
 
 CmdDelay::CmdDelay(QObject* parent):
-    Command(DRAKON::DELAY, parent),
+    Command(DRAKON::DELAY, 1, parent),
     mTimeLeft(0)
 {
     mTimer = new QTimer(this);

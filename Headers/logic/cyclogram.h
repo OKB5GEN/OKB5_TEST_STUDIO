@@ -40,6 +40,8 @@ public:
     Command* createCommand(DRAKON::IconType type, int param = -1);
 
     const QList<Command*>& commands() const;
+    void getBranches(QList<Command*>& branches) const;
+
     State state() const;
 
     void deleteCommand(Command* cmd, bool recursive = false);

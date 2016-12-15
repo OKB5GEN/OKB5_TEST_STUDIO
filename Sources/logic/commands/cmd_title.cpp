@@ -9,7 +9,7 @@
 */
 
 CmdTitle::CmdTitle(QObject * parent):
-    Command(DRAKON::TERMINATOR, parent)
+    Command(DRAKON::TERMINATOR, 0, parent)
 {
     mFlags = (Selectable | Editable);
 }
