@@ -823,7 +823,7 @@ ShapeItem* CyclogramWidget::addCommandOld(DRAKON::IconType type, const ValencyPo
     int role = point.role();
     if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
     {
-        return addNewBranch(point.owner());
+        return addNewBranchOld(point.owner());
     }
 
     if (type == DRAKON::QUESTION)
@@ -1224,7 +1224,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     onNeedUpdate();
 }
 
-ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
+ShapeItem* CyclogramWidget::addNewBranchOld(ShapeItem* item)
 {
     // create new branch to the right of the item command tree
     QPoint newCmdCell = item->cell();
@@ -1867,4 +1867,49 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     update();
 
     return newShape;
+}
+
+ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
+{
+    // Create and add BRANCH_BEGIN item
+    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::BRANCH_BEGIN);
+    if (!newCmd)
+    {
+        return Q_NULLPTR;
+    }
+
+    //generate unique branch name
+    CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);
+    cmd->setText(generateBranchName());
+
+    // create new branch to the right of the item command tree
+    QPoint newCmdCell = item->cell();
+    newCmdCell.setX(newCmdCell.x() + item->rect().width());
+
+    // Update commands positions to the right of the inserted branch
+    int xNext = newCmdCell.x();
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it->cell().x() >= xNext)
+        {
+            updateItemGeometry(it, 1, 0, 0, 0);
+        }
+    }
+
+    // update diagram rect
+    QRect r = mRootShape->rect();
+    r.setRight(r.right() + item->rect().width());
+    mRootShape->setRect(r, false);
+
+
+    ShapeItem* newBranchItem = addShape(newCmd, newCmdCell, mRootShape);
+    mRootShape->addChildShape(newBranchItem);
+
+    // Create and add GO_TO_BRANCH item to the created branch (by default new branch is linked to itself)
+    ShapeItem* goToBranchItem = addCommand(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(ValencyPoint::Down));
+    goToBranchItem->command()->addCommand(newBranchItem->command());
+
+    onNeedUpdate();
+
+    return newBranchItem;
 }

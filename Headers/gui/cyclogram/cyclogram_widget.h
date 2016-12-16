@@ -59,7 +59,7 @@ private:
     ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
     bool isCyclogramEndBranch(Command* cmd) const;
-    ShapeItem* addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
+    ShapeItem* addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param = -1); // TODO remove
 
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
 
@@ -82,6 +82,8 @@ private:
 
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     ShapeItem* findNextBranch(const QPoint& cell) const;
+    ShapeItem* addNewBranchOld(ShapeItem* item); // TODO remove
+
     ShapeItem* addNewBranch(ShapeItem* item);
 
     ShapeItem* addQuestion(const ValencyPoint& point, int param);
