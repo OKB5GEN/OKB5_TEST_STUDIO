@@ -99,6 +99,8 @@ private:
     ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;
 
+    ShapeItem* mRootShape;
+
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 };
 

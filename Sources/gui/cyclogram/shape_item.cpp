@@ -194,21 +194,25 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 
             if (childs.empty())
             {
-                mRect.setBottom(mRect.bottom() + rect.height() - mRect.height());
-                mCell.setY(mCell.y() + rect.height() - mRect.height());
+                QPoint cell = mCell;
+                cell.setY(cell.y() + rect.height() - mRect.height()); // update cell first
+                setCell(cell);
+                mRect.setBottom(mRect.bottom() + rect.height() - mRect.height()); // then update rect
             }
             else if (childs.size() == 1)
             {
                 if (childs[0] != Q_NULLPTR)
                 {
                     // has one possible child command
-                    QRect newRect = mChildShapes[0]->rect();
+                    QRect newRect = rect;
                     newRect.setTop(newRect.top() + 1);
                     mChildShapes[0]->setRect(newRect, true);
                 }
             }
             else if (childs.size() == 3)
             {
+                int TODO; // QUESTION
+
                 // has 3 possible child commands
                 if (mCommand->type() == DRAKON::QUESTION)
                 {
@@ -234,6 +238,7 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
     }
 
     mRect = rect;
+    createPath();
 }
 
 QRect ShapeItem::rect() const
@@ -253,9 +258,9 @@ ShapeItem* ShapeItem::parentShape() const
 
 ShapeItem* ShapeItem::childShape(int index) const
 {
-    if (index > 0 && index < mChildShapes.size())
+    if (index >= 0 && index < mChildShapes.size())
     {
-        return mChildShapes.at(index);
+        return mChildShapes[index];
     }
 
     return Q_NULLPTR;
@@ -265,8 +270,19 @@ void ShapeItem::setChildShape(ShapeItem* item, int index)
 {
     if (index >= 0 && index < mChildShapes.size())
     {
+        item->setParentShape(this);
         mChildShapes[index] = item;
     }
+}
+
+void ShapeItem::addChildShape(ShapeItem* item)
+{
+    mChildShapes.push_back(item);
+}
+
+void ShapeItem::removeChildShape(ShapeItem* item)
+{
+    mChildShapes.removeAll(item);
 }
 
 void ShapeItem::onTextChanged(const QString& text)
@@ -528,17 +544,8 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
 {
     if (mCommand && mCommand->type() == DRAKON::TERMINATOR && !mCommand->nextCommands().empty())
     {
-        // 1. Сюда мы попадаем, когда меняется размер какого-то бранча (а может де-факто не поменяться теоретически)
-        // 2. Сюда мы можем попасть при добавлении команды
-        // 3. Если совкупная ширина бранчей стала больше ректа this'а (добавилась новая команда в какой-то из боковых веток), то ширина поменялась, this-у обновляем рект
-        // 4. Пробегаем по всем бранчам (сортированным слева направо) смотрим cell и width его ректа
-        // 5. Если находим пересечение, то все бранчи начиная с пересекаемого и правее двигаем на дельту-width вправо (например switch-case могли добавить)
-        // 6. Далее смотрим поменялась ли высота бранча
-        // 7. Если бранч стал выше ректа this'a, то считаем, что бранч удлинился и пушим новый рект в остальные бранчи (где-то подрастянется), this-у обновляем рект
-        // 8. Если бранч стал ниже ректа this'а, то проводим тест по другим бранчам на предмет "можно ли их ужать"
-        // 9. Если все бранчи можно ужать до новой высоты, то пушим в них новые ректы и обновляем рект this'а
-        // 10. Если хоть один бранч ужать нельзя, то бранчу, которого поменялась высота ректа пушим текущую высоту this'а
-        int TODO; // custom logic for entire cyclogram size update
+        updateCyclogramRect(shape);
+        return;
     }
 
     if (mChildShapes.size() == 1)
@@ -556,4 +563,164 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
     {
         int TODO; // custom logic for question
     }
+}
+
+void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
+{
+    int TODO; // branch deletion
+
+    // 1. Сюда мы попадаем, когда меняется размер какого-то бранча (а может де-факто не поменяться теоретически)
+    // 2. Сюда мы можем попасть при добавлении команды
+    // 3. Если совкупная ширина бранчей стала больше ректа this'а (добавилась новая команда в какой-то из боковых веток), то ширина поменялась, this-у обновляем рект
+    // 4. Пробегаем по всем бранчам (сортированным слева направо) смотрим cell и width его ректа
+    // 5. Если находим пересечение, то все бранчи начиная с пересекаемого и правее двигаем на дельту-width вправо (например switch-case могли добавить)
+    // 6. Далее смотрим поменялась ли высота бранча
+    // 7. Если бранч стал выше ректа this'a, то считаем, что бранч удлинился и пушим новый рект в остальные бранчи (где-то подрастянется), this-у обновляем рект
+    // 8. Если бранч стал ниже ректа this'а, то проводим тест по другим бранчам на предмет "можно ли их ужать"
+    // 9. Если все бранчи можно ужать до новой высоты, то пушим в них новые ректы и обновляем рект this'а
+    // 10. Если хоть один бранч ужать нельзя, то бранчу, которого поменялась высота ректа пушим текущую высоту this'а
+
+    QRect before = mRect;
+
+    //1. If branch width changed, shift all branches to the right of changed
+    int xOffset = -mRect.width();
+    foreach (ShapeItem* it, mChildShapes)
+    {
+        xOffset += it->rect().width();
+    }
+
+    if (xOffset != 0)
+    {
+        QRect rect = changedBranch->rect();
+
+        foreach (ShapeItem* it, mChildShapes)
+        {
+            QRect branchRect = it->rect();
+            if (branchRect.left() > rect.left())
+            {
+                branchRect.setLeft(branchRect.left() + xOffset);
+                branchRect.setRight(branchRect.right() + xOffset);
+                it->setRect(branchRect, true);
+            }
+        }
+
+        mRect.setRight(mRect.right() + xOffset);
+    }
+
+    int yOffset = (changedBranch->rect().height() + 1) - mRect.height();
+
+    if (yOffset != 0)
+    {
+        bool canSetRect = true;
+
+        foreach (ShapeItem* it, mChildShapes)
+        {
+            if (it != changedBranch)
+            {
+                QRect branchRect = it->rect();
+                branchRect.setBottom(branchRect.bottom() + yOffset);
+
+                if (!it->canSetRect(branchRect))
+                {
+                    canSetRect = false;
+                    break;
+                }
+            }
+        }
+
+        if (canSetRect) // push new size to all other branches
+        {
+            foreach (ShapeItem* it, mChildShapes)
+            {
+                if (it != changedBranch)
+                {
+                    QRect branchRect = it->rect();
+                    branchRect.setBottom(branchRect.bottom() + yOffset);
+                    it->setRect(branchRect, true);
+                }
+            }
+
+            mRect.setBottom(mRect.bottom() + yOffset);
+        }
+        else
+        {// find the highest branch, and set rect for all branches
+            int minHeight = 0;
+            foreach (ShapeItem* it, mChildShapes)
+            {
+                if (it->minHeight() > minHeight)
+                {
+                    minHeight = it->minHeight();
+                }
+            }
+
+            foreach (ShapeItem* it, mChildShapes)
+            {
+                QRect branchRect = it->rect();
+                branchRect.setBottom(branchRect.bottom() + minHeight - branchRect.height());
+                it->setRect(branchRect, true);
+            }
+
+            mRect.setBottom(mRect.bottom() + minHeight - mRect.height() + 1);
+        }
+    }
+
+    if (before != mRect)
+    {
+        emit changed();
+    }
+}
+
+bool ShapeItem::canSetRect(const QRect& rect) const
+{
+    if (mRect.top() == rect.top() && mRect.left() == rect.left() && mRect.right() == rect.right())
+    {
+        if (mRect.bottom() <= rect.bottom())
+        {
+            return true;
+        }
+
+        if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+        {
+            return (mRect.bottom() >= rect.bottom());
+        }
+        else if (mChildShapes.size() == 1)
+        {
+            QRect tempRect = rect;
+            tempRect.setTop(tempRect.top() + 1);
+
+            if (tempRect.top() == tempRect.bottom())
+            {
+                return false;
+            }
+
+            return mChildShapes[0]->canSetRect(tempRect);
+        }
+        else if (mChildShapes.size() == 3) //
+        {
+            int TODO; // question
+        }
+    }
+
+    return false;
+}
+
+int ShapeItem::minHeight() const
+{
+    int minHeight = 1;
+
+    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+    {
+        return minHeight;
+    }
+
+    if (mChildShapes.size() == 1)
+    {
+        minHeight += mChildShapes[0]->minHeight();
+    }
+    else if (mChildShapes.size() == 3) //
+    {
+        int TODO; // question
+    }
+
+    return minHeight;
 }

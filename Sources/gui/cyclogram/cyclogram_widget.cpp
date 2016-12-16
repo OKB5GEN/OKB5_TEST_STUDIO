@@ -93,6 +93,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
 
     mMovingItem = 0;
     mSelectedItem = 0;
+    mRootShape = 0;
 
     setFocusPolicy(Qt::ClickFocus);
 }
@@ -546,6 +547,7 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     ShapeItem* title = addShape(first, parentCell, 0);
     drawCyclogram(title);
     QRect rect = title->rect();
+    mRootShape = title;
     mDiagramSize.setWidth(rect.width());
     mDiagramSize.setHeight(rect.height());
 #endif
@@ -1113,6 +1115,12 @@ void CyclogramWidget::onNeedUpdate()
 {
     //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
 
+#ifdef OLD_LOGIC
+#else
+    mDiagramSize.setWidth(mRootShape->rect().width());
+    mDiagramSize.setHeight(mRootShape->rect().height());
+#endif
+
     int w = ShapeItem::itemSize().width() * mDiagramSize.width() + ShapeItem::origin().x() + ShapeItem::cellSize().width();
     int h = ShapeItem::itemSize().height() * mDiagramSize.height() + ShapeItem::origin().y() + ShapeItem::cellSize().height();
     resize(w, h);
@@ -1665,6 +1673,8 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
             rect.setBottom(rect.bottom() + maxHeight - rect.height());
             it->setRect(rect, true);
         }
+
+        item->addChildShape(it);
     }
 
     QRect rect;

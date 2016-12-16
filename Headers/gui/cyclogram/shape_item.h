@@ -29,7 +29,10 @@ public:
     void setRect(const QRect& rect, bool pushToChildren);
     void setSelected(bool selected);
     void setParentShape(ShapeItem* parent);
-    void setChildShape(ShapeItem* item, int index); //TODO
+
+    void setChildShape(ShapeItem* item, int index);
+    void addChildShape(ShapeItem* item);
+    void removeChildShape(ShapeItem* item);
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -63,6 +66,10 @@ private slots:
     void setActive(bool active);
 
 private:
+    void updateCyclogramRect(ShapeItem* changedBranch);
+    bool canSetRect(const QRect& rect) const;
+    int minHeight() const;
+
     QPainterPath mPath;             // shape path
     QPainterPath mTextPath;         // path for text iside shape
     QPainterPath mAdditionalPath;   // path for some not-interactive display (arrow line)
