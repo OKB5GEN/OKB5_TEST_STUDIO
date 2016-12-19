@@ -561,6 +561,7 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
     }
     else if (mChildShapes.size() == 3)
     {
+        int i = 0;
         int TODO; // custom logic for question
     }
 }

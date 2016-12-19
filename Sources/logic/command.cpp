@@ -342,16 +342,20 @@ void Command::insertCommand(Command* newCmd, int role)
                         Command* cmd = (existing == underArrow) ? underArrow : existing;
 
                         newCmd->addCommand(cmd, ValencyPoint::Down);
-                        mNextCommands[role] = newCmd;
                     }
 
                     newCmd->addCommand(newCmd, ValencyPoint::Right);
                     newCmd->addCommand(newCmd, ValencyPoint::UnderArrow);
+                    mNextCommands[role] = newCmd;
                 }
                 else // QUESTION-IF insertion in QUESTION-IF
                 {
+                    Command* cmd = Q_NULLPTR;
+
                     if (role == ValencyPoint::UnderArrow)
                     {
+                        cmd = underArrow;
+
                         // recursively replace references to current "under arrow" command with new "under arrow" command
                         Command* tree1 = mNextCommands[ValencyPoint::Down];
                         if (tree1 == underArrow)
@@ -372,23 +376,18 @@ void Command::insertCommand(Command* newCmd, int role)
                         {
                             replaceReferences(underArrow, newCmd, tree2);
                         }
-
-                        // old "under arrow" command now become "under arrow, etc" command for new command
-                        newCmd->addCommand(underArrow, ValencyPoint::Down);
-                        newCmd->addCommand(underArrow, ValencyPoint::Right);
-                        newCmd->addCommand(underArrow, ValencyPoint::UnderArrow);
                     }
                     else
                     {
                         Command* existing = mNextCommands[role];
-                        Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-                        newCmd->addCommand(cmd, ValencyPoint::Down);
-                        newCmd->addCommand(cmd, ValencyPoint::Right);
-                        newCmd->addCommand(cmd, ValencyPoint::UnderArrow);
-
-                        mNextCommands[role] = newCmd;
+                        cmd = (existing == underArrow) ? underArrow : existing;
                     }
+
+                    // old "under arrow" command now become "under arrow, etc" command for new command
+                    newCmd->addCommand(cmd, ValencyPoint::Down);
+                    newCmd->addCommand(cmd, ValencyPoint::Right);
+                    newCmd->addCommand(cmd, ValencyPoint::UnderArrow);
+                    mNextCommands[role] = newCmd;
                 }
             }
             else // simple command insertion in QUESTION-IF
@@ -424,9 +423,9 @@ void Command::insertCommand(Command* newCmd, int role)
                     Command* cmd = (existing == underArrow) ? underArrow : existing;
 
                     newCmd->addCommand(cmd, ValencyPoint::Down);
-
-                    mNextCommands[role] = newCmd;
                 }
+
+                mNextCommands[role] = newCmd;
             }
         }
     }

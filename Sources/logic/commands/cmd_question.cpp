@@ -94,19 +94,18 @@ void CmdQuestion::execute()
         break;
     }
 
-    foreach (Command* cmd, mNextCommands)
-    {
-        bool cond1 = result && (mOrientation == YesDown) && (cmd->role() == ValencyPoint::Down);
-        bool cond2 = result && (mOrientation == YesRight) && (cmd->role() == ValencyPoint::Right);
-        bool cond3 = !result && (mOrientation == YesDown) && (cmd->role() == ValencyPoint::Right);
-        bool cond4 = !result && (mOrientation == YesRight) && (cmd->role() == ValencyPoint::Down);
+    Command* cmd = Q_NULLPTR;
 
-        if (cond1 || cond2 || cond3 || cond4)
-        {
-            emit finished(cmd);
-            return;
-        }
+    if (result)
+    {
+        cmd = (mOrientation == YesDown) ? mNextCommands[ValencyPoint::Down] : mNextCommands[ValencyPoint::Right];
     }
+    else
+    {
+        cmd = (mOrientation == YesDown) ? mNextCommands[ValencyPoint::Right] : mNextCommands[ValencyPoint::Down];
+    }
+
+    emit finished(cmd);
 }
 
 void CmdQuestion::setOperation(Operation operation)

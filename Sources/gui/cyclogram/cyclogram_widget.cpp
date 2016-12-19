@@ -1184,7 +1184,23 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     if (prevChildShape)
     {
         // 3.3.1 update shape connections
-        newShape->setChildShape(prevChildShape, role);
+        if (newShape->command()->type() == DRAKON::QUESTION)
+        {
+            CmdQuestion* command = qobject_cast<CmdQuestion*>(newShape->command());
+            if (command->questionType() == CmdQuestion::CYCLE)
+            {
+                newShape->setChildShape(prevChildShape, ValencyPoint::Down);
+            }
+            else
+            {
+                newShape->setChildShape(prevChildShape, ValencyPoint::UnderArrow);
+            }
+        }
+        else
+        {
+            newShape->setChildShape(prevChildShape, ValencyPoint::Down);
+        }
+
         owner->setChildShape(newShape, role);
 
         // 3.3.2 update child rects, then parent rects
