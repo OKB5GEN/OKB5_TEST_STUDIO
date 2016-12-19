@@ -586,9 +586,16 @@ void Command::replaceReferences(Command* oldCmd, Command* newCmd, Command* tree)
         return;
     }
 
-    if (oldCmd == this)
+    const QList<Command*>& commands = tree->nextCommands();
+    for (int i = 0, sz = commands.size(); i < sz; ++i)
     {
-
+        if (commands[i] == oldCmd)
+        {
+            tree->replaceCommand(newCmd, commands[i]->role());
+        }
+        else
+        {
+            replaceReferences(oldCmd, newCmd, commands[i]);
+        }
     }
-
 }
