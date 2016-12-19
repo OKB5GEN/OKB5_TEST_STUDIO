@@ -192,6 +192,18 @@ void Command::setChildCommand(Command* cmd, int role)
     }
 }
 
+void Command::replaceChildCommand(Command* newCmd, Command* oldCmd)
+{
+    for (int i = 0, sz = mChildCommands.size(); i < sz; ++i)
+    {
+        if (mChildCommands[i] == oldCmd)
+        {
+            mChildCommands[i] = newCmd;
+            return;
+        }
+    }
+}
+
 void Command::replaceCommand(Command *newCmd, int role)
 {
     int TODO2; // possibly make virtual and move to DRAKON::GO_TO_BRANCH class

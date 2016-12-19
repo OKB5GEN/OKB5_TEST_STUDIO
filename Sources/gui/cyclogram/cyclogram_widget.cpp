@@ -180,7 +180,11 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
                     {
                         ShapeItem* item = mSelectedItem;
                         clearSelection();
+#ifdef OLD_LOGIC
+                        deleteCommandOld(item);
+#else
                         deleteCommand(item);
+#endif
                     }
                 }
                 else
@@ -941,7 +945,7 @@ ShapeItem* CyclogramWidget::addCommandOld(DRAKON::IconType type, const ValencyPo
     return newItem;
 }
 
-void CyclogramWidget::deleteCommand(ShapeItem* item)
+void CyclogramWidget::deleteCommandOld(ShapeItem* item)
 {
     bool deleteShape = true;
 
@@ -1912,4 +1916,10 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     onNeedUpdate();
 
     return newBranchItem;
+}
+
+void CyclogramWidget::deleteCommand(ShapeItem* item)
+{
+    item->remove();
+    mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
 }

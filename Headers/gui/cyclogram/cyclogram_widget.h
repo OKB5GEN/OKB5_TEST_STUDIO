@@ -64,6 +64,7 @@ private:
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
 
     bool canBeDeleted(ShapeItem* item, QString& error) const;
+    void deleteCommandOld(ShapeItem* item);
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 

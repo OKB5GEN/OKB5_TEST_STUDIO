@@ -33,6 +33,9 @@ public:
     void setChildShape(ShapeItem* item, int index);
     void addChildShape(ShapeItem* item);
     void removeChildShape(ShapeItem* item);
+    void replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem);
+
+    void remove();
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -55,6 +58,7 @@ public:
     static const QPointF& origin();
 
     void pushDown();
+    void pullUp();
     void onChildRectChanged(ShapeItem * shape);
 
 signals:

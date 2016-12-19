@@ -39,6 +39,7 @@ public:
     void insertCommand(Command* newCmd, int role = 0);
     void replaceCommand(Command* newCmd, int role = 0);
     void setChildCommand(Command* cmd, int role);
+    void replaceChildCommand(Command* newCmd, Command* oldCmd);
 
     int role() const;
     uint32_t flags() const;

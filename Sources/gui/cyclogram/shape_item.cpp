@@ -724,3 +724,80 @@ int ShapeItem::minHeight() const
 
     return minHeight;
 }
+
+void ShapeItem::remove()
+{
+    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+    {
+        mRect.setBottom(mRect.top());
+        mParentShape->replaceChildShape(0, this); // update shape connections
+
+        mParentShape->onChildRectChanged(this);
+        return;
+    }
+
+    if (mChildShapes.size() == 1)
+    {
+        ShapeItem* item = mChildShapes[0];
+
+        mParentShape->replaceChildShape(item, this); // update shape connections
+        item->setParentShape(mParentShape);
+
+        item->pullUp();
+        mParentShape->onChildRectChanged(item);
+    }
+    else if (mChildShapes.size() == 3) //
+    {
+        int TODO; // question
+    }
+}
+
+void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
+{
+    for (int i = 0, sz = mChildShapes.size(); i < sz; ++i)
+    {
+        if (mChildShapes[i] == oldItem)
+        {
+            if (newItem == Q_NULLPTR)
+            {
+                mCommand->replaceChildCommand(0, oldItem->command());
+            }
+
+            mChildShapes[i] = newItem;
+            return;
+        }
+    }
+}
+
+void ShapeItem::pullUp()
+{
+    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+    {
+        // just move shape up
+        mRect.setTop(mRect.top() - 1);
+        mRect.setBottom(mRect.bottom() - 1);
+
+        QPoint cell = mCell;
+        cell.setY(cell.y() - 1);
+        setCell(cell);
+    }
+    else if (mChildShapes.size() == 1)
+    {
+        QPoint cell = mCell;
+        cell.setY(cell.y() - 1);
+        setCell(cell);
+
+        // tell child to pull itself up
+        mChildShapes[0]->pullUp();
+
+        QRect rect = mChildShapes[0]->rect();
+        rect.setTop(rect.top() - 1);
+        setRect(rect, false);
+    }
+    else if (mChildShapes.size() == 3)
+    {
+        int TODO5; // question logic
+    }
+
+    createPath();
+}
