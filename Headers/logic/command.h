@@ -38,15 +38,16 @@ public:
     void addCommand(Command* cmd, int role = 0);
     void insertCommand(Command* newCmd, int role = 0);
     void replaceCommand(Command* newCmd, int role = 0);
+
+    // TODO remove >>>
     void setChildCommand(Command* cmd, int role);
     void replaceChildCommand(Command* newCmd, Command* oldCmd);
+    const QList<Command*>& childCommands() const;
+    Command* parentCommand() const;
+    // <<<
 
     int role() const;
     uint32_t flags() const;
-
-    Command* parentCommand() const;
-
-    const QList<Command*>& childCommands() const;
 
     bool hasError() const;
 
@@ -84,8 +85,9 @@ protected:
     VariableController* mVarCtrl;
 
     QList<Command*> mNextCommands;
-    Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
 
+// TODO remove >>>
+    Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
     QList<Command*> mChildCommands; // TODO implement
 
 private slots:
@@ -93,6 +95,8 @@ private slots:
     void end();
 
 private:
+    void replaceReferences(Command* oldCmd, Command* newCmd, Command* tree);
+
     bool mHasError;
 };
 
