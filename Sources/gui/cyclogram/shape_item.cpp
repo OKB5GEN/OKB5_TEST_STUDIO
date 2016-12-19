@@ -565,6 +565,35 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
     }
 }
 
+void ShapeItem::adjust()
+{
+    if (!mCommand || mCommand->type() != DRAKON::TERMINATOR || mCommand->nextCommands().empty())
+    {
+        qDebug("Adjust operation is not applicable for this shape");
+        return;
+    }
+
+    // find the highest branch, and set rect for all branches
+    int minHeight = 0;
+    foreach (ShapeItem* it, mChildShapes)
+    {
+        if (it->minHeight() > minHeight)
+        {
+            minHeight = it->minHeight();
+        }
+    }
+
+    foreach (ShapeItem* it, mChildShapes)
+    {
+        QRect branchRect = it->rect();
+        branchRect.setBottom(branchRect.bottom() + minHeight - branchRect.height());
+        it->setRect(branchRect, true);
+    }
+
+    mRect.setBottom(mRect.bottom() + minHeight - mRect.height() + 1);
+    emit changed();
+}
+
 void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
 {
     int TODO; // branch deletion
@@ -643,24 +672,8 @@ void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
             mRect.setBottom(mRect.bottom() + yOffset);
         }
         else
-        {// find the highest branch, and set rect for all branches
-            int minHeight = 0;
-            foreach (ShapeItem* it, mChildShapes)
-            {
-                if (it->minHeight() > minHeight)
-                {
-                    minHeight = it->minHeight();
-                }
-            }
-
-            foreach (ShapeItem* it, mChildShapes)
-            {
-                QRect branchRect = it->rect();
-                branchRect.setBottom(branchRect.bottom() + minHeight - branchRect.height());
-                it->setRect(branchRect, true);
-            }
-
-            mRect.setBottom(mRect.bottom() + minHeight - mRect.height() + 1);
+        {
+            adjust();
         }
     }
 

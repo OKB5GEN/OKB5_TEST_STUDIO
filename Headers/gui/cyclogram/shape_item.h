@@ -36,6 +36,7 @@ public:
     void replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem);
 
     void remove();
+    void adjust();
 
     QPainterPath path() const;
     QPainterPath textPath() const;

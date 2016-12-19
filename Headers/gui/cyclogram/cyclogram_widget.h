@@ -5,7 +5,7 @@
 #include <QMap>
 
 #include "Headers/shape_types.h"
-#include "Headers/gui/cyclogram/shape_item.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -16,6 +16,7 @@ QT_END_NAMESPACE
 
 class Cyclogram;
 class Command;
+class ShapeItem;
 
 class CyclogramWidget : public QWidget
 {
@@ -52,19 +53,13 @@ private:
     void drawCyclogram(ShapeItem* item);
     void drawChildren(ShapeItem* item);
 
-    // new cyclogram visualization alogotithm >>>
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
-    // <<<
 
-    ShapeItem* createCommandShape(Command* cmd, const QPoint& cell);
     ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
     bool isCyclogramEndBranch(Command* cmd) const;
-    ShapeItem* addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param = -1); // TODO remove
 
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
-
     bool canBeDeleted(ShapeItem* item, QString& error) const;
-    void deleteCommandOld(ShapeItem* item);
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 
@@ -77,23 +72,15 @@ private:
 
     void moveItemTo(const QPoint &pos);
 
-    void addChildCommands(Command* parentCmd, const QPoint& parentCell);
-    bool isBranchExist(Command* goToBranchCmd);
     QString generateBranchName() const;
 
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     ShapeItem* findNextBranch(const QPoint& cell) const;
-    ShapeItem* addNewBranchOld(ShapeItem* item); // TODO remove
-
     ShapeItem* addNewBranch(ShapeItem* item);
-
-    ShapeItem* addQuestion(const ValencyPoint& point, int param);
 
     void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
 
     void showEditDialog(Command* command);
-
-    QSize mDiagramSize;
 
     QList<ShapeItem*> mCommands;
     QList<ShapeItem*> mSihlouette; // sihlouette (TODO temporary)

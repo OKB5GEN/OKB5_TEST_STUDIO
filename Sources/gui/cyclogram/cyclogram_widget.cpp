@@ -21,6 +21,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
+#include "Headers/gui/cyclogram/shape_item.h"
 
 /* Алгоритм построения ДРАКОН-схемы на основе дерева команд (с нуля)
  *
@@ -75,11 +76,8 @@
  * Если это не взлетит, то можно тупо перерисовывать циклограмму целиком при каждом изменении (первый вариант очистить-загрузить надо сделать сразу)
 */
 
-#define OLD_LOGIC
-
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
-    mDiagramSize(0, 0),
     mCurrentCyclogram(Q_NULLPTR)
 {
     setMouseTracking(true);
@@ -180,11 +178,7 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
                     {
                         ShapeItem* item = mSelectedItem;
                         clearSelection();
-#ifdef OLD_LOGIC
-                        deleteCommandOld(item);
-#else
                         deleteCommand(item);
-#endif
                     }
                 }
                 else
@@ -287,11 +281,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 
             if (dialog->result() == QDialog::Accepted)
             {
-#ifdef OLD_LOGIC
-                addCommandOld(dialog->shapeType(), point, dialog->param());
-#else
                 addCommand(dialog->shapeType(), point, dialog->param());
-#endif
             }
 
             dialog->deleteLater();
@@ -408,33 +398,6 @@ void CyclogramWidget::moveItemTo(const QPoint &pos)
     update();
 }
 
-ShapeItem* CyclogramWidget::createCommandShape(Command* cmd, const QPoint& cell)
-{
-    int TODO; //update diagram size if adding is to the end of the diagram, REMOVE FROM THIS METHOD
-    if (cell.x() + 1 > mDiagramSize.width())
-    {
-        mDiagramSize.setWidth(cell.x() + 1);
-    }
-
-    if (cell.y() + 1 > mDiagramSize.height())
-    {
-        mDiagramSize.setHeight(cell.y() + 1);
-    }
-
-    ShapeItem* shapeItem = new ShapeItem(this);
-    shapeItem->setCommand(cmd);
-    shapeItem->setToolTip(tr("Tooltip"));
-    shapeItem->setCell(cell);
-    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
-    shapeItem->createPath();
-    shapeItem->setValencyPoints(createValencyPoints(cmd));
-    mCommands.append(shapeItem);
-
-    connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
-
-    return shapeItem;
-}
-
 ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
 {
     ShapeItem* shapeItem = new ShapeItem(this);
@@ -459,7 +422,7 @@ void CyclogramWidget::drawSilhouette()
     mSihlouette.clear();
 
     QPoint bottomRight(INT_MIN, INT_MIN);
-    QPoint bottomLeft(ShapeItem::origin().x(), mDiagramSize.height() * ShapeItem::itemSize().height());
+    QPoint bottomLeft(ShapeItem::origin().x(), mRootShape->rect().height() * ShapeItem::itemSize().height());
     QPoint topLeft(ShapeItem::origin().x(), ShapeItem::origin().y() + ShapeItem::itemSize().height());
     QPoint topRight(INT_MIN, INT_MAX);
 
@@ -542,19 +505,10 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     connect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
-    QPoint parentCell(0, 0);
-
-#ifdef OLD_LOGIC
-    createCommandShape(first, parentCell);
-    addChildCommands(first, parentCell);
-#else
-    ShapeItem* title = addShape(first, parentCell, 0);
-    drawCyclogram(title);
-    QRect rect = title->rect();
+    ShapeItem* title = addShape(first, QPoint(0, 0), 0);
     mRootShape = title;
-    mDiagramSize.setWidth(rect.width());
-    mDiagramSize.setHeight(rect.height());
-#endif
+    drawCyclogram(title);
+
     onNeedUpdate();
 }
 
@@ -647,60 +601,6 @@ void CyclogramWidget::clearSelection(bool needUpdate)
             update();
         }
     }
-}
-
-void CyclogramWidget::addChildCommands(Command* parentCmd, const QPoint& parentCell)
-{
-    QList<Command*> nextCommands = parentCmd->nextCommands();
-    if (nextCommands.empty())
-    {
-        return;
-    }
-
-    if (nextCommands.size() == 1)
-    {
-        Command* cmd = nextCommands[0];
-        QPoint cell(parentCell.x(), parentCell.y() + 1);
-
-        if (cmd->type() == DRAKON::BRANCH_BEGIN && parentCmd->type() == DRAKON::GO_TO_BRANCH) // not first branch
-        {
-            cell.setX(mDiagramSize.width());
-            cell.setY(1);
-        }
-
-        createCommandShape(cmd, cell);
-
-        if (cmd->type() == DRAKON::GO_TO_BRANCH)
-        {
-            if (!isBranchExist(cmd))
-            {
-                addChildCommands(cmd, cell);
-            }
-        }
-        else
-        {
-            addChildCommands(cmd, cell);
-        }
-
-    }
-    else // QUESTION or SWITCH-CASE command
-    {
-        int TODO;
-    }
-}
-
-bool CyclogramWidget::isBranchExist(Command* goToBranchCmd)
-{
-    foreach (ShapeItem* shape, mCommands)
-    {
-        Command* command = shape->command();
-        if (command->type() == DRAKON::BRANCH_BEGIN && command->text() == goToBranchCmd->text())
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
@@ -822,283 +722,7 @@ bool CyclogramWidget::isCyclogramEndBranch(Command* cmd) const
     return false;
 }
 
-ShapeItem* CyclogramWidget::addCommandOld(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
-{
-    int role = point.role();
-    if (type == DRAKON::BRANCH_BEGIN && role == 1) //TODO make enum for roles?
-    {
-        return addNewBranchOld(point.owner());
-    }
 
-    if (type == DRAKON::QUESTION)
-    {
-        return addQuestion(point, param);
-    }
-
-    // 1. Create new command
-    Command* newCmd = mCurrentCyclogram->createCommand(type, param);
-    if (!newCmd)
-    {
-        return Q_NULLPTR;
-    }
-
-    ShapeItem* owner = point.owner();
-    Command* cmd = owner->command();
-
-    // 2. Update command tree connections
-    if (cmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
-    {
-        cmd->addCommand(newCmd, role);
-    }
-    else
-    {
-        cmd->insertCommand(newCmd, role);
-    }
-
-    // 3. Add new command shape item to cyclogram view
-    QPoint newCmdCell = owner->cell();
-    // create new shape below the points' owner
-    newCmdCell.setY(newCmdCell.y() + 1);
-
-    int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
-    /* Мысли вслух по добавлению QUESTION
-     * 1. При редактировании QUESTIONа можно указать следующую команду для ветки вправо (любая команда слева от question)
-     * 2. Можно указать ТОЛЬКО на команду, расположенную в столбце слева (вероятно)
-     * 3. QUESION, если вставляется в самый правый столбец бранча, увеличивает его ширину на 1
-    */
-    ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
-
-    // 4. Update commands positions below and to the right of the inserted command shape
-
-    // 4.1 Find "expanded" elements in the insertion column, if it exist, just reduce the expanded element rect height
-    ShapeItem* expandedItem = findExpandedItem(newItem);
-
-    if (expandedItem)
-    {
-        // shift items between new inserted and found expanded item
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
-
-            if (item->cell().x() == newItem->cell().x())
-            {
-                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
-                {
-                    updateItemGeometry(item, 0, 1, 1, 1);
-                }
-            }
-        }
-
-        // reduce expanded item size
-        updateItemGeometry(expandedItem, 0, 0, 1, 0);
-
-    }
-    else // no expanded item in the column, shift items below the inserted in all columns
-    {
-        if (owner->command()->type() == DRAKON::BRANCH_BEGIN && newItem->command()->type() == DRAKON::GO_TO_BRANCH)
-        {// new branch creation
-
-            int y = newItem->cell().y();
-            int h = mDiagramSize.height();
-            int shift = h - y - 1;
-            updateItemGeometry(newItem, 0, shift, 0, shift);
-        }
-        else // new item in branch adding
-        {
-            foreach (ShapeItem* item, mCommands)
-            {
-                if (item == newItem) // skip added item
-                {
-                    continue;
-                }
-
-                if (item->cell().y() >= newItem->cell().y())
-                {
-                    // shift items below the added one down by 1 cell in own column
-                    if (item->cell().x() == newItem->cell().x())
-                    {
-                        updateItemGeometry(item, 0, 1, 1, 1);
-                    }
-                    else // expand the rect of the lowest item in all other columns
-                    {
-                        if (item->cell().y() == (mDiagramSize.height() - 1))
-                        {
-                            updateItemGeometry(item, 0, 1, 0, 1);
-                        }
-                    }
-                }
-            }
-
-            //TODO on diagram size changed
-            mDiagramSize.setHeight(mDiagramSize.height() + 1);
-            onNeedUpdate();
-        }
-    }
-
-    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
-    int TODO2; // owner->parentTreeItem();
-    update();
-
-    return newItem;
-}
-
-void CyclogramWidget::deleteCommandOld(ShapeItem* item)
-{
-    bool deleteShape = true;
-
-    int TODO; // first try to do simple command deletion (linear comand inside some branch)
-
-    switch (item->command()->type())
-    {
-    case DRAKON::ACTION_MATH:
-    case DRAKON::ACTION_MODULE:
-    case DRAKON::DELAY:
-        {
-            int TODO3; // this is only for one-column branches! QUESTION/CASE will require some refactor
-            ShapeItem* expandedItem = findExpandedItem(item);
-
-            if (expandedItem)
-            {
-                // not the longest branch ->
-                // 1. Shift up items below that need to be deleted (with except of expandedItem)
-                // 2. Expand the rect of expandedItem by 1 to top
-                foreach (ShapeItem* it, mCommands)
-                {
-                    if (it == item)
-                    {
-                        continue;
-                    }
-
-                    // if element is in the deleted elements column and below it
-                    if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
-                    {
-                        int h = item->rect().height();
-                        if (it != expandedItem)
-                        {
-                            updateItemGeometry(it, 0, -h, -h, -h);
-                        }
-                        else
-                        {
-                            updateItemGeometry(it, 0, 0, -h, 0);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                int TODO4; // this is only for one-column branches system! QUESTION/CASE will require some refactor
-
-                bool isLongestColumn = true;
-                QList<ShapeItem*> otherGoToBranchCommands;
-                ShapeItem* ownGoToBranchItem = Q_NULLPTR;
-
-                foreach (ShapeItem* it, mCommands)
-                {
-                    // it is GO_TO_BRANCH or cyclogram end TERMINATOR
-                    if (it->command()->type() == DRAKON::GO_TO_BRANCH || (it->command()->type() == DRAKON::TERMINATOR && it->cell().y() > 0))
-                    {
-                        if (it->cell().x() != item->cell().x())
-                        {
-                            otherGoToBranchCommands.push_back(it);
-
-                            if (isLongestColumn && it->rect().height() == 1)
-                            {
-                                isLongestColumn = false;
-                            }
-                        }
-                        else
-                        {
-                            ownGoToBranchItem = it;
-                        }
-                    }
-                }
-
-                if (isLongestColumn)
-                {
-                    // reduce GO_TO_BRANCH commands rect in other columns
-
-                    // Shift up ALL items below that need to be deleted (including GO_TO_BRANCH command)
-                    foreach (ShapeItem* it, mCommands)
-                    {
-                        if (it == item)
-                        {
-                            continue;
-                        }
-
-                        // if element is in the deleted elements column and below it
-                        if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
-                        {
-                            int h = item->rect().height();
-                            updateItemGeometry(it, 0, -h, -h, -h);
-                        }
-                    }
-
-                    // reduce size of the terminating commands in other columns
-
-                    int h = item->rect().height();
-                    foreach (ShapeItem* it, otherGoToBranchCommands)
-                    {
-                        updateItemGeometry(it, 0, -h, 0, -h);
-                    }
-
-                    // diagram size reduced
-                    mDiagramSize.setHeight(mDiagramSize.height() - h);
-                }
-                else
-                {
-                    // TODO almost copypaste of if expandedItem
-                    // just delete command and expand rect of the columns GO_TO_BRANCH item
-                    foreach (ShapeItem* it, mCommands)
-                    {
-                        if (it == item)
-                        {
-                            continue;
-                        }
-
-                        // if element is in the deleted elements column and below it
-                        if (it->cell().x() == item->cell().x() && it->cell().y() >= item->cell().y())
-                        {
-                            int h = item->rect().height();
-                            if (it != ownGoToBranchItem)
-                            {
-                                updateItemGeometry(it, 0, -h, -h, -h);
-                            }
-                            else
-                            {
-                                updateItemGeometry(it, 0, 0, -h, 0);
-                            }
-                        }
-                    }
-                }
-            }
-
-            int TODO2; // possibly update parent QUESTION command rect here
-        }
-        break;
-
-    case DRAKON::BRANCH_BEGIN:
-        {
-            deleteBranch(item);
-            deleteShape = false;
-        }
-        break;
-
-    default:
-        {
-            qDebug("Try to delete non-deleatable");
-            deleteShape = false;
-        }
-        break;
-    }
-
-    if (deleteShape)
-    {
-        mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
-    }
-}
 
 void CyclogramWidget::removeShape(Command* command)
 {
@@ -1119,158 +743,17 @@ void CyclogramWidget::onNeedUpdate()
 {
     //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
 
-#ifdef OLD_LOGIC
-#else
-    mDiagramSize.setWidth(mRootShape->rect().width());
-    mDiagramSize.setHeight(mRootShape->rect().height());
-#endif
+    int W = ShapeItem::itemSize().width();
+    int H = ShapeItem::itemSize().height();
+    int w = ShapeItem::cellSize().width();
+    int h = ShapeItem::cellSize().height();
 
-    int w = ShapeItem::itemSize().width() * mDiagramSize.width() + ShapeItem::origin().x() + ShapeItem::cellSize().width();
-    int h = ShapeItem::itemSize().height() * mDiagramSize.height() + ShapeItem::origin().y() + ShapeItem::cellSize().height();
-    resize(w, h);
+    int width = W * mRootShape->rect().width() + ShapeItem::origin().x() + w;
+    int height = H * mRootShape->rect().height() + ShapeItem::origin().y() + h;
+    resize(width, height);
 
     drawSilhouette();
     update();
-}
-
-void CyclogramWidget::deleteBranch(ShapeItem* item)
-{
-    int TODO; // this only working for one-column branches, QUESTION/CASE command adding will require some refactoring
-
-    bool isLongestColumn = true;
-    QList<ShapeItem*> otherGoToBranchCommands;
-    ShapeItem* ownGoToBranchItem = Q_NULLPTR;
-
-    // find out is deleting branch the longest one
-    foreach (ShapeItem* it, mCommands)
-    {
-        // it is GO_TO_BRANCH or cyclogram end TERMINATOR
-        if (it->command()->type() == DRAKON::GO_TO_BRANCH || (it->command()->type() == DRAKON::TERMINATOR && it->cell().y() > 0))
-        {
-            if (it->cell().x() != item->cell().x())
-            {
-                otherGoToBranchCommands.push_back(it);
-
-                if (isLongestColumn && it->rect().height() == 1)
-                {
-                    isLongestColumn = false;
-                }
-            }
-            else
-            {
-                ownGoToBranchItem = it;
-            }
-        }
-    }
-
-    int yOffset = 0;
-
-    if (isLongestColumn) // the longes one
-    {
-        // reduce GO_TO_BRANCH commands rect in other columns by the second longest branch expansion size
-        // find set second branch by length (it has the lowest height)
-        int minHeight = INT_MAX;
-        ShapeItem* secondMinBranch = Q_NULLPTR;
-
-        foreach (ShapeItem* it, otherGoToBranchCommands)
-        {
-            if (it->rect().height() < minHeight)
-            {
-                minHeight = it->rect().height();
-                secondMinBranch = it;
-            }
-        }
-
-        yOffset = minHeight - 1;
-    }
-
-    // shrink other columns size
-    // update links to the deleted branch
-    foreach (ShapeItem* it, otherGoToBranchCommands)
-    {
-        updateItemGeometry(it, 0, -yOffset, 0, -yOffset);
-
-        // if other GO_TO_BRANCH commands refer to deleting branch, set error status on them
-        const QList<Command*>& next = it->command()->nextCommands();
-        if (!next.empty() && next[0] == item->command()) // first check is for TERMINATOR, cause it never has any next commands
-        {
-            it->command()->replaceCommand(Q_NULLPTR);
-        }
-    }
-
-    // diagram size reduced
-    mDiagramSize.setHeight(mDiagramSize.height() - yOffset);
-
-    int w = item->rect().width();
-
-    // Anyway shift to the left all branches right to deleting one
-    foreach (ShapeItem* it, mCommands)
-    {
-        if (it == item)
-        {
-            continue;
-        }
-
-        if (it->cell().x() > item->cell().x())
-        {
-            updateItemGeometry(it, -w, 0, 0, 0);
-        }
-    }
-
-    int TODO5; // make control over command by shape (delete shape = delete command)
-
-    mDiagramSize.setWidth(mDiagramSize.width() - w);
-
-    // kill all shapes and commands, belonging to deleting branch
-    ownGoToBranchItem->command()->replaceCommand(Q_NULLPTR); // to block further tree deletion
-    mCurrentCyclogram->deleteCommand(item->command(), true);
-
-    onNeedUpdate();
-}
-
-ShapeItem* CyclogramWidget::addNewBranchOld(ShapeItem* item)
-{
-    // create new branch to the right of the item command tree
-    QPoint newCmdCell = item->cell();
-    ShapeItem* nextBranch = findNextBranch(newCmdCell);
-    newCmdCell.setX(nextBranch->cell().x());
-
-    // 1. Create and add BRANCH_BEGIN item
-    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::BRANCH_BEGIN);
-    if (!newCmd)
-    {
-        return Q_NULLPTR;
-    }
-
-    QString name = generateBranchName();
-
-    // do not create links to new branch
-    // Update commands positions to the right of the inserted branch
-    int xNext = nextBranch->cell().x();
-    foreach (ShapeItem* it, mCommands)
-    {
-        if (it->cell().x() >= xNext)
-        {
-            updateItemGeometry(it, 1, 0, 0, 0);
-        }
-    }
-
-    ShapeItem* newBranchItem = createCommandShape(newCmd, newCmdCell);
-
-    // 2. Create and add GO_TO_BRANCH item to the created branch
-    ShapeItem* goToBranchItem = addCommandOld(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(0));
-
-    // by default new branch is linked to itself
-    goToBranchItem->command()->addCommand(newBranchItem->command());
-
-    //generate unique branch name
-    CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);
-    cmd->setText(name);
-
-    mDiagramSize.setWidth(mDiagramSize.width() + 1);
-    onNeedUpdate();
-
-    return newBranchItem;
 }
 
 QString CyclogramWidget::generateBranchName() const
@@ -1479,155 +962,6 @@ void CyclogramWidget::showValidationError(Command* cmd)
     }
 
     dialog->deleteLater();
-}
-
-ShapeItem* CyclogramWidget::addQuestion(const ValencyPoint& point, int param)
-{
-    //return Q_NULLPTR; //TODO Temporary
-
-    ValencyPoint::Role role = point.role();
-    // 1. Create new command
-    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::QUESTION, param);
-    if (!newCmd)
-    {
-        return Q_NULLPTR;
-    }
-
-    ShapeItem* owner = point.owner();
-    Command* cmd = owner->command();
-
-    // 2. Update command tree connections
-    cmd->insertCommand(newCmd, role);
-
-
-    /* Закономерности, которые удалось засечь при моделировании:
-     * 1. Независимо от типа вопроса ("Условие" или "Цикл"), добавление команды в "правую" точку валентности увеличивает ширину бранча на 1
-     * 2. Независимо от типа вопроса ("Условие" или "Цикл"), добавление команды в любую точку валентности увеличивает высоту бранча на 1
-     * в тех же ситуациях, что и обычная команда (если в столбце нет "растянутой команды")
-     * 3. Независимо от типа вопроса ("Условие" или "Цикл") команда всегда имеет 3 точки валентности (вниз, вправо и "под стрелкой")
-     * 4. -||- удаление команды сносит саму команду и все, что идет в ее правую ветку
-     *
-
-*/
-
-    /* Как эту поебень отриcовывать?
-     *
-     * 1. Отрисовыватель шейпа может смотреть на то, где расположен шейп следующей команды
-     * 2. По разнице этих ячеек может отрисовваться путь (вниз будет не черточка, а какая-то ломаная линия)
-     *
-*/
-
-    if (param == CmdQuestion::IF)
-    {
-        if (cmd->type() == DRAKON::QUESTION)
-        {
-        }
-        else
-        {
-
-        }
-    }
-    else if (param == CmdQuestion::CYCLE)
-    {
-        if (cmd->type() == DRAKON::QUESTION)
-        {
-
-        }
-        else
-        {
-
-        }
-    }
-
-    // 3. Add new command shape item to cyclogram view
-    QPoint newCmdCell = owner->cell();
-
-    if (role == ValencyPoint::Down)
-    {
-        // create new shape below the points' owner
-        newCmdCell.setY(newCmdCell.y() + 1);
-    }
-    else if (role == ValencyPoint::Right)
-    {
-        // create new shape below and to the right of the the points' owner
-        newCmdCell.setY(newCmdCell.y() + 1);
-        newCmdCell.setX(newCmdCell.x() + 1); //TODO depends on subtree rect in "down" branch, calculate its rect!
-
-        mDiagramSize.setWidth(mDiagramSize.width() + 1); //TODO unsafe handling
-    }
-    else if (role == ValencyPoint::UnderArrow)
-    {
-        int TODO100; // adding under arrow, complex logic here
-    }
-
-    int TODO; // QUESTION/SWITCH commands cell will be shifted 1 column right
-
-    ShapeItem* newItem = createCommandShape(newCmd, newCmdCell);
-
-    // 4. Update commands positions below and to the right of the inserted command shape
-
-    // 4.1 Find "expanded" elements in the insertion column, if it exist, just reduce the expanded element rect height
-    ShapeItem* expandedItem = findExpandedItem(newItem);
-
-    if (expandedItem)
-    {
-        // shift items between new inserted and found expanded item
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
-
-            if (item->cell().x() == newItem->cell().x())
-            {
-                if (item->cell().y() >= newItem->cell().y() && item->cell().y() < expandedItem->rect().top())
-                {
-                    updateItemGeometry(item, 0, 1, 1, 1);
-                }
-            }
-        }
-
-        // reduce expanded item size
-        updateItemGeometry(expandedItem, 0, 0, 1, 0);
-
-    }
-    else // no expanded item in the column, shift items below the inserted in all columns
-    {
-        foreach (ShapeItem* item, mCommands)
-        {
-            if (item == newItem) // skip added item
-            {
-                continue;
-            }
-
-            if (item->cell().y() >= newItem->cell().y())
-            {
-                // shift items below the added one down by 1 cell in own column
-                if (item->cell().x() == newItem->cell().x())
-                {
-                    updateItemGeometry(item, 0, 1, 1, 1);
-                }
-                else // expand the rect of the lowest item in all other columns
-                {
-                    if (item->cell().y() == (mDiagramSize.height() - 1))
-                    {
-                        updateItemGeometry(item, 0, 1, 0, 1);
-                    }
-                }
-            }
-        }
-
-        //TODO on diagram size changed
-        mDiagramSize.setHeight(mDiagramSize.height() + 1);
-        onNeedUpdate();
-    }
-
-    // 5. Update owner rect size recursively (for QUESTION/SWITCH-CASE command trees)
-    int TODO2; // owner->parentTreeItem();
-    update();
-
-    return newItem;
 }
 
 void CyclogramWidget::drawCyclogram(ShapeItem* item)
@@ -1905,7 +1239,6 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     r.setRight(r.right() + item->rect().width());
     mRootShape->setRect(r, false);
 
-
     ShapeItem* newBranchItem = addShape(newCmd, newCmdCell, mRootShape);
     mRootShape->addChildShape(newBranchItem);
 
@@ -1920,6 +1253,63 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
+    if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+    {
+        deleteBranch(item);
+        return;
+    }
+
     item->remove();
     mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
+}
+
+void CyclogramWidget::deleteBranch(ShapeItem* item)
+{
+    // 1. Remove cyclogram parent-child link to branch being deleted
+    item->parentShape()->removeChildShape(item);
+
+    // 2. Update links of all GO_TO_BRANCH commands
+    QRect rect = item->rect();
+    int min = rect.left();
+    int max = rect.right() + 1;
+
+    foreach (ShapeItem* it, mCommands)
+    {
+        Command* cmd = it->command();
+        if (cmd->type() == DRAKON::GO_TO_BRANCH)
+        {
+            int x = it->cell().x();
+            if (x >= max || x < min) // other branches commands
+            {
+                if (!cmd->nextCommands().empty() && cmd->nextCommands()[0] == item->command())
+                {
+                    cmd->replaceCommand(Q_NULLPTR); // remove link to branch being deleted
+                }
+            }
+            else // deleting branch commands
+            {
+                cmd->replaceCommand(Q_NULLPTR); // remove links to other branches
+            }
+        }
+    }
+
+    // 3. Shift left all branches to the right of the being deleted by the rect of the deleted
+    int xOffset = min - max;
+    foreach (ShapeItem* it, mCommands)
+    {
+        if (it->cell().x() >= max)
+        {
+            updateItemGeometry(it, xOffset, 0, 0, 0);
+        }
+    }
+
+    // 4. Kill all shapes and commands, belonging to deleting branch
+    mCurrentCyclogram->deleteCommand(item->command(), true);
+
+    QRect r = mRootShape->rect();
+    r.setRight(r.right() + xOffset);
+    mRootShape->setRect(r, false);
+
+    // 5. Update entire cyclogram rect
+    mRootShape->adjust();
 }

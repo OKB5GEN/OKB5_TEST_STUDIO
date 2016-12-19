@@ -1,6 +1,7 @@
 #include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
 #include "Headers/logic/commands/cmd_question.h"
+#include "Headers/gui/cyclogram/shape_item.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
