@@ -1141,16 +1141,16 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
 
     ShapeItem* owner = point.owner();
-    Command* cmd = owner->command();
+    Command* pointCmd = owner->command();
 
     // 2. Update command tree connections in logic
-    if (cmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
+    if (pointCmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
     {
-        cmd->addCommand(newCmd, role);
+        pointCmd->addCommand(newCmd, role);
     }
     else
     {
-        cmd->insertCommand(newCmd, role);
+        pointCmd->insertCommand(newCmd, role);
     }
 
     // 3. Create new shape and add it to diagram
@@ -1165,9 +1165,32 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
     else // question branch end command
     {
-        if (cmd->type() == DRAKON::QUESTION)
+        if (pointCmd->type() == DRAKON::QUESTION)
         {
-            int TODO; // depending on role and shape type
+            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(pointCmd);
+            if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            {
+                int TODO; // depending on role and shape type
+            }
+            else // IF-QUESTION
+            {
+                newCmdCell = owner->cell();
+                newCmdCell.setY(newCmdCell.y() + 1);
+
+                if (role == ValencyPoint::Right)
+                {
+                    ShapeItem* down = owner->childShape(ValencyPoint::Down);
+                    if (down)
+                    {
+                        newCmdCell.setX(newCmdCell.x() + down->rect().width());
+                    }
+                    else
+                    {
+                        newCmdCell.setX(newCmdCell.x() + 1);
+                    }
+                }
+                // UnderArrow always has child shape, or there is no UnderArrow valency point
+            }
         }
         else
         {
@@ -1213,7 +1236,6 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
     else // if owner hadn't any child shapes, update only to parent direction (QUESTION-IF branches ending)
     {
-        int TODO1; //QUESTION
         owner->setChildShape(newShape, role);
         owner->onChildRectChanged(newShape);
     }

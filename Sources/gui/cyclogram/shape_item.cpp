@@ -195,9 +195,8 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
             if (childs.empty())
             {
                 QPoint cell = mCell;
-                cell.setY(cell.y() + rect.height() - mRect.height()); // update cell first
+                cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
                 setCell(cell);
-                mRect.setBottom(mRect.bottom() + rect.height() - mRect.height()); // then update rect
             }
             else if (childs.size() == 1)
             {
@@ -534,6 +533,7 @@ void ShapeItem::pushDown()
     }
     else if (mChildShapes.size() == 3)
     {
+        int i = 0;
         int TODO5; // question logic
     }
 
@@ -553,16 +553,96 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
         QRect rect = shape->rect();
         rect.setTop(rect.top() - 1);
         setRect(rect, false);
-
-        if (mParentShape)
-        {
-            mParentShape->onChildRectChanged(this);
-        }
     }
     else if (mChildShapes.size() == 3)
     {
-        int i = 0;
-        int TODO; // custom logic for question
+        QRect changedRect = shape->rect();
+        CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+
+        if (cmd->questionType() == CmdQuestion::CYCLE)
+        {
+            if (mChildShapes[ValencyPoint::UnderArrow] == shape)
+            {
+                int i = 0;
+                int TODO;
+            }
+            else if (mChildShapes[ValencyPoint::Down] == shape)
+            {
+                int i = 0;
+                int TODO;
+            }
+            else if (mChildShapes[ValencyPoint::Right] == shape)
+            {
+                int i = 0;
+                int TODO;
+            }
+        }
+        else // QUESTION-IF
+        {
+            if (mChildShapes[ValencyPoint::UnderArrow] == shape)
+            {
+                QRect downRect;
+                if (mChildShapes[ValencyPoint::Down])
+                {
+                    downRect = mChildShapes[ValencyPoint::Down]->rect();
+                }
+
+                QRect rightRect;
+                if (mChildShapes[ValencyPoint::Right])
+                {
+                    rightRect = mChildShapes[ValencyPoint::Right]->rect();
+                }
+
+                mRect.setRight(mRect.left() + qMax(downRect.width() + rightRect.width(), changedRect.width()) - 1);
+                mRect.setBottom(changedRect.bottom());
+                setRect(mRect, false);
+            }
+            else if (mChildShapes[ValencyPoint::Down] == shape)
+            {
+                QRect rightRect;
+                ShapeItem* right = mChildShapes[ValencyPoint::Right];
+                if (right)
+                {
+                    int TODO;
+                    rightRect = right->rect();
+                    if (rightRect.height() > changedRect.height())
+                    {
+                        int minRight = right->minHeight();
+                    }
+                }
+                else // empty right branch
+                {
+                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+                    if (underArrow)
+                    {
+                        QRect underArrowRect = underArrow->rect();
+                        int yOffset = changedRect.bottom() - underArrowRect.top() + 1;
+                        underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                        underArrowRect.setTop(underArrowRect.top() + yOffset);
+                        underArrow->setRect(underArrowRect, true);
+
+                        mRect.setRight(mRect.left() + qMax(changedRect.width() + rightRect.width(), underArrowRect.width()) - 1);
+                        mRect.setBottom(underArrowRect.bottom());
+                        setRect(mRect, false);
+                    }
+                    else // without under arrow
+                    {
+                        int i = 0;
+                        int TODO;
+                    }
+                }
+            }
+            else if (mChildShapes[ValencyPoint::Right] == shape)
+            {
+                int i = 0;
+                int TODO;
+            }
+        }
+    }
+
+    if (mParentShape)
+    {
+        mParentShape->onChildRectChanged(this);
     }
 }
 
@@ -729,7 +809,7 @@ int ShapeItem::minHeight() const
 
     if (mChildShapes.size() == 1)
     {
-        minHeight += mChildShapes[0]->minHeight();
+        minHeight += mChildShapes[ValencyPoint::Down]->minHeight();
     }
     else if (mChildShapes.size() == 3) //
     {
@@ -762,6 +842,7 @@ void ShapeItem::remove()
     }
     else if (mChildShapes.size() == 3) //
     {
+        int i = 0;
         int TODO; // question
     }
 }
@@ -810,6 +891,7 @@ void ShapeItem::pullUp()
     }
     else if (mChildShapes.size() == 3)
     {
+        int i = 0;
         int TODO5; // question logic
     }
 
