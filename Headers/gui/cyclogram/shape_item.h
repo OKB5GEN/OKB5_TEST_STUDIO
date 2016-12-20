@@ -17,15 +17,12 @@ class ShapeItem: public QObject
 public:
     ShapeItem(QObject* parent);
 
-    void createPath();
-
     void setPath(const QPainterPath &path);
     void setTextPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
     void setColor(const QColor &color);
     void setCell(const QPoint &cell);
     void setCommand(Command* command);
-    void setValencyPoints(const QList<ValencyPoint>& points);
     void setRect(const QRect& rect, bool pushToChildren);
     void setSelected(bool selected);
     void setParentShape(ShapeItem* parent);
@@ -71,6 +68,12 @@ private slots:
     void setActive(bool active);
 
 private:
+    void createPath();
+    void setValencyPoints(const QList<ValencyPoint>& points);
+    ValencyPoint createValencyPoint(const QPointF& point, ValencyPoint::Role role);
+    void createValencyPoints(Command* cmd);
+    bool isCyclogramEndBranch(Command* cmd) const;
+
     void updateCyclogramRect(ShapeItem* changedBranch);
     bool canSetRect(const QRect& rect) const;
     int minHeight() const;

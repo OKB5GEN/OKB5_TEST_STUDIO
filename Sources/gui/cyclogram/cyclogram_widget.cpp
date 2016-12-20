@@ -404,10 +404,8 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
     shapeItem->setCommand(cmd);
     shapeItem->setToolTip(tr("Tooltip"));
     shapeItem->setCell(cell);
-    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
-    shapeItem->createPath();
-    shapeItem->setValencyPoints(createValencyPoints(cmd));
     shapeItem->setParentShape(parentShape);
+    shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
 
     mCommands.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
@@ -603,127 +601,6 @@ void CyclogramWidget::clearSelection(bool needUpdate)
     }
 }
 
-QList<ValencyPoint> CyclogramWidget::createValencyPoints(Command* cmd)
-{
-    //
-    // Valency points general rules
-    //
-    // 1. All valency points belongs to any shape
-    // 2. All shapes (with except QUESION and BRANCH_BEGIN) can have only one valency point BELOW shape
-    // 3. TERMINATOR and GO_TO_BRANCH shapes does not have any valency points
-    // 4. BRANCH_BEGIN shape has two valency points: below shape and in top-right corner
-    // 5. BRANCH_BEGIN shapes' valency point in top-right corner is for adding new branches only
-    // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
-    // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
-    // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
-
-    // QUESTION shape valency points transformations while adding forms
-    //
-    // 1.
-
-    QList<ValencyPoint> points;
-
-    DRAKON::IconType type = cmd->type();
-
-    switch (type)
-    {
-    case DRAKON::BRANCH_BEGIN:
-    case DRAKON::ACTION_MATH:
-    case DRAKON::ACTION_MODULE:
-    case DRAKON::DELAY:
-        {
-            ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() - ShapeItem::cellSize().height() / 2), ValencyPoint::Down);
-            points.push_back(point);
-
-            if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
-            {
-                ValencyPoint point = createPoint(QPointF(ShapeItem::itemSize().width(), 0), ValencyPoint::Right);
-                points.push_back(point);
-            }
-        }
-        break;
-
-    case DRAKON::QUESTION:
-        {
-            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
-            if (questionCmd)
-            {
-                ValencyPoint rightPoint = createPoint(QPointF(ShapeItem::itemSize().width(), ShapeItem::itemSize().height() / 2), ValencyPoint::Right);
-                points.push_back(rightPoint);
-
-                if (questionCmd->questionType() == CmdQuestion::IF)
-                {
-                    ValencyPoint downPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() - ShapeItem::cellSize().height() / 2), ValencyPoint::Down);
-                    points.push_back(downPoint);
-
-                    ValencyPoint underArrowPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height() + ShapeItem::cellSize().height() / 2), ValencyPoint::UnderArrow);
-                    points.push_back(underArrowPoint);
-
-                }
-                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
-                {
-                    ValencyPoint downPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::itemSize().height()), ValencyPoint::Down);
-                    points.push_back(downPoint);
-
-                    ValencyPoint underArrowPoint = createPoint(QPointF(ShapeItem::itemSize().width() / 2, ShapeItem::cellSize().height() / 2), ValencyPoint::UnderArrow);
-                    points.push_back(underArrowPoint);
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
-
-    return points;
-}
-
-ValencyPoint CyclogramWidget::createPoint(const QPointF& point, ValencyPoint::Role role)
-{
-    QPainterPath path;
-
-    qreal crossSize = 0.6;
-    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 3;
-    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-    path.moveTo(0, -radius * crossSize);
-    path.lineTo(0, radius * crossSize);
-    path.moveTo(-radius * crossSize, 0);
-    path.lineTo(radius * crossSize, 0);
-
-    path.translate(point);
-
-    ValencyPoint vPoint;
-    vPoint.setPath(path);
-    vPoint.setColor(QColor::fromRgba(0xff00ff00));
-    vPoint.setRole(role);
-
-    return vPoint;
-}
-
-bool CyclogramWidget::isCyclogramEndBranch(Command* cmd) const
-{
-    if (cmd->type() == DRAKON::TERMINATOR)
-    {
-        return true;
-    }
-    else if (cmd->type() == DRAKON::GO_TO_BRANCH)
-    {
-        return false; // do not search further
-    }
-
-    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
-    {
-        if (isCyclogramEndBranch(cmd->nextCommands()[i]))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-
 void CyclogramWidget::removeShape(Command* command)
 {
     for (int i = 0, sz = mCommands.size(); i < sz; ++i)
@@ -851,7 +728,7 @@ ShapeItem* CyclogramWidget::findNextBranch(const QPoint& cell) const
     return item;
 }
 
-void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const
+void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift) const
 {
     QPoint cell = item->cell();
     cell.setX(cell.x() + xShift);
@@ -859,16 +736,9 @@ void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift
     item->setCell(cell);
 
     QRect rect = item->rect();
-    rect.setTop(rect.top() + topShift);
-    rect.setBottom(rect.bottom() + bottomShift);
     rect.setLeft(rect.left() + xShift);
     rect.setRight(rect.right() + xShift);
     item->setRect(rect, false);
-
-    if (topShift != bottomShift) // rect size changed, update path
-    {
-        item->createPath();
-    }
 }
 
 void CyclogramWidget::showEditDialog(Command *command)
@@ -1268,7 +1138,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     {
         if (it->cell().x() >= xNext)
         {
-            updateItemGeometry(it, 1, 0, 0, 0);
+            updateItemGeometry(it, 1, 0);
         }
     }
 
@@ -1337,7 +1207,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     {
         if (it->cell().x() >= max)
         {
-            updateItemGeometry(it, xOffset, 0, 0, 0);
+            updateItemGeometry(it, xOffset, 0);
         }
     }
 

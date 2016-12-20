@@ -54,10 +54,6 @@ private:
     void drawChildren(ShapeItem* item);
 
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
-
-    ValencyPoint createPoint(const QPointF& point, ValencyPoint::Role role);
-    bool isCyclogramEndBranch(Command* cmd) const;
-
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
     bool canBeDeleted(ShapeItem* item, QString& error) const;
     void deleteCommand(ShapeItem* item);
@@ -68,8 +64,6 @@ private:
 
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
-    QList<ValencyPoint> createValencyPoints(Command* cmd);
-
     void moveItemTo(const QPoint &pos);
 
     QString generateBranchName() const;
@@ -78,7 +72,7 @@ private:
     ShapeItem* findNextBranch(const QPoint& cell) const;
     ShapeItem* addNewBranch(ShapeItem* item);
 
-    void updateItemGeometry(ShapeItem* item, int xShift, int yShift, int topShift, int bottomShift) const;
+    void updateItemGeometry(ShapeItem* item, int xShift, int yShift) const;
 
     void showEditDialog(Command* command);
 

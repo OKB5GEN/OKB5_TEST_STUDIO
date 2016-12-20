@@ -430,8 +430,6 @@ void ShapeItem::createPath()
 
             if (questionCmd)
             {
-                int TODO; // very complex logics for QUESTION connections drawing will be here
-
                 path.moveTo(w, H / 2);
                 path.lineTo(w * 2, H - h);
                 path.lineTo(W - 2 * w, H - h);
@@ -443,13 +441,81 @@ void ShapeItem::createPath()
                 QPainterPath addPath;
                 if (questionCmd->questionType() == CmdQuestion::IF)
                 {
+                    ShapeItem* down = mChildShapes[ValencyPoint::Down];
+                    ShapeItem* right = mChildShapes[ValencyPoint::Right];
+                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+
+                    QRect downRect;
+                    QRect rightRect;
+                    int xOffset = W;
+
+                    if (down)
+                    {
+                        downRect = down->rect();
+                        xOffset += W * (downRect.width() - 1);
+                    }
+
+                    if (right)
+                    {
+                        rightRect = right->rect();
+                        xOffset += W / 2;
+                    }
+
+                    int yOffset = H * (qMax(downRect.height(), rightRect.height()) + 1);
+
+                    // if underArrow && !down && !right, i.e. by default
                     addPath.moveTo(W - w, H / 2);
-                    addPath.lineTo(W, H / 2);
-                    addPath.lineTo(W, H);
-                    addPath.lineTo(W / 2, H);
+                    addPath.lineTo(xOffset, H / 2);
+                    addPath.lineTo(xOffset, H);
+
+                    if (!right && down)
+                    {
+                        addPath.lineTo(xOffset, yOffset);
+                    }
+
+                    if (right && !down)
+                    {
+                        addPath.moveTo(W / 2, H);
+                        addPath.lineTo(W / 2, yOffset);
+                    }
+
+                    if (underArrow)
+                    {
+                        addPath.moveTo(xOffset, yOffset);
+                        addPath.lineTo(W / 2, yOffset);
+                    }
+                    else
+                    {
+                        qDebug("IMPOSSIBRU!!!11");
+                    }
+
+                    // update valency point positions
+                    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+                    {
+                        int role = mValencyPoints[i].role();
+
+                        if (role == ValencyPoint::Right)
+                        {
+                            mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), ValencyPoint::Right);
+                        }
+                        else if (role == ValencyPoint::UnderArrow)
+                        {
+                            if (underArrow)
+                            {
+                                mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), ValencyPoint::UnderArrow);
+                            }
+                            else
+                            {
+                                int j = 0; // TODO remove valency point? make null path?
+                                int TODO;
+                            }
+                        }
+                    }
                 }
                 else if (questionCmd->questionType() == CmdQuestion::CYCLE)
                 {
+                    int TODO; // very complex logics for QUESTION-CYCLE connections drawing will be here
+
                     addPath.moveTo(W - w, H / 2);
                     addPath.lineTo(W, H / 2);
                     addPath.lineTo(W, 0);
@@ -485,6 +551,11 @@ void ShapeItem::createPath()
     }
 
     mPath = path;
+
+    if (mValencyPoints.empty())
+    {
+        createValencyPoints(mCommand);
+    }
 }
 
 void ShapeItem::setSelected(bool selected)
@@ -501,17 +572,18 @@ void ShapeItem::setSelected(bool selected)
 
 void ShapeItem::pushDown()
 {
+    QRect rect = mRect;
+
     if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
     {
-        if (mRect.height() > 1) // "expanded shape"
+        if (mRect.height() > 1) // "expanded shape", just reduce own rect height by 1
         {
-            // just reduce own rect height by 1
-            mRect.setTop(mRect.top() + 1);
+            rect.setTop(mRect.top() + 1);
         }
         else // move shape down
         {
-            mRect.setBottom(mRect.bottom() + 1);
-            mRect.setTop(mRect.top() + 1);
+            rect.setBottom(rect.bottom() + 1);
+            rect.setTop(rect.top() + 1);
 
             QPoint cell = mCell;
             cell.setY(cell.y() + 1);
@@ -527,9 +599,8 @@ void ShapeItem::pushDown()
         // tell child to push itself down
         mChildShapes[0]->pushDown();
 
-        QRect rect = mChildShapes[0]->rect();
+        rect = mChildShapes[0]->rect();
         rect.setTop(rect.top() - 1);
-        setRect(rect, false);
     }
     else if (mChildShapes.size() == 3)
     {
@@ -537,7 +608,7 @@ void ShapeItem::pushDown()
         int TODO5; // question logic
     }
 
-    createPath();
+    setRect(rect, false);
 }
 
 void ShapeItem::onChildRectChanged(ShapeItem * shape)
@@ -579,6 +650,8 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
         }
         else // QUESTION-IF
         {
+            QRect newRect = mRect;
+
             if (mChildShapes[ValencyPoint::UnderArrow] == shape)
             {
                 QRect downRect;
@@ -593,9 +666,9 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                     rightRect = mChildShapes[ValencyPoint::Right]->rect();
                 }
 
-                mRect.setRight(mRect.left() + qMax(downRect.width() + rightRect.width(), changedRect.width()) - 1);
-                mRect.setBottom(changedRect.bottom());
-                setRect(mRect, false);
+                newRect.setRight(newRect.left() + qMax(downRect.width() + rightRect.width(), changedRect.width()) - 1);
+                newRect.setBottom(changedRect.bottom());
+                setRect(newRect, false);
             }
             else if (mChildShapes[ValencyPoint::Down] == shape)
             {
@@ -621,9 +694,9 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                         underArrowRect.setTop(underArrowRect.top() + yOffset);
                         underArrow->setRect(underArrowRect, true);
 
-                        mRect.setRight(mRect.left() + qMax(changedRect.width() + rightRect.width(), underArrowRect.width()) - 1);
-                        mRect.setBottom(underArrowRect.bottom());
-                        setRect(mRect, false);
+                        newRect.setRight(newRect.left() + qMax(changedRect.width() + rightRect.width(), underArrowRect.width()) - 1);
+                        newRect.setBottom(underArrowRect.bottom());
+                        setRect(newRect, false);
                     }
                     else // without under arrow
                     {
@@ -821,7 +894,7 @@ int ShapeItem::minHeight() const
 
 void ShapeItem::remove()
 {
-    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
+    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[ValencyPoint::Down] == Q_NULLPTR))
     {
         mRect.setBottom(mRect.top());
         mParentShape->replaceChildShape(0, this); // update shape connections
@@ -866,11 +939,12 @@ void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
 
 void ShapeItem::pullUp()
 {
+    QRect rect = mRect;
     if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
     {
         // just move shape up
-        mRect.setTop(mRect.top() - 1);
-        mRect.setBottom(mRect.bottom() - 1);
+        rect.setTop(rect.top() - 1);
+        rect.setBottom(rect.bottom() - 1);
 
         QPoint cell = mCell;
         cell.setY(cell.y() - 1);
@@ -885,9 +959,8 @@ void ShapeItem::pullUp()
         // tell child to pull itself up
         mChildShapes[0]->pullUp();
 
-        QRect rect = mChildShapes[0]->rect();
+        rect = mChildShapes[0]->rect();
         rect.setTop(rect.top() - 1);
-        setRect(rect, false);
     }
     else if (mChildShapes.size() == 3)
     {
@@ -895,5 +968,127 @@ void ShapeItem::pullUp()
         int TODO5; // question logic
     }
 
-    createPath();
+    setRect(rect, false);
+}
+
+ValencyPoint ShapeItem::createValencyPoint(const QPointF& point, ValencyPoint::Role role)
+{
+    QPainterPath path;
+
+    qreal crossSize = 0.6;
+    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 3;
+    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
+    path.moveTo(0, -radius * crossSize);
+    path.lineTo(0, radius * crossSize);
+    path.moveTo(-radius * crossSize, 0);
+    path.lineTo(radius * crossSize, 0);
+
+    path.translate(point);
+
+    ValencyPoint vPoint;
+    vPoint.setPath(path);
+    vPoint.setColor(QColor::fromRgba(0xff00ff00));
+    vPoint.setRole(role);
+    vPoint.setOwner(this);
+
+    return vPoint;
+}
+
+void ShapeItem::createValencyPoints(Command* cmd)
+{
+    //
+    // Valency points general rules
+    //
+    // 1. All valency points belongs to any shape
+    // 2. All shapes (with except QUESION and BRANCH_BEGIN) can have only one valency point BELOW shape
+    // 3. TERMINATOR and GO_TO_BRANCH shapes does not have any valency points
+    // 4. BRANCH_BEGIN shape has two valency points: below shape and in top-right corner
+    // 5. BRANCH_BEGIN shapes' valency point in top-right corner is for adding new branches only
+    // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
+    // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
+    // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
+
+    // QUESTION shape valency points transformations while adding forms
+    //
+    // 1.
+
+    mValencyPoints.clear();
+    qreal W = itemSize().width();
+    qreal H = itemSize().height();
+    qreal w = cellSize().width();
+    qreal h = cellSize().height();
+
+    DRAKON::IconType type = cmd->type();
+
+    switch (type)
+    {
+    case DRAKON::BRANCH_BEGIN:
+    case DRAKON::ACTION_MATH:
+    case DRAKON::ACTION_MODULE:
+    case DRAKON::DELAY:
+        {
+            ValencyPoint point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+            mValencyPoints.push_back(point);
+
+            if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
+            {
+                ValencyPoint point = createValencyPoint(QPointF(W, 0), ValencyPoint::Right);
+                mValencyPoints.push_back(point);
+            }
+        }
+        break;
+
+    case DRAKON::QUESTION:
+        {
+            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
+            if (questionCmd)
+            {
+                ValencyPoint rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
+                mValencyPoints.push_back(rightPoint);
+
+                if (questionCmd->questionType() == CmdQuestion::IF)
+                {
+                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+                    mValencyPoints.push_back(downPoint);
+
+                    ValencyPoint underArrowPoint = createValencyPoint(QPointF(W / 2, H + h / 2), ValencyPoint::UnderArrow);
+                    mValencyPoints.push_back(underArrowPoint);
+
+                }
+                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
+                {
+                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H), ValencyPoint::Down);
+                    mValencyPoints.push_back(downPoint);
+
+                    ValencyPoint underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
+                    mValencyPoints.push_back(underArrowPoint);
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+bool ShapeItem::isCyclogramEndBranch(Command* cmd) const
+{
+    if (cmd->type() == DRAKON::TERMINATOR)
+    {
+        return true;
+    }
+    else if (cmd->type() == DRAKON::GO_TO_BRANCH)
+    {
+        return false; // do not search further
+    }
+
+    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
+    {
+        if (isCyclogramEndBranch(cmd->nextCommands()[i]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
