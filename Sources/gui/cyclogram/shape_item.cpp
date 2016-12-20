@@ -194,8 +194,10 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 
             if (childs.empty())
             {
+                int xOffset = rect.right() - mRect.right();
                 QPoint cell = mCell;
                 cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
+                cell.setX(cell.x() + xOffset);
                 setCell(cell);
             }
             else if (childs.size() == 1)
@@ -203,6 +205,11 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                 if (childs[0] != Q_NULLPTR)
                 {
                     // has one possible child command
+                    int xOffset = rect.right() - mRect.right();
+                    QPoint cell = mCell;
+                    cell.setX(cell.x() + xOffset); // update cell first
+                    setCell(cell);
+
                     QRect newRect = rect;
                     newRect.setTop(newRect.top() + 1);
                     mChildShapes[0]->setRect(newRect, true);
@@ -676,7 +683,7 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                 ShapeItem* right = mChildShapes[ValencyPoint::Right];
                 if (right)
                 {
-                    int TODO;
+                    int TODO; // тут надо будет как-то выровнять размеры down и right ветки по высоте, чтобы они были одинаковые
                     rightRect = right->rect();
                     if (rightRect.height() > changedRect.height())
                     {
@@ -694,7 +701,7 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                         underArrowRect.setTop(underArrowRect.top() + yOffset);
                         underArrow->setRect(underArrowRect, true);
 
-                        newRect.setRight(newRect.left() + qMax(changedRect.width() + rightRect.width(), underArrowRect.width()) - 1);
+                        newRect.setWidth(qMax(changedRect.left() + changedRect.width(), underArrowRect.left() + underArrowRect.width()));
                         newRect.setBottom(underArrowRect.bottom());
                         setRect(newRect, false);
                     }
@@ -707,8 +714,34 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
             }
             else if (mChildShapes[ValencyPoint::Right] == shape)
             {
-                int i = 0;
-                int TODO;
+                ShapeItem* down = mChildShapes[ValencyPoint::Down];
+                QRect downRect;
+                if (down)
+                {
+                    downRect = down->rect();
+                    int TODO; // тут надо будет как-то выровнять размеры down и right ветки по высоте, чтобы они были одинаковые
+                }
+                else // empty down branch
+                {
+                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+                    if (underArrow)
+                    {
+                        QRect underArrowRect = underArrow->rect();
+                        int yOffset = changedRect.bottom() - underArrowRect.top() + 1;
+                        underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                        underArrowRect.setTop(underArrowRect.top() + yOffset);
+                        underArrow->setRect(underArrowRect, true);
+
+                        newRect.setWidth(qMax(changedRect.left() + changedRect.width(), underArrowRect.left() + underArrowRect.width()));
+                        newRect.setBottom(underArrowRect.bottom());
+                        setRect(newRect, false);
+                    }
+                    else
+                    {
+                        int j = 0;
+                        int TODO;
+                    }
+                }
             }
         }
     }
@@ -778,9 +811,9 @@ void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
 
         foreach (ShapeItem* it, mChildShapes)
         {
-            QRect branchRect = it->rect();
-            if (branchRect.left() > rect.left())
+            if (changedBranch->cell().x() < it->cell().x())
             {
+                QRect branchRect = it->rect();
                 branchRect.setLeft(branchRect.left() + xOffset);
                 branchRect.setRight(branchRect.right() + xOffset);
                 it->setRect(branchRect, true);

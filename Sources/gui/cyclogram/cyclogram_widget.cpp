@@ -922,6 +922,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
     else if (cmd->childCommands().size() == 3)
     {
         int i = 0;
+        int TODO;
     }
 
     /*
