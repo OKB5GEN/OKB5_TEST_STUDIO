@@ -208,6 +208,7 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                     int xOffset = rect.right() - mRect.right();
                     QPoint cell = mCell;
                     cell.setX(cell.x() + xOffset); // update cell first
+                    cell.setY(cell.y() + rect.top() - mRect.top());
                     setCell(cell);
 
                     QRect newRect = rect;
@@ -661,19 +662,23 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
 
             if (mChildShapes[ValencyPoint::UnderArrow] == shape)
             {
+                int branchesWidth = 0;
+
                 QRect downRect;
                 if (mChildShapes[ValencyPoint::Down])
                 {
                     downRect = mChildShapes[ValencyPoint::Down]->rect();
+                    branchesWidth = downRect.left() + downRect.width();
                 }
 
                 QRect rightRect;
                 if (mChildShapes[ValencyPoint::Right])
                 {
                     rightRect = mChildShapes[ValencyPoint::Right]->rect();
+                    branchesWidth = rightRect.left() + rightRect.width();
                 }
 
-                newRect.setRight(newRect.left() + qMax(downRect.width() + rightRect.width(), changedRect.width()) - 1);
+                newRect.setWidth(qMax(branchesWidth, changedRect.left() + changedRect.width()));
                 newRect.setBottom(changedRect.bottom());
                 setRect(newRect, false);
             }
