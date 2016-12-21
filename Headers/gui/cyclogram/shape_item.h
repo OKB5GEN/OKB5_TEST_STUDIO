@@ -55,8 +55,11 @@ public:
     static const QSizeF& cellSize();
     static const QPointF& origin();
 
+    // TODO remove >>>
     void pushDown();
     void pullUp();
+    //<<<
+
     void onChildRectChanged(ShapeItem * shape);
 
 signals:

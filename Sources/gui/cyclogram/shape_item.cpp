@@ -184,10 +184,10 @@ ValencyPoint ShapeItem::valencyPoint(int role) const
 
 void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 {
-    if (mRect == rect)
-    {
-        return; // rect doesn't changed
-    }
+//    if (mRect == rect)
+//    {
+//        return; // rect doesn't changed, BUT its child shapes rect can be chaged
+//    }
 
     if (pushToChildren)
     {
@@ -737,8 +737,10 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                 if (underArrow) // is changed size of one of branches, move up/down "underArrow" part
                 {
                     int yOffset = shape->rect().bottom() - underArrowRect.top() + 1;
-                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
-                    underArrowRect.setTop(underArrowRect.top() + yOffset);
+                    int delta = underArrow->minHeight() - underArrowRect.height();
+
+                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset + delta);
+                    underArrowRect.setTop(underArrowRect.top() + yOffset/* + delta*/);
                     underArrow->setRect(underArrowRect, true);
                 }
             }
