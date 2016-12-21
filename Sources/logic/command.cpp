@@ -15,7 +15,7 @@ namespace
 Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     QObject(parent),
     mType(type),
-    mRole(0),
+    mRole(ValencyPoint::Down),
     mFlags(Command::All),
     mParentCommand(Q_NULLPTR),
     mHasError(false),
@@ -25,7 +25,7 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
 
     for (int i = 0; i < childCmdCnt; ++i)
     {
-        mChildCommands.push_back(Q_NULLPTR);
+        mNextCommands.push_back(Q_NULLPTR);
     }
 }
 
@@ -48,13 +48,7 @@ void Command::run()
 
 void Command::end()
 {
-    if (mNextCommands.empty())
-    {
-        emit finished(Q_NULLPTR);
-        return;
-    }
-
-    emit finished(mNextCommands[0]);
+    emit finished(nextCommand());
 }
 
 void Command::stop()
@@ -102,36 +96,38 @@ const QList<Command*>& Command::nextCommands() const
     return mNextCommands;
 }
 
-const QList<Command*>& Command::childCommands() const
+void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
 {
-    return mChildCommands;
-}
-
-void Command::addCommand(Command* cmd, int role /*= 0*/)
-{
-    if (!cmd)
+    if (newCmd)
     {
-        return;
+        newCmd->setRole(role);
+
+        if (newCmd->type() != DRAKON::BRANCH_BEGIN)
+        {
+            newCmd->setParentCommand(this);
+        }
     }
 
-    if (cmd->type() != DRAKON::BRANCH_BEGIN)
+    if (mType == DRAKON::GO_TO_BRANCH)
     {
-        cmd->setParentCommand(this);
+        if (newCmd)
+        {
+            disconnect(nextCommand(role), SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            onNextCmdTextChanged(newCmd->text());
+
+            if (hasError()) // error fixing after branch deletion
+            {
+                setErrorStatus(false);
+            }
+        }
+        else // branch deletion
+        {
+            setErrorStatus(true);
+        }
     }
 
-    cmd->setRole(role);
-    mNextCommands.push_back(cmd);
-
-    if (mType == DRAKON::GO_TO_BRANCH && cmd->type() == DRAKON::BRANCH_BEGIN)
-    {
-        connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
-        onNextCmdTextChanged(cmd->text());
-    }
-
-    if (mType != DRAKON::GO_TO_BRANCH && mType != DRAKON::TERMINATOR)
-    {
-        setChildCommand(cmd, role);
-    }
+    mNextCommands[role] = newCmd;
 }
 
 void Command::onNextCmdTextChanged(const QString& text)
@@ -140,12 +136,12 @@ void Command::onNextCmdTextChanged(const QString& text)
     emit textChanged(mText);
 }
 
-int Command::role() const
+ValencyPoint::Role Command::role() const
 {
     return mRole;
 }
 
-void Command::setRole(int role)
+void Command::setRole(ValencyPoint::Role role)
 {
     mRole = role;
 }
@@ -171,7 +167,7 @@ bool Command::hasError() const
     return mHasError;
 }
 
-void Command::insertCommand(Command* newCmd, int role)
+void Command::insertCommand(Command* newCmd, ValencyPoint::Role role)
 {
     // TODO very complex function, split it on small
 
@@ -193,10 +189,11 @@ void Command::insertCommand(Command* newCmd, int role)
     {
         newCmd->setParentCommand(this);
         newCmd->setRole(role);
-        setChildCommand(newCmd, role);
 
         CmdQuestion* thisCmd = qobject_cast<CmdQuestion*>(this);
-        Command* underArrow = mNextCommands[ValencyPoint::UnderArrow];
+        Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+        Command* right = nextCommand(ValencyPoint::Right);
+        Command* down = nextCommand(ValencyPoint::Down);
 
         if (thisCmd->questionType() == CmdQuestion::CYCLE) // insertions in QUESTION-CYCLE
         {
@@ -209,12 +206,11 @@ void Command::insertCommand(Command* newCmd, int role)
                     if (role == ValencyPoint::UnderArrow)
                     {
                         // update "under arrow" branch
-                        Command* right = mNextCommands[ValencyPoint::Right];
                         Command* cmd = (underArrow == this) ? this : underArrow;
 
-                        newCmd->addCommand(cmd, ValencyPoint::Down);
-                        newCmd->addCommand(newCmd, ValencyPoint::Right);
-                        newCmd->addCommand(newCmd, ValencyPoint::UnderArrow);
+                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+                        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+                        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
 
                         mNextCommands[ValencyPoint::UnderArrow] = newCmd;
 
@@ -225,15 +221,14 @@ void Command::insertCommand(Command* newCmd, int role)
                         }
                         else
                         {
-                            Command* tree = mNextCommands[ValencyPoint::Right];
-                            replaceReferences(cmd, newCmd, tree);
+                            replaceReferences(cmd, newCmd, right);
                         }
                     }
                     else
                     {
-                        newCmd->addCommand(mNextCommands[role], ValencyPoint::Down);
-                        newCmd->addCommand(newCmd, ValencyPoint::Right);
-                        newCmd->addCommand(newCmd, ValencyPoint::UnderArrow);
+                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+                        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+                        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
 
                         mNextCommands[role] = newCmd;
                     }
@@ -243,12 +238,11 @@ void Command::insertCommand(Command* newCmd, int role)
                     if (role == ValencyPoint::UnderArrow)
                     {
                         // update "under arrow" branch
-                        Command* right = mNextCommands[ValencyPoint::Right];
                         Command* cmd = (underArrow == this) ? this : underArrow;
 
-                        newCmd->addCommand(cmd, ValencyPoint::Down);
-                        newCmd->addCommand(cmd, ValencyPoint::Right);
-                        newCmd->addCommand(cmd, ValencyPoint::UnderArrow);
+                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+                        newCmd->replaceCommand(cmd, ValencyPoint::Right);
+                        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
 
                         mNextCommands[ValencyPoint::UnderArrow] = newCmd;
 
@@ -259,15 +253,14 @@ void Command::insertCommand(Command* newCmd, int role)
                         }
                         else
                         {
-                            Command* tree = mNextCommands[ValencyPoint::Right];
-                            replaceReferences(cmd, newCmd, tree);
+                            replaceReferences(cmd, newCmd, right);
                         }
                     }
                     else
                     {
-                        newCmd->addCommand(mNextCommands[role], ValencyPoint::Down);
-                        newCmd->addCommand(mNextCommands[role], ValencyPoint::Right);
-                        newCmd->addCommand(mNextCommands[role], ValencyPoint::UnderArrow);
+                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
+                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
 
                         mNextCommands[role] = newCmd;
                     }
@@ -278,10 +271,9 @@ void Command::insertCommand(Command* newCmd, int role)
                 if (role == ValencyPoint::UnderArrow)
                 {
                     // update "under arrow" branch
-                    Command* right = mNextCommands[ValencyPoint::Right];
                     Command* cmd = (underArrow == this) ? this : underArrow;
 
-                    newCmd->addCommand(cmd, ValencyPoint::Down);
+                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
                     mNextCommands[ValencyPoint::UnderArrow] = newCmd;
 
                     // update "right" branch
@@ -291,13 +283,12 @@ void Command::insertCommand(Command* newCmd, int role)
                     }
                     else
                     {
-                        Command* tree = mNextCommands[ValencyPoint::Right];
-                        replaceReferences(cmd, newCmd, tree);
+                        replaceReferences(cmd, newCmd, right);
                     }
                 }
                 else
                 {
-                    newCmd->addCommand(mNextCommands[role], ValencyPoint::Down);
+                    newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
                     mNextCommands[role] = newCmd;
                 }
             }
@@ -313,39 +304,37 @@ void Command::insertCommand(Command* newCmd, int role)
                     if (role == ValencyPoint::UnderArrow)
                     {
                         // recursively replace references to current "under arrow" command with new "under arrow" command
-                        Command* tree1 = mNextCommands[ValencyPoint::Down];
-                        if (tree1 == underArrow)
+                        if (down == underArrow)
                         {
                             mNextCommands[ValencyPoint::Down] = newCmd;
                         }
                         else
                         {
-                            replaceReferences(underArrow, newCmd, tree1);
+                            replaceReferences(underArrow, newCmd, down);
                         }
 
-                        Command* tree2 = mNextCommands[ValencyPoint::Right];
-                        if (tree2 == underArrow)
+                        if (right == underArrow)
                         {
                             mNextCommands[ValencyPoint::Right] = newCmd;
                         }
                         else
                         {
-                            replaceReferences(underArrow, newCmd, tree2);
+                            replaceReferences(underArrow, newCmd, right);
                         }
 
                         // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
-                        newCmd->addCommand(underArrow, ValencyPoint::Down);
+                        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
                     }
                     else
                     {
                         Command* existing = mNextCommands[role];
                         Command* cmd = (existing == underArrow) ? underArrow : existing;
 
-                        newCmd->addCommand(cmd, ValencyPoint::Down);
+                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
                     }
 
-                    newCmd->addCommand(newCmd, ValencyPoint::Right);
-                    newCmd->addCommand(newCmd, ValencyPoint::UnderArrow);
+                    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+                    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
                     mNextCommands[role] = newCmd;
                 }
                 else // QUESTION-IF insertion in QUESTION-IF
@@ -357,24 +346,22 @@ void Command::insertCommand(Command* newCmd, int role)
                         cmd = underArrow;
 
                         // recursively replace references to current "under arrow" command with new "under arrow" command
-                        Command* tree1 = mNextCommands[ValencyPoint::Down];
-                        if (tree1 == underArrow)
+                        if (down == underArrow)
                         {
                             mNextCommands[ValencyPoint::Down] = newCmd;
                         }
                         else
                         {
-                            replaceReferences(underArrow, newCmd, tree1);
+                            replaceReferences(underArrow, newCmd, down);
                         }
 
-                        Command* tree2 = mNextCommands[ValencyPoint::Right];
-                        if (tree2 == underArrow)
+                        if (right == underArrow)
                         {
                             mNextCommands[ValencyPoint::Right] = newCmd;
                         }
                         else
                         {
-                            replaceReferences(underArrow, newCmd, tree2);
+                            replaceReferences(underArrow, newCmd, right);
                         }
                     }
                     else
@@ -384,9 +371,9 @@ void Command::insertCommand(Command* newCmd, int role)
                     }
 
                     // old "under arrow" command now become "under arrow, etc" command for new command
-                    newCmd->addCommand(cmd, ValencyPoint::Down);
-                    newCmd->addCommand(cmd, ValencyPoint::Right);
-                    newCmd->addCommand(cmd, ValencyPoint::UnderArrow);
+                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+                    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+                    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
                     mNextCommands[role] = newCmd;
                 }
             }
@@ -395,34 +382,32 @@ void Command::insertCommand(Command* newCmd, int role)
                 if (role == ValencyPoint::UnderArrow)
                 {
                     // recursively replace references to current "under arrow" command with new "under arrow" command
-                    Command* tree1 = mNextCommands[ValencyPoint::Down];
-                    if (tree1 == underArrow)
+                    if (down == underArrow)
                     {
                         mNextCommands[ValencyPoint::Down] = newCmd;
                     }
                     else
                     {
-                        replaceReferences(underArrow, newCmd, tree1);
+                        replaceReferences(underArrow, newCmd, down);
                     }
 
-                    Command* tree2 = mNextCommands[ValencyPoint::Right];
-                    if (tree2 == underArrow)
+                    if (right == underArrow)
                     {
                         mNextCommands[ValencyPoint::Right] = newCmd;
                     }
                     else
                     {
-                        replaceReferences(underArrow, newCmd, tree2);
+                        replaceReferences(underArrow, newCmd, right);
                     }
 
-                    newCmd->addCommand(underArrow, ValencyPoint::Down);
+                    newCmd->replaceCommand(underArrow, ValencyPoint::Down);
                 }
                 else
                 {
                     Command* existing = mNextCommands[role];
                     Command* cmd = (existing == underArrow) ? underArrow : existing;
 
-                    newCmd->addCommand(cmd, ValencyPoint::Down);
+                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
                 }
 
                 mNextCommands[role] = newCmd;
@@ -431,103 +416,33 @@ void Command::insertCommand(Command* newCmd, int role)
     }
     else // QUESTION insertion in simple command
     {
-        for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
-        {
-            if (mNextCommands[i]->role() == role)
-            {
-                setChildCommand(newCmd, role);
-                newCmd->setParentCommand(this);
-                newCmd->setRole(role);
-                if (newCmd->type() == DRAKON::QUESTION)
-                {
-                    CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-                    if (questionCmd->questionType() == CmdQuestion::CYCLE)
-                    {
-                        questionCmd->addCommand(mNextCommands[i], ValencyPoint::Down);
-                        questionCmd->addCommand(questionCmd, ValencyPoint::UnderArrow);
-                        questionCmd->addCommand(questionCmd, ValencyPoint::Right);
-                    }
-                    else // by default IF-type command refers with all branches to command below
-                    {
-                        questionCmd->addCommand(mNextCommands[i], ValencyPoint::UnderArrow);
-                        questionCmd->addCommand(mNextCommands[i], ValencyPoint::Down);
-                        questionCmd->addCommand(mNextCommands[i], ValencyPoint::Right);
-                    }
-                }
-                else
-                {
-                    newCmd->addCommand(mNextCommands[i], role);
-                }
+        Command* next = nextCommand();
 
-                mNextCommands[i] = newCmd;
-                break;
+        newCmd->setParentCommand(this);
+        newCmd->setRole(role);
+
+        if (newCmd->type() == DRAKON::QUESTION)
+        {
+            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+            if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            {
+                questionCmd->replaceCommand(next, ValencyPoint::Down);
+                questionCmd->replaceCommand(questionCmd, ValencyPoint::UnderArrow);
+                questionCmd->replaceCommand(questionCmd, ValencyPoint::Right);
+            }
+            else // by default IF-type command refers with all branches to command below
+            {
+                questionCmd->replaceCommand(next, ValencyPoint::UnderArrow);
+                questionCmd->replaceCommand(next, ValencyPoint::Down);
+                questionCmd->replaceCommand(next, ValencyPoint::Right);
             }
         }
-    }
-}
-
-void Command::setChildCommand(Command* cmd, int role)
-{
-    if (role >= 0 && role < mChildCommands.size())
-    {
-        mChildCommands[role] = cmd;
-    }
-}
-
-void Command::replaceChildCommand(Command* newCmd, Command* oldCmd)
-{
-    for (int i = 0, sz = mChildCommands.size(); i < sz; ++i)
-    {
-        if (mChildCommands[i] == oldCmd)
+        else
         {
-            mChildCommands[i] = newCmd;
-            return;
-        }
-    }
-}
-
-void Command::replaceCommand(Command *newCmd, int role)
-{
-    int TODO2; // possibly make virtual and move to DRAKON::GO_TO_BRANCH class
-
-    if (mType == DRAKON::GO_TO_BRANCH)
-    {
-        if (!newCmd)  // branch deletion
-        {
-            mNextCommands.clear();
-            setErrorStatus(true);
-            return;
+            newCmd->replaceCommand(next, role);
         }
 
-        if (mNextCommands.empty() && hasError()) // error fixing after branch deletion
-        {
-            newCmd->setRole(role); //TODO possibly not?
-            mNextCommands.push_back(newCmd);
-            connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
-            setErrorStatus(false);
-            return;
-        }
-    }
-
-    int TODO; // непонятно как эти роли должны передаваться при замене
-    // роль - это актуально только для ветвлений
-    for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
-    {
-        if (mNextCommands[i]->role() == role)
-        {
-            if (mType == DRAKON::GO_TO_BRANCH && newCmd->type() == DRAKON::BRANCH_BEGIN)
-            {
-                disconnect(mNextCommands[i], SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
-                connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
-            }
-            else
-            {
-                newCmd->setParentCommand(this);
-            }
-
-            mNextCommands[i] = newCmd;
-            break;
-        }
+        mNextCommands[role] = newCmd;
     }
 }
 
@@ -597,4 +512,14 @@ void Command::replaceReferences(Command* oldCmd, Command* newCmd, Command* tree)
             replaceReferences(oldCmd, newCmd, commands[i]);
         }
     }
+}
+
+Command* Command::nextCommand(ValencyPoint::Role role) const
+{
+    if (role >= ValencyPoint::Down && role < mNextCommands.size())
+    {
+        return mNextCommands[role];
+    }
+
+    return Q_NULLPTR;
 }

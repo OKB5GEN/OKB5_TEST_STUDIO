@@ -23,13 +23,6 @@ void CmdAction::run()
 
 void CmdAction::finish()
 {
-    stop();
-    if (mNextCommands.empty())
-    {
-        emit finished(Q_NULLPTR);
-        return;
-    }
-
-    emit finished(mNextCommands[0]);
+    emit finished(nextCommand());
 }
 

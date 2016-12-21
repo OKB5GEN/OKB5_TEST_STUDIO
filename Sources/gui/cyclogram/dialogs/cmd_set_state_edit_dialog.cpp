@@ -44,7 +44,7 @@ void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Comma
 
     if (!mCommand->hasError())
     {
-        nextCmd = mCommand->nextCommands()[0];
+        nextCmd = mCommand->nextCommand();
         mCurrentIndex = -1;
     }
     else

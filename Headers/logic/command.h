@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSize>
 #include "Headers/shape_types.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 class VariableController;
 
@@ -35,25 +36,23 @@ public:
     DRAKON::IconType type() const;
 
     const QList<Command*>& nextCommands() const;
-    void addCommand(Command* cmd, int role = 0);
-    void insertCommand(Command* newCmd, int role = 0);
-    void replaceCommand(Command* newCmd, int role = 0);
+    void insertCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
+    void replaceCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
+
+    Command* nextCommand(ValencyPoint::Role role = ValencyPoint::Down) const;
 
     // TODO remove >>>
-    void setChildCommand(Command* cmd, int role);
-    void replaceChildCommand(Command* newCmd, Command* oldCmd);
-    const QList<Command*>& childCommands() const;
     Command* parentCommand() const;
+    void setParentCommand(Command* cmd);
     // <<<
 
-    int role() const;
+    ValencyPoint::Role role() const;
     uint32_t flags() const;
 
     bool hasError() const;
 
-    void setRole(int role);
+    void setRole(ValencyPoint::Role role);
     void setFlags(uint32_t flags);
-    void setParentCommand(Command* cmd);
     void setActive(bool active);
 
     void setExecutionDelay(int msec);
@@ -78,7 +77,7 @@ protected:
     DRAKON::IconType mType;
     QString mText;
     QString mErrorText;
-    int mRole;
+    ValencyPoint::Role mRole;
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
     int mExecutionDelay;
@@ -88,7 +87,6 @@ protected:
 
 // TODO remove >>>
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
-    QList<Command*> mChildCommands; // TODO implement
 
 private slots:
     void onNextCmdTextChanged(const QString& text);

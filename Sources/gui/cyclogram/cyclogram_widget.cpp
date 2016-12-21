@@ -537,7 +537,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
         Command* startBranch = mCurrentCyclogram->first();
 
         // check is start branch trying to delete
-        if (startBranch->nextCommands()[0] == item->command())
+        if (startBranch->nextCommand() == item->command())
         {
             error = tr("Start branch never can be deleted");
             return false;
@@ -895,110 +895,44 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
 {
     Command* cmd = item->command();
 
-    if (cmd->childCommands().empty())
+    if (cmd->nextCommands().empty())
     {
         return; // command has no valency points
     }
 
-    if (cmd->childCommands().size() == 1)
+    if (cmd->nextCommands().size() == 1)
     {
-        if (cmd->childCommands()[0] == Q_NULLPTR)
+        if (!cmd->nextCommand())
         {
-            return; // empty valency point
+            return; // empty valency point or branch end
         }
 
         QPoint cell = item->cell();
         cell.setY(cell.y() + 1);
 
-        ShapeItem* shape = addShape(cmd->childCommands()[0], cell, item);
+        ShapeItem* shape = addShape(cmd->nextCommand(), cell, item);
         item->setChildShape(shape, 0);
-        drawChildren(shape);
+
+        if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+        {
+            drawChildren(shape);
+        }
 
         QRect rect = item->rect();
         rect.setBottom(rect.bottom() + shape->rect().height());
         rect.setRight(rect.right() + shape->rect().width() - rect.width());
         item->setRect(rect, false);
     }
-    else if (cmd->childCommands().size() == 3)
+    else if (cmd->nextCommands().size() == 3)
     {
         int i = 0;
         int TODO;
     }
-
-    /*
-
-    switch (cmd->type())
-    {
-    case DRAKON::TERMINATOR:
-    case DRAKON::BRANCH_BEGIN:
-    case DRAKON::GO_TO_BRANCH:
-    case DRAKON::ACTION_MATH:
-    case DRAKON::DELAY:
-    case DRAKON::QUESTION:
-    case DRAKON::ACTION_MODULE:
-    case DRAKON::SUBPROGRAM:
-    case DRAKON::SWITCH:
-    case DRAKON::CASE:
-    case DRAKON::FOR_BEGIN:
-    case DRAKON::FOR_END:
-    case DRAKON::OUTPUT:
-    case DRAKON::INPUT:
-    case DRAKON::START_TIMER:
-    case DRAKON::SYNCHRONIZER:
-    case DRAKON::PARALLEL_PROCESS:
-    case DRAKON::SHELF:
-
-        break;
-    default:
-        {
-
-        }
-        break;
-    }*/
-
-///////////////////
-/*    QList<Command*> nextCommands = parentCmd->nextCommands();
-    if (nextCommands.empty())
-    {
-        return;
-    }
-
-    if (nextCommands.size() == 1)
-    {
-        Command* cmd = nextCommands[0];
-        QPoint cell(parentCell.x(), parentCell.y() + 1);
-
-        if (cmd->type() == DRAKON::BRANCH_BEGIN && parentCmd->type() == DRAKON::GO_TO_BRANCH) // not first branch
-        {
-            cell.setX(mDiagramSize.width());
-            cell.setY(1);
-        }
-
-        createCommandShape(cmd, cell);
-
-        if (cmd->type() == DRAKON::GO_TO_BRANCH)
-        {
-            if (!isBranchExist(cmd))
-            {
-                addChildCommands(cmd, cell);
-            }
-        }
-        else
-        {
-            addChildCommands(cmd, cell);
-        }
-
-    }
-    else // QUESTION or SWITCH-CASE command
-    {
-        int TODO;
-    }*/
 }
-
 
 ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
 {
-    int role = point.role();
+    ValencyPoint::Role role = point.role();
     if (type == DRAKON::BRANCH_BEGIN && role == ValencyPoint::Right)
     {
         return addNewBranch(point.owner());
@@ -1017,7 +951,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     // 2. Update command tree connections in logic
     if (pointCmd->type() == DRAKON::BRANCH_BEGIN && newCmd->type() == DRAKON::GO_TO_BRANCH) // new branch creation
     {
-        pointCmd->addCommand(newCmd, role);
+        pointCmd->replaceCommand(newCmd, role);
     }
     else
     {
@@ -1153,7 +1087,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
     // Create and add GO_TO_BRANCH item to the created branch (by default new branch is linked to itself)
     ShapeItem* goToBranchItem = addCommand(DRAKON::GO_TO_BRANCH, newBranchItem->valencyPoint(ValencyPoint::Down));
-    goToBranchItem->command()->addCommand(newBranchItem->command());
+    goToBranchItem->command()->replaceCommand(newBranchItem->command());
 
     onNeedUpdate();
 
@@ -1190,7 +1124,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
             int x = it->cell().x();
             if (x >= max || x < min) // other branches commands
             {
-                if (!cmd->nextCommands().empty() && cmd->nextCommands()[0] == item->command())
+                if (cmd->nextCommand() == item->command())
                 {
                     cmd->replaceCommand(Q_NULLPTR); // remove link to branch being deleted
                 }

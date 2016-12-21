@@ -102,12 +102,10 @@ void Cyclogram::createDefault()
         tmp->setTitleType(CmdTitle::END);
     }
 
-    begin->addCommand(branch1);
-    branch1->addCommand(toBranch2);
-    branch1->setChildCommand(toBranch2, 0);
-    toBranch2->addCommand(branch2);
-    branch2->addCommand(end);
-    branch2->setChildCommand(end, 0);
+    begin->replaceCommand(branch1);
+    branch1->replaceCommand(toBranch2);
+    toBranch2->replaceCommand(branch2);
+    branch2->replaceCommand(end);
 
     mFirst = begin;
     mLast = end;
@@ -278,7 +276,10 @@ void Cyclogram::deleteCommandTree(Command* cmd)
 
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
-        deleteCommandTree(cmd->nextCommands()[i]);
+        if (cmd->nextCommands()[i])
+        {
+            deleteCommandTree(cmd->nextCommands()[i]);
+        }
     }
 
     cmd->deleteLater();
@@ -294,9 +295,9 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 
     emit deleted(cmd);
 
-    int TODO; // this is valid for one-column branches only!
+    int TODO; // this is valid for one-column branches only! QUESTION deletion
     Command* parentCmd = cmd->parentCommand();
-    Command* nextCmd = cmd->nextCommands()[0]; // TODO QUESTION deletion
+    Command* nextCmd = cmd->nextCommand();
     parentCmd->replaceCommand(nextCmd, nextCmd->role());
 
     for (int i = 0, sz = mCommands.size(); i < sz; ++i)
@@ -438,7 +439,7 @@ void Cyclogram::getBranches(QList<Command*>& branches) const
     }
 
     // find first and last branches
-    Command* firstBranch = mFirst->nextCommands()[0];
+    Command* firstBranch = mFirst->nextCommand();
     Command* lastBranch = mLast->parentCommand(); //TODO parent command
     while (lastBranch->type() != DRAKON::BRANCH_BEGIN)
     {

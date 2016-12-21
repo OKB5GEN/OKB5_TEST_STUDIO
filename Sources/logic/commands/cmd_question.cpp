@@ -31,28 +31,6 @@ void CmdQuestion::run()
     }
 }
 
-void CmdQuestion::swapBranches()
-{
-    if (mNextCommands.size() == 2)
-    {
-        foreach (Command* cmd, mNextCommands)
-        {
-            if (cmd->role() == ValencyPoint::Down)
-            {
-                cmd->setRole(ValencyPoint::Right);
-            }
-            else if (cmd->role() == ValencyPoint::Right)
-            {
-                cmd->setRole(ValencyPoint::Down);
-            }
-        }
-    }
-    else
-    {
-        qDebug("CmdQuestion warning: swapping branches does not performed (commands count=%i)", mNextCommands.size());
-    }
-}
-
 void CmdQuestion::execute()
 {
     // read current values from variable controller
@@ -95,14 +73,16 @@ void CmdQuestion::execute()
     }
 
     Command* cmd = Q_NULLPTR;
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
 
     if (result)
     {
-        cmd = (mOrientation == YesDown) ? mNextCommands[ValencyPoint::Down] : mNextCommands[ValencyPoint::Right];
+        cmd = nextCommand((mOrientation == YesDown) ? ValencyPoint::Down : ValencyPoint::Right);
     }
     else
     {
-        cmd = (mOrientation == YesDown) ? mNextCommands[ValencyPoint::Right] : mNextCommands[ValencyPoint::Down];
+        cmd = nextCommand((mOrientation == YesDown) ? ValencyPoint::Right : ValencyPoint::Down);
     }
 
     emit finished(cmd);
@@ -116,11 +96,6 @@ void CmdQuestion::setOperation(Operation operation)
 
 void CmdQuestion::setOrientation(Orientation orientation)
 {
-    if (mOrientation != orientation)
-    {
-        swapBranches();
-    }
-
     mOrientation = orientation;
     updateText();
 }

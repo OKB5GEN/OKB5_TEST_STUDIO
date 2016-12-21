@@ -140,9 +140,12 @@ void ShapeItem::setCommand(Command* command)
     onErrorStatusChanged(mCommand->hasError());
 
     mChildShapes.clear();
-    for (int i = 0; i < mCommand->childCommands().size(); ++i)
+    if (mCommand->type() != DRAKON::TERMINATOR && mCommand->type() != DRAKON::GO_TO_BRANCH)
     {
-        mChildShapes.push_back(Q_NULLPTR);
+        for (int i = 0; i < mCommand->nextCommands().size(); ++i)
+        {
+            mChildShapes.push_back(Q_NULLPTR);
+        }
     }
 }
 
@@ -190,9 +193,9 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
     {
         if (mCommand)
         {
-            const QList<Command*>& childs = mCommand->childCommands();
+            const QList<Command*>& commands = mCommand->nextCommands();
 
-            if (childs.empty())
+            if (commands.empty())
             {
                 int xOffset = rect.right() - mRect.right();
                 QPoint cell = mCell;
@@ -200,37 +203,56 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                 cell.setX(cell.x() + xOffset);
                 setCell(cell);
             }
-            else if (childs.size() == 1)
+            else if (commands.size() == 1)
             {
-                if (childs[0] != Q_NULLPTR)
+                if (mCommand->type() == DRAKON::GO_TO_BRANCH)
                 {
-                    // has one possible child command
                     int xOffset = rect.right() - mRect.right();
                     QPoint cell = mCell;
-                    cell.setX(cell.x() + xOffset); // update cell first
-                    cell.setY(cell.y() + rect.top() - mRect.top());
+                    cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
+                    cell.setX(cell.x() + xOffset);
                     setCell(cell);
+                }
+                else
+                {
+                    if (mCommand->nextCommand())
+                    {
+                        // has one possible child command
+                        int xOffset = rect.right() - mRect.right();
+                        QPoint cell = mCell;
+                        cell.setX(cell.x() + xOffset); // update cell first
+                        cell.setY(cell.y() + rect.top() - mRect.top());
+                        setCell(cell);
 
-                    QRect newRect = rect;
-                    newRect.setTop(newRect.top() + 1);
-                    mChildShapes[0]->setRect(newRect, true);
+                        QRect newRect = rect;
+                        newRect.setTop(newRect.top() + 1);
+                        mChildShapes[0]->setRect(newRect, true);
+                    }
+                    else
+                    {
+                        int xOffset = rect.right() - mRect.right();
+                        QPoint cell = mCell;
+                        cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
+                        cell.setX(cell.x() + xOffset);
+                        setCell(cell);
+                    }
                 }
             }
-            else if (childs.size() == 3)
+            else if (commands.size() == 3)
             {
                 int TODO; // QUESTION
 
                 // has 3 possible child commands
                 if (mCommand->type() == DRAKON::QUESTION)
                 {
-                    CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+ /*                   CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
                     if (question->questionType() == CmdQuestion::CYCLE)
                     {
 
                     }
                     else // IF-type
                     {
-                        if (childs[ValencyPoint::UnderArrow] == Q_NULLPTR)
+                        if (commands[ValencyPoint::UnderArrow] == Q_NULLPTR)
                         {// "landed" branches
 
                         }
@@ -238,7 +260,7 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                         {
 
                         }
-                    }
+                    }*/
                 }
             }
         }
@@ -621,7 +643,7 @@ void ShapeItem::pushDown()
 
 void ShapeItem::onChildRectChanged(ShapeItem * shape)
 {
-    if (mCommand && mCommand->type() == DRAKON::TERMINATOR && !mCommand->nextCommands().empty())
+    if (mCommand && mCommand->type() == DRAKON::TERMINATOR && mCommand->nextCommand())
     {
         updateCyclogramRect(shape);
         return;
@@ -759,7 +781,7 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
 
 void ShapeItem::adjust()
 {
-    if (!mCommand || mCommand->type() != DRAKON::TERMINATOR || mCommand->nextCommands().empty())
+    if (!mCommand || mCommand->type() != DRAKON::TERMINATOR || !mCommand->nextCommand())
     {
         qDebug("Adjust operation is not applicable for this shape");
         return;
@@ -964,11 +986,6 @@ void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
     {
         if (mChildShapes[i] == oldItem)
         {
-            if (newItem == Q_NULLPTR)
-            {
-                mCommand->replaceChildCommand(0, oldItem->command());
-            }
-
             mChildShapes[i] = newItem;
             return;
         }
@@ -1122,7 +1139,7 @@ bool ShapeItem::isCyclogramEndBranch(Command* cmd) const
 
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
-        if (isCyclogramEndBranch(cmd->nextCommands()[i]))
+        if (cmd->nextCommands()[i] && isCyclogramEndBranch(cmd->nextCommands()[i]))
         {
             return true;
         }

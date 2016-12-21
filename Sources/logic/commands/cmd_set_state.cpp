@@ -1,7 +1,7 @@
 #include "Headers/logic/commands/cmd_set_state.h"
 
 CmdSetState::CmdSetState(QObject * parent):
-    Command(DRAKON::GO_TO_BRANCH, 0, parent)
+    Command(DRAKON::GO_TO_BRANCH, 1, parent)
 {
      mFlags = (Command::Selectable | Command::Editable);
 }

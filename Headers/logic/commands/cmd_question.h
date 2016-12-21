@@ -79,7 +79,6 @@ private:
     };
 
     void updateText();
-    void swapBranches();
 
     Operation mOperation;
     Orientation mOrientation;
