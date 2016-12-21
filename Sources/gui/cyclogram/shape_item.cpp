@@ -191,82 +191,93 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 
     if (pushToChildren)
     {
-        if (mCommand)
+        int xOffset = rect.right() - mRect.right();
+        QPoint cell = mCell;
+        cell.setX(cell.x() + xOffset);
+        cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // place own shape to the bottom of its rect by default
+
+        const QList<Command*>& commands = mCommand->nextCommands();
+
+        if (commands.size() == 1 && mCommand->type() != DRAKON::GO_TO_BRANCH && mCommand->nextCommand())
         {
-            const QList<Command*>& commands = mCommand->nextCommands();
+            cell.setY(mCell.y() + rect.top() - mRect.top()); // if has child shapes below, place own shape to the top of its rect
 
-            if (commands.empty())
+            ShapeItem* down = mChildShapes[ValencyPoint::Down];
+            if (down)
             {
-                int xOffset = rect.right() - mRect.right();
-                QPoint cell = mCell;
-                cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
-                cell.setX(cell.x() + xOffset);
-                setCell(cell);
+                // if has shape below, reduce rect by 1 (own shape height), and push rect further down
+                QRect newRect = rect;
+                newRect.setTop(newRect.top() + 1);
+                down->setRect(newRect, true);
             }
-            else if (commands.size() == 1)
-            {
-                if (mCommand->type() == DRAKON::GO_TO_BRANCH)
-                {
-                    int xOffset = rect.right() - mRect.right();
-                    QPoint cell = mCell;
-                    cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
-                    cell.setX(cell.x() + xOffset);
-                    setCell(cell);
-                }
-                else
-                {
-                    if (mCommand->nextCommand())
-                    {
-                        // has one possible child command
-                        int xOffset = rect.right() - mRect.right();
-                        QPoint cell = mCell;
-                        cell.setX(cell.x() + xOffset); // update cell first
-                        cell.setY(cell.y() + rect.top() - mRect.top());
-                        setCell(cell);
+        }
+        else if (commands.size() == 3)
+        {
+            int yOffset = rect.top() - mRect.top();
+            cell.setY(mCell.y() + yOffset); // if has child shapes below, place own shape to the top of its rect
 
-                        if (mChildShapes[ValencyPoint::Down])
-                        {
-                            QRect newRect = rect;
-                            newRect.setTop(newRect.top() + 1);
-                            mChildShapes[ValencyPoint::Down]->setRect(newRect, true);
-                        }
-                    }
-                    else
-                    {
-                        int xOffset = rect.right() - mRect.right();
-                        QPoint cell = mCell;
-                        cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // update cell first
-                        cell.setX(cell.x() + xOffset);
-                        setCell(cell);
-                    }
-                }
+            CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+            if (question->questionType() == CmdQuestion::CYCLE)
+            {
+                int i = 0;
+                int TODO;
             }
-            else if (commands.size() == 3)
+            else // QUESTION-IF
             {
-                int TODO; // QUESTION
+                ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+                ShapeItem* down = mChildShapes[ValencyPoint::Down];
+                ShapeItem* right = mChildShapes[ValencyPoint::Right];
 
-                // has 3 possible child commands
-                if (mCommand->type() == DRAKON::QUESTION)
+                if (underArrow)
                 {
- /*                   CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
-                    if (question->questionType() == CmdQuestion::CYCLE)
+                    // move "down" and "right" branches without changing their size
+                    int branchesHeight = 0;
+                    if (down)
                     {
+                        QRect downRect = down->rect();
+                        downRect.setTop(downRect.top() + yOffset);
+                        downRect.setBottom(downRect.bottom() + yOffset);
+                        downRect.setLeft(downRect.left() + xOffset);
+                        downRect.setRight(downRect.right() + xOffset);
+                        down->setRect(downRect, true);
 
+                        branchesHeight = down->rect().height();
                     }
-                    else // IF-type
+
+                    if (right)
                     {
-                        if (commands[ValencyPoint::UnderArrow] == Q_NULLPTR)
-                        {// "landed" branches
+                        QRect rightRect = right->rect();
+                        rightRect.setTop(rightRect.top() + yOffset);
+                        rightRect.setBottom(rightRect.bottom() + yOffset);
+                        rightRect.setLeft(rightRect.left() + xOffset);
+                        rightRect.setRight(rightRect.right() + xOffset);
+                        right->setRect(rightRect, true);
 
-                        }
-                        else
-                        {
+                        branchesHeight = right->rect().height();
+                    }
 
-                        }
-                    }*/
+                    // push remainig height to "under arrow" branch, possibly changing its size
+                    QRect newRect = rect;
+                    newRect.setTop(newRect.top() + branchesHeight + 1); // reduce by own shape height + branches height
+                    newRect.setWidth(underArrow->rect().width()); // reduce width to underArrow own width
+                    underArrow->setRect(newRect, true);
+                }
+                else // push rect to both down and right branches (they MUST exist if there is no "under arrow" branch)
+                {
+                    QRect downRect = rect;
+                    downRect.setTop(rect.top() + 1);
+                    downRect.setWidth(down->rect().width());
+                    down->setRect(downRect, true);
+
+                    QRect rightRect = rect;
+                    rightRect.setTop(rect.top() + 1);
+                    rightRect.setLeft(rect.left() + downRect.width());
+                    right->setRect(rightRect, true);
                 }
             }
         }
+
+        setCell(cell);
     }
 
     mRect = rect;
