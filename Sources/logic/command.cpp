@@ -112,7 +112,11 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
     {
         if (newCmd)
         {
-            disconnect(nextCommand(role), SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            if (nextCommand(role))
+            {
+                disconnect(nextCommand(role), SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            }
+
             connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
             onNextCmdTextChanged(newCmd->text());
 

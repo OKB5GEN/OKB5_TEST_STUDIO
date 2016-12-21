@@ -224,9 +224,12 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                         cell.setY(cell.y() + rect.top() - mRect.top());
                         setCell(cell);
 
-                        QRect newRect = rect;
-                        newRect.setTop(newRect.top() + 1);
-                        mChildShapes[0]->setRect(newRect, true);
+                        if (mChildShapes[ValencyPoint::Down])
+                        {
+                            QRect newRect = rect;
+                            newRect.setTop(newRect.top() + 1);
+                            mChildShapes[ValencyPoint::Down]->setRect(newRect, true);
+                        }
                     }
                     else
                     {
@@ -516,6 +519,7 @@ void ShapeItem::createPath()
                     }
                     else
                     {
+                        int i = 0;
                         qDebug("IMPOSSIBRU!!!11");
                     }
 
@@ -657,7 +661,6 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
     }
     else if (mChildShapes.size() == 3)
     {
-        QRect changedRect = shape->rect();
         CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
 
         if (cmd->questionType() == CmdQuestion::CYCLE)
@@ -680,96 +683,59 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
         }
         else // QUESTION-IF
         {
-            QRect newRect = mRect;
+            ShapeItem* down = mChildShapes[ValencyPoint::Down];
+            ShapeItem* right = mChildShapes[ValencyPoint::Right];
+            ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
 
-            if (mChildShapes[ValencyPoint::UnderArrow] == shape)
+            QRect downRect = down ? down->rect() : QRect();
+            QRect rightRect = right ? right->rect() : QRect();
+            QRect underArrowRect = underArrow ? underArrow->rect() : QRect();
+
+            if (shape == right || shape == down)
             {
-                int branchesWidth = 0;
+                ShapeItem* branchToAdjust = (shape == down) ? right : down;
 
-                QRect downRect;
-                if (mChildShapes[ValencyPoint::Down])
+                if (branchToAdjust)
                 {
-                    downRect = mChildShapes[ValencyPoint::Down]->rect();
-                    branchesWidth = downRect.left() + downRect.width();
+                    QRect shapeRect = shape->rect();
+                    QRect branchRect = branchToAdjust->rect();
+
+                    int xOffset = 0;
+                    if (branchRect.left() > shapeRect.left()) // if down branch width changed, adjust right branch width
+                    {
+                        xOffset = branchRect.left() - shapeRect.right() + 1;
+                    }
+
+                    // set min equal height to both branches
+                    int minHeight = qMax(shape->minHeight(), branchToAdjust->minHeight());
+
+                    branchRect.setBottom(branchRect.bottom() + minHeight - branchRect.height());
+                    shapeRect.setBottom(shapeRect.bottom() + minHeight - shapeRect.height());
+
+                    branchRect.setRight(branchRect.right() + xOffset);
+                    branchRect.setLeft(branchRect.left() + xOffset);
+
+                    branchToAdjust->setRect(branchRect, true);
+                    shape->setRect(shapeRect, true);
+
+                    // update rects after abjusting
+                    downRect = down ? down->rect() : QRect();
+                    rightRect = right ? right->rect() : QRect();
                 }
 
-                QRect rightRect;
-                if (mChildShapes[ValencyPoint::Right])
+                if (underArrow) // is changed size of one of branches, move up/down "underArrow" part
                 {
-                    rightRect = mChildShapes[ValencyPoint::Right]->rect();
-                    branchesWidth = rightRect.left() + rightRect.width();
-                }
-
-                newRect.setWidth(qMax(branchesWidth, changedRect.left() + changedRect.width()));
-                newRect.setBottom(changedRect.bottom());
-                setRect(newRect, false);
-            }
-            else if (mChildShapes[ValencyPoint::Down] == shape)
-            {
-                QRect rightRect;
-                ShapeItem* right = mChildShapes[ValencyPoint::Right];
-                if (right)
-                {
-                    int TODO; // тут надо будет как-то выровнять размеры down и right ветки по высоте, чтобы они были одинаковые
-                    rightRect = right->rect();
-                    if (rightRect.height() > changedRect.height())
-                    {
-                        int minRight = right->minHeight();
-                    }
-                }
-                else // empty right branch
-                {
-                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
-                    if (underArrow)
-                    {
-                        QRect underArrowRect = underArrow->rect();
-                        int yOffset = changedRect.bottom() - underArrowRect.top() + 1;
-                        underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
-                        underArrowRect.setTop(underArrowRect.top() + yOffset);
-                        underArrow->setRect(underArrowRect, true);
-
-                        newRect.setWidth(qMax(changedRect.left() + changedRect.width(), underArrowRect.left() + underArrowRect.width()));
-                        newRect.setBottom(underArrowRect.bottom());
-                        setRect(newRect, false);
-                    }
-                    else // without under arrow
-                    {
-                        int i = 0;
-                        int TODO;
-                    }
+                    int yOffset = shape->rect().bottom() - underArrowRect.top() + 1;
+                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                    underArrowRect.setTop(underArrowRect.top() + yOffset);
+                    underArrow->setRect(underArrowRect, true);
                 }
             }
-            else if (mChildShapes[ValencyPoint::Right] == shape)
-            {
-                ShapeItem* down = mChildShapes[ValencyPoint::Down];
-                QRect downRect;
-                if (down)
-                {
-                    downRect = down->rect();
-                    int TODO; // тут надо будет как-то выровнять размеры down и right ветки по высоте, чтобы они были одинаковые
-                }
-                else // empty down branch
-                {
-                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
-                    if (underArrow)
-                    {
-                        QRect underArrowRect = underArrow->rect();
-                        int yOffset = changedRect.bottom() - underArrowRect.top() + 1;
-                        underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
-                        underArrowRect.setTop(underArrowRect.top() + yOffset);
-                        underArrow->setRect(underArrowRect, true);
 
-                        newRect.setWidth(qMax(changedRect.left() + changedRect.width(), underArrowRect.left() + underArrowRect.width()));
-                        newRect.setBottom(underArrowRect.bottom());
-                        setRect(newRect, false);
-                    }
-                    else
-                    {
-                        int j = 0;
-                        int TODO;
-                    }
-                }
-            }
+            QRect newRect = downRect.united(rightRect);
+            newRect = newRect.united(underArrowRect);
+            newRect.setTop(mRect.top());
+            setRect(newRect, false);
         }
     }
 
@@ -838,7 +804,7 @@ void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
 
         foreach (ShapeItem* it, mChildShapes)
         {
-            if (changedBranch->cell().x() < it->cell().x())
+            if (changedBranch != it && changedBranch->cell().x() <= it->cell().x())
             {
                 QRect branchRect = it->rect();
                 branchRect.setLeft(branchRect.left() + xOffset);
@@ -944,9 +910,18 @@ int ShapeItem::minHeight() const
     {
         minHeight += mChildShapes[ValencyPoint::Down]->minHeight();
     }
-    else if (mChildShapes.size() == 3) //
+    else if (mChildShapes.size() == 3) // QUESTION
     {
-        int TODO; // question
+        ShapeItem* down = mChildShapes[ValencyPoint::Down];
+        ShapeItem* right = mChildShapes[ValencyPoint::Right];
+        ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+
+        int minDownHeight = (down ? down->minHeight() : 0);
+        int minRightHeight = (right ? right->minHeight() : 0);
+        int minUnderArrowHeight = (underArrow ? underArrow->minHeight() : 0);
+
+        minHeight += qMax(minDownHeight, minRightHeight);
+        minHeight += minUnderArrowHeight;
     }
 
     return minHeight;

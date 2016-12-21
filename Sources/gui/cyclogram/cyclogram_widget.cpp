@@ -728,19 +728,6 @@ ShapeItem* CyclogramWidget::findNextBranch(const QPoint& cell) const
     return item;
 }
 
-void CyclogramWidget::updateItemGeometry(ShapeItem* item, int xShift, int yShift) const
-{
-    QPoint cell = item->cell();
-    cell.setX(cell.x() + xShift);
-    cell.setY(cell.y() + yShift);
-    item->setCell(cell);
-
-    QRect rect = item->rect();
-    rect.setLeft(rect.left() + xShift);
-    rect.setRight(rect.right() + xShift);
-    item->setRect(rect, false);
-}
-
 void CyclogramWidget::showEditDialog(Command *command)
 {
     QDialog* dialog = Q_NULLPTR;
@@ -1067,21 +1054,6 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     QPoint newCmdCell = item->cell();
     newCmdCell.setX(newCmdCell.x() + item->rect().width());
 
-    // Update commands positions to the right of the inserted branch
-    int xNext = newCmdCell.x();
-    foreach (ShapeItem* it, mCommands)
-    {
-        if (it->cell().x() >= xNext)
-        {
-            updateItemGeometry(it, 1, 0);
-        }
-    }
-
-    // update diagram rect
-    QRect r = mRootShape->rect();
-    r.setRight(r.right() + item->rect().width());
-    mRootShape->setRect(r, false);
-
     ShapeItem* newBranchItem = addShape(newCmd, newCmdCell, mRootShape);
     mRootShape->addChildShape(newBranchItem);
 
@@ -1142,7 +1114,14 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     {
         if (it->cell().x() >= max)
         {
-            updateItemGeometry(it, xOffset, 0);
+            QPoint cell = it->cell();
+            cell.setX(cell.x() + xOffset);
+            it->setCell(cell);
+
+            QRect rect = it->rect();
+            rect.setLeft(rect.left() + xOffset);
+            rect.setRight(rect.right() + xOffset);
+            it->setRect(rect, false);
         }
     }
 

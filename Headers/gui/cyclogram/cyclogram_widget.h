@@ -72,8 +72,6 @@ private:
     ShapeItem* findNextBranch(const QPoint& cell) const;
     ShapeItem* addNewBranch(ShapeItem* item);
 
-    void updateItemGeometry(ShapeItem* item, int xShift, int yShift) const;
-
     void showEditDialog(Command* command);
 
     QList<ShapeItem*> mCommands;
