@@ -184,11 +184,6 @@ ValencyPoint ShapeItem::valencyPoint(int role) const
 
 void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 {
-//    if (mRect == rect)
-//    {
-//        return; // rect doesn't changed, BUT its child shapes rect can be chaged
-//    }
-
     if (pushToChildren)
     {
         int xOffset = rect.right() - mRect.right();
@@ -214,9 +209,6 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
         }
         else if (commands.size() == 3)
         {
-            int yOffset = rect.top() - mRect.top();
-            cell.setY(mCell.y() + yOffset); // if has child shapes below, place own shape to the top of its rect
-
             CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
             if (question->questionType() == CmdQuestion::CYCLE)
             {
@@ -228,6 +220,13 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                 ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
                 ShapeItem* down = mChildShapes[ValencyPoint::Down];
                 ShapeItem* right = mChildShapes[ValencyPoint::Right];
+
+                int yOffset = rect.top() - mRect.top();
+
+                if (underArrow || right || down)
+                {
+                    cell.setY(mCell.y() + yOffset); // if has child shapes below, place own shape to the top of its rect
+                }
 
                 if (underArrow)
                 {
@@ -263,17 +262,24 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
                     newRect.setWidth(underArrow->rect().width()); // reduce width to underArrow own width
                     underArrow->setRect(newRect, true);
                 }
-                else // push rect to both down and right branches (they MUST exist if there is no "under arrow" branch)
+                else
                 {
-                    QRect downRect = rect;
-                    downRect.setTop(rect.top() + 1);
-                    downRect.setWidth(down->rect().width());
-                    down->setRect(downRect, true);
+                    if (down && right)
+                    {// push rect to both down and right branches (they MUST exist if there is no "under arrow" branch)
+                        QRect downRect = rect;
+                        downRect.setTop(rect.top() + 1);
+                        downRect.setWidth(down->rect().width());
+                        down->setRect(downRect, true);
 
-                    QRect rightRect = rect;
-                    rightRect.setTop(rect.top() + 1);
-                    rightRect.setLeft(rect.left() + downRect.width());
-                    right->setRect(rightRect, true);
+                        QRect rightRect = rect;
+                        rightRect.setTop(rect.top() + 1);
+                        rightRect.setLeft(rect.left() + downRect.width());
+                        right->setRect(rightRect, true);
+                    }
+                    else // "empty" question insertion in down/right branch of another question-if
+                    {
+                        // do nothing
+                    }
                 }
             }
         }
@@ -529,11 +535,6 @@ void ShapeItem::createPath()
                         addPath.moveTo(xOffset, yOffset);
                         addPath.lineTo(W / 2, yOffset);
                     }
-                    else
-                    {
-                        int i = 0;
-                        qDebug("IMPOSSIBRU!!!11");
-                    }
 
                     // update valency point positions
                     for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
@@ -550,9 +551,9 @@ void ShapeItem::createPath()
                             {
                                 mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), ValencyPoint::UnderArrow);
                             }
-                            else
+                            else // question with "landed" right/down branches, or question, added to down/right branch of another question
                             {
-                                int j = 0; // TODO remove valency point? make null path?
+                                int j = 0;
                                 int TODO;
                             }
                         }
@@ -650,8 +651,94 @@ void ShapeItem::pushDown()
     }
     else if (mChildShapes.size() == 3)
     {
-        int i = 0;
-        int TODO5; // question logic
+        ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+        ShapeItem* down = mChildShapes[ValencyPoint::Down];
+        ShapeItem* right = mChildShapes[ValencyPoint::Right];
+
+        CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+        if (question->questionType() == CmdQuestion::CYCLE)
+        {
+            int i = 0;
+            int TODO;
+        }
+        else // QUESTION-IF
+        {
+            if (!underArrow && !down && !right)
+            {
+                if (mRect.height() > 1) // "expanded shape", just reduce own rect height by 1
+                {
+                    rect.setTop(mRect.top() + 1);
+                }
+                else
+                {
+                    rect.setBottom(rect.bottom() + 1);
+                    rect.setTop(rect.top() + 1);
+
+                    QPoint cell = mCell;
+                    cell.setY(cell.y() + 1);
+                    setCell(cell);
+                }
+            }
+            else
+            {
+                QRect downRect = down ? down->rect() : QRect();
+                QRect rightRect = right ? right->rect() : QRect();
+                QRect underArrowRect = underArrow ? underArrow->rect() : QRect();
+
+                // push self down
+                QPoint cell = mCell;
+                cell.setY(cell.y() + 1);
+                setCell(cell);
+
+                if (underArrow) // if we have under arrow branch, we push to it
+                {
+                    // just move down "down" and "right" branches without pushing them
+                    if (down)
+                    {
+                        downRect.setTop(downRect.top() + 1);
+                        downRect.setBottom(downRect.bottom() + 1);
+                        down->setRect(downRect, true);
+                    }
+
+                    if (right)
+                    {
+                        rightRect.setTop(rightRect.top() + 1);
+                        rightRect.setBottom(rightRect.bottom() + 1);
+                        right->setRect(rightRect, true);
+                    }
+
+                    underArrow->pushDown();
+                }
+                else // "landed" down and right branches, push to both, and adjust after pushing
+                {
+                    if (down && right)
+                    {
+                        down->pushDown();
+                        right->pushDown();
+
+                        downRect = down->rect();
+                        rightRect = right->rect();
+
+                        int maxHeight = qMax(downRect.height(), rightRect.height());
+
+                        rightRect.setBottom(rightRect.bottom() + maxHeight - rightRect.height());
+                        right->setRect(rightRect, true);
+                        downRect.setBottom(downRect.bottom() + maxHeight - downRect.height());
+                        down->setRect(downRect, true);
+                    }
+                }
+
+                // get current rects, and calculate own rect
+                downRect = down ? down->rect() : QRect();
+                rightRect = right ? right->rect() : QRect();
+                underArrowRect = underArrow ? underArrow->rect() : QRect();
+
+                QRect newRect = downRect.united(rightRect);
+                newRect = newRect.united(underArrowRect);
+                newRect.setTop(newRect.top() - 1);
+                rect = newRect;
+            }
+        }
     }
 
     setRect(rect, false);

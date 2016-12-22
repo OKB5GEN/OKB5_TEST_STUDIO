@@ -4,6 +4,11 @@
 
 #include <QTimer>
 
+namespace
+{
+    static const qreal PRECISION = 0.001;
+}
+
 CmdQuestion::OperandData::OperandData()
 {
     type = OperandNotSet;
@@ -33,6 +38,11 @@ void CmdQuestion::run()
 
 void CmdQuestion::execute()
 {
+    // TODO
+    /* Логика выполняется в вещественных числах, поэтому все операции, где есть проверка на равенство могут в некоторых ситуациях работать некорректно
+     * Надо либо разделять "дробные/целые" и дробные сранивать только на больше-меньше
+    */
+
     // read current values from variable controller
     for (int i = 0; i < OperandsCount; ++i)
     {
@@ -55,17 +65,16 @@ void CmdQuestion::execute()
         result = (mOperands[Left].value < mOperands[Right].value);
         break;
     case Equal:
-        // TODO здесь подстава подстав, так как из-за погрешностей округления циферки могут не сойтись и на строгое равенство проверять некорректно
-        result = qAbs(mOperands[Left].value - mOperands[Right].value) < 0.01; // если числа различаются где-то в сотых, то считаем, что они равны
+        result = (qAbs(mOperands[Left].value - mOperands[Right].value) < PRECISION);
         break;
     case GreaterOrEqual:
-        result = (mOperands[Left].value >= mOperands[Right].value);
+        result = ((mOperands[Left].value > mOperands[Right].value) || qAbs(mOperands[Left].value - mOperands[Right].value) < PRECISION);
         break;
     case LessOrEqual:
-        result = (mOperands[Left].value <= mOperands[Right].value);
+        result = ((mOperands[Left].value < mOperands[Right].value) || qAbs(mOperands[Left].value - mOperands[Right].value) < PRECISION);
         break;
     case NotEqual:
-        result = (mOperands[Left].value != mOperands[Right].value);
+        result = (qAbs(mOperands[Left].value - mOperands[Right].value) > PRECISION);
         break;
 
     default:
