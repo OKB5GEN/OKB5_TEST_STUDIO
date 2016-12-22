@@ -38,20 +38,20 @@ public:
     const QList<Command*>& nextCommands() const;
     void insertCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
     void replaceCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
+    void replaceCommand(Command* newCmd, Command* oldCmd);
 
     Command* nextCommand(ValencyPoint::Role role = ValencyPoint::Down) const;
 
     // TODO remove >>>
     Command* parentCommand() const;
     void setParentCommand(Command* cmd);
+    void setRole(ValencyPoint::Role role);
+    ValencyPoint::Role role() const;
     // <<<
 
-    ValencyPoint::Role role() const;
     uint32_t flags() const;
-
     bool hasError() const;
 
-    void setRole(ValencyPoint::Role role);
     void setFlags(uint32_t flags);
     void setActive(bool active);
 
@@ -77,7 +77,6 @@ protected:
     DRAKON::IconType mType;
     QString mText;
     QString mErrorText;
-    ValencyPoint::Role mRole;
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
 
     int mExecutionDelay;
@@ -87,6 +86,7 @@ protected:
 
 // TODO remove >>>
     Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
+    ValencyPoint::Role mRole; // TODO role belongs to valency point not the command
 
 private slots:
     void onNextCmdTextChanged(const QString& text);

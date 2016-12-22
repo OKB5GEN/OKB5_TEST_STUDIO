@@ -409,6 +409,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
 
     mCommands.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
+    connect(shapeItem, SIGNAL(needToDelete(ShapeItem*)), this, SLOT(onNeedToDelete(ShapeItem*)));
 
     return shapeItem;
 }
@@ -614,6 +615,11 @@ void CyclogramWidget::removeShape(Command* command)
     }
 
     onNeedUpdate();
+}
+
+void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
+{
+    mCurrentCyclogram->deleteCommand(shape->command());
 }
 
 void CyclogramWidget::onNeedUpdate()
@@ -913,7 +919,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
     else if (cmd->nextCommands().size() == 3)
     {
         int i = 0;
-        int TODO;
+        int TODO; // loading from file
     }
 }
 

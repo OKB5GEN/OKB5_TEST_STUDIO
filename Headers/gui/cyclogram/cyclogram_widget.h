@@ -44,6 +44,7 @@ private slots:
     void onCyclogramStateChanged(int state);
     void removeShape(Command* command);
     void onNeedUpdate();
+    void onNeedToDelete(ShapeItem* shape);
 
 private:
     void clear(bool onDestroy = false);

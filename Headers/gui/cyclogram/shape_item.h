@@ -55,15 +55,14 @@ public:
     static const QSizeF& cellSize();
     static const QPointF& origin();
 
-    // TODO remove >>>
     void pushDown();
     void pullUp();
-    //<<<
 
     void onChildRectChanged(ShapeItem * shape);
 
 signals:
     void changed();
+    void needToDelete(ShapeItem* shape);
 
 private slots:
     void onTextChanged(const QString& text);
@@ -76,6 +75,9 @@ private:
     ValencyPoint createValencyPoint(const QPointF& point, ValencyPoint::Role role);
     void createValencyPoints(Command* cmd);
     bool isCyclogramEndBranch(Command* cmd) const;
+
+    void removeQuestionBranch(ShapeItem* branch);
+    ShapeItem* findShape(Command* cmd, ValencyPoint::Role& role);
 
     void updateCyclogramRect(ShapeItem* changedBranch);
     bool canSetRect(const QRect& rect) const;

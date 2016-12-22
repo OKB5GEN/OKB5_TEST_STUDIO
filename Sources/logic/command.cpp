@@ -134,6 +134,36 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
     mNextCommands[role] = newCmd;
 }
 
+void Command::replaceCommand(Command* newCmd, Command* oldCmd)
+{
+    int TODO; // used in QUESTION command deletion
+
+    for (int i = 0, sz = mNextCommands.size(); i < sz; ++i)
+    {
+        if (mNextCommands[i] && mNextCommands[i] == oldCmd)
+        {
+            if (i == ValencyPoint::UnderArrow)
+            {
+                Command* right = mNextCommands[ValencyPoint::Right];
+                if (right)
+                {
+                    replaceReferences(oldCmd, newCmd, right);
+                }
+
+                Command* down = mNextCommands[ValencyPoint::Down];
+                if (down)
+                {
+                    replaceReferences(oldCmd, newCmd, down);
+                }
+            }
+
+            newCmd->setRole(mNextCommands[i]->role());
+            mNextCommands[i] = newCmd;
+            return;
+        }
+    }
+}
+
 void Command::onNextCmdTextChanged(const QString& text)
 {
     mText = text;

@@ -1051,26 +1051,205 @@ void ShapeItem::remove()
     {
         mRect.setBottom(mRect.top());
         mParentShape->replaceChildShape(0, this); // update shape connections
-
         mParentShape->onChildRectChanged(this);
         return;
     }
 
     if (mChildShapes.size() == 1)
     {
-        ShapeItem* item = mChildShapes[0];
+        ShapeItem* item = mChildShapes[ValencyPoint::Down];
 
         mParentShape->replaceChildShape(item, this); // update shape connections
-        item->setParentShape(mParentShape);
-
         item->pullUp();
         mParentShape->onChildRectChanged(item);
     }
-    else if (mChildShapes.size() == 3) //
+    else if (mChildShapes.size() == 3)
     {
-        int i = 0;
-        int TODO; // question
+        // Deleting the question is deleting as it never exist
+        ShapeItem* down = mChildShapes[ValencyPoint::Down];
+        ShapeItem* right = mChildShapes[ValencyPoint::Right];
+        ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+
+        // if it is "empty" shape without any connections, just delete it as usual shape
+        if (!down && !right && !underArrow)
+        {
+            mRect.setBottom(mRect.top());
+            mParentShape->replaceChildShape(0, this); // update shape connections
+            mParentShape->onChildRectChanged(this);
+            return;
+        }
+
+        CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+
+        if (cmd->questionType() == CmdQuestion::CYCLE)
+        {
+            int TODO;
+        }
+        else // QUESTION-IF
+        {
+            // 1. Delete right branch commands (if exist)
+            if (right)
+            {
+                removeQuestionBranch(right);
+                replaceChildShape(0, right);
+                right = Q_NULLPTR;
+            }
+
+            // 2. Update down branch (if exist)
+            if (down)
+            {
+                // Update down branch rect to its minmum height
+                QRect downRect = down->rect();
+                int yOffset = down->minHeight() - downRect.height();
+                downRect.setBottom(downRect.bottom() + yOffset);
+                down->setRect(downRect, true);
+
+                // Update under arrow branch rect
+                if (underArrow)
+                {
+                    // Shrink rect of the "under arrow" branch to its minimum size
+                    QRect underArrowRect = underArrow->rect();
+                    int yOffset1 = underArrow->minHeight() - underArrowRect.height();
+                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset1);
+                    underArrow->setRect(underArrowRect, true);
+
+                    // Shift "under arrow" rect up
+                    underArrowRect = underArrow->rect();
+                    underArrowRect.setTop(underArrowRect.top() + yOffset);
+                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                    underArrow->setRect(underArrowRect, true);
+
+                    // Link "down" branch end shape to "under arrow" branch begin shape
+                    // There's no nedd to link commands, because they are already linked
+                    ValencyPoint::Role role;
+                    ShapeItem* parentShape = down->findShape(underArrow->command(), role);
+                    parentShape->setChildShape(underArrow, role);
+
+                    // Unite both rects (beacuse inter-shape links changed) and shift them up by 1 (deleted shape height)
+                    downRect = down->rect();
+                    downRect = downRect.united(underArrowRect);
+                    downRect.setTop(downRect.top() - 1);
+                    downRect.setBottom(downRect.bottom() - 1);
+                    down->setRect(downRect, true);
+                }
+                else
+                {
+                    downRect = down->rect();
+                    downRect.setTop(downRect.top() - 1);
+                    downRect.setBottom(downRect.bottom() - 1);
+                    down->setRect(downRect, true);
+                }
+
+                // Link parent shape and "down" branch shape hierarcy and update command links
+                mParentShape->replaceChildShape(down, this);
+                mParentShape->command()->replaceCommand(down->command(), mCommand);
+                mParentShape->onChildRectChanged(down);
+            }
+            else if (underArrow)
+            {
+                // 3. Down branch does not exist, link parent shape and command hierachy to "under arrow" branch
+
+                // Shrink rect of the "under arrow" branch to its minimum size
+                QRect underArrowRect = underArrow->rect();
+                int yOffset = underArrow->minHeight() - underArrowRect.height();
+                underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                underArrow->setRect(underArrowRect, true);
+
+                // Shift "under arrow" rect up
+                underArrowRect = underArrow->rect();
+                yOffset = mRect.top() - underArrowRect.top();
+                underArrowRect.setTop(mRect.top());
+                underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                underArrow->setRect(underArrowRect, true);
+
+                // Link parent shape and "under arrow" branch shape hierarcy and update command links
+                mParentShape->replaceChildShape(underArrow, this);
+                mParentShape->command()->replaceCommand(underArrow->command(), mCommand);
+                mParentShape->onChildRectChanged(underArrow);
+            }
+            else // only right branch was
+            {
+                mRect.setBottom(mRect.top());
+                mParentShape->replaceChildShape(0, this);
+                mParentShape->onChildRectChanged(this);
+            }
+        }
     }
+}
+
+void ShapeItem::removeQuestionBranch(ShapeItem* branch)
+{
+    if (!branch)
+    {
+        return;
+    }
+
+    // just brutally delete commands from the entire branch
+    foreach (ShapeItem* it, branch->mChildShapes)
+    {
+        if (it)
+        {
+            removeQuestionBranch(it);
+        }
+    }
+
+    // delete own command
+    Command* cmd = branch->command();
+    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
+    {
+        cmd->replaceCommand(Q_NULLPTR, ValencyPoint::Role(i));
+    }
+
+    emit needToDelete(branch);
+}
+
+ShapeItem* ShapeItem::findShape(Command* cmd, ValencyPoint::Role& role)
+{
+    if (mChildShapes.size() == 1)
+    {
+        ShapeItem* down = mChildShapes[ValencyPoint::Down];
+        if (down)
+        {
+            // search down the tree
+            return down->findShape(cmd, role);
+        }
+
+        if (mCommand->nextCommand(ValencyPoint::Down) == cmd)
+        {
+            role = ValencyPoint::Down;
+            return this;
+        }
+    }
+    else if (mChildShapes.size() == 3)
+    {
+        CmdQuestion* command = qobject_cast<CmdQuestion*>(mCommand);
+
+        if (command->questionType() == CmdQuestion::CYCLE)
+        {
+            int TODO;
+        }
+        else // QUESTION-IF
+        {
+            ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+
+            if (underArrow)
+            {
+                return underArrow->findShape(cmd, role);
+            }
+            else
+            {
+                if (mCommand->nextCommand(ValencyPoint::UnderArrow) == cmd)
+                {
+                    role = ValencyPoint::UnderArrow;
+                    return this;
+                }
+            }
+        }
+    }
+
+    qDebug("FFFUUUUUU--");
+
+    return Q_NULLPTR;
 }
 
 void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
@@ -1080,6 +1259,11 @@ void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
         if (mChildShapes[i] == oldItem)
         {
             mChildShapes[i] = newItem;
+            if (newItem)
+            {
+                newItem->setParentShape(this);
+            }
+
             return;
         }
     }
@@ -1088,32 +1272,23 @@ void ShapeItem::replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem)
 void ShapeItem::pullUp()
 {
     QRect rect = mRect;
-    if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[0] == Q_NULLPTR))
-    {
-        // just move shape up
-        rect.setTop(rect.top() - 1);
-        rect.setBottom(rect.bottom() - 1);
 
-        QPoint cell = mCell;
-        cell.setY(cell.y() - 1);
-        setCell(cell);
-    }
-    else if (mChildShapes.size() == 1)
-    {
-        QPoint cell = mCell;
-        cell.setY(cell.y() - 1);
-        setCell(cell);
+    QPoint cell = mCell;
+    cell.setY(cell.y() - 1);
+    setCell(cell);
 
-        // tell child to pull itself up
-        mChildShapes[0]->pullUp();
+    rect.setBottom(rect.bottom() - 1);
+    rect.setTop(rect.top() - 1);
 
-        rect = mChildShapes[0]->rect();
-        rect.setTop(rect.top() - 1);
-    }
-    else if (mChildShapes.size() == 3)
+    foreach (ShapeItem* shape, mChildShapes)
     {
-        int i = 0;
-        int TODO5; // question logic
+        if (shape)
+        {
+            QRect shapeRect = shape->rect();
+            shapeRect.setTop(shapeRect.top() - 1);
+            shapeRect.setBottom(shapeRect.bottom() - 1);
+            shape->setRect(shapeRect, true);
+        }
     }
 
     setRect(rect, false);

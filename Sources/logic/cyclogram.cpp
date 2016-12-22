@@ -295,10 +295,13 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 
     emit deleted(cmd);
 
-    int TODO; // this is valid for one-column branches only! QUESTION deletion
     Command* parentCmd = cmd->parentCommand();
     Command* nextCmd = cmd->nextCommand();
-    parentCmd->replaceCommand(nextCmd, nextCmd->role());
+
+    if (nextCmd)
+    {
+        parentCmd->replaceCommand(nextCmd, nextCmd->role());
+    }
 
     for (int i = 0, sz = mCommands.size(); i < sz; ++i)
     {
