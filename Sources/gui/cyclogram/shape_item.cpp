@@ -200,11 +200,12 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 
         if (commands.size() == 1 && mCommand->type() != DRAKON::GO_TO_BRANCH && mCommand->nextCommand())
         {
-            cell.setY(mCell.y() + rect.top() - mRect.top()); // if has child shapes below, place own shape to the top of its rect
-
             ShapeItem* down = mChildShapes[ValencyPoint::Down];
             if (down)
             {
+                // if has child shapes below, place own shape to the top of its rect
+                cell.setY(mCell.y() + rect.top() - mRect.top());
+
                 // if has shape below, reduce rect by 1 (own shape height), and push rect further down
                 QRect newRect = rect;
                 newRect.setTop(newRect.top() + 1);
@@ -706,15 +707,23 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
             {
                 ShapeItem* branchToAdjust = (shape == down) ? right : down;
 
-                if (branchToAdjust)
+                if (branchToAdjust) // both down and right branches exist
                 {
                     QRect shapeRect = shape->rect();
                     QRect branchRect = branchToAdjust->rect();
 
+                    // shaif right branch horizontally
                     int xOffset = 0;
-                    if (branchRect.left() > shapeRect.left()) // if down branch width changed, adjust right branch width
+                    if (branchRect.left() > shapeRect.left())
                     {
-                        xOffset = branchRect.left() - shapeRect.right() + 1;
+                        if (shapeRect.right() < (branchRect.left() - 1))
+                        {
+                            xOffset = shapeRect.right() - branchRect.left() + 1; // < 0
+                        }
+                        else if (shapeRect.right() >= branchRect.left())
+                        {
+                            xOffset = branchRect.left() - shapeRect.right() + 1; // > 0
+                        }
                     }
 
                     // set min equal height to both branches
@@ -732,6 +741,15 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                     // update rects after abjusting
                     downRect = down ? down->rect() : QRect();
                     rightRect = right ? right->rect() : QRect();
+                }
+                else if (right)
+                {
+                    // shift right branch to the left if down branch became empty
+                    int xOffset = mCell.x() - rightRect.left() + 1;
+                    rightRect.setRight(rightRect.right() + xOffset);
+                    rightRect.setLeft(rightRect.left() + xOffset);
+                    rightRect.setBottom(rightRect.bottom() + right->minHeight() - rightRect.height());
+                    right->setRect(rightRect, true);
                 }
 
                 if (underArrow) // is changed size of one of branches, move up/down "underArrow" part
