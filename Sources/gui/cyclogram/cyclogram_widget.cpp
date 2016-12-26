@@ -992,9 +992,15 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
         }
         else
         {
-            // create new shape below the points' owner
-            newCmdCell = owner->cell();
-            newCmdCell.setY(newCmdCell.y() + 1);
+            if (owner->rect().height() > 1) // if owner is expanded and hadn't child shapes, create new shape in owners cell
+            {
+                newCmdCell = owner->cell();
+            }
+            else // create new shape below the points' owner, if it is not expanded
+            {
+                newCmdCell = owner->cell();
+                newCmdCell.setY(newCmdCell.y() + 1);
+            }
         }
     }
 
@@ -1026,17 +1032,32 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 
         // 3.3.2 update child rects, then parent rects
         prevChildShape->pushDown();
+
         QRect rect = prevChildShape->rect();
         rect.setTop(rect.top() - 1);
-
         newShape->setRect(rect, false);
-        owner->onChildRectChanged(newShape);
     }
     else // if owner hadn't any child shapes, update only to parent direction (QUESTION-IF branches ending)
     {
+        // simple command in the end of the one of the QUESTION branches
+        // if owner is expanded and hadn't child shapes before, push the expansion to new shape
+        if (pointCmd->type() != DRAKON::QUESTION && owner->rect().height() > 1)
+        {
+            // update owner cell
+            QPoint ownerCell = owner->cell();
+            ownerCell.setY(owner->rect().top());
+            owner->setCell(ownerCell);
+
+            // update new child shape rect
+            QRect newShapeRect = owner->rect();
+            newShapeRect.setTop(newShapeRect.top() + 1);
+            newShape->setRect(newShapeRect, false);
+        }
+
         owner->setChildShape(newShape, role);
-        owner->onChildRectChanged(newShape);
     }
+
+    owner->onChildRectChanged(newShape);
 
     update();
 
