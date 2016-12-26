@@ -43,8 +43,6 @@ public:
     Command* nextCommand(ValencyPoint::Role role = ValencyPoint::Down) const;
 
     // TODO remove >>>
-    Command* parentCommand() const;
-    void setParentCommand(Command* cmd);
     void setRole(ValencyPoint::Role role);
     ValencyPoint::Role role() const;
     // <<<
@@ -85,7 +83,6 @@ protected:
     QList<Command*> mNextCommands;
 
 // TODO remove >>>
-    Command* mParentCommand; // TODO BRANCH_BEGIN has not parent command. REFACTOR - many commands can be "parent"
     ValencyPoint::Role mRole; // TODO role belongs to valency point not the command
 
 private slots:

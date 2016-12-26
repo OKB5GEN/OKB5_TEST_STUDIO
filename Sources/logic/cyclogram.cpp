@@ -295,14 +295,23 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 
     emit deleted(cmd);
 
-    Command* parentCmd = cmd->parentCommand();
-    Command* nextCmd = cmd->nextCommand();
-
-    if (nextCmd)
+    if (cmd->nextCommand())
     {
-        parentCmd->replaceCommand(nextCmd, nextCmd->role());
+        // update other commands links if the refer to command being deleted
+        foreach (Command* command, mCommands)
+        {
+            for (int i = 0, sz = command->nextCommands().size(); i < sz; ++i)
+            {
+                Command* cur = command->nextCommands()[i];
+                if (cur && cur == cmd)
+                {
+                    command->replaceCommand(cmd->nextCommand(), cmd);
+                }
+            }
+        }
     }
 
+    // remove command from commands list
     for (int i = 0, sz = mCommands.size(); i < sz; ++i)
     {
         if (mCommands[i] == cmd)
@@ -443,21 +452,52 @@ void Cyclogram::getBranches(QList<Command*>& branches) const
 
     // find first and last branches
     Command* firstBranch = mFirst->nextCommand();
-    Command* lastBranch = mLast->parentCommand(); //TODO parent command
-    while (lastBranch->type() != DRAKON::BRANCH_BEGIN)
-    {
-        lastBranch = lastBranch->parentCommand();
-    }
+    Command* lastBranch = Q_NULLPTR;
 
-    // get other branches and draw them
+    // get other branches
     foreach (Command* it, mCommands)
     {
-        if (it->type() == DRAKON::BRANCH_BEGIN && it != firstBranch && it != lastBranch)
+        if (it->type() == DRAKON::BRANCH_BEGIN && it != firstBranch)
         {
-            branches.push_back(it);
+            if (!lastBranch && isCyclogramEndBranch(it))
+            {
+                lastBranch = it;
+            }
+
+            if (it != lastBranch)
+            {
+                branches.push_back(it);
+            }
         }
     }
 
     branches.push_front(firstBranch);
     branches.push_back(lastBranch);
+}
+
+bool Cyclogram::isCyclogramEndBranch(Command* cmd)
+{
+    if (!cmd)
+    {
+        return false;
+    }
+
+    if (cmd->type() == DRAKON::TERMINATOR)
+    {
+        return true;
+    }
+    else if (cmd->type() == DRAKON::GO_TO_BRANCH)
+    {
+        return false; // do not search further
+    }
+
+    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
+    {
+        if (cmd->nextCommands()[i] && isCyclogramEndBranch(cmd->nextCommands()[i]))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

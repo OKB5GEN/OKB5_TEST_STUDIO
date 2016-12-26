@@ -6,6 +6,8 @@
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_question.h"
 
+#include "Headers/logic/cyclogram.h"
+
 /* Обобщенные правила редактирования ДРАКОН-схемы:
  *
  * 1. В схеме есть ТОЧКИ ВАЛЕНТНОСТИ, АТОМЫ и ЛИАНЫ
@@ -1353,7 +1355,7 @@ void ShapeItem::createValencyPoints(Command* cmd)
             ValencyPoint point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
             mValencyPoints.push_back(point);
 
-            if (type == DRAKON::BRANCH_BEGIN && !isCyclogramEndBranch(cmd))
+            if (type == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(cmd))
             {
                 ValencyPoint point = createValencyPoint(QPointF(W, 0), ValencyPoint::Right);
                 mValencyPoints.push_back(point);
@@ -1392,26 +1394,4 @@ void ShapeItem::createValencyPoints(Command* cmd)
     default:
         break;
     }
-}
-
-bool ShapeItem::isCyclogramEndBranch(Command* cmd) const
-{
-    if (cmd->type() == DRAKON::TERMINATOR)
-    {
-        return true;
-    }
-    else if (cmd->type() == DRAKON::GO_TO_BRANCH)
-    {
-        return false; // do not search further
-    }
-
-    for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
-    {
-        if (cmd->nextCommands()[i] && isCyclogramEndBranch(cmd->nextCommands()[i]))
-        {
-            return true;
-        }
-    }
-
-    return false;
 }

@@ -50,6 +50,8 @@ public:
 
     VariableController* varCtrl() const;
 
+    static bool isCyclogramEndBranch(Command* cmd);
+
 private slots:
     void onCommandFinished(Command* cmd);
     void onCriticalError(Command* cmd);

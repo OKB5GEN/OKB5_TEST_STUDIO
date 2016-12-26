@@ -544,15 +544,10 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
             return false;
         }
 
-        Command* lastBranch = mCurrentCyclogram->last()->parentCommand();
-
-        while (lastBranch->type() != DRAKON::BRANCH_BEGIN)
-        {
-            lastBranch = lastBranch->parentCommand();
-        }
+        const ShapeItem* lastBranch = findBranch(mCurrentCyclogram->last());
 
         // check is end branch trying to delete
-        if (lastBranch == item->command())
+        if (lastBranch->command() == item->command())
         {
             error = tr("End branch never can be deleted");
             return false;
@@ -571,14 +566,9 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
         // branch of current command can not be deleted
         if (item->command()->type() == DRAKON::BRANCH_BEGIN)
         {
-            Command* currentBranch = mCurrentCyclogram->current()->parentCommand();
+            const ShapeItem* currentBranch = findBranch(mCurrentCyclogram->current());
 
-            while (currentBranch->type() != DRAKON::BRANCH_BEGIN)
-            {
-                currentBranch = currentBranch->parentCommand();
-            }
-
-            if (currentBranch == item->command())
+            if (currentBranch->command() == item->command())
             {
                 error = tr("Has running command in this branch");
                 return false;
@@ -587,6 +577,30 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     }
 
     return true;
+}
+
+const ShapeItem* CyclogramWidget::findBranch(const Command* command) const
+{
+    if (!command)
+    {
+        return Q_NULLPTR;
+    }
+
+    foreach (const ShapeItem* item, mCommands)
+    {
+        if (item->command() == command)
+        {
+            while (command->type() != DRAKON::BRANCH_BEGIN)
+            {
+                item = item->parentShape();
+                command = item->command();
+            }
+
+            return item;
+        }
+    }
+
+    return Q_NULLPTR;
 }
 
 void CyclogramWidget::clearSelection(bool needUpdate)

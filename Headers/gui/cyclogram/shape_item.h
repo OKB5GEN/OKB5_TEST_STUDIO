@@ -74,7 +74,6 @@ private:
     void setValencyPoints(const QList<ValencyPoint>& points);
     ValencyPoint createValencyPoint(const QPointF& point, ValencyPoint::Role role);
     void createValencyPoints(Command* cmd);
-    bool isCyclogramEndBranch(Command* cmd) const;
 
     void removeQuestionBranch(ShapeItem* branch);
     ShapeItem* findShape(Command* cmd, ValencyPoint::Role& role);

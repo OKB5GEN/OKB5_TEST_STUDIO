@@ -60,6 +60,8 @@ private:
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 
+    const ShapeItem* findBranch(const Command* command) const;
+
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
 

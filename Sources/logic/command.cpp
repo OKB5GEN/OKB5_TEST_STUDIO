@@ -17,7 +17,6 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mType(type),
     mRole(ValencyPoint::Down),
     mFlags(Command::All),
-    mParentCommand(Q_NULLPTR),
     mHasError(false),
     mExecutionDelay(0)
 {
@@ -101,11 +100,6 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
     if (newCmd)
     {
         newCmd->setRole(role);
-
-        if (newCmd->type() != DRAKON::BRANCH_BEGIN)
-        {
-            newCmd->setParentCommand(this);
-        }
     }
 
     if (mType == DRAKON::GO_TO_BRANCH)
@@ -185,17 +179,6 @@ void Command::setActive(bool active)
     emit activeStateChanged(active);
 }
 
-void Command::setParentCommand(Command* cmd)
-{
-    mParentCommand = cmd;
-}
-
-Command* Command::parentCommand() const
-{
-    int TODO; // неясно которую из команд считать парентовой в случае если сверху находится развилка QUESTION или SWICH-CASE, вероятно будет тоже массив, как и "nextCommands"
-    return mParentCommand;
-}
-
 bool Command::hasError() const
 {
     return mHasError;
@@ -219,11 +202,15 @@ void Command::insertCommand(Command* newCmd, ValencyPoint::Role role)
     //     insertion of QUESTION
     //     insertion of "one-cell" command
 
+    if (!newCmd)
+    {
+        return;
+    }
+
+    newCmd->setRole(role);
+
     if (mType == DRAKON::QUESTION) // insertion in QUSTION command
     {
-        newCmd->setParentCommand(this);
-        newCmd->setRole(role);
-
         CmdQuestion* thisCmd = qobject_cast<CmdQuestion*>(this);
         Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
         Command* right = nextCommand(ValencyPoint::Right);
@@ -451,9 +438,6 @@ void Command::insertCommand(Command* newCmd, ValencyPoint::Role role)
     else // QUESTION insertion in simple command
     {
         Command* next = nextCommand();
-
-        newCmd->setParentCommand(this);
-        newCmd->setRole(role);
 
         if (newCmd->type() == DRAKON::QUESTION)
         {
