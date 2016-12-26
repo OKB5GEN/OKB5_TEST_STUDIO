@@ -852,10 +852,35 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
                 }
             }
 
-            QRect newRect = downRect.united(rightRect);
-            newRect = newRect.united(underArrowRect);
-            newRect.setTop(mRect.top());
-            setRect(newRect, false);
+            if (!down && !right)
+            {
+                if (underArrow)
+                {
+                    int yOffset = -1;
+                    underArrowRect.setTop(underArrowRect.top() + yOffset);
+                    underArrowRect.setBottom(underArrowRect.bottom() + yOffset);
+                    underArrow->setRect(underArrowRect, true);
+
+                    QRect newRect = underArrow->rect();
+                    newRect.setTop(mRect.top());
+                    setRect(newRect, false);
+                }
+                else // set rect to itself
+                {
+                    QRect newRect = mRect;
+                    newRect.setRight(newRect.left());
+                    setRect(newRect, false);
+                }
+            }
+            else
+            {
+                QRect minOwnRect = mRect;
+                minOwnRect.setRight(minOwnRect.left());
+                QRect newRect = downRect.united(rightRect);
+                newRect = newRect.united(underArrowRect);
+                newRect = newRect.united(minOwnRect);
+                setRect(newRect, false);
+            }
         }
     }
 
