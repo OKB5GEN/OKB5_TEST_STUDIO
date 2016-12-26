@@ -532,11 +532,8 @@ void ShapeItem::createPath()
                         addPath.lineTo(W / 2, yOffset);
                     }
 
-                    if (underArrow)
-                    {
-                        addPath.moveTo(xOffset, yOffset);
-                        addPath.lineTo(W / 2, yOffset);
-                    }
+                    addPath.moveTo(xOffset, yOffset);
+                    addPath.lineTo(W / 2, yOffset);
 
                     // update valency point positions
                     for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
