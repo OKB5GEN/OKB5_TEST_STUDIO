@@ -7,7 +7,7 @@
 class QSerialPort;
 class QTimer;
 
-class OTD:public QObject
+class OTD: public QObject
 {
     Q_OBJECT
 

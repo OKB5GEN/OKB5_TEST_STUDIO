@@ -57,7 +57,9 @@ SOURCES += main.cpp\
     Sources/system/MKO.cpp \
     Sources/system/myclass.cpp \
     Sources/system/OTD.cpp \
-    Sources/system/WDMTMKv2.cpp
+    Sources/system/WDMTMKv2.cpp \
+    Sources/system/system_state.cpp \
+    Sources/system/module.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -100,7 +102,9 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/MKO.h \
     Headers/system/myclass.h \
     Headers/system/OTD.h \
-    Headers/system/WDMTMKv2.h
+    Headers/system/WDMTMKv2.h \
+    Headers/system/system_state.h \
+    Headers/system/module.h
 
 
 FORMS    += mainwindow.ui

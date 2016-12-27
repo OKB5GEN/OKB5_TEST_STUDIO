@@ -16,7 +16,7 @@ public:
     };
 
     VariableController(QObject* parent);
-    ~VariableController();
+    virtual ~VariableController();
 
     // set/get actions are usually performed on current variable values
     const QMap<QString, qreal>& variables(Container container = Current) const;
@@ -38,7 +38,7 @@ signals:
     void valueChanged(const QString& name, qreal value, int container);
     void nameChanged(const QString& newName, const QString& oldName);
 
-private:
+protected:
     QMap<QString, qreal> mCurrent;
     QMap<QString, qreal> mInitial;
 };
