@@ -9,6 +9,14 @@
 #include "qapplication.h"
 #include <QtSerialPort/QtSerialPort>
 #include "synchapi.h"
+#include "Headers/module_commands.h"
+
+namespace
+{
+    static const uint8_t OTD_DEFAULT_ADDR = 0x44;
+    static const int MAX_ADDR_COUNT = 8;
+    static const int MAX_PT100_COUNT = 2;
+}
 
 OTD::OTD(QString s, QObject* parent) :
     QObject(parent),
@@ -60,13 +68,13 @@ void OTD::OTD_id()
 {
     QByteArray bw(4, 0);
     bw[0] = 0xff;
-    bw[1] = 0x01;
+    bw[1] = ModuleCommands::GET_MODULE_ADDRESS;
     bw[2] = 0x00;
     bw[3] = 0x01;
     QByteArray readData1 = send(bw, 100);
 
     bw[0] = 0xff;
-    bw[1] = 0x01;
+    bw[1] = ModuleCommands::GET_MODULE_ADDRESS;
     bw[2] = 0x00;
     bw[3] = 0x02;
 
@@ -84,8 +92,8 @@ void OTD::OTD_req()
     {
         QString res;
         QByteArray bw(4, 0);
-        bw[0] = 0x44;
-        bw[1] = 0x02;
+        bw[0] = OTD_DEFAULT_ADDR;
+        bw[1] = ModuleCommands::GET_STATUS_WORD;
         bw[2] = 0x00;
         bw[3] = 0x00;
         QByteArray readData1 = send(bw, 100);
@@ -119,8 +127,8 @@ void OTD::OTD_req()
 void OTD::OTD_fw()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x06;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::GET_SOWFTWARE_VER;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 100);
@@ -131,8 +139,8 @@ void OTD::res_OTD()
 {
     m_isActive = false;
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x04;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::SOFT_RESET;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 100);
@@ -150,8 +158,8 @@ void OTD::res_OTD()
 void OTD::err_res_OTD()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x03;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::RESET_ERROR;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 100);
@@ -161,8 +169,8 @@ void OTD::err_res_OTD()
 void OTD::OTDres1()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x26;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::RESET_LINE_1;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 500);
@@ -175,8 +183,8 @@ void OTD::OTDres1()
 void OTD::OTDres2()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x27;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::RESET_LINE_2;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 500);
@@ -193,8 +201,8 @@ void OTD::OTDres2()
 void OTD::OTDmeas1()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x28;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::START_MEASUREMENT_LINE_1;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 500, 2000);
@@ -209,8 +217,8 @@ void OTD::OTDmeas1()
 void OTD::OTDmeas2()
 {
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x29;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::START_MEASUREMENT_LINE_2;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData1 = send(bw, 500, 2000);
@@ -227,8 +235,8 @@ void OTD::OTDtemper()
     QString data;
     data += "Кол-во датчиков DS1820 по оси 1: ";
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x1e;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::GET_DS1820_COUNT_LINE_1;
     bw[2] = 0x00;
     bw[3] = 0x00;
     QByteArray readData0 = send(bw, 500);
@@ -241,10 +249,10 @@ void OTD::OTDtemper()
     {
         data += QString::number(j);
         data += " : ";
-        for(int k = 0; k < 8; k++)
+        for(int k = 0; k < MAX_ADDR_COUNT; k++)
         {
-            bw[0] = 0x44;
-            bw[1] = 0x2a;
+            bw[0] = OTD_DEFAULT_ADDR;
+            bw[1] = ModuleCommands::GET_DS1820_ADDR_LINE_1;
             bw[2] = j;
             bw[3] = k;
             QByteArray readData3 = send(bw, 100);
@@ -261,8 +269,8 @@ void OTD::OTDtemper()
     }
 
     data += "Кол-во датчиков DS1820 по оси 2: ";
-    bw[0] = 0x44;
-    bw[1] = 0x1d;
+    bw[0] = OTD_DEFAULT_ADDR;
+    bw[1] = ModuleCommands::GET_DS1820_COUNT_LINE_2;
     bw[2] = 0x00;
     bw[3] = 0x00;
 
@@ -275,10 +283,10 @@ void OTD::OTDtemper()
     {
         data += QString::number(j);
         data += " : ";
-        for(int k = 0; k < 8; k++)
+        for(int k = 0; k < MAX_ADDR_COUNT; k++)
         {
-            bw[0] = 0x44;
-            bw[1] = 0x2a;
+            bw[0] = OTD_DEFAULT_ADDR;
+            bw[1] = ModuleCommands::GET_DS1820_ADDR_LINE_2;
             bw[2] = j;
             bw[3] = k;
             QByteArray readData4 = send(bw, 100);
@@ -300,7 +308,7 @@ void OTD::OTDtm1()
 {
     QString temp;
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
+    bw[0] = OTD_DEFAULT_ADDR;
     bw[1] = 0x1f;
     bw[3] = 0x00;
 
@@ -339,7 +347,7 @@ void OTD::OTDtm2()
 {
     QString temp;
     QByteArray bw(4, 0);
-    bw[0] = 0x44;
+    bw[0] = OTD_DEFAULT_ADDR;
     bw[1] = 0x20;
     bw[3] = 0x00;
 
@@ -376,28 +384,26 @@ void OTD::OTDtm2()
 
 void OTD::OTDPT()
 {
-    QByteArray bw(4, 0);
-    bw[0] = 0x44;
-    bw[1] = 0x1c;
-    bw[2] = 0x01;
-    bw[3] = 0x00;
-    QByteArray readData1 = send(bw, 500);
-    uint8_t uu1, uu2;
-    uu1 = readData1[2];
-    uu2 = readData1[3];
-    double uu = (uu1 << 8) | uu2;
-    uu = uu / 32 - 256;
+    double values[MAX_PT100_COUNT];
 
-    bw[0] = 0x44;
-    bw[1] = 0x1c;
-    bw[2] = 0x02;
-    bw[3] = 0x00;
-    QByteArray readData2 = send(bw, 500);
-    uu1 = readData2[2];
-    uu2 = readData2[3];
-    double uu3 = (uu1 << 8) | uu2;
-    uu3 = uu3 / 32 - 256;
-    emit start_OTDPT(uu * 100, uu3 * 100);
+    for (int i = 0; i < MAX_PT100_COUNT; ++i)
+    {
+        QByteArray bw(4, 0);
+        bw[0] = OTD_DEFAULT_ADDR;
+        bw[1] = ModuleCommands::GET_TEMPERATURE_PT100;
+        bw[2] = i + 1;
+        bw[3] = 0x00;
+        QByteArray readData1 = send(bw, 500);
+        uint8_t uu1, uu2;
+        uu1 = readData1[2];
+        uu2 = readData1[3];
+        double uu = (uu1 << 8) | uu2;
+        uu = uu / 32 - 256;
+
+        values[i] = uu * 100;
+    }
+
+    emit start_OTDPT(values[0], values[1]); // TODO hardcode
 }
 
 void OTD::OTD_avt(int x, int y)

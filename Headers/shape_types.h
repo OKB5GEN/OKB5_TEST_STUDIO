@@ -1,5 +1,5 @@
-#ifndef SHAPETYPES_H
-#define SHAPETYPES_H
+#ifndef SHAPE_TYPES_H
+#define SHAPE_TYPES_H
 
 #include <QObject>
 
@@ -40,4 +40,4 @@ public:
     Q_ENUM(IconType)
 };
 
-#endif // SHAPETYPES_H
+#endif // SHAPE_TYPES_H

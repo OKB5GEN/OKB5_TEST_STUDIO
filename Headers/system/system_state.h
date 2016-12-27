@@ -3,6 +3,8 @@
 
 #include "Headers/logic/variable_controller.h"
 
+class QSerialPort;
+
 class SystemState: public VariableController
 {
     Q_OBJECT
@@ -14,5 +16,6 @@ public:
     void init();
 
 private:
+    QSerialPort * createPort();
 };
 #endif // SYSTEM_STATE_H

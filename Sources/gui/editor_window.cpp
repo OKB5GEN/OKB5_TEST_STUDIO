@@ -8,6 +8,7 @@
 
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
+#include "Headers/system/system_state.h"
 
 namespace
 {
@@ -19,7 +20,6 @@ EditorWindow::EditorWindow():
     mScaleFactor(1.0)
 {
     mScrollArea = new QScrollArea(this);
-
 
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogram = new Cyclogram(this);
@@ -48,6 +48,13 @@ EditorWindow::EditorWindow():
     setUnifiedTitleAndToolBarOnMac(true);
 
     setWindowTitle(tr("OKB5 Test Studio"));
+
+    mSystemState = new SystemState(this);
+}
+
+void EditorWindow::init()
+{
+    mSystemState->init();
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)

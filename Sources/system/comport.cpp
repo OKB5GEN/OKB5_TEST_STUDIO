@@ -1,5 +1,7 @@
 #include "Headers/system/comport.h"
 
+#include "Headers/module_commands.h"
+
 #include <QObject>
 #include <QString>
 #include "qapplication.h"
@@ -132,7 +134,7 @@ int COMPortSender::setPowerChannelState(int channel, PowerState state)
 {
     QByteArray buffer(4, 0);
     buffer[0] = STM_DEFAULT_ADDR;
-    buffer[1] = POWER_CHANNEL_CTRL;
+    buffer[1] = ModuleCommands::POWER_CHANNEL_CTRL;
     buffer[2] = channel;
     buffer[3] = (state == POWER_ON) ? 1 : 0;
 
@@ -144,7 +146,7 @@ int COMPortSender::stm_on_mko(int x, int y)
 {
     QByteArray buffer(4, 0);
     buffer[0] = STM_DEFAULT_ADDR;
-    buffer[1] = SET_MKO_PWR_CHANNEL_STATE;
+    buffer[1] = ModuleCommands::SET_MKO_PWR_CHANNEL_STATE;
     buffer[2] = x;
     buffer[3] = y;
 
@@ -156,7 +158,7 @@ int COMPortSender::stm_check_fuse(int fuse)
 {
     QByteArray buffer(4, 0);
     buffer[0] = STM_DEFAULT_ADDR;
-    buffer[1] = GET_PWR_MODULE_FUSE_STATE;
+    buffer[1] = ModuleCommands::GET_PWR_MODULE_FUSE_STATE;
     buffer[2] = fuse;
     buffer[3] = 0x00;
     QByteArray readData1 = send(getPort(STM), buffer);
@@ -181,11 +183,11 @@ int COMPortSender::tech_read(int x)
         uint8_t command = 0;
         if(x == 1)
         {
-            command = CHECK_RECV_DATA_RS485;
+            command = ModuleCommands::CHECK_RECV_DATA_RS485;
         }
         else
         {
-            command = CHECK_RECV_DATA_CAN;
+            command = ModuleCommands::CHECK_RECV_DATA_CAN;
         }
 
         QByteArray buffer(4, 0);
@@ -210,11 +212,11 @@ QString COMPortSender::tech_read_buf(int x, int len)
     uint8_t command = 0;
     if(x == 1)
     {
-        command = RECV_DATA_RS485;
+        command = ModuleCommands::RECV_DATA_RS485;
     }
     else
     {
-        command = RECV_DATA_CAN;
+        command = ModuleCommands::RECV_DATA_CAN;
     }
 
     QString result;
@@ -251,7 +253,7 @@ double COMPortSender::stm_data_ch(int ch)
     {
         QByteArray buffer(4, 0);
         buffer[0] = STM_DEFAULT_ADDR;
-        buffer[1] = GET_CHANNEL_TELEMETRY;
+        buffer[1] = ModuleCommands::GET_CHANNEL_TELEMETRY;
         buffer[2] = ch;
         buffer[3] = 0x00;
 
@@ -299,7 +301,7 @@ int COMPortSender::resetError(ModuleID id)
         {
             buffer.resize(4);
             buffer[0] = STM_DEFAULT_ADDR;
-            buffer[1] = RESET_ERROR;
+            buffer[1] = ModuleCommands::RESET_ERROR;
             buffer[2] = 0x00;
             buffer[3] = 0x00;
         }
@@ -309,7 +311,7 @@ int COMPortSender::resetError(ModuleID id)
         {
             buffer.resize(4);
             buffer[0] = TECH_DEFAULT_ADDR;
-            buffer[1] = RESET_ERROR;
+            buffer[1] = ModuleCommands::RESET_ERROR;
             buffer[2] = 0x00;
             buffer[3] = 0x00;
         }
@@ -542,7 +544,7 @@ int COMPortSender::softResetModule(ModuleID id)
 
     QByteArray buffer(4, 0);
     buffer[0] = moduleAddr;
-    buffer[1] = SOFT_RESET;
+    buffer[1] = ModuleCommands::SOFT_RESET;
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
@@ -598,7 +600,7 @@ int COMPortSender::getSoftwareVersion(ModuleID id)
 
     QByteArray buffer(4, 0);
     buffer[0] = moduleAddr;
-    buffer[1] = GET_SOWFTWARE_VER;
+    buffer[1] = ModuleCommands::GET_SOWFTWARE_VER;
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 

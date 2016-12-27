@@ -6,16 +6,14 @@
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
-class QPlainTextEdit;
 class QSessionManager;
 class QScrollArea;
 QT_END_NAMESPACE
 
-class RenderArea;
 class CyclogramWidget;
 class Cyclogram;
-class CyclogramEndDialog;
 class VariablesWindow;
+class SystemState;
 
 class EditorWindow : public QMainWindow
 {
@@ -25,6 +23,7 @@ public:
     EditorWindow();
 
     void loadFile(const QString &fileName);
+    void init();
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -64,8 +63,8 @@ private:
     CyclogramWidget *mCyclogramWidget;
 
     VariablesWindow* mVariablesWindow;
+    SystemState* mSystemState;
 
-    //QPlainTextEdit *textEdit;
     QString mCurFile;
 
     QAction* mRunAct;

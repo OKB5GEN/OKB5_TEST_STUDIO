@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+class QSerialPort;
+
 class Module: public QObject
 {
     Q_OBJECT
@@ -10,6 +12,15 @@ class Module: public QObject
 public:
     Module(QObject* parent);
     virtual ~Module();
+
+    virtual bool init() = 0;
+
+    void setPort(QSerialPort* port);
+
+protected:
+    bool send(const QByteArray& request, QByteArray& response);
+
+    QSerialPort* mPort;
 
 private:
 };

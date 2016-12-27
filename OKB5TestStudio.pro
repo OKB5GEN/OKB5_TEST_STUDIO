@@ -116,7 +116,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/modules/module_power_bup.h \
     Headers/system/modules/module_power_pna.h \
     Headers/system/modules/module_stm.h \
-    Headers/system/modules/module_tech.h
+    Headers/system/modules/module_tech.h \
+    Headers/module_commands.h
 
 
 FORMS    += mainwindow.ui

@@ -38,7 +38,7 @@ signals:
     void valueChanged(const QString& name, qreal value, int container);
     void nameChanged(const QString& newName, const QString& oldName);
 
-protected:
+private:
     QMap<QString, qreal> mCurrent;
     QMap<QString, qreal> mInitial;
 };
