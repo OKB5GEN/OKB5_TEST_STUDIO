@@ -59,7 +59,13 @@ SOURCES += main.cpp\
     Sources/system/OTD.cpp \
     Sources/system/WDMTMKv2.cpp \
     Sources/system/system_state.cpp \
-    Sources/system/module.cpp
+    Sources/system/module.cpp \
+    Sources/system/modules/module_mko.cpp \
+    Sources/system/modules/module_otd.cpp \
+    Sources/system/modules/module_power_bup.cpp \
+    Sources/system/modules/module_power_pna.cpp \
+    Sources/system/modules/module_stm.cpp \
+    Sources/system/modules/module_tech.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -104,7 +110,13 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/OTD.h \
     Headers/system/WDMTMKv2.h \
     Headers/system/system_state.h \
-    Headers/system/module.h
+    Headers/system/module.h \
+    Headers/system/modules/module_mko.h \
+    Headers/system/modules/module_otd.h \
+    Headers/system/modules/module_power_bup.h \
+    Headers/system/modules/module_power_pna.h \
+    Headers/system/modules/module_stm.h \
+    Headers/system/modules/module_tech.h
 
 
 FORMS    += mainwindow.ui
