@@ -17,12 +17,6 @@ QT += serialport
 CONFIG +=c++11
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    qcustomplot.cpp \
-    myclass.cpp \
-    comport.cpp \
-    OTD.cpp \
-    MKO.cpp \
     Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp \
@@ -56,16 +50,16 @@ SOURCES += main.cpp\
     Sources/logic/commands/cmd_title.cpp \
     Sources/logic/command.cpp \
     Sources/logic/cyclogram.cpp \
-    Sources/logic/variable_controller.cpp
+    Sources/logic/variable_controller.cpp \
+    Sources/gui/mainwindow.cpp \
+    Sources/gui/qcustomplot.cpp \
+    Sources/system/comport.cpp \
+    Sources/system/MKO.cpp \
+    Sources/system/myclass.cpp \
+    Sources/system/OTD.cpp \
+    Sources/system/WDMTMKv2.cpp
 
-HEADERS  += mainwindow.h \
-    qcustomplot.h \
-    myclass.h \
-    comport.h \
-    OTD.h \
-    WDMTMKv2.h \
-    MKO.h \
-    Headers/shape_types.h \
+HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
     Headers/gui/cyclogram/cyclogram_widget.h \
     Headers/gui/cyclogram/shape_item.h \
@@ -99,7 +93,14 @@ HEADERS  += mainwindow.h \
     Headers/logic/commands/cmd_state_start.h \
     Headers/logic/commands/cmd_sub_program.h \
     Headers/logic/commands/cmd_switch.h \
-    Headers/logic/commands/cmd_title.h
+    Headers/logic/commands/cmd_title.h \
+    Headers/gui/mainwindow.h \
+    Headers/gui/qcustomplot.h \
+    Headers/system/comport.h \
+    Headers/system/MKO.h \
+    Headers/system/myclass.h \
+    Headers/system/OTD.h \
+    Headers/system/WDMTMKv2.h
 
 
 FORMS    += mainwindow.ui

@@ -1,9 +1,9 @@
-#include "mainwindow.h"
+#include "Headers/gui/mainwindow.h"
 #include "ui_mainwindow.h"
-#include "myclass.h"
-#include "OTD.h"
-#include "MKO.h"
-#include "comport.h"
+#include "Headers/system/myclass.h"
+#include "Headers/system/OTD.h"
+#include "Headers/system/MKO.h"
+#include "Headers/system/comport.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

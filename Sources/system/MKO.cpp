@@ -1,5 +1,5 @@
-#include "MKO.h"
-#include "mainwindow.h"
+#include "Headers/system/MKO.h"
+#include "Headers/gui/mainwindow.h"
 #include <QDebug>
 #include <windows.h>
 #include <QTimer>
@@ -8,8 +8,8 @@
 #include <QString>
 #include "qapplication.h"
 #include "synchapi.h"
-#include "comport.h"
-#include "WDMTMKv2.cpp"
+#include "Headers/system/comport.h"
+#include "Sources/system/WDMTMKv2.cpp"
 
 HANDLE hEvent, hEvent1;
 int flag_ch = 0;

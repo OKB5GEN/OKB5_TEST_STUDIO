@@ -1,5 +1,5 @@
-#include "OTD.h"
-#include "mainwindow.h"
+#include "Headers/system/OTD.h"
+#include "Headers/gui/mainwindow.h"
 #include <QDebug>
 #include <windows.h>
 #include <QTimer>

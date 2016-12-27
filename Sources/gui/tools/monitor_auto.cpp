@@ -1,5 +1,5 @@
 #include "Headers/gui/tools/monitor_auto.h"
-#include "qcustomplot.h"
+#include "Headers/gui/qcustomplot.h"
 
 #include <QtWidgets>
 

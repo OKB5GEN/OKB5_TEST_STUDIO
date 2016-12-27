@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "Headers/gui/mainwindow.h"
 #include <QApplication>
 
 #include <QCommandLineParser>
