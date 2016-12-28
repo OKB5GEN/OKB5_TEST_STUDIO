@@ -1,9 +1,9 @@
 #ifndef MODULE_STM_H
 #define MODULE_STM_H
 
-#include "Headers/system/module.h"
+#include "Headers/system/com_port_module.h"
 
-class ModuleSTM: public Module
+class ModuleSTM: public COMPortModule
 {
     Q_OBJECT
 

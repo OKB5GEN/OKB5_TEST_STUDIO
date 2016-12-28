@@ -6,8 +6,12 @@
 #include "Headers/logic/variable_controller.h"
 
 class QSerialPort;
+
 class ModuleMKO;
 class ModuleOTD;
+class ModuleSTM;
+class ModuleTech;
+class ModulePower;
 
 class SystemState: public VariableController
 {
@@ -129,6 +133,7 @@ signals:
     void MKO_auto(int x,int y,int adr1, int adr2);
 
 private:
+
     enum ModuleID
     {
         STM,             // STM Module
@@ -137,11 +142,24 @@ private:
         POW_ANT_DRV      // Antenna drive power unit
     };
 
+
+    // TODO move to pwer module >>>
     enum PowerState
     {
         POWER_ON,
         POWER_OFF
     };
+
+    enum ValueID
+    {
+        MAX_VOLTAGE_VAL = 0x26,
+        MAX_CURRENT_VAL = 0x27,
+        CUR_VOLTAGE_VAL = 0x32,
+        CUR_CURRENT_VAL = 0x33
+    };
+
+    // <<<<<<<<<<<<<<<
+
 
     enum InterfaceID
     {
@@ -149,13 +167,6 @@ private:
         RS485
     };
 
-    enum ValueID // TODO Power unit documentation
-    {
-        MAX_VOLTAGE_VAL = 0x26,
-        MAX_CURRENT_VAL = 0x27,
-        CUR_VOLTAGE_VAL = 0x32,
-        CUR_CURRENT_VAL = 0x33
-    };
 
     struct ModuleInfo
     {
@@ -200,12 +211,20 @@ private:
 
     QSerialPort* getPort(ModuleID id);
     bool isActive(ModuleID id) const;
-    uint8_t getAddress(ModuleID id) const;
 
     QThread* mThreadOTD;
-    ModuleOTD* mOTD;
     QThread* mThreadMKO;
+    QThread* mThreadSTM;
+    QThread* mThreadTech;
+    QThread* mThreadPowerBUP;
+    QThread* mThreadPowerPNA;
+
     ModuleMKO* mMKO;
+    ModuleOTD* mOTD;
+    ModuleSTM* mSTM;
+    ModuleTech* mTech;
+    ModulePower* mPowerBUP;
+    ModulePower* mPowerPNA;
 
     int m_mko_kits;
 

@@ -12,12 +12,12 @@
 namespace
 {
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
-    static const int MAX_ADDR_COUNT = 8;
+    static const int SERIAL_NUMER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
-    Module(parent)
+    COMPortModule(parent)
 {
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
@@ -278,7 +278,7 @@ void ModuleOTD::OTDtemper()
     {
         data += QString::number(j);
         data += " : ";
-        for(int k = 0; k < MAX_ADDR_COUNT; k++)
+        for(int k = 0; k < SERIAL_NUMER_BYTES_COUNT; k++)
         {
             bw[0] = OTD_DEFAULT_ADDR;
             bw[1] = ModuleCommands::GET_DS1820_ADDR_LINE_1;
@@ -312,7 +312,7 @@ void ModuleOTD::OTDtemper()
     {
         data += QString::number(j);
         data += " : ";
-        for(int k = 0; k < MAX_ADDR_COUNT; k++)
+        for(int k = 0; k < SERIAL_NUMER_BYTES_COUNT; k++)
         {
             bw[0] = OTD_DEFAULT_ADDR;
             bw[1] = ModuleCommands::GET_DS1820_ADDR_LINE_2;

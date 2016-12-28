@@ -1,14 +1,13 @@
-#include "Headers/system/module.h"
+#include "Headers/system/com_port_module.h"
 
 #include <QtSerialPort>
 
 namespace
 {
     static const int WAIT_TIME = 100; // msec
-
 }
 
-Module::Module(QObject* parent):
+COMPortModule::COMPortModule(QObject* parent):
     QObject(parent),
     mPort(Q_NULLPTR),
     mAddress(0xff),
@@ -16,12 +15,12 @@ Module::Module(QObject* parent):
 {
 }
 
-Module::~Module()
+COMPortModule::~COMPortModule()
 {
 
 }
 
-bool Module::send(const QByteArray& request, QByteArray& response)
+bool COMPortModule::send(const QByteArray& request, QByteArray& response)
 {
     if (mPort && mPort->isOpen())
     {
@@ -46,12 +45,12 @@ bool Module::send(const QByteArray& request, QByteArray& response)
     return false;
 }
 
-void Module::setPort(QSerialPort* port)
+void COMPortModule::setPort(QSerialPort* port)
 {
     mPort = port;
 }
 
-bool Module::send(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
+bool COMPortModule::send(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
     QByteArray request(4, 0);
     request[0] = mAddress;
@@ -87,7 +86,7 @@ bool Module::send(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
     return true;
 }
 
-bool Module::canReturnError(ModuleCommands::CommandID cmd) const
+bool COMPortModule::canReturnError(ModuleCommands::CommandID cmd) const
 {
     switch (cmd)
     {
@@ -143,7 +142,7 @@ bool Module::canReturnError(ModuleCommands::CommandID cmd) const
     return false;
 }
 
-bool Module::init(QSerialPort* port)
+bool COMPortModule::init(QSerialPort* port)
 {
     setPort(port);
 
@@ -167,12 +166,12 @@ bool Module::init(QSerialPort* port)
     return true;
 }
 
-uint8_t Module::defaultAddress() const
+uint8_t COMPortModule::defaultAddress() const
 {
     return mDefaultAddress;
 }
 
-uint8_t Module::currentAddress() const
+uint8_t COMPortModule::currentAddress() const
 {
     return mAddress;
 }

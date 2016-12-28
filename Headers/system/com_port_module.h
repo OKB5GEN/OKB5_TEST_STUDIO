@@ -6,13 +6,13 @@
 
 class QSerialPort;
 
-class Module: public QObject
+class COMPortModule: public QObject
 {
     Q_OBJECT
 
 public:
-    Module(QObject* parent);
-    virtual ~Module();
+    COMPortModule(QObject* parent);
+    virtual ~COMPortModule();
 
     virtual void postInit() = 0;
 

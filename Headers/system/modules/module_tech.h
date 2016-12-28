@@ -1,9 +1,9 @@
 #ifndef MODULE_TECH_H
 #define MODULE_TECH_H
 
-#include "Headers/system/module.h"
+#include "Headers/system/com_port_module.h"
 
-class ModuleTech: public Module
+class ModuleTech: public COMPortModule
 {
     Q_OBJECT
 

@@ -1,11 +1,11 @@
 #ifndef MODULE_OTD_H
 #define MODULE_OTD_H
 
-#include "Headers/system/module.h"
+#include "Headers/system/com_port_module.h"
 
 class QTimer;
 
-class ModuleOTD: public Module
+class ModuleOTD: public COMPortModule
 {
     Q_OBJECT
 

@@ -1,7 +1,7 @@
 #include "Headers/system/modules/module_tech.h"
 
 ModuleTech::ModuleTech(QObject* parent):
-    Module(parent)
+    COMPortModule(parent)
 {
 }
 
