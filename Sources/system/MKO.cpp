@@ -1,13 +1,12 @@
 #include "Headers/system/MKO.h"
-#include "Headers/gui/mainwindow.h"
 #include <QDebug>
 #include <windows.h>
 #include <QTimer>
 #include <QTime>
 #include <QObject>
 #include <QString>
-#include "qapplication.h"
-#include "synchapi.h"
+//#include "qapplication.h"
+//#include "synchapi.h"
 #include "Sources/system/WDMTMKv2.cpp"
 
 HANDLE hEvent, hEvent1;

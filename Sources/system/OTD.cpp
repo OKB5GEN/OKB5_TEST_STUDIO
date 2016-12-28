@@ -1,5 +1,4 @@
 #include "Headers/system/OTD.h"
-#include "Headers/gui/mainwindow.h"
 #include <QDebug>
 #include <windows.h>
 #include <QTimer>
@@ -8,7 +7,7 @@
 #include <QString>
 #include "qapplication.h"
 #include <QtSerialPort/QtSerialPort>
-#include "synchapi.h"
+//#include "synchapi.h"
 #include "Headers/module_commands.h"
 
 namespace

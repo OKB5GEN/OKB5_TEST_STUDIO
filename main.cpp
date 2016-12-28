@@ -1,4 +1,3 @@
-#include "Headers/gui/mainwindow.h"
 #include <QApplication>
 
 #include <QCommandLineParser>
@@ -33,20 +32,5 @@ int main(int argc, char *argv[])
     mainWin.init();
     return app.exec();
 }
-
-/*
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    MainWindow w;
-    //w.setWindowFlags(Qt::Dialog);
-    //w.setFixedSize(QSize(1130, 630));
-    //w.showMaximized();
-
-    w.show();
-
-    return a.exec();
-}
-*/
 
 

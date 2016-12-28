@@ -51,7 +51,6 @@ SOURCES += main.cpp\
     Sources/logic/command.cpp \
     Sources/logic/cyclogram.cpp \
     Sources/logic/variable_controller.cpp \
-    Sources/gui/mainwindow.cpp \
     Sources/gui/qcustomplot.cpp \
     Sources/system/MKO.cpp \
     Sources/system/myclass.cpp \
@@ -101,7 +100,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_sub_program.h \
     Headers/logic/commands/cmd_switch.h \
     Headers/logic/commands/cmd_title.h \
-    Headers/gui/mainwindow.h \
     Headers/gui/qcustomplot.h \
     Headers/system/MKO.h \
     Headers/system/myclass.h \
