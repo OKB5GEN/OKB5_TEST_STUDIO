@@ -53,9 +53,24 @@ public:
         START_MEASUREMENT_LINE_2        = 0x29, // Can be sent to OTD only (Nu) 1-2 seconds to perform
         GET_DS1820_ADDR_LINE_1          = 0x2A, // Can be sent to OTD only (Psi)
         GET_DS1820_ADDR_LINE_2          = 0x2B, // Can be sent to OTD only (Nu)
+        SET_TECH_INTERFACE              = 0x3B, // Can be sent to TECH only
+        GET_TECH_INTERFACE              = 0x3C, // Can be sent to TECH only
+        RECV_DATA_SSI                   = 0x3D, // Can be sent to TECH only
     };
 
     Q_ENUM(CommandID)
+
+    enum ModuleAddress
+    {
+        CURRENT = 0x01,
+        DEFAULT = 0x02,
+    };
+
+    enum ExecutionResult
+    {
+        CMD_OK      = 0x01,
+        CMD_ERROR   = 0x02,
+    };
 };
 
 #endif // MODULE_COMMANDS_H

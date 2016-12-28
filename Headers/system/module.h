@@ -2,6 +2,7 @@
 #define MODULE_H
 
 #include <QObject>
+#include "Headers/module_commands.h"
 
 class QSerialPort;
 
@@ -13,16 +14,28 @@ public:
     Module(QObject* parent);
     virtual ~Module();
 
-    virtual bool init() = 0;
+    virtual void postInit() = 0;
+
+    bool init(QSerialPort* port);
 
     void setPort(QSerialPort* port);
+    uint8_t defaultAddress() const;
+    uint8_t currentAddress() const;
 
 protected:
-    bool send(const QByteArray& request, QByteArray& response);
+    bool send(ModuleCommands::CommandID cmd, uint8_t param1 = 0, uint8_t param2 = 0);
 
     QSerialPort* mPort;
 
+    uint8_t mAddress;
+    uint8_t mDefaultAddress;
+
+signals:
+    void incorrectSlot(uint8_t defaultAddr);
+
 private:
+    bool send(const QByteArray& request, QByteArray& response);
+    bool canReturnError(ModuleCommands::CommandID cmd) const;
 };
 
 #endif // MODULE_H

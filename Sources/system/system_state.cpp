@@ -2,6 +2,11 @@
 
 #include <QtSerialPort/QtSerialPort>
 
+namespace
+{
+    static const uint8_t OTD_DEFAULT_ADDR = 0x44;
+}
+
 SystemState::SystemState(QObject* parent):
     VariableController(parent)
 {

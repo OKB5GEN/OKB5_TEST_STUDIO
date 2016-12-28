@@ -70,13 +70,13 @@ void OTD::OTD_id()
     bw[0] = 0xff;
     bw[1] = ModuleCommands::GET_MODULE_ADDRESS;
     bw[2] = 0x00;
-    bw[3] = 0x01;
+    bw[3] = ModuleCommands::CURRENT;
     QByteArray readData1 = send(bw, 100);
 
     bw[0] = 0xff;
     bw[1] = ModuleCommands::GET_MODULE_ADDRESS;
     bw[2] = 0x00;
-    bw[3] = 0x02;
+    bw[3] = ModuleCommands::DEFAULT;
 
     QByteArray readData0 = send(bw, 500);
 
@@ -239,6 +239,7 @@ void OTD::OTDtemper()
     bw[1] = ModuleCommands::GET_DS1820_COUNT_LINE_1;
     bw[2] = 0x00;
     bw[3] = 0x00;
+
     QByteArray readData0 = send(bw, 500);
     m_sensorsCntAxis1 = readData0[2];
     data += QString::number(m_sensorsCntAxis1);
@@ -309,7 +310,7 @@ void OTD::OTDtm1()
     QString temp;
     QByteArray bw(4, 0);
     bw[0] = OTD_DEFAULT_ADDR;
-    bw[1] = 0x1f;
+    bw[1] = ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1;
     bw[3] = 0x00;
 
     for(int i = 1; i <= m_sensorsCntAxis1; i++)
@@ -348,7 +349,7 @@ void OTD::OTDtm2()
     QString temp;
     QByteArray bw(4, 0);
     bw[0] = OTD_DEFAULT_ADDR;
-    bw[1] = 0x20;
+    bw[1] = ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2;
     bw[3] = 0x00;
 
     for(int i = 1; i <= m_sensorsCntAxis2; i++)
