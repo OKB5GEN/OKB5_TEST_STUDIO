@@ -424,15 +424,15 @@ int COMPortSender::id_stm()
 {
     QByteArray buffer(4, 0);
     buffer[0] = 0xff;
-    buffer[1] = 0x01;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
     buffer[2] = 0x00;
-    buffer[3] = 0x01;
+    buffer[3] = ModuleCommands::CURRENT;
     QByteArray readData1 = send(getPort(STM), buffer);
 
     buffer[0] = 0xff;
-    buffer[1] = 0x01;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
     buffer[2] = 0x00;
-    buffer[3] = 0x02;
+    buffer[3] = ModuleCommands::DEFAULT;
     QByteArray readData2 = send(getPort(STM), buffer);
 
     if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
@@ -447,15 +447,15 @@ int COMPortSender::id_tech()
 {
     QByteArray buffer(4, 0);
     buffer[0] = 0xff;
-    buffer[1] = 0x01;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
     buffer[2] = 0x00;
-    buffer[3] = 0x01;
+    buffer[3] = ModuleCommands::CURRENT;
     QByteArray readData1 = send(getPort(TECH), buffer);
 
     buffer[0] = 0xff;
-    buffer[1] = 0x01;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
     buffer[2] = 0x00;
-    buffer[3] = 0x02;
+    buffer[3] = ModuleCommands::DEFAULT;
 
     QByteArray readData2 = send(getPort(TECH), buffer);
 
@@ -474,7 +474,7 @@ QString COMPortSender::req_stm()
         QString res;
         QByteArray buffer(4, 0);
         buffer[0] = STM_DEFAULT_ADDR;
-        buffer[1] = 0x02;
+        buffer[1] = ModuleCommands::GET_STATUS_WORD;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
         QByteArray readData1 = send(getPort(STM), buffer);
@@ -504,7 +504,7 @@ QString COMPortSender::req_tech()
         QString res;
         QByteArray buffer(4, 0);
         buffer[0] = TECH_DEFAULT_ADDR;
-        buffer[1] = 0x02;
+        buffer[1] = ModuleCommands::GET_STATUS_WORD;
         buffer[2] = 0x00;
         buffer[3] = 0x00;
 

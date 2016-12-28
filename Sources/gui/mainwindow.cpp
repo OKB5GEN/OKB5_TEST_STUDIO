@@ -5,19 +5,6 @@
 #include "Headers/system/MKO.h"
 #include "Headers/system/comport.h"
 
-/* Структура работы модульных команд
- *
- * 1. В общих чертах работа комнад будет аналогична обычным командам
- * 2. Для каждого модуля будет свой класс-посылатель команд
- * 3. Будет чудо-таблица-синглтон (наверное), куда команды будут срать данные по типу "Имя-значение"
- * 4. Таблица скорее всего будет обновляться сама и называться System State
- * 5. Каждый из параметров состояния системы конфигурируется отдельно
- * 6. У System State будет метод init, который будет вызываться на старте приложения и проводить предподготовку системы к использованию
- * 7. Предподготовка заключается в создании и прозвоне COM-портов на предмет что за модули на нем находятся
- * 8. При послыке модульной команды будет запускаться таймер ожидания ответа
- * 9. Если ответ не получен до истечения таймера, то считаем, что произошла какая-то здц
-*/
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -31,16 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
     threadMKO = new QThread(this);
     myMKO = new MKO("B", this);
 
-    //startCondition(); // TODO: uncomment to work with real device
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
-void MainWindow::startCondition()
-{
     m_COMPortSender->createPorts();
     m_COMPortSender->startPower();
 
@@ -147,6 +124,11 @@ void MainWindow::startCondition()
     }
 
     ui->error_mod->setText(error_m);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 int MainWindow::simpltst1(int z)

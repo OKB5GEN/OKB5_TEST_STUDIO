@@ -42,7 +42,6 @@ private slots:
     void statusM();
     void statusRS();
     void statusCAN();
-    void startCondition();
 
     void on_pushButton_U1_clicked();
     void on_pushButton_U2_clicked();
