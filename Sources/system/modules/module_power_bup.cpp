@@ -1,7 +1,7 @@
 #include "Headers/system/modules/module_power_bup.h"
 
 ModulePowerBUP::ModulePowerBUP(QObject* parent):
-    Module(parent)
+    QObject(parent)
 {
 }
 

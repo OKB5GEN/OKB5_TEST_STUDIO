@@ -1,9 +1,9 @@
 #ifndef MODULE_POWER_BUP_H
 #define MODULE_POWER_BUP_H
 
-#include "Headers/system/module.h"
+#include <QObject>
 
-class ModulePowerBUP: public Module
+class ModulePowerBUP: public QObject
 {
     Q_OBJECT
 

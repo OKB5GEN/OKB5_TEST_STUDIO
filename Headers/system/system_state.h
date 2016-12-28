@@ -7,7 +7,7 @@
 
 class QSerialPort;
 class ModuleMKO;
-class OTD;
+class ModuleOTD;
 
 class SystemState: public VariableController
 {
@@ -202,10 +202,10 @@ private:
     bool isActive(ModuleID id) const;
     uint8_t getAddress(ModuleID id) const;
 
-    QThread *mThreadOTD;
-    OTD *mOTD;
-    QThread *mThreadMKO;
-    ModuleMKO *mMKO;
+    QThread* mThreadOTD;
+    ModuleOTD* mOTD;
+    QThread* mThreadMKO;
+    ModuleMKO* mMKO;
 
     int m_mko_kits;
 

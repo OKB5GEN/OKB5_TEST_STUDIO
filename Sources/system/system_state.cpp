@@ -1,6 +1,6 @@
 #include "Headers/system/system_state.h"
 #include "Headers/system/myclass.h"
-#include "Headers/system/OTD.h"
+#include "Headers/system/modules/module_otd.h"
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/module_commands.h"
 
@@ -60,7 +60,7 @@ void SystemState::init()
     */
 
     mThreadOTD = new QThread(this);
-    mOTD = new OTD("B", this);
+    mOTD = new ModuleOTD(this);
 
     mThreadMKO = new QThread(this);
     mMKO = new ModuleMKO(this);

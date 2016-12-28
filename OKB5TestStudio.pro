@@ -53,7 +53,6 @@ SOURCES += main.cpp\
     Sources/logic/variable_controller.cpp \
     Sources/gui/qcustomplot.cpp \
     Sources/system/myclass.cpp \
-    Sources/system/OTD.cpp \
     Sources/system/WDMTMKv2.cpp \
     Sources/system/system_state.cpp \
     Sources/system/module.cpp \
@@ -101,7 +100,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_title.h \
     Headers/gui/qcustomplot.h \
     Headers/system/myclass.h \
-    Headers/system/OTD.h \
     Headers/system/WDMTMKv2.h \
     Headers/system/system_state.h \
     Headers/system/module.h \

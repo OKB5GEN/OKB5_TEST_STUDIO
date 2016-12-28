@@ -1,9 +1,9 @@
 #ifndef MODULE_POWER_PNA_H
 #define MODULE_POWER_PNA_H
 
-#include "Headers/system/module.h"
+#include <QObject>
 
-class ModulePowerPNA: public Module
+class ModulePowerPNA: public QObject
 {
     Q_OBJECT
 
