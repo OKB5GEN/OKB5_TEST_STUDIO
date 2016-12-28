@@ -41,6 +41,33 @@ void SystemState::init()
 {
     return;
 
+    /*
+     * Что надо сделать?
+     *
+     * 1. Тупо создаем все модули в НУЖНОМ ПОРЯДКЕ!
+     * 2. Создаем два модуля питания, оставляя один класс module_power, избавляясь от module_power_bup и module_power_pna
+     * 3. класс Module переиименовываем в COMPortModule и переносим туда весь функционал работы с COM-портом
+     * 4. туда же наверное переносим команды, принимаемые всеми "нашими" модулями, но делаем их виртуальными и в модуле питания их переопределяем на пустышки
+     * 5. здесь создаем объекты всех модулей в нужном порядке
+     * 6. здесь же из инитим, безо всякой поебени типа "стартовали тред-шлем сигнал себе-инициализируемся"
+     * 7. пусть инит пройдет здесь, а далее каждый тред живет в своем потоке
+     * 8. свой поток важен в том плане, что какой-то модуль может затупить, и, если это случится, то повиснет все, а не только поток модуля
+     * 9. модули с систем стэйтом будут общаться через сигналы-слоты
+     * 10. систем стэйт по идее будет просто слушать модули и слать сигналв в их слоты
+     * 11. напрямую модули нихера не выдают
+     * 12. также систем стэйт держит флажки активности модулей, которые при перезагрузках как-то модифицируются
+     * 13. MyClass вообще удалить нахуй
+     *
+     * Далее, общий принцип работы такой:
+     *
+     * 1. Модули вертятся каждый в своем потоке
+     * 2. Они обновляются по таймеру и серут сигналами, что тот или иной параметр обновился
+     * 3. System State аккумулирует то, что модули серут и через сигналы их может попинывать
+     * 4. Внутри себя модули не хранят данные
+     *
+     *
+    */
+
     // 1. Create COM-ports
     // 2. Send command "Get module address" (current and default) to each of them
     // 3. Depending on list, create modules and put port pointers to them
@@ -59,11 +86,23 @@ void SystemState::init()
     }
     */
 
-    mThreadOTD = new QThread(this);
     mOTD = new ModuleOTD(this);
+    connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
+    connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
+    connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
+    connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
+    connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
+    connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
+    connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
+    connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
+    connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
+    connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
 
-    mThreadMKO = new QThread(this);
     mMKO = new ModuleMKO(this);
+    connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
+    connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
+    connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
+    connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
 
     // TODO: The order of ports creation possibly important!
     {
@@ -103,24 +142,12 @@ void SystemState::init()
     stm_on_mko(1,0);
     stm_on_mko(2,0);
 
+    mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);
-    connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
-    connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
-    connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
-    connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
     mThreadMKO->start();
 
+    mThreadOTD = new QThread(this);
     mOTD->moveToThread(mThreadOTD);
-    connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
-    connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
-    connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
-    connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
-    connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
-    connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
-    connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
-    connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
-    connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
-    connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
     connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
     mThreadOTD->start();
 
