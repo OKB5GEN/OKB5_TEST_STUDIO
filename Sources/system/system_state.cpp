@@ -1,13 +1,13 @@
 #include "Headers/system/system_state.h"
 #include "Headers/system/myclass.h"
 #include "Headers/system/OTD.h"
-#include "Headers/system/MKO.h"
+#include "Headers/system/modules/module_mko.h"
 #include "Headers/module_commands.h"
 
-#include <QtSerialPort/QtSerialPort>
+#include <QtSerialPort>
 #include <windows.h>
 #include "qapplication.h"
-//#include "synchapi.h"
+
 
 namespace
 {
@@ -22,7 +22,7 @@ namespace
 
 SystemState::SystemState(QObject* parent):
     VariableController(parent),
-    m_mko_kits(MKO::NO_KIT)
+    m_mko_kits(ModuleMKO::NO_KIT)
 {
 }
 
@@ -61,8 +61,9 @@ void SystemState::init()
 
     mThreadOTD = new QThread(this);
     mOTD = new OTD("B", this);
+
     mThreadMKO = new QThread(this);
-    mMKO = new MKO("B", this);
+    mMKO = new ModuleMKO(this);
 
     // TODO: The order of ports creation possibly important!
     {
@@ -286,7 +287,7 @@ void SystemState::MKO_cm_data(QString data)
         }
     }
 
-    if(m_mko_kits == MKO::ALL_KITS)
+    if(m_mko_kits == ModuleMKO::ALL_KITS)
     {
         if (list1[0] != "")
         {
@@ -1262,9 +1263,9 @@ void SystemState::on_pow_DY_rez_clicked()
 
 void SystemState::on_MKO_osn_clicked()
 {
-    m_mko_kits ^= MKO::MAIN_KIT;
+    m_mko_kits ^= ModuleMKO::MAIN_KIT;
 
-    if(m_mko_kits & MKO::MAIN_KIT)
+    if(m_mko_kits & ModuleMKO::MAIN_KIT)
     {
         //ui->MKO_osn->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
@@ -1280,8 +1281,8 @@ void SystemState::on_MKO_osn_clicked()
 
 void SystemState::on_MKO_rez_clicked()
 {
-    m_mko_kits ^= MKO::RESERVE_KIT;
-    if(m_mko_kits & MKO::RESERVE_KIT)
+    m_mko_kits ^= ModuleMKO::RESERVE_KIT;
+    if(m_mko_kits & ModuleMKO::RESERVE_KIT)
     {
         //ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }

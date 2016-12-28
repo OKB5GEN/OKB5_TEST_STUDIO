@@ -6,7 +6,7 @@
 #include "Headers/logic/variable_controller.h"
 
 class QSerialPort;
-class MKO;
+class ModuleMKO;
 class OTD;
 
 class SystemState: public VariableController
@@ -205,7 +205,7 @@ private:
     QThread *mThreadOTD;
     OTD *mOTD;
     QThread *mThreadMKO;
-    MKO *mMKO;
+    ModuleMKO *mMKO;
 
     int m_mko_kits;
 

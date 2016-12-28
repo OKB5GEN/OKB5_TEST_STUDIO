@@ -52,7 +52,6 @@ SOURCES += main.cpp\
     Sources/logic/cyclogram.cpp \
     Sources/logic/variable_controller.cpp \
     Sources/gui/qcustomplot.cpp \
-    Sources/system/MKO.cpp \
     Sources/system/myclass.cpp \
     Sources/system/OTD.cpp \
     Sources/system/WDMTMKv2.cpp \
@@ -101,7 +100,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_switch.h \
     Headers/logic/commands/cmd_title.h \
     Headers/gui/qcustomplot.h \
-    Headers/system/MKO.h \
     Headers/system/myclass.h \
     Headers/system/OTD.h \
     Headers/system/WDMTMKv2.h \
