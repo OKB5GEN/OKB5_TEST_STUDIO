@@ -8,7 +8,6 @@
 #include <QString>
 #include "qapplication.h"
 #include "synchapi.h"
-#include "Headers/system/comport.h"
 #include "Sources/system/WDMTMKv2.cpp"
 
 HANDLE hEvent, hEvent1;

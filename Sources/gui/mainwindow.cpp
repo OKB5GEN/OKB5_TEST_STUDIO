@@ -3,7 +3,23 @@
 #include "Headers/system/myclass.h"
 #include "Headers/system/OTD.h"
 #include "Headers/system/MKO.h"
-#include "Headers/system/comport.h"
+
+#include "Headers/module_commands.h"
+
+#include <QtSerialPort/QtSerialPort>
+
+//#include "qapplication.h"
+//#include "synchapi.h"
+
+namespace
+{
+    static const uint8_t MAX_VOLTAGE = 42; // volts
+    static const uint8_t MAX_CURRENT = 10; // ampers
+    static const uint8_t MAX_POWER = 155; // watts actually 160, but for safety purposes reduced to 155
+
+    static const uint8_t STM_DEFAULT_ADDR = 0x22;
+    static const uint8_t TECH_DEFAULT_ADDR = 0x56;
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -11,15 +27,46 @@ MainWindow::MainWindow(QWidget *parent) :
     m_mko_kits(MKO::NO_KIT)
 {
     ui->setupUi(this);
-    m_COMPortSender = new COMPortSender(this);
 
     threadOTD = new QThread(this);
     myOTD = new OTD("B", this);
     threadMKO = new QThread(this);
     myMKO = new MKO("B", this);
 
-    m_COMPortSender->createPorts();
-    m_COMPortSender->startPower();
+    // TODO: The order of ports creation possibly important!
+    {
+        ModuleInfo info;
+        info.port = createPort("6");
+        info.state = true;
+        info.address = 0xFF;
+        m_modules[POW_ANT_DRV] = info;
+    }
+
+    {
+        ModuleInfo info;
+        info.port = createPort("5");
+        info.state = true;
+        info.address = 0xFF;
+        m_modules[POW_ANT_DRV_CTRL] = info;
+    }
+
+    {
+        ModuleInfo info;
+        info.port = createPort("4");
+        info.state = true;
+        info.address = STM_DEFAULT_ADDR;
+        m_modules[STM] = info;
+    }
+
+    {
+        ModuleInfo info;
+        info.port = createPort("8");
+        info.state = true;
+        info.address = TECH_DEFAULT_ADDR;
+        m_modules[TECH] = info;
+    }
+
+    startPower();
 
     ui->MKO_avt->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -69,8 +116,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget_2->setShowGrid(true);
     ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableWidget_2->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_COMPortSender->stm_on_mko(1,0);
-    m_COMPortSender->stm_on_mko(2,0);
+    stm_on_mko(1,0);
+    stm_on_mko(2,0);
 
     myMKO->moveToThread(threadMKO);
     connect(myMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
@@ -113,12 +160,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->error_mod->setStyleSheet("font: 25 16pt GOST type A;" "color: red;");
 
     QString error_m;
-    if(m_COMPortSender->id_stm() != 1)
+    if(id_stm() != 1)
     {
         error_m += " Модуль СТМ установлен не в свой слот!";
     }
 
-    if(m_COMPortSender->id_tech() != 1)
+    if(id_tech() != 1)
     {
         error_m += " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
     }
@@ -129,6 +176,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    foreach (ModuleInfo info, m_modules)
+    {
+        if (info.port->isOpen())
+        {
+            info.port->close();
+        }
+    }
 }
 
 int MainWindow::simpltst1(int z)
@@ -379,13 +434,13 @@ void MainWindow::on_pushButton_start_com6_clicked()
     if(flag_rem1 == 0)
     {
         flag_rem1 = 1;
-        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV_CTRL, COMPortSender::POWER_ON);
+        setPowerState(POW_ANT_DRV_CTRL, POWER_ON);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
     else
     {
         flag_rem1 = 0;
-        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV_CTRL, COMPortSender::POWER_OFF);
+        setPowerState(POW_ANT_DRV_CTRL, POWER_OFF);
         ui->pushButton_start_com6->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
@@ -395,13 +450,13 @@ void MainWindow::on_pushButton_start_com5_clicked()
     if(flag_rem2 == 0)
     {
         flag_rem2 = 1;
-        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV, COMPortSender::POWER_ON);
+        setPowerState(POW_ANT_DRV, POWER_ON);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
     else
     {
         flag_rem2 = 0;
-        m_COMPortSender->setPowerState(COMPortSender::POW_ANT_DRV, COMPortSender::POWER_OFF);
+        setPowerState(POW_ANT_DRV, POWER_OFF);
         ui->pushButton_start_com5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
     }
 }
@@ -412,8 +467,8 @@ void MainWindow::paintvalue()
     uint8_t er1, er2;
 
     ui->tech_error->setText("");
-    m_COMPortSender->getCurVoltageAndCurrent(COMPortSender::POW_ANT_DRV, u1, i1, er1);
-    m_COMPortSender->getCurVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, u2, i2, er2);
+    getCurVoltageAndCurrent(POW_ANT_DRV, u1, i1, er1);
+    getCurVoltageAndCurrent(POW_ANT_DRV_CTRL, u2, i2, er2);
 
     ui->err1->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
     ui->err2->setStyleSheet("font: 25 9pt GOST type A;" "color: black;");
@@ -459,11 +514,11 @@ void MainWindow::paintvalue()
 
 void MainWindow::statusRS()
 {
-    int len1 = m_COMPortSender->tech_read(1);
+    int len1 = tech_read(1);
     if(len1 != 0)
     {
         ui->tech_error->setText(" ");
-        QString result_tech = m_COMPortSender->tech_read_buf(1, len1);
+        QString result_tech = tech_read_buf(1, len1);
         QString buf;
         QStringList list2 = result_tech.split(" ");
         int s = list2.size();
@@ -494,11 +549,11 @@ void MainWindow::statusRS()
 
 void MainWindow::statusCAN()
 {
-    int len2 = m_COMPortSender->tech_read(2);
+    int len2 = tech_read(2);
     if(len2 != 0)
     {
         ui->tech_error->setText(" ");
-        QString result_tech = m_COMPortSender->tech_read_buf(2, len2);
+        QString result_tech = tech_read_buf(2, len2);
         QString buf;
         QStringList list3 = result_tech.split(" ");
         int s = list3.size ();
@@ -531,8 +586,8 @@ void MainWindow::statusM()
 {
     QString res;
     on_pushButton_ctm_ch_15_clicked();
-    res += m_COMPortSender->req_stm();
-    res += m_COMPortSender->req_tech();
+    res += req_stm();
+    res += req_tech();
     connect(this, SIGNAL( OTD_req()), myOTD, SLOT(OTD_req()));
     emit OTD_req();
     disconnect(this, SIGNAL(OTD_req()), myOTD, SLOT(OTD_req()));
@@ -606,8 +661,8 @@ void MainWindow::on_pushButton_U1_clicked()
     }
 
     ui->setU1->setText(QString::number(u1));
-    m_COMPortSender->setMaxVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, ul1, Il1);
-    m_COMPortSender->setVoltageAndCurrent(COMPortSender::POW_ANT_DRV_CTRL, u1);
+    setMaxVoltageAndCurrent(POW_ANT_DRV_CTRL, ul1, Il1);
+    setVoltageAndCurrent(POW_ANT_DRV_CTRL, u1);
 }
 
 void MainWindow::on_pushButton_U2_clicked()
@@ -624,30 +679,30 @@ void MainWindow::on_pushButton_U2_clicked()
     }
 
     ui->setU2->setText(QString::number(u1));
-    m_COMPortSender->setMaxVoltageAndCurrent(COMPortSender::POW_ANT_DRV, ul1, Il1);
-    m_COMPortSender->setVoltageAndCurrent(COMPortSender::POW_ANT_DRV, u1);
+    setMaxVoltageAndCurrent(POW_ANT_DRV, ul1, Il1);
+    setVoltageAndCurrent(POW_ANT_DRV, u1);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    m_COMPortSender->resetError(COMPortSender::POW_ANT_DRV);
+    resetError(POW_ANT_DRV);
     ui->err1->setText(" ");
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    m_COMPortSender->resetError(COMPortSender::POW_ANT_DRV_CTRL);
+    resetError(POW_ANT_DRV_CTRL);
     ui->err2->setText(" ");
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    if(m_COMPortSender->setPowerChannelState(1, COMPortSender::POWER_ON) == 1 && flag_con1 == 0)
+    if(setPowerChannelState(1, POWER_ON) == 1 && flag_con1 == 0)
     {
         flag_con1 = 1;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->setPowerChannelState(1, COMPortSender::POWER_OFF) == 1 && flag_con1 == 1)
+    else if(setPowerChannelState(1, POWER_OFF) == 1 && flag_con1 == 1)
     {
         flag_con1 = 0;
         ui->pushButton_4->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -655,12 +710,12 @@ void MainWindow::on_pushButton_4_clicked()
 }
 void MainWindow::on_pushButton_7_clicked()
 {
-    if(m_COMPortSender->setPowerChannelState(2, COMPortSender::POWER_ON) == 1 && flag_con3 == 0)
+    if(setPowerChannelState(2, POWER_ON) == 1 && flag_con3 == 0)
     {
         flag_con3 = 1;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->setPowerChannelState(2, COMPortSender::POWER_OFF) == 1 && flag_con3 == 1)
+    else if(setPowerChannelState(2, POWER_OFF) == 1 && flag_con3 == 1)
     {
         flag_con3 = 0;
         ui->pushButton_7->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -669,12 +724,12 @@ void MainWindow::on_pushButton_7_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    if(m_COMPortSender->setPowerChannelState(4, COMPortSender::POWER_ON) == 1 && flag_con2 == 0)
+    if(setPowerChannelState(4, POWER_ON) == 1 && flag_con2 == 0)
     {
         flag_con2 = 1;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->setPowerChannelState(4, COMPortSender::POWER_OFF) == 1 && flag_con2 == 1)
+    else if(setPowerChannelState(4, POWER_OFF) == 1 && flag_con2 == 1)
     {
         flag_con2 = 0;
         ui->pushButton_5->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -683,12 +738,12 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    if(m_COMPortSender->setPowerChannelState(5, COMPortSender::POWER_ON) == 1 && flag_con4 == 0)
+    if(setPowerChannelState(5, POWER_ON) == 1 && flag_con4 == 0)
     {
         flag_con4 = 1;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->setPowerChannelState(5, COMPortSender::POWER_OFF) == 1 && flag_con4 == 1)
+    else if(setPowerChannelState(5, POWER_OFF) == 1 && flag_con4 == 1)
     {
         flag_con4 = 0;
         ui->pushButton_8->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -697,12 +752,12 @@ void MainWindow::on_pushButton_8_clicked()
 
 void MainWindow::on_pushButton_10_clicked()
 {
-    if(m_COMPortSender->setPowerChannelState(6, COMPortSender::POWER_ON) == 1 && flag_con5 == 0)
+    if(setPowerChannelState(6, POWER_ON) == 1 && flag_con5 == 0)
     {
         flag_con5 = 1;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
     }
-    else if(m_COMPortSender->setPowerChannelState(6, COMPortSender::POWER_OFF) == 1 && flag_con5 == 1)
+    else if(setPowerChannelState(6, POWER_OFF) == 1 && flag_con5 == 1)
     {
         flag_con5 = 0;
         ui->pushButton_10->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
@@ -711,103 +766,103 @@ void MainWindow::on_pushButton_10_clicked()
 
 void MainWindow::on_pushButton_ctm_ch_0_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(0)/10000;
+    double res = stm_data_ch(0)/10000;
     ui->lineEdit_ctm_ch_0->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_1_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(1)/10000;
+    double res = stm_data_ch(1)/10000;
     ui->lineEdit_ctm_ch_1->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_2_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(2)/10000;
+    double res = stm_data_ch(2)/10000;
     ui->lineEdit_ctm_ch_2->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_3_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(3)/10000;
+    double res = stm_data_ch(3)/10000;
     ui->lineEdit_ctm_ch_3->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_4_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(4)/10000;
+    double res = stm_data_ch(4)/10000;
     ui->lineEdit_ctm_ch_4->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_5_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(5)/10000;
+    double res = stm_data_ch(5)/10000;
     ui->lineEdit_ctm_ch_5->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_6_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(6)/10000;
+    double res = stm_data_ch(6)/10000;
     ui->lineEdit_ctm_ch_6->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_7_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(7)/10000;
+    double res = stm_data_ch(7)/10000;
     ui->lineEdit_ctm_ch_7->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_8_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(8)/10000;
+    double res = stm_data_ch(8)/10000;
     ui->lineEdit_ctm_ch_8->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_9_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(9)/10000;
+    double res = stm_data_ch(9)/10000;
     ui->lineEdit_ctm_ch_9->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_10_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(10)/10000;
+    double res = stm_data_ch(10)/10000;
     ui->lineEdit_ctm_ch_10->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_11_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(11)/10000;
+    double res = stm_data_ch(11)/10000;
     ui->lineEdit_ctm_ch_11->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_12_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(12)/10000;
+    double res = stm_data_ch(12)/10000;
     ui->lineEdit_ctm_ch_12->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_13_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(13)/10000;
+    double res = stm_data_ch(13)/10000;
     ui->lineEdit_ctm_ch_13->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_14_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(14)/10000;
+    double res = stm_data_ch(14)/10000;
     ui->lineEdit_ctm_ch_14->setText(QString::number(res));
 }
 
 void MainWindow::on_pushButton_ctm_ch_15_clicked()
 {
-    double res = m_COMPortSender->stm_data_ch(15)/10000;
+    double res = stm_data_ch(15)/10000;
     if(res >= 0.5)
     {
         ui->pushButton_ctm_ch_15->setText ("Разъединена");
         ui->pushButton_ctm_ch_15->setStyleSheet(QString::fromUtf8("background-color: rgb(250, 24, 0);"));
     }
-    else if(res >= 0 && res < 0.51 && m_COMPortSender->req_stm()=="")
+    else if(res >= 0 && res < 0.51 && req_stm()=="")
     {
         ui->pushButton_ctm_ch_15->setText ("Соединена");
         ui->pushButton_ctm_ch_15->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 230, 0);"));
@@ -816,7 +871,7 @@ void MainWindow::on_pushButton_ctm_ch_15_clicked()
 
 void MainWindow::on_pushButton_check_fuse_1_clicked()
 {
-    int cf = m_COMPortSender->stm_check_fuse(1);
+    int cf = stm_check_fuse(1);
     if (cf==0 )
         ui->lineEdit_fuse_1->setText(" Исправен");
     else if ( cf==1 )
@@ -827,7 +882,7 @@ void MainWindow::on_pushButton_check_fuse_1_clicked()
 
 void MainWindow::on_pushButton_check_fuse_2_clicked()
 {
-    int cf = m_COMPortSender->stm_check_fuse(2);
+    int cf = stm_check_fuse(2);
     if (cf ==0)
         ui->lineEdit_fuse_2->setText(" Исправен");
     else if ( cf==1 )
@@ -838,7 +893,7 @@ void MainWindow::on_pushButton_check_fuse_2_clicked()
 
 void MainWindow::on_pushButton_tech_fd_clicked()
 {
-    if(m_COMPortSender->tech_send(36,0,0)!=1)
+    if(tech_send(36,0,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке режима работы!");
@@ -847,7 +902,7 @@ void MainWindow::on_pushButton_tech_fd_clicked()
 
 void MainWindow::on_pushButton_tech_hd_clicked()
 {
-    if(m_COMPortSender->tech_send(36,1,0)!=1)
+    if(tech_send(36,1,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке режима работы!");
@@ -857,7 +912,7 @@ void MainWindow::on_pushButton_tech_hd_clicked()
 void MainWindow::on_tech_set_speed_clicked()
 {
     int sp= ui->baudRateBox_tech->currentIndex();
-    if(m_COMPortSender->tech_send(37,sp,0)!=1)
+    if(tech_send(37,sp,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при установке скорости работы!");
@@ -882,7 +937,7 @@ void MainWindow::on_pushButton_send_tech_clicked()
     s=s-cou;
     int x =( s >> 8 ) & 0xFF;
     int y = s & 0xFF;
-    m_COMPortSender->tech_send(22,x,y) ;
+    tech_send(22,x,y) ;
     bool ok;
     int ersend;
     int hex;
@@ -894,7 +949,7 @@ void MainWindow::on_pushButton_send_tech_clicked()
             if(ok==1 && hex<256)
             {
                 ui->tech_error->setText("");
-                ersend = m_COMPortSender->tech_send(23,hex,0);
+                ersend = tech_send(23,hex,0);
                 if(ersend==2)
                 {
                     ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -913,7 +968,7 @@ void MainWindow::on_pushButton_send_tech_clicked()
 
     if(ersend==1)
     {
-        ersend = m_COMPortSender->tech_send(24,0,0);
+        ersend = tech_send(24,0,0);
         if(ersend!=1)
         {
             ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -924,7 +979,7 @@ void MainWindow::on_pushButton_send_tech_clicked()
 
 void MainWindow::on_tech_clear_out_3_clicked()
 {
-    if(m_COMPortSender->tech_send(27,1,0)!=1)
+    if(tech_send(27,1,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
@@ -933,7 +988,7 @@ void MainWindow::on_tech_clear_out_3_clicked()
 
 void MainWindow::on_tech_clear_in_3_clicked()
 {
-    if(m_COMPortSender->tech_send(27,2,0)!=1)
+    if(tech_send(27,2,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
@@ -942,7 +997,7 @@ void MainWindow::on_tech_clear_in_3_clicked()
 
 void MainWindow::on_tech_clear_buf_3_clicked()
 {
-    if(m_COMPortSender->tech_send(27,3,0)!=1)
+    if(tech_send(27,3,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буферов!");
@@ -951,7 +1006,7 @@ void MainWindow::on_tech_clear_buf_3_clicked()
 
 void MainWindow::on_tech_clear_out_4_clicked()
 {
-    if(m_COMPortSender->tech_send(21,1,0)!=1)
+    if(tech_send(21,1,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
@@ -960,7 +1015,7 @@ void MainWindow::on_tech_clear_out_4_clicked()
 
 void MainWindow::on_tech_clear_in_4_clicked()
 {
-    if(m_COMPortSender->tech_send(21,2,0)!=1)
+    if(tech_send(21,2,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буфера!");
@@ -969,7 +1024,7 @@ void MainWindow::on_tech_clear_in_4_clicked()
 
 void MainWindow::on_tech_clear_buf_4_clicked()
 {
-    if(m_COMPortSender->tech_send(21,3,0)!=1)
+    if(tech_send(21,3,0)!=1)
     {
         ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
         ui->tech_error->setText(" Oшибка при очистке буферов!");
@@ -994,7 +1049,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
     s=s-cou;
     int x =( s >> 8 ) & 0xFF;
     int y = s & 0xFF;
-    m_COMPortSender->tech_send(16,x,y) ;
+    tech_send(16,x,y) ;
     bool ok;
     int ersend;
     int hex;
@@ -1006,7 +1061,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
             if(ok==1 && hex<256)
             {
                 ui->tech_error->setText("");
-                ersend = m_COMPortSender->tech_send(17,hex,0);
+                ersend = tech_send(17,hex,0);
                 if(ersend==2)
                 {
                     ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -1025,7 +1080,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
 
     if(ersend==1)
     {
-        ersend = m_COMPortSender->tech_send(18,0,0);
+        ersend = tech_send(18,0,0);
         if(ersend!=1)
         {
             ui->tech_error->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
@@ -1036,7 +1091,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked()
 
 void MainWindow::on_res_err_stm_clicked()
 {
-    if(m_COMPortSender->resetError(COMPortSender::STM) != 1)
+    if(resetError(STM) != 1)
     {
         ui->error_mod->setText(" Не удалось сбросить ошибку!");
     }
@@ -1059,7 +1114,7 @@ void MainWindow::OTD_err_res(int x)
 
 void MainWindow::on_res_err_tech_clicked()
 {
-    if(m_COMPortSender->resetError(COMPortSender::TECH) != 1)
+    if(resetError(TECH) != 1)
     {
         ui->error_mod->setText(" Не удалось сбросить ошибку!");
     }
@@ -1067,7 +1122,7 @@ void MainWindow::on_res_err_tech_clicked()
 
 void MainWindow::on_pushButton_res_stm_clicked()
 {
-    if(m_COMPortSender->softResetModule(COMPortSender::STM) != 1)
+    if(softResetModule(STM) != 1)
     {
         ui->error_mod->setText(" Не удалось провести перезагрузку!");
     }
@@ -1075,7 +1130,7 @@ void MainWindow::on_pushButton_res_stm_clicked()
 
 void MainWindow::on_pushButton_res_tech_clicked()
 {
-    if(m_COMPortSender->softResetModule(COMPortSender::TECH) != 1)
+    if(softResetModule(TECH) != 1)
     {
         ui->error_mod->setText(" Не удалось провести перезагрузку!");
     }
@@ -1103,7 +1158,7 @@ void MainWindow::OTD_id()
 
 void MainWindow::on_pushButton_6_clicked()
 {
-    double v = m_COMPortSender->getSoftwareVersion(COMPortSender::STM);
+    double v = getSoftwareVersion(STM);
     if(v == 2)
     {
         ui->error_mod->setText(" Не удалось узнать версию прошивки!");
@@ -1116,7 +1171,7 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::on_pushButton_9_clicked()
 {
-    double v = m_COMPortSender->getSoftwareVersion(COMPortSender::TECH);
+    double v = getSoftwareVersion(TECH);
     if(v == 2)
     {
         ui->error_mod->setText(" Не удалось узнать версию прошивки!");
@@ -1321,7 +1376,7 @@ void MainWindow::on_pushButton_12_clicked()
 
 void MainWindow::MKO_change_ch(int x, int y)
 {
-    m_COMPortSender->stm_on_mko(x,y);
+    stm_on_mko(x,y);
 }
 
 void MainWindow::on_MKO_avt_clicked()
@@ -1372,12 +1427,541 @@ void MainWindow::on_OTD_avt_2_clicked()
     }
 }
 
+QSerialPort * MainWindow::createPort(const QString& name)
+{
+    QSerialPort *port = new QSerialPort(name, this);
+    port->open(QIODevice::ReadWrite);
+    port->setBaudRate(QSerialPort::Baud115200);
+    port->setDataBits(QSerialPort::Data5);
+    port->setParity(QSerialPort::OddParity);
+    port->setStopBits(QSerialPort::OneStop);
+    port->setFlowControl(QSerialPort::NoFlowControl);
 
+    return port;
+}
 
+QByteArray MainWindow::send(QSerialPort * port, QByteArray data)
+{
+    QByteArray readData;
+    if (port->isOpen())
+    {
+        port->QIODevice::write(data);
+        port->waitForBytesWritten(-1);
 
+        readData = port->readAll();
+        while (port->waitForReadyRead(100))
+        {
+            readData.append(port->readAll());
+        }
+    }
 
+    return readData;
+}
 
+void MainWindow::startPower()
+{
+    // PowerON
+    QByteArray buffer1(7, 0);
+    buffer1[0] = 0xf1;
+    buffer1[1] = 0x00;
+    buffer1[2] = 0x36;
+    buffer1[3] = 0x10;
+    buffer1[4] = 0x10;
+    buffer1[5] = 0x01;
+    buffer1[6] = 0x47;
+    QByteArray readData11 = send(getPort(POW_ANT_DRV_CTRL), buffer1);
+    QByteArray readData21 = send(getPort(POW_ANT_DRV), buffer1);
 
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power off
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x00;
+    buffer[5] = 0x01;
+    buffer[6] = 0x28;
 
+    QByteArray readData1 = send(getPort(POW_ANT_DRV_CTRL), buffer);
+    QByteArray readData2 = send(getPort(POW_ANT_DRV), buffer);
 
+    setVoltageAndCurrent(POW_ANT_DRV, 0.5);
+    setVoltageAndCurrent(POW_ANT_DRV_CTRL, 0.5);
+}
 
+int MainWindow::setPowerChannelState(int channel, PowerState state)
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = ModuleCommands::POWER_CHANNEL_CTRL;
+    buffer[2] = channel;
+    buffer[3] = (state == POWER_ON) ? 1 : 0;
+
+    QByteArray readData1 = send(getPort(STM), buffer);
+    return readData1[3];
+}
+
+int MainWindow::stm_on_mko(int x, int y)
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = ModuleCommands::SET_MKO_PWR_CHANNEL_STATE;
+    buffer[2] = x;
+    buffer[3] = y;
+
+    QByteArray readData1 = send(getPort(STM), buffer);
+    return readData1[3];
+}
+
+int MainWindow::stm_check_fuse(int fuse)
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = STM_DEFAULT_ADDR;
+    buffer[1] = ModuleCommands::GET_PWR_MODULE_FUSE_STATE;
+    buffer[2] = fuse;
+    buffer[3] = 0x00;
+    QByteArray readData1 = send(getPort(STM), buffer);
+    return readData1[3];
+}
+
+int MainWindow::tech_send(int com, int x, int y)
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = TECH_DEFAULT_ADDR;
+    buffer[1] = com;
+    buffer[2] = x;
+    buffer[3] = y;
+    QByteArray readData1 = send(getPort(TECH), buffer);
+    return readData1[3];
+}
+
+int MainWindow::tech_read(int x)
+{
+    if(isActive(TECH))
+    {
+        uint8_t command = 0;
+        if(x == 1)
+        {
+            command = ModuleCommands::CHECK_RECV_DATA_RS485;
+        }
+        else
+        {
+            command = ModuleCommands::CHECK_RECV_DATA_CAN;
+        }
+
+        QByteArray buffer(4, 0);
+        buffer[0] = TECH_DEFAULT_ADDR;
+        buffer[1] = command;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData2 = send(getPort(TECH), buffer);
+
+        uint8_t uu1,uu2;
+        uu1 = readData2[2];
+        uu2 = readData2[3];
+        double uu = (uu1 << 8) | uu2;
+        return uu;
+    }
+
+    return 0;
+}
+
+QString MainWindow::tech_read_buf(int x, int len)
+{
+    uint8_t command = 0;
+    if(x == 1)
+    {
+        command = ModuleCommands::RECV_DATA_RS485;
+    }
+    else
+    {
+        command = ModuleCommands::RECV_DATA_CAN;
+    }
+
+    QString result;
+    QByteArray buffer(4, 0);
+    for(int i = 0; i < len; i++)
+    {
+        buffer[0] = TECH_DEFAULT_ADDR;
+        buffer[1] = command;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData2 = send(getPort(TECH), buffer);
+
+        if(readData2.at(2) == 1)
+        {
+            result += "em ";
+        }
+
+        if(readData2.at(2) == 2)
+        {
+            result += "uu ";
+        }
+
+        result += readData2[3];
+        result += " ";
+        QApplication::processEvents();
+    }
+
+    return result;
+}
+
+double MainWindow::stm_data_ch(int ch)
+{
+    if (isActive(STM))
+    {
+        QByteArray buffer(4, 0);
+        buffer[0] = STM_DEFAULT_ADDR;
+        buffer[1] = ModuleCommands::GET_CHANNEL_TELEMETRY;
+        buffer[2] = ch;
+        buffer[3] = 0x00;
+
+        QByteArray readData1 = send(getPort(STM), buffer);
+
+        uint8_t uu1, uu2;
+        uu1 = readData1[2];
+        uu2 = readData1[3];
+        double res = (uu1 << 8) | uu2;
+        return res;
+    }
+
+    return 50000;
+}
+
+QSerialPort* MainWindow::getPort(ModuleID id)
+{
+    QSerialPort* port = m_modules.value(id, ModuleInfo()).port;
+    Q_ASSERT(port != Q_NULLPTR);
+    return port;
+}
+
+int MainWindow::resetError(ModuleID id)
+{
+    QSerialPort * port = getPort(id);
+    QByteArray buffer;
+
+    switch (id)
+    {
+    case POW_ANT_DRV_CTRL:
+    case POW_ANT_DRV:
+        {
+            buffer.resize(7);
+            buffer[0] = 0xf1;
+            buffer[1] = 0x00;
+            buffer[2] = 0x36;
+            buffer[3] = 0x0a;
+            buffer[4] = 0x0a;
+            buffer[5] = 0x01;
+            buffer[6] = 0x3b;
+        }
+        break;
+
+    case STM:
+        {
+            buffer.resize(4);
+            buffer[0] = STM_DEFAULT_ADDR;
+            buffer[1] = ModuleCommands::RESET_ERROR;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+        }
+        break;
+
+    case TECH:
+        {
+            buffer.resize(4);
+            buffer[0] = TECH_DEFAULT_ADDR;
+            buffer[1] = ModuleCommands::RESET_ERROR;
+            buffer[2] = 0x00;
+            buffer[3] = 0x00;
+        }
+        break;
+    default:
+        break;
+    }
+
+    QByteArray readData = send(port, buffer);
+    if (readData.size() > 3)
+    {
+        return readData[3];
+    }
+
+    return 0;
+}
+
+void MainWindow::setPowerState(ModuleID id, PowerState state)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    QByteArray buffer(7, 0);
+    buffer[0] = 0xf1;//power on/off
+    buffer[1] = 0x00;
+    buffer[2] = 0x36;
+    buffer[3] = 0x01;
+    buffer[4] = 0x01;
+    buffer[5] = 0x01;
+    buffer[6] = (state == POWER_ON) ? 0x29 : 0x28;
+    QByteArray readData1 = send(port, buffer);
+}
+
+void MainWindow::setPowerValue(uint8_t valueID, double value, double maxValue, QSerialPort * port)
+{
+    QByteArray buffer(7, 0);
+    uint32_t val = uint32_t((value * 256 * 100) / maxValue);
+
+    if(val > (256 * 100))
+    {
+        val = (256 * 100);
+    }
+
+    buffer[0] = 0xf1;
+    buffer[1] = 0x00;
+    buffer[2] = valueID;
+    buffer[3] = (val >> 8) & 0xFF;
+    buffer[4] = val & 0xFF;
+    uint16_t sum = 0;
+    for(int i = 0; i < 5; i++)
+    {
+        uint8_t s = buffer[i];
+        sum = (sum + s) & 0xFFFF;
+    }
+
+    buffer[5] = ((sum >> 8) & 0xFF);
+    buffer[6] = (sum & 0xFF);
+    QByteArray readData = send(port, buffer);
+}
+
+void MainWindow::setMaxVoltageAndCurrent(ModuleID id, double voltage, double current)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    // TODO make constants
+    setPowerValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE, port);
+    setPowerValue(MAX_CURRENT_VAL, current, MAX_CURRENT, port);
+}
+
+void MainWindow::setVoltageAndCurrent(ModuleID id, double voltage)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    // TODO make constants
+    setPowerValue(CUR_VOLTAGE_VAL, voltage, MAX_VOLTAGE, port);
+    setPowerValue(CUR_CURRENT_VAL, ((double)MAX_POWER) / voltage, MAX_CURRENT, port);
+}
+
+void MainWindow::getCurVoltageAndCurrent(ModuleID id, double& voltage, double& current, uint8_t& error)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == POW_ANT_DRV_CTRL || id == POW_ANT_DRV);
+
+    QByteArray buffer(5, 0);
+    buffer[0] = 0x75;
+    buffer[1] = 0x00;
+    buffer[2] = 0x47;
+    buffer[3] = 0x00;
+    buffer[4] = 0xbc;
+
+    QByteArray readData = send(port, buffer);
+
+    uint8_t uu1, uu2;
+    error = (readData[4] >> 4);
+
+    uu1 = readData[5];
+    uu2 = readData[6];
+    voltage = (uu1 << 8) | uu2;
+    voltage = voltage * MAX_VOLTAGE / 256;
+
+    uu1 = readData[7];
+    uu2 = readData[8];
+    current = (uu1 << 8) | uu2;
+    current = current * MAX_CURRENT / 256;
+}
+
+int MainWindow::id_stm()
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = 0xff;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
+    buffer[2] = 0x00;
+    buffer[3] = ModuleCommands::CURRENT;
+    QByteArray readData1 = send(getPort(STM), buffer);
+
+    buffer[0] = 0xff;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
+    buffer[2] = 0x00;
+    buffer[3] = ModuleCommands::DEFAULT;
+    QByteArray readData2 = send(getPort(STM), buffer);
+
+    if(readData1[2] == readData2[2] && readData1[3] == readData2[3])
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+int MainWindow::id_tech()
+{
+    QByteArray buffer(4, 0);
+    buffer[0] = 0xff;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
+    buffer[2] = 0x00;
+    buffer[3] = ModuleCommands::CURRENT;
+    QByteArray readData1 = send(getPort(TECH), buffer);
+
+    buffer[0] = 0xff;
+    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
+    buffer[2] = 0x00;
+    buffer[3] = ModuleCommands::DEFAULT;
+
+    QByteArray readData2 = send(getPort(TECH), buffer);
+
+    if (readData1[2] == readData2[2] && readData1[3] == readData2[3])
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+QString MainWindow::req_stm()
+{
+    if (isActive(STM))
+    {
+        QString res;
+        QByteArray buffer(4, 0);
+        buffer[0] = STM_DEFAULT_ADDR;
+        buffer[1] = ModuleCommands::GET_STATUS_WORD;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+        QByteArray readData1 = send(getPort(STM), buffer);
+        uint8_t x = readData1[2];
+        uint8_t z1, z2, z3;
+        z1 = x >> 7;
+        z2 = x << 1;
+        z2 = z2 >> 7;
+        z3 = x << 2;
+        z3 = z3 >> 7;
+        if(z1 == 0)
+            res += " СТМ не готов к работе! \n";
+        if(z2 == 1)
+            res += " Ошибки у модуля СТМ! \n";
+        if(z3 == 1)
+            res += " Модуль СТМ после перезагрузки! \n";
+        return res;
+    }
+
+    return "";
+}
+
+QString MainWindow::req_tech()
+{
+    if(isActive(TECH))
+    {
+        QString res;
+        QByteArray buffer(4, 0);
+        buffer[0] = TECH_DEFAULT_ADDR;
+        buffer[1] = ModuleCommands::GET_STATUS_WORD;
+        buffer[2] = 0x00;
+        buffer[3] = 0x00;
+
+        QByteArray readData1 = send(getPort(TECH), buffer);
+        uint8_t x = readData1[2];
+        uint8_t z1, z2, z3;
+        z1 = x >> 7;
+        z2 = x << 1;
+        z2 = z2 >> 7;
+        z3 = x << 2;
+        z3 = z3 >> 7;
+        if(z1 == 0)
+            res += " Технол. модуль не готов к работе! \n";
+        if(z2 == 1)
+            res += " Ошибки у Технол. модуля! \n";
+        if(z3 == 1)
+            res += " Модуль Технол. после перезагрузки! \n";
+        if(readData1.at(3)==0x10)
+            res += " Потеря байта из-за переполнения буфера RS485! \n";
+        return res;
+    }
+
+    return "";
+}
+
+int MainWindow::softResetModule(ModuleID id)
+{
+    Q_ASSERT(id == STM || id == TECH);
+
+    setActive(id, false);
+
+    uint8_t moduleAddr = STM_DEFAULT_ADDR;
+    if (id == TECH)
+    {
+        moduleAddr = TECH_DEFAULT_ADDR;
+    }
+
+    QByteArray buffer(4, 0);
+    buffer[0] = moduleAddr;
+    buffer[1] = ModuleCommands::SOFT_RESET;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+
+    QSerialPort * port = getPort(id);
+    QByteArray readData1 = send(port, buffer);
+
+    resetPort(id);
+    setActive(id, true);
+
+    return readData1[3];
+}
+
+void MainWindow::resetPort(ModuleID id)
+{
+    ModuleInfo info = m_modules.take(id);
+
+    info.port->close();
+    info.port->deleteLater();
+    info.port = Q_NULLPTR;
+
+    for(int i = 0; i < 500; i++) // i guess some sort of govnomagics here "freeze app for 5 seconds to restore COM port with module after reset"
+    {
+        Sleep(10);
+        QApplication::processEvents();
+    }
+
+    info.port = createPort("");
+    m_modules[id] = info;
+}
+
+bool MainWindow::isActive(ModuleID id) const
+{
+    return m_modules.value(id, ModuleInfo()).state;
+}
+
+void MainWindow::setActive(ModuleID id, bool state)
+{
+    ModuleInfo info = m_modules.take(id);
+    info.state = state;
+    m_modules[id] = info;
+}
+
+int MainWindow::getSoftwareVersion(ModuleID id)
+{
+    QSerialPort * port = getPort(id);
+    Q_ASSERT(id == STM || id == TECH);
+
+    uint8_t moduleAddr = STM_DEFAULT_ADDR;
+    if (id == TECH)
+    {
+        moduleAddr = TECH_DEFAULT_ADDR;
+    }
+
+    QByteArray buffer(4, 0);
+    buffer[0] = moduleAddr;
+    buffer[1] = ModuleCommands::GET_SOWFTWARE_VER;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
+
+    QByteArray readData1 = send(port, buffer);
+    return (readData1[2] * 10 + readData1[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
+}

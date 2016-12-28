@@ -1,8 +1,5 @@
 #include "Headers/system/myclass.h"
-#include "Headers/gui/mainwindow.h"
-//#include <QDebug>
 #include <windows.h>
-#include "Headers/system/comport.h"
 
 MyClass::MyClass(QString s) : name(s)
 {
