@@ -14,28 +14,20 @@ public:
     COMPortModule(QObject* parent);
     virtual ~COMPortModule();
 
-    virtual void postInit() = 0;
+    bool init();
 
-    bool init(QSerialPort* port);
-
-    void setPort(QSerialPort* port);
-    uint8_t defaultAddress() const;
-    uint8_t currentAddress() const;
+    virtual bool postInit() = 0;
+    virtual void resetError();
 
 protected:
-    bool send(ModuleCommands::CommandID cmd, uint8_t param1 = 0, uint8_t param2 = 0);
+    bool send(const QByteArray& request, QByteArray& response);
+
+    void resetPort();
 
     QSerialPort* mPort;
 
-    uint8_t mAddress;
-    uint8_t mDefaultAddress;
-
-signals:
-    void incorrectSlot(uint8_t defaultAddr);
-
 private:
-    bool send(const QByteArray& request, QByteArray& response);
-    bool canReturnError(ModuleCommands::CommandID cmd) const;
+    void createPort();
 };
 
 #endif // MODULE_H

@@ -52,7 +52,6 @@ SOURCES += main.cpp\
     Sources/logic/cyclogram.cpp \
     Sources/logic/variable_controller.cpp \
     Sources/gui/qcustomplot.cpp \
-    Sources/system/myclass.cpp \
     Sources/system/WDMTMKv2.cpp \
     Sources/system/system_state.cpp \
     Sources/system/modules/module_mko.cpp \
@@ -60,7 +59,8 @@ SOURCES += main.cpp\
     Sources/system/modules/module_stm.cpp \
     Sources/system/modules/module_tech.cpp \
     Sources/system/modules/module_power.cpp \
-    Sources/system/com_port_module.cpp
+    Sources/system/com_port_module.cpp \
+    Sources/system/okb_module.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -98,7 +98,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_switch.h \
     Headers/logic/commands/cmd_title.h \
     Headers/gui/qcustomplot.h \
-    Headers/system/myclass.h \
     Headers/system/WDMTMKv2.h \
     Headers/system/system_state.h \
     Headers/system/modules/module_mko.h \
@@ -107,7 +106,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/modules/module_tech.h \
     Headers/module_commands.h \
     Headers/system/modules/module_power.h \
-    Headers/system/com_port_module.h
+    Headers/system/com_port_module.h \
+    Headers/system/okb_module.h
 
 
 FORMS    += mainwindow.ui

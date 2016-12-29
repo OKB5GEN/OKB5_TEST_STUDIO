@@ -17,7 +17,7 @@ namespace
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
-    COMPortModule(parent)
+    ModuleOKB(parent)
 {
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
@@ -39,8 +39,10 @@ void ModuleOTD::resetLine(LineID line)
     }
 }
 
-void ModuleOTD::postInit()
+void ModuleOTD::postInit1()
 {
+    int TODO;
+
     // 1. Read sensors count on both lines
     // 2. Read sensors addresses on both lines
     // 3. Start measurement on both lines
@@ -75,13 +77,6 @@ QByteArray ModuleOTD::send1(QByteArray data, double readTimeout, double delayBef
 
 void ModuleOTD::COMConnectorOTD()
 {
-    mPort = new QSerialPort("com7");
-    mPort->open(QIODevice::ReadWrite);
-    mPort->setBaudRate(QSerialPort::Baud115200);
-    mPort->setDataBits(QSerialPort::Data5);
-    mPort->setParity(QSerialPort::OddParity);
-    mPort->setStopBits(QSerialPort::OneStop);
-    mPort->setFlowControl(QSerialPort::NoFlowControl);
     m_isActive = true;
     OTD_id();
     OTDtemper();
@@ -457,4 +452,19 @@ void ModuleOTD::OTD_timer()
 void ModuleOTD::doWork()
 {
     emit start_OTD();
+    int TODO; // ошибки ПТ-100 датчиков (см ниже)
 }
+
+/*
+void SystemState::OTDPTdata(double x,double y)
+{
+    x = x / 100;
+    y = y / 100;
+    //ui->OTDerror->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
+    //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+    //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+    //ui->OTDPT1->setText(QString::number(x));
+    //ui->OTDPT2->setText(QString::number(y));
+}*/

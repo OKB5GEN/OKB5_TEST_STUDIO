@@ -71,6 +71,12 @@ public:
         CMD_OK      = 0x01,
         CMD_ERROR   = 0x02,
     };
+
+    enum PowerState
+    {
+        POWER_ON,
+        POWER_OFF
+    };
 };
 
 #endif // MODULE_COMMANDS_H

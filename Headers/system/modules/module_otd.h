@@ -1,11 +1,11 @@
 #ifndef MODULE_OTD_H
 #define MODULE_OTD_H
 
-#include "Headers/system/com_port_module.h"
+#include "Headers/system/okb_module.h"
 
 class QTimer;
 
-class ModuleOTD: public COMPortModule
+class ModuleOTD: public ModuleOKB
 {
     Q_OBJECT
 
@@ -19,7 +19,7 @@ public:
     ModuleOTD(QObject* parent);
     ~ModuleOTD();
 
-    void postInit() override;
+    void postInit1() /*override*/;
 
 public slots:
     void resetLine(LineID line);
