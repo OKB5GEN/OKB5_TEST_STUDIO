@@ -65,7 +65,14 @@ void SystemState::init()
     // 3. Depending on list, create modules and put port pointers to them
     // 4. Call "init" of the each module
 
-    // TODO: The order of ports creation possibly important!
+    //QThread* mThreadOTD;
+    //QThread* mThreadMKO;
+    //QThread* mThreadSTM;
+    //QThread* mThreadTech;
+    //QThread* mThreadPowerBUP;
+    //QThread* mThreadPowerPNA;
+
+    // TODO: The order of modules creation possibly important!
     mPowerPNA = new ModulePower(this);
     mPowerBUP = new ModulePower(this);
     mSTM = new ModuleSTM(this);
@@ -101,11 +108,11 @@ void SystemState::init()
     mSTM->stm_on_mko(1, 0);
     mSTM->stm_on_mko(2, 0);
 
-    mThreadMKO = new QThread(this);
+    QThread* mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);
     mThreadMKO->start();
 
-    mThreadOTD = new QThread(this);
+    QThread* mThreadOTD = new QThread(this);
     mOTD->moveToThread(mThreadOTD);
     connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
     mThreadOTD->start();

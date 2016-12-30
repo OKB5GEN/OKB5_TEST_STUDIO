@@ -11,12 +11,14 @@
 #include "Headers/logic/commands/cmd_title.h"
 
 #include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/logic/commands/cmd_delay.h"
 #include "Headers/logic/commands/cmd_state_start.h"
 #include "Headers/logic/commands/cmd_set_state.h"
 #include "Headers/logic/commands/cmd_question.h"
 
 #include "Headers/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
@@ -766,6 +768,14 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdActionMathEditDialog* d = new CmdActionMathEditDialog(this);
             d->setCommand(qobject_cast<CmdActionMath*>(command));
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::ACTION_MODULE:
+        {
+            CmdActionModuleEditDialog* d = new CmdActionModuleEditDialog(this);
+            d->setCommand(qobject_cast<CmdActionModule*>(command));
             dialog = d;
         }
         break;

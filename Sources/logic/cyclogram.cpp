@@ -9,6 +9,7 @@
 #include "Headers/logic/commands/cmd_delay.h"
 #include "Headers/logic/commands/cmd_action.h"
 #include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/logic/commands/cmd_question.h"
 
 #include "Headers/logic/variable_controller.h"
@@ -376,7 +377,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         break;
     case DRAKON::ACTION_MODULE:
         {
-            //cmd = new CmdActionModule(this);
+            cmd = new CmdActionModule(this);
         }
         break;
 

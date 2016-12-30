@@ -51,6 +51,7 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     {
     case DRAKON::DELAY:
     case DRAKON::ACTION_MATH:
+    case DRAKON::ACTION_MODULE:
     case DRAKON::QUESTION:
         {
             setDefaultList();
@@ -118,11 +119,11 @@ void ShapeAddDialog::onCurrentIndexChanged(int index)
 
  void ShapeAddDialog::setDefaultList()
  {
-     mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
+     mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
      mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
+     mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
      mComboBox->addItem(tr("Question"), QVariant(int(DRAKON::QUESTION)));
-     mComboBox->addItem(tr("Cycle"), QVariant(int(DRAKON::QUESTION)));
-     //mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
+     //mComboBox->addItem(tr("Cycle"), QVariant(int(DRAKON::QUESTION))); // temporarily remove cycles
 
-     mComboBox->setCurrentIndex(1); //Action command by deafult as more frequently used
+     //mComboBox->setCurrentIndex(1); //Action module command by deafult as more frequently used
  }

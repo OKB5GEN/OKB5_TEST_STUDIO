@@ -60,7 +60,9 @@ SOURCES += main.cpp\
     Sources/system/modules/module_tech.cpp \
     Sources/system/modules/module_power.cpp \
     Sources/system/com_port_module.cpp \
-    Sources/system/okb_module.cpp
+    Sources/system/okb_module.cpp \
+    Sources/logic/commands/cmd_action_module.cpp \
+    Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -107,7 +109,9 @@ HEADERS  += Headers/shape_types.h \
     Headers/module_commands.h \
     Headers/system/modules/module_power.h \
     Headers/system/com_port_module.h \
-    Headers/system/okb_module.h
+    Headers/system/okb_module.h \
+    Headers/logic/commands/cmd_action_module.h \
+    Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h
 
 
 FORMS    += mainwindow.ui

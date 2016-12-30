@@ -16,12 +16,14 @@ public:
         ACTION_MATH,
         DELAY,
 
-        // NOT OR PARTIALLY IMPLEMENTED >>>
+        // PARTIALLY IMPLEMENTED >>>
         QUESTION,
         ACTION_MODULE,
 
+        // NOT IMPLEMENTED (PLANNED)
         SUBPROGRAM,
 
+        // NOT IMPLEMENTED (NOT PLANNED YET)
         SWITCH,
         CASE,
         FOR_BEGIN,

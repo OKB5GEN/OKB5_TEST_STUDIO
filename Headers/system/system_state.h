@@ -82,13 +82,6 @@ signals:
     void MKO_auto(int x,int y,int adr1, int adr2);
 
 private:
-    QThread* mThreadOTD;
-    QThread* mThreadMKO;
-    QThread* mThreadSTM;
-    QThread* mThreadTech;
-    QThread* mThreadPowerBUP;
-    QThread* mThreadPowerPNA;
-
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
     ModuleSTM* mSTM;
