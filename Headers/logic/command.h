@@ -7,6 +7,7 @@
 #include "Headers/gui/cyclogram/valency_point.h"
 
 class VariableController;
+class SystemState;
 
 class Command: public QObject
 {
@@ -58,6 +59,9 @@ public:
     void setVariableController(VariableController* controller);
     VariableController* variableController() const;
 
+    void setSystemState(SystemState* state);
+    SystemState* systemState() const;
+
 signals:
     void finished(Command* nextCmd);
     void textChanged(const QString& text);
@@ -79,6 +83,7 @@ protected:
 
     int mExecutionDelay;
     VariableController* mVarCtrl;
+    SystemState* mSystemState;
 
     QList<Command*> mNextCommands;
 

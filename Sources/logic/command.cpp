@@ -18,7 +18,9 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mRole(ValencyPoint::Down),
     mFlags(Command::All),
     mHasError(false),
-    mExecutionDelay(0)
+    mExecutionDelay(0),
+    mVarCtrl(Q_NULLPTR),
+    mSystemState(Q_NULLPTR)
 {
     setExecutionDelay(EXECUTION_DELAY);
 
@@ -487,6 +489,16 @@ void Command::setVariableController(VariableController* controller)
 VariableController* Command::variableController() const
 {
     return mVarCtrl;
+}
+
+void Command::setSystemState(SystemState* state)
+{
+    mSystemState = state;
+}
+
+SystemState* Command::systemState() const
+{
+    return mSystemState;
 }
 
 void Command::onNameChanged(const QString& newName, const QString& oldName)

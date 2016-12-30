@@ -8,6 +8,7 @@
 
 class Command;
 class VariableController;
+class SystemState;
 
 class Cyclogram: public QObject
 {
@@ -49,6 +50,7 @@ public:
     Command* validate() const; //
 
     VariableController* varCtrl() const;
+    void setSystemState(SystemState* state);
 
     static bool isCyclogramEndBranch(Command* cmd);
 
@@ -70,6 +72,7 @@ private:
     QList<Command*> mCommands;
 
     VariableController* mVarController;
+    SystemState* mSystemState;
 
     //bool mExecuteOneCmd;
 

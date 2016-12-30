@@ -50,6 +50,8 @@ EditorWindow::EditorWindow():
     setWindowTitle(tr("OKB5 Test Studio"));
 
     mSystemState = new SystemState(this);
+
+    mCyclogram->setSystemState(mSystemState);
 }
 
 void EditorWindow::init()

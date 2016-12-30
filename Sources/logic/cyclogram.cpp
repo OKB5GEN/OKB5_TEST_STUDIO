@@ -354,6 +354,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         {
             CmdActionMath* tmp = new CmdActionMath(this);
             tmp->setVariableController(mVarController);
+            tmp->setSystemState(mSystemState);
             cmd = tmp;
         }
         break;
@@ -377,7 +378,10 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         break;
     case DRAKON::ACTION_MODULE:
         {
-            cmd = new CmdActionModule(this);
+            CmdActionModule* tmp = new CmdActionModule(this);
+            tmp->setVariableController(mVarController);
+            tmp->setSystemState(mSystemState);
+            cmd = tmp;
         }
         break;
 
@@ -442,6 +446,11 @@ Command* Cyclogram::validate() const
 VariableController* Cyclogram::varCtrl() const
 {
     return mVarController;
+}
+
+void Cyclogram::setSystemState(SystemState* state)
+{
+    mSystemState = state;
 }
 
 void Cyclogram::getBranches(QList<Command*>& branches) const
