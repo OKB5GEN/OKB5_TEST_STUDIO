@@ -798,12 +798,13 @@ ModulePower* SystemState::modulePowerPNA() const
     return mPowerPNA;
 }
 
-QString SystemState::paramName(int module, int command, int param) const
+QString SystemState::paramName(int module, int command, int param, bool isInputParam) const
 {
     if (module >= 0 && module < ModuleCommands::MODULES_COUNT)
     {
-        QMap<int, QStringList>::const_iterator it = mParams[module].find(command);
-        if (it != mParams[module].end())
+        const QMap<int, QStringList>& container = (isInputParam ? mInParams[module] : mOutParams[module]);
+        QMap<int, QStringList>::const_iterator it = container.find(command);
+        if (it != container.end())
         {
             if (param >= 0 && param < it.value().size())
             {
@@ -815,12 +816,13 @@ QString SystemState::paramName(int module, int command, int param) const
     return "";
 }
 
-int SystemState::paramsCount(int module, int command) const
+int SystemState::paramsCount(int module, int command, bool isInputParam) const
 {
     if (module >= 0 && module < ModuleCommands::MODULES_COUNT)
     {
-        QMap<int, QStringList>::const_iterator it = mParams[module].find(command);
-        if (it != mParams[module].end())
+        const QMap<int, QStringList>& container = isInputParam ? mInParams[module] : mOutParams[module];
+        QMap<int, QStringList>::const_iterator it = container.find(command);
+        if (it != container.end())
         {
             return it.value().size();
         }
@@ -831,42 +833,46 @@ int SystemState::paramsCount(int module, int command) const
 
 void SystemState::setupParams()
 {
+    QStringList powerParams({tr("Напряжение, В"), tr("Ток, А")});
     {
         QMap<int, QStringList> params;
-        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = QStringList({tr("Напряжение"), tr("Ток")});
-        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = QStringList({tr("Напряжение"), tr("Ток")});
-        params[ModuleCommands::SET_POWER_STATE] = QStringList({tr("Вкл/Выкл")});
-        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = QStringList();
-        mParams[ModuleCommands::POWER_UNIT_BUP] = params;
+        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
+        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
+        mInParams[ModuleCommands::POWER_UNIT_BUP] = params;
+
+        params.clear();
+        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
+        mOutParams[ModuleCommands::POWER_UNIT_BUP] = params;
     }
 
     {
         QMap<int, QStringList> params;
-        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = QStringList({tr("Напряжение"), tr("Ток")});
-        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = QStringList({tr("Напряжение"), tr("Ток")});
-        params[ModuleCommands::SET_POWER_STATE] = QStringList({tr("Вкл/Выкл")});
-        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = QStringList();
-        mParams[ModuleCommands::POWER_UNIT_PNA] = params;
+        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
+        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
+        mInParams[ModuleCommands::POWER_UNIT_PNA] = params;
+
+        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
+        mOutParams[ModuleCommands::POWER_UNIT_PNA] = params;
     }
 
     {
         QMap<int, QStringList> params;
-        mParams[ModuleCommands::MKO] = params;
+        mInParams[ModuleCommands::MKO] = params;
     }
 
     {
         QMap<int, QStringList> params;
-        mParams[ModuleCommands::STM] = params;
+        mInParams[ModuleCommands::STM] = params;
     }
 
     {
         QMap<int, QStringList> params;
-        mParams[ModuleCommands::OTD] = params;
+        mInParams[ModuleCommands::OTD] = params;
     }
 
     {
         QMap<int, QStringList> params;
-        mParams[ModuleCommands::TECH] = params;
+        mInParams[ModuleCommands::TECH] = params;
     }
 
     /*

@@ -32,8 +32,8 @@ public:
     ModulePower* modulePowerBUP() const;
     ModulePower* modulePowerPNA() const;
 
-    QString paramName(int module, int command, int param) const;
-    int paramsCount(int module, int command) const;
+    QString paramName(int module, int command, int param, bool isInputParam) const;
+    int paramsCount(int module, int command, bool isInputParam) const;
 
 private slots:
     int simpltst1(int x);
@@ -115,6 +115,7 @@ private:
     //int m_flag_otd_auto = 0;
     //int m_dat[1000]={0};
     //int m_dat1[1000]={0};
-    QMap<int, QStringList> mParams[ModuleCommands::MODULES_COUNT];
+    QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
+    QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
 };
 #endif // SYSTEM_STATE_H

@@ -3,7 +3,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h"
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/system/system_state.h"
-//#include "Headers/logic/variable_controller.h"
+#include "Headers/logic/variable_controller.h"
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     QDialog(parent),
@@ -27,12 +27,12 @@ void CmdActionModuleEditDialog::setupUI()
     mValidator = new QDoubleValidator(this);
 
     mModules = new QListWidget(this);
-    mModules->addItem(tr("БП БУП"));
-    mModules->addItem(tr("БП ПНА"));
-    mModules->addItem(tr("МКО"));
-    mModules->addItem(tr("СТМ"));
-    mModules->addItem(tr("ОТД"));
-    mModules->addItem(tr("ТЕХ"));
+    mModules->addItem(tr("Блок питания БУП"));
+    //mModules->addItem(tr("Блок питания ПНА"));
+    //mModules->addItem(tr("МКО"));
+    //mModules->addItem(tr("СТМ"));
+    //mModules->addItem(tr("ОТД"));
+    //mModules->addItem(tr("ТЕХ"));
 
     layout->addWidget(mModules, 0, 0, 5, 4);
 
@@ -81,28 +81,35 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     case ModuleCommands::POWER_UNIT_PNA:
         {
             QListWidgetItem* item1 = new QListWidgetItem();
-            item1->setText(tr("УСТ.НАПР"));
+            item1->setText(tr("Установить текущее значение"));
             item1->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_VOLTAGE_AND_CURRENT));
             mCommands->addItem(item1);
 
             QListWidgetItem* item2 = new QListWidgetItem();
-            item2->setText(tr("УСТ.МАКС.НАПР"));
+            item2->setText(tr("Установить ограничение"));
             item2->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT));
             mCommands->addItem(item2);
 
             QListWidgetItem* item3 = new QListWidgetItem();
-            item3->setText(tr("УСТ.СОСТ"));
+            item3->setText(tr("Включить питание"));
             item3->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_POWER_STATE));
+            item3->setData(Qt::UserRole + 1, QVariant((int)ModuleCommands::POWER_ON));
             mCommands->addItem(item3);
 
             QListWidgetItem* item4 = new QListWidgetItem();
-            item4->setText(tr("ПОЛ.НАПР"));
-            item4->setData(Qt::UserRole, QVariant((int)ModuleCommands::GET_VOLTAGE_AND_CURRENT));
+            item4->setText(tr("Выключить питание"));
+            item4->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_POWER_STATE));
+            item4->setData(Qt::UserRole + 1, QVariant((int)ModuleCommands::POWER_OFF));
             mCommands->addItem(item4);
+
+            QListWidgetItem* item5 = new QListWidgetItem();
+            item5->setText(tr("Получить текущее значение"));
+            item5->setData(Qt::UserRole, QVariant((int)ModuleCommands::GET_VOLTAGE_AND_CURRENT));
+            mCommands->addItem(item5);
         }
         break;
 
-    case ModuleCommands::MKO:
+    case ModuleCommands::MKO: //TODO
         {
             mCommands->addItem(tr("МКО1"));
             mCommands->addItem(tr("МКО2"));
@@ -110,7 +117,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::STM:
+    case ModuleCommands::STM: //TODO
         {
             mCommands->addItem(tr("СТМ1"));
             mCommands->addItem(tr("СТМ2"));
@@ -118,7 +125,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::OTD:
+    case ModuleCommands::OTD://TODO
         {
             mCommands->addItem(tr("ОТД1"));
             mCommands->addItem(tr("ОТД2"));
@@ -126,7 +133,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::TECH:
+    case ModuleCommands::TECH://TODO
         {
             mCommands->addItem(tr("ТЕХ1"));
             mCommands->addItem(tr("ТЕХ2"));
@@ -152,21 +159,33 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
     mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
-    int count = system->paramsCount(mModuleID, mCommandID);
-    mParams->setRowCount(count);
+    int inCount = system->paramsCount(mModuleID, mCommandID, true);
+    int outCount = system->paramsCount(mModuleID, mCommandID, false);
+    mParams->setRowCount(inCount + outCount);
 
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < inCount; ++i)
     {
-        QString name = system->paramName(mModuleID, mCommandID, i);
+        QString name = system->paramName(mModuleID, mCommandID, i, true);
         QLabel* text = new QLabel(mParams);
         text->setText(name);
         mParams->setCellWidget(i, 0, text);
 
-        //SystemState::ParamType type = system->paramType(mModuleID, mCommandID, i);
-
         QLineEdit* lineEdit = new QLineEdit(mParams);
         lineEdit->setValidator(mValidator);
         mParams->setCellWidget(i, 1, lineEdit);
+    }
+
+    for (int i = 0; i < outCount; ++i)
+    {
+        QString name = system->paramName(mModuleID, mCommandID, i, false);
+        QLabel* text = new QLabel(mParams);
+        text->setText(name);
+        mParams->setCellWidget(i + inCount, 0, text);
+
+        QComboBox* comboBox = new QComboBox(mParams);
+        VariableController* vc = mCommand->variableController();
+        comboBox->addItems(vc->variables().keys());
+        mParams->setCellWidget(i + inCount, 1, comboBox);
     }
 }
 
