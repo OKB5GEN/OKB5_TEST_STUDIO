@@ -14,8 +14,8 @@ public:
         POWER_UNIT_PNA,
         MKO,
         STM,
-        TECH,
-        OTD
+        OTD,
+        TECH
     };
 
     enum Operation
