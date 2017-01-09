@@ -2,6 +2,7 @@
 
 #include "Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h"
 #include "Headers/logic/commands/cmd_action_module.h"
+#include "Headers/system/system_state.h"
 //#include "Headers/logic/variable_controller.h"
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
@@ -23,6 +24,7 @@ CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
 void CmdActionModuleEditDialog::setupUI()
 {
     QGridLayout * layout = new QGridLayout(this);
+    mValidator = new QDoubleValidator(this);
 
     mModules = new QListWidget(this);
     mModules->addItem(tr("БП БУП"));
@@ -54,8 +56,6 @@ void CmdActionModuleEditDialog::setupUI()
     connect(mModules, SIGNAL(currentRowChanged(int)), this, SLOT(onModuleChanged(int)));
     connect(mCommands, SIGNAL(currentRowChanged(int)), this, SLOT(onCommandChanged(int)));
 
-    mModules->setCurrentRow(0);
-
     setLayout(layout);
 }
 
@@ -65,6 +65,7 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 
     if (mCommand)
     {
+        mModules->setCurrentRow(mCommand->module());
     }
 }
 
@@ -76,25 +77,32 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     // module changed -> update command list for this module
     switch (index)
     {
-    case CmdActionModule::POWER_UNIT_BUP:
+    case ModuleCommands::POWER_UNIT_BUP:
+    case ModuleCommands::POWER_UNIT_PNA:
         {
-            mCommands->addItem(tr("1УСТ.НАПР"));
-            mCommands->addItem(tr("1УСТ.МАКС.НАПР"));
-            mCommands->addItem(tr("1УСТ.СОСТ"));
-            mCommands->addItem(tr("1ПОЛ.НАПР"));
+            QListWidgetItem* item1 = new QListWidgetItem();
+            item1->setText(tr("УСТ.НАПР"));
+            item1->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_VOLTAGE_AND_CURRENT));
+            mCommands->addItem(item1);
+
+            QListWidgetItem* item2 = new QListWidgetItem();
+            item2->setText(tr("УСТ.МАКС.НАПР"));
+            item2->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT));
+            mCommands->addItem(item2);
+
+            QListWidgetItem* item3 = new QListWidgetItem();
+            item3->setText(tr("УСТ.СОСТ"));
+            item3->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_POWER_STATE));
+            mCommands->addItem(item3);
+
+            QListWidgetItem* item4 = new QListWidgetItem();
+            item4->setText(tr("ПОЛ.НАПР"));
+            item4->setData(Qt::UserRole, QVariant((int)ModuleCommands::GET_VOLTAGE_AND_CURRENT));
+            mCommands->addItem(item4);
         }
         break;
 
-    case CmdActionModule::POWER_UNIT_PNA:
-        {
-            mCommands->addItem(tr("2УСТ.НАПР"));
-            mCommands->addItem(tr("2УСТ.МАКС.НАПР"));
-            mCommands->addItem(tr("2УСТ.СОСТ"));
-            mCommands->addItem(tr("2ПОЛ.НАПР"));
-        }
-        break;
-
-    case CmdActionModule::MKO:
+    case ModuleCommands::MKO:
         {
             mCommands->addItem(tr("МКО1"));
             mCommands->addItem(tr("МКО2"));
@@ -102,7 +110,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case CmdActionModule::STM:
+    case ModuleCommands::STM:
         {
             mCommands->addItem(tr("СТМ1"));
             mCommands->addItem(tr("СТМ2"));
@@ -110,7 +118,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case CmdActionModule::OTD:
+    case ModuleCommands::OTD:
         {
             mCommands->addItem(tr("ОТД1"));
             mCommands->addItem(tr("ОТД2"));
@@ -118,7 +126,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case CmdActionModule::TECH:
+    case ModuleCommands::TECH:
         {
             mCommands->addItem(tr("ТЕХ1"));
             mCommands->addItem(tr("ТЕХ2"));
@@ -135,8 +143,31 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
 void CmdActionModuleEditDialog::onCommandChanged(int index)
 {
-    mCommandID = index;
     mParams->clearContents();
+
+    if (index == -1)
+    {
+        return;
+    }
+
+    mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
+    SystemState* system = mCommand->systemState();
+    int count = system->paramsCount(mModuleID, mCommandID);
+    mParams->setRowCount(count);
+
+    for (int i = 0; i < count; ++i)
+    {
+        QString name = system->paramName(mModuleID, mCommandID, i);
+        QLabel* text = new QLabel(mParams);
+        text->setText(name);
+        mParams->setCellWidget(i, 0, text);
+
+        //SystemState::ParamType type = system->paramType(mModuleID, mCommandID, i);
+
+        QLineEdit* lineEdit = new QLineEdit(mParams);
+        lineEdit->setValidator(mValidator);
+        mParams->setCellWidget(i, 1, lineEdit);
+    }
 }
 
 void CmdActionModuleEditDialog::onAccept()
@@ -148,4 +179,3 @@ void CmdActionModuleEditDialog::onAccept()
 
     accept();
 }
-

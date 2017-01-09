@@ -2,41 +2,21 @@
 #define CMD_ACTION_MODULE_H
 
 #include "Headers/logic/commands/cmd_action.h"
+#include "Headers/module_commands.h"
 
 class CmdActionModule: public CmdAction
 {
     Q_OBJECT
 
 public:
-    enum Module
-    {
-        POWER_UNIT_BUP,
-        POWER_UNIT_PNA,
-        MKO,
-        STM,
-        OTD,
-        TECH
-    };
-
-    enum Operation
-    {
-        // Power unit operations
-        SET_VOLTAGE_AND_CURRENT,
-        SET_MAX_VOLTAGE_AND_CURRENT,
-        SET_POWER_STATE,
-        GET_CURRENT_VOLTAGE_AND_CURRENT,
-
-        //
-    };
-
     CmdActionModule(QObject* parent);
 
     void run() override;
 
-    void setOperation(Module module, Operation operation);
+    void setOperation(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation);
 
-    Operation operation() const;
-    Module module() const;
+    ModuleCommands::CommandID operation() const;
+    ModuleCommands::ModuleID module() const;
 
 /*
     void setOperand(OperandID operand, qreal value);
@@ -53,8 +33,7 @@ private slots:
 private:
     void updateText();
 
-    Module mModule;
-    Operation mOperation;
-
+    ModuleCommands::ModuleID mModule;
+    ModuleCommands::CommandID mOperation;
 };
 #endif // CMD_ACTION_MODULE_H

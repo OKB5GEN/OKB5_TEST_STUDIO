@@ -10,6 +10,8 @@ class ModuleCommands: public QObject
 public:
     enum CommandID
     {
+        // Own modules commands (documented) >>>>>
+
         GET_MODULE_ADDRESS              = 0x01,
         GET_STATUS_WORD                 = 0x02,
         RESET_ERROR                     = 0x03,
@@ -56,6 +58,16 @@ public:
         SET_TECH_INTERFACE              = 0x3B, // Can be sent to TECH only
         GET_TECH_INTERFACE              = 0x3C, // Can be sent to TECH only
         RECV_DATA_SSI                   = 0x3D, // Can be sent to TECH only
+
+        // Third party modules commands (arbitrary) >>>>
+
+        // Power unit modules commands (0xFF00-started)
+        SET_VOLTAGE_AND_CURRENT         = 0xFF01,
+        SET_MAX_VOLTAGE_AND_CURRENT     = 0xFF02,
+        SET_POWER_STATE                 = 0xFF03,
+        GET_VOLTAGE_AND_CURRENT         = 0xFF04,
+
+        // MKO module commands (0xFF0000 started)
     };
 
     Q_ENUM(CommandID)
@@ -76,6 +88,18 @@ public:
     {
         POWER_ON,
         POWER_OFF
+    };
+
+    enum ModuleID
+    {
+        POWER_UNIT_BUP,
+        POWER_UNIT_PNA,
+        MKO,
+        STM,
+        OTD,
+        TECH,
+
+        MODULES_COUNT
     };
 };
 

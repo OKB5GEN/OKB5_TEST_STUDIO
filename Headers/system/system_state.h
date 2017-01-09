@@ -2,8 +2,10 @@
 #define SYSTEM_STATE_H
 
 #include <QMap>
+#include <QStringList>
 
 #include "Headers/logic/variable_controller.h"
+#include "Headers/module_commands.h"
 
 class QSerialPort;
 
@@ -29,6 +31,9 @@ public:
     ModuleTech* moduleTech() const;
     ModulePower* modulePowerBUP() const;
     ModulePower* modulePowerPNA() const;
+
+    QString paramName(int module, int command, int param) const;
+    int paramsCount(int module, int command) const;
 
 private slots:
     int simpltst1(int x);
@@ -89,6 +94,8 @@ signals:
     void MKO_auto(int x,int y,int adr1, int adr2);
 
 private:
+    void setupParams();
+
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
     ModuleSTM* mSTM;
@@ -101,7 +108,6 @@ private:
     QThread* mThreadMKO;
     QThread* mThreadOTD;
 
-
     //int m_flag_rem1 = 0;
     //int m_flag_rem2 = 0;
     //int m_k = 0;
@@ -109,5 +115,6 @@ private:
     //int m_flag_otd_auto = 0;
     //int m_dat[1000]={0};
     //int m_dat1[1000]={0};
+    QMap<int, QStringList> mParams[ModuleCommands::MODULES_COUNT];
 };
 #endif // SYSTEM_STATE_H

@@ -10,8 +10,9 @@
 #include <QTimer>
 
 CmdActionModule::CmdActionModule(QObject* parent):
-    CmdAction(DRAKON::ACTION_MODULE, parent)
-//    mOperation(Assign)
+    CmdAction(DRAKON::ACTION_MODULE, parent),
+    mModule(ModuleCommands::POWER_UNIT_BUP),
+    mOperation(ModuleCommands::SET_VOLTAGE_AND_CURRENT)
 {
     updateText();
 }
@@ -30,31 +31,33 @@ void CmdActionModule::run()
 
 void CmdActionModule::execute()
 {
+    int TODO; //SEND SIGNALS, NOT DIRECT CALLS!
+
     switch (mModule)
     {
-    case POWER_UNIT_BUP:
-    case POWER_UNIT_PNA:
+    case ModuleCommands::POWER_UNIT_BUP:
+    case ModuleCommands::POWER_UNIT_PNA:
         {
-            ModulePower* module = (mModule == POWER_UNIT_BUP) ? mSystemState->modulePowerBUP() : mSystemState->modulePowerPNA();
+            ModulePower* module = (mModule == ModuleCommands::POWER_UNIT_BUP) ? mSystemState->modulePowerBUP() : mSystemState->modulePowerPNA();
 
             switch (mOperation)
             {
-            case SET_VOLTAGE_AND_CURRENT:
+            case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
                 {
                     module->setVoltageAndCurrent(27); //TODO
                 }
                 break;
-            case SET_MAX_VOLTAGE_AND_CURRENT:
+            case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
                 {
                     module->setMaxVoltageAndCurrent(28, 0.5); //TODO
                 }
                 break;
-            case SET_POWER_STATE:
+            case ModuleCommands::SET_POWER_STATE:
                 {
                     module->setPowerState(ModuleCommands::POWER_ON); //TODO
                 }
                 break;
-            case GET_CURRENT_VOLTAGE_AND_CURRENT:
+            case ModuleCommands::GET_CURRENT_VOLTAGE_AND_CURRENT:
                 {
                     double voltage;
                     double current;
@@ -114,25 +117,24 @@ void CmdActionModule::execute()
 
     // set new variable value to variable controller
     mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
-
     */
 
     finish();
 }
 
-void CmdActionModule::setOperation(CmdActionModule::Module module, CmdActionModule::Operation operation)
+void CmdActionModule::setOperation(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation)
 {
     mModule = module;
     mOperation = operation;
     updateText();
 }
 
-CmdActionModule::Operation CmdActionModule::operation() const
+ModuleCommands::CommandID CmdActionModule::operation() const
 {
     return mOperation;
 }
 
-CmdActionModule::Module CmdActionModule::module() const
+ModuleCommands::ModuleID CmdActionModule::module() const
 {
     return mModule;
 }
