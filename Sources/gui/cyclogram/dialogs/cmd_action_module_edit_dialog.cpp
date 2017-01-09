@@ -167,18 +167,21 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     {
         QString name = system->paramName(mModuleID, mCommandID, i, true);
         QLabel* text = new QLabel(mParams);
+        text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
         mParams->setCellWidget(i, 0, text);
 
-        QLineEdit* lineEdit = new QLineEdit(mParams);
-        lineEdit->setValidator(mValidator);
-        mParams->setCellWidget(i, 1, lineEdit);
+        QComboBox* comboBox = new QComboBox(mParams);
+        VariableController* vc = mCommand->variableController();
+        comboBox->addItems(vc->variables().keys());
+        mParams->setCellWidget(i, 1, comboBox);
     }
 
     for (int i = 0; i < outCount; ++i)
     {
         QString name = system->paramName(mModuleID, mCommandID, i, false);
         QLabel* text = new QLabel(mParams);
+        text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
         mParams->setCellWidget(i + inCount, 0, text);
 
@@ -193,7 +196,46 @@ void CmdActionModuleEditDialog::onAccept()
 {
     if (mCommand)
     {
-        // TODO : set GUI data to command
+        QMap<QString, QString> input;
+        QMap<QString, QString> output;
+
+        SystemState* system = mCommand->systemState();
+        int inCount = system->paramsCount(mModuleID, mCommandID, true);
+        int outCount = system->paramsCount(mModuleID, mCommandID, false);
+
+        for (int i = 0; i < inCount; ++i)
+        {
+            QLabel* label = qobject_cast<QLabel*>(mParams->cellWidget(i, 0));
+            QString name;
+            if (label)
+            {
+                name = label->text();
+            }
+
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mParams->cellWidget(i, 1));
+            if (comboBox)
+            {
+                input[name] = comboBox->currentText();
+            }
+        }
+
+        for (int i = inCount; i < (inCount + outCount); ++i)
+        {
+            QString name;
+            QLabel* label = qobject_cast<QLabel*>(mParams->cellWidget(i, 0));
+            if (label)
+            {
+                name = label->text();
+            }
+
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mParams->cellWidget(i, 1));
+            if (comboBox)
+            {
+                output[name] = comboBox->currentText();
+            }
+        }
+
+        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
     }
 
     accept();

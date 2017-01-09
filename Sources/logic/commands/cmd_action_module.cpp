@@ -57,7 +57,7 @@ void CmdActionModule::execute()
                     module->setPowerState(ModuleCommands::POWER_ON); //TODO
                 }
                 break;
-            case ModuleCommands::GET_CURRENT_VOLTAGE_AND_CURRENT:
+            case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
                 {
                     double voltage;
                     double current;
@@ -122,10 +122,12 @@ void CmdActionModule::execute()
     finish();
 }
 
-void CmdActionModule::setOperation(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation)
+void CmdActionModule::setParams(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out)
 {
     mModule = module;
     mOperation = operation;
+    mInputParams = in;
+    mOutputParams = out;
     updateText();
 }
 
@@ -139,207 +141,156 @@ ModuleCommands::ModuleID CmdActionModule::module() const
     return mModule;
 }
 
-/*
-void CmdActionModule::setOperation(Operation operation)
+const QMap<QString, QString>& CmdActionModule::inputParams() const
 {
-    mOperation = operation;
-    updateText();
+    return mInputParams;
 }
 
-void CmdActionMath::setOperand(OperandID operand, qreal value)
+const QMap<QString, QString>& CmdActionModule::outputParams() const
 {
-    if (operand < 0 || operand >= OperandsCount)
-    {
-        qDebug("Invalid operand input 1");
-        return;
-    }
-
-    if (operand == Result)
-    {
-        qDebug("Operation result must be variable");
-        return;
-    }
-
-    mOperands[operand].value = value;
-    mOperands[operand].type = Number;
-    mOperands[operand].variable = "";
-    updateText();
+    return mOutputParams;
 }
 
-void CmdActionMath::setOperand(OperandID operand, const QString& variable)
-{
-    if (operand < 0 || operand >= OperandsCount)
-    {
-        qDebug("Invalid operand input");
-        return;
-    }
-
-    if (variable.isEmpty())
-    {
-        qDebug("No variable name provided");
-        return;
-    }
-
-    mOperands[operand].value = mVarCtrl->variable(variable);
-    mOperands[operand].type = Variable;
-    mOperands[operand].variable = variable;
-    updateText();
-}
-
-CmdActionMath::Operation CmdActionMath::operation() const
-{
-    return mOperation;
-}
-
-CmdActionMath::OperandType CmdActionMath::operandType(OperandID operand) const
-{
-    if (operand < 0 || operand >= OperandsCount)
-    {
-        qDebug("Invalid operand input 2");
-        return OperandNotSet;
-    }
-
-    return mOperands[operand].type;
-}
-
-QString CmdActionMath::variableName(OperandID operand) const
-{
-    if (operand < 0 || operand >= OperandsCount)
-    {
-        qDebug("Invalid operand input 3");
-        return "";
-    }
-
-    if (mOperands[operand].type == Number)
-    {
-        qDebug("Operand is not variable");
-        return "";
-    }
-
-    return mOperands[operand].variable;
-}
-
-qreal CmdActionMath::value(OperandID operand) const
-{
-    if (operand < 0 || operand >= OperandsCount)
-    {
-        qDebug("Invalid operand input 4");
-        return -1;
-    }
-
-    return mOperands[operand].value;
-}
-*/
 void CmdActionModule::updateText()
 {
-    mText = "ModuleCMD";
-
-    /*mText = "";
-
-    if (mOperands[Result].variable.isEmpty())
+    if (!mSystemState)
     {
-        mText = "N/A";
-        if (!hasError())
-        {
-            setErrorStatus(true);
-        }
-
+        mText = tr("Invalid cmd");
+        setErrorStatus(true);
         return;
     }
 
+    mText = "";
     bool isValid = true;
 
-    mText += mOperands[Result].variable;
-    mText += "=";
-
-    switch (mOperands[Operand1].type)
+    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
-    case Variable:
-        mText += mOperands[Operand1].variable;
-        break;
-    case Number:
-        mText += QString::number(mOperands[Operand1].value);
-        break;
-    default:
-        mText += "N/A";
-        isValid = false;
-        break;
-    }
-
-    if (mOperation != Assign)
-    {
-        switch (mOperation)
+        if (it.value().isEmpty())
         {
-        case Add:
-            mText += "+";
-            break;
-        case Subtract:
-            mText += "-";
-            break;
-        case Multiply:
-            mText += "*";
-            break;
-        case Divide:
-            mText += ":";
-            break;
-        default:
-            break;
-        }
-
-        switch (mOperands[Operand2].type)
-        {
-        case Variable:
-            mText += mOperands[Operand2].variable;
-            break;
-        case Number:
-            mText += QString::number(mOperands[Operand2].value);
-            break;
-        default:
-            mText += "N/A";
             isValid = false;
             break;
         }
+        else
+        {
+            if (!mText.isEmpty())
+            {
+                mText += ",";
+            }
+
+            mText += it.value();
+        }
     }
+
+    if (!mOutputParams.isEmpty())
+    {
+        mText += "=";
+    }
+
+    if (mInputParams.size() < mSystemState->paramsCount(mModule, mOperation, true))
+    {
+        isValid = false;
+    }
+
+    if (mOutputParams.size() < mSystemState->paramsCount(mModule, mOperation, false))
+    {
+        isValid = false;
+    }
+
+    mText += moduleName();
+    mText += ".";
+    mText += commandName();
+    mText += "(";
+
+    bool isFirstParam = true;
+
+    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        if (it.value().isEmpty())
+        {
+            isValid = false;
+        }
+        else
+        {
+            if (!isFirstParam)
+            {
+                mText += ",";
+            }
+
+            mText += it.value();
+        }
+
+        isFirstParam = false;
+    }
+
+    mText += ")";
 
     if ((hasError() && isValid) || (!hasError() && !isValid))
     {
+        if (!isValid)
+        {
+            mText = tr("Invalid cmd");
+        }
+
         setErrorStatus(!isValid);
-    }*/
+    }
 
     emit textChanged(mText);
 }
 
-/*
-void CmdActionMath::onNameChanged(const QString& newName, const QString& oldName)
+void CmdActionModule::onNameChanged(const QString& newName, const QString& oldName)
 {
-    for (int i = 0; i < OperandsCount; ++i)
+    QList<QString> values = mInputParams.values();
+
+    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
-        if (mOperands[i].type == Variable && mOperands[i].variable == oldName)
+        if (it.value() == oldName)
         {
-            mOperands[i].variable = newName; // just change name
+            mInputParams[it.key()] = newName;
+        }
+    }
+
+    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.value() == oldName)
+        {
+            mOutputParams[it.key()] = newName;
         }
     }
 
     updateText();
 }
 
-void CmdActionMath::onVariableRemoved(const QString& name)
+void CmdActionModule::onVariableRemoved(const QString& name)
 {
-    for (int i = 0; i < OperandsCount; ++i)
+    QList<QString> values = mInputParams.values();
+
+    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
-        if (mOperands[i].type == Variable && mOperands[i].variable == name)
+        if (it.value() == name)
         {
-            if (i == Operand2 && mOperation == Assign)
-            {
-                // do nothing
-            }
-            else
-            {
-                mOperands[i].type = OperandNotSet;
-                mOperands[i].variable.clear();
-            }
+            mInputParams[it.key()] = "";
+        }
+    }
+
+    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.value() == name)
+        {
+            mOutputParams[it.key()] = "";
         }
     }
 
     updateText();
-}*/
+}
+
+QString CmdActionModule::moduleName() const
+{
+    mModule;
+    return tr("БП");
+}
+
+QString CmdActionModule::commandName() const
+{
+    mOperation;
+    return tr("КМД");
+}
