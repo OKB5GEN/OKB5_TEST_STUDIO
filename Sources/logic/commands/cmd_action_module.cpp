@@ -1,4 +1,10 @@
 #include "Headers/logic/commands/cmd_action_module.h"
+#include "Headers/system/system_state.h"
+#include "Headers/system/modules/module_mko.h"
+#include "Headers/system/modules/module_otd.h"
+#include "Headers/system/modules/module_power.h"
+#include "Headers/system/modules/module_stm.h"
+#include "Headers/system/modules/module_tech.h"
 //#include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
@@ -24,6 +30,47 @@ void CmdActionModule::run()
 
 void CmdActionModule::execute()
 {
+    switch (mModule)
+    {
+    case POWER_UNIT_BUP:
+    case POWER_UNIT_PNA:
+        {
+            ModulePower* module = (mModule == POWER_UNIT_BUP) ? mSystemState->modulePowerBUP() : mSystemState->modulePowerPNA();
+
+            switch (mOperation)
+            {
+            case SET_VOLTAGE_AND_CURRENT:
+                {
+                    module->setVoltageAndCurrent(27); //TODO
+                }
+                break;
+            case SET_MAX_VOLTAGE_AND_CURRENT:
+                {
+                    module->setMaxVoltageAndCurrent(28, 0.5); //TODO
+                }
+                break;
+            case SET_POWER_STATE:
+                {
+                    module->setPowerState(ModuleCommands::POWER_ON); //TODO
+                }
+                break;
+            case GET_CURRENT_VOLTAGE_AND_CURRENT:
+                {
+                    double voltage;
+                    double current;
+                    uint8_t error;
+                    module->getCurVoltageAndCurrent(voltage, current, error); // TODO
+                }
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+
     // read current values from variable controller
 /*    for (int i = 0; i < OperandsCount; ++i)
     {
@@ -68,10 +115,30 @@ void CmdActionModule::execute()
     // set new variable value to variable controller
     mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
 
-    finish();*/
+    */
+
+    finish();
 }
+
+void CmdActionModule::setOperation(CmdActionModule::Module module, CmdActionModule::Operation operation)
+{
+    mModule = module;
+    mOperation = operation;
+    updateText();
+}
+
+CmdActionModule::Operation CmdActionModule::operation() const
+{
+    return mOperation;
+}
+
+CmdActionModule::Module CmdActionModule::module() const
+{
+    return mModule;
+}
+
 /*
-void CmdActionMath::setOperation(Operation operation)
+void CmdActionModule::setOperation(Operation operation)
 {
     mOperation = operation;
     updateText();

@@ -1,4 +1,5 @@
 #include "Headers/system/modules/module_power.h"
+#include <QTimer>
 
 namespace
 {
@@ -9,8 +10,15 @@ namespace
 
 ModulePower::ModulePower(QObject* parent):
     COMPortModule(parent),
-    mState(ModuleCommands::POWER_OFF)
+    mState(ModuleCommands::POWER_OFF),
+    mUpdatePeriod(0),
+    mVoltage(0),
+    mCurrent(0),
+    mError(0)
 {
+    mUpdateTimer = new QTimer(this);
+    connect(mUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
+
     int TODO; // проверять перед установкой на максимум, ограничения ставим сразу, текущее значение, ограничиваем по максимуму
     /*
     QString S1 = ui->setU1->text();
@@ -175,4 +183,27 @@ void ModulePower::getCurVoltageAndCurrent(double& voltage, double& current, uint
     uu2 = response[8];
     current = (uu1 << 8) | uu2;
     current = current * MAX_CURRENT / 256;
+}
+
+void ModulePower::setUpdatePeriod(int msec, bool startTimer)
+{
+    mUpdatePeriod = msec;
+
+    if (startTimer)
+    {
+        if (mUpdatePeriod > 0)
+        {
+            mUpdateTimer->setInterval(mUpdatePeriod);
+            mUpdateTimer->start();
+        }
+        else
+        {
+            mUpdateTimer->stop();
+        }
+    }
+}
+
+void ModulePower::update()
+{
+    getCurVoltageAndCurrent(mVoltage, mCurrent, mError);
 }

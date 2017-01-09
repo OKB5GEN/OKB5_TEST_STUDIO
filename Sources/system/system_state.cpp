@@ -21,17 +21,38 @@ namespace
 
 SystemState::SystemState(QObject* parent):
     VariableController(parent),
-    m_mko_kits(ModuleMKO::NO_KIT)
+    m_mko_kits(ModuleMKO::NO_KIT),
+    mThreadMKO(Q_NULLPTR),
+    mThreadOTD(Q_NULLPTR)
 {
 }
 
 SystemState::~SystemState()
 {
+    if (mThreadMKO && mThreadMKO->isRunning())
+    {
+        mThreadMKO->terminate();
+    }
+
+    if (mThreadOTD && mThreadOTD->isRunning())
+    {
+        mThreadOTD->terminate();
+    }
+
+    if (mMKO)
+    {
+        delete mMKO;
+    }
+
+    if (mOTD)
+    {
+        delete mOTD;
+    }
 }
 
 void SystemState::init()
 {
-    return;
+    //return;
 
     /*
      * Что надо сделать?
@@ -60,11 +81,6 @@ void SystemState::init()
      *
     */
 
-    // 1. Create COM-ports
-    // 2. Send command "Get module address" (current and default) to each of them
-    // 3. Depending on list, create modules and put port pointers to them
-    // 4. Call "init" of the each module
-
     //QThread* mThreadOTD;
     //QThread* mThreadMKO;
     //QThread* mThreadSTM;
@@ -78,23 +94,23 @@ void SystemState::init()
     mSTM = new ModuleSTM(this);
     mTech = new ModuleTech(this);
 
-    mOTD = new ModuleOTD(this);
-    connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
-    connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
-    connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
-    connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
-    connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
-    connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
-    connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
-    connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
-    connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
-    connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
+    mOTD = new ModuleOTD(Q_NULLPTR);
+    //connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
+    //connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
+    //connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
+    //connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
+    //connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
+    //connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
+    //connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
+    //connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
+    //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
+    //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
 
-    mMKO = new ModuleMKO(this);
-    connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
-    connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
-    connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
-    connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
+    mMKO = new ModuleMKO(Q_NULLPTR);
+    //connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
+    //connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
+    //connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
+    //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
 
     mPowerPNA->init();
     mPowerBUP->init();
@@ -103,16 +119,19 @@ void SystemState::init()
     mOTD->init();
 
     mPowerBUP->startPower();
+    //mPowerBUP->setUpdatePeriod(5000); //TODO
+
     mPowerPNA->startPower();
+    //mPowerPNA->setUpdatePeriod(5000); //TODO
 
     mSTM->stm_on_mko(1, 0);
     mSTM->stm_on_mko(2, 0);
 
-    QThread* mThreadMKO = new QThread(this);
+    mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);
     mThreadMKO->start();
 
-    QThread* mThreadOTD = new QThread(this);
+    mThreadOTD = new QThread(this);
     mOTD->moveToThread(mThreadOTD);
     connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
     mThreadOTD->start();
@@ -748,3 +767,32 @@ void SystemState::on_OTD_avt_2_clicked()
     */
 }
 
+ModuleMKO* SystemState::moduleMKO() const
+{
+    return mMKO;
+}
+
+ModuleOTD* SystemState::moduleOTD() const
+{
+    return mOTD;
+}
+
+ModuleSTM* SystemState::moduleSTM() const
+{
+    return mSTM;
+}
+
+ModuleTech* SystemState::moduleTech() const
+{
+    return mTech;
+}
+
+ModulePower* SystemState::modulePowerBUP() const
+{
+    return mPowerBUP;
+}
+
+ModulePower* SystemState::modulePowerPNA() const
+{
+    return mPowerPNA;
+}

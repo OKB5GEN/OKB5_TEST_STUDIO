@@ -287,7 +287,7 @@ void ModuleOTD::OTDtemper()
     }
 
     data += "\n";
-    if(readData0.at(3) == 2)
+    if(!readData0.isEmpty() && readData0.at(3) == 2)
     {
         data += "Ошибка при считывании датчиков 1-й оси\n";
     }
@@ -320,7 +320,7 @@ void ModuleOTD::OTDtemper()
         data += "\n";
     }
 
-    if (readData3.at(3) == 2)
+    if (!readData3.isEmpty() && readData3.at(3) == 2)
     {
         data += "Ошибка при считывании датчиков 2-й оси\n";
     }

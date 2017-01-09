@@ -23,6 +23,13 @@ public:
 
     void init();
 
+    ModuleMKO* moduleMKO() const;
+    ModuleOTD* moduleOTD() const;
+    ModuleSTM* moduleSTM() const;
+    ModuleTech* moduleTech() const;
+    ModulePower* modulePowerBUP() const;
+    ModulePower* modulePowerPNA() const;
+
 private slots:
     int simpltst1(int x);
 
@@ -90,6 +97,10 @@ private:
     ModulePower* mPowerPNA;
 
     int m_mko_kits;
+
+    QThread* mThreadMKO;
+    QThread* mThreadOTD;
+
 
     //int m_flag_rem1 = 0;
     //int m_flag_rem2 = 0;

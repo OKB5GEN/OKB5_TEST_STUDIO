@@ -3,6 +3,8 @@
 
 #include "Headers/system/com_port_module.h"
 
+class QTimer;
+
 class ModulePower: public COMPortModule
 {
     Q_OBJECT
@@ -20,6 +22,11 @@ public:
     void setMaxVoltageAndCurrent(double voltage, double current);
     void getCurVoltageAndCurrent(double& voltage, double& current, uint8_t& error);
 
+    void setUpdatePeriod(int msec, bool startTimer = true);
+
+private slots:
+    void update();
+
 private:
     enum ValueID
     {
@@ -32,6 +39,13 @@ private:
     void setPowerValue(uint8_t valueID, double value, double maxValue);
 
     ModuleCommands::PowerState mState;
+
+    QTimer* mUpdateTimer;
+    int mUpdatePeriod;
+
+    double mVoltage;
+    double mCurrent;
+    uint8_t mError;
 };
 
 #endif // MODULE_POWER_H
