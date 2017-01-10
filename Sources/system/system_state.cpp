@@ -932,3 +932,8 @@ void SystemState::setupParams()
     GET_CURRENT_VOLTAGE_AND_CURRENT = 0xFF04,
     */
 }
+
+bool SystemState::sendCommand(CmdActionModule* command)
+{
+    return false;
+}

@@ -31,93 +31,15 @@ void CmdActionModule::run()
 
 void CmdActionModule::execute()
 {
-    int TODO; //SEND SIGNALS, NOT DIRECT CALLS!
-
-    switch (mModule)
+    if (mSystemState->sendCommand(this))
     {
-    case ModuleCommands::POWER_UNIT_BUP:
-    case ModuleCommands::POWER_UNIT_PNA:
-        {
-            ModulePower* module = (mModule == ModuleCommands::POWER_UNIT_BUP) ? mSystemState->modulePowerBUP() : mSystemState->modulePowerPNA();
-
-            switch (mOperation)
-            {
-            case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-                {
-                    module->setVoltageAndCurrent(27); //TODO
-                }
-                break;
-            case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
-                {
-                    module->setMaxVoltageAndCurrent(28, 0.5); //TODO
-                }
-                break;
-            case ModuleCommands::SET_POWER_STATE:
-                {
-                    module->setPowerState(ModuleCommands::POWER_ON); //TODO
-                }
-                break;
-            case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-                {
-                    double voltage;
-                    double current;
-                    uint8_t error;
-                    module->getCurVoltageAndCurrent(voltage, current, error); // TODO
-                }
-                break;
-            default:
-                break;
-            }
-        }
-        break;
-    default:
-        break;
+        finish(); // command executed
     }
-
-    // read current values from variable controller
-/*    for (int i = 0; i < OperandsCount; ++i)
+    else
     {
-        if (mOperands[i].type == Variable)
-        {
-            qreal v = mVarCtrl->variable(mOperands[i].variable);
-            mOperands[i].value = v;
-        }
+        int TODO; //some command execution error, stop cyclogram
+        emit criticalError(this);
     }
-
-    // perform operation
-    switch (mOperation)
-    {
-    case Add:
-        mOperands[Result].value = mOperands[Operand1].value + mOperands[Operand2].value;
-        break;
-    case Subtract:
-        mOperands[Result].value = mOperands[Operand1].value - mOperands[Operand2].value;
-        break;
-    case Multiply:
-        mOperands[Result].value = mOperands[Operand1].value * mOperands[Operand2].value;
-        break;
-    case Divide:
-        if (mOperands[Operand2].value != 0)
-        {
-            mOperands[Result].value = mOperands[Operand1].value / mOperands[Operand2].value;
-        }
-        else
-        {
-            mErrorText = tr("Division by zero in runtime");
-            emit criticalError(this);
-        }
-
-        break;
-    case Assign:
-        mOperands[Result].value = mOperands[Operand1].value;
-        break;
-    default:
-        break;
-    }
-
-    // set new variable value to variable controller
-    mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
-    */
 
     finish();
 }

@@ -14,6 +14,7 @@ class ModuleOTD;
 class ModuleSTM;
 class ModuleTech;
 class ModulePower;
+class CmdActionModule;
 
 class SystemState: public VariableController
 {
@@ -34,6 +35,8 @@ public:
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
+
+    bool sendCommand(CmdActionModule* command);
 
 private slots:
     int simpltst1(int x);
