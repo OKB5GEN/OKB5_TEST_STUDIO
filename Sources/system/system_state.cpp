@@ -1,5 +1,5 @@
 #include "Headers/system/system_state.h"
-//#include "Headers/logic/commands/cmd_action_module.h"
+#include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/system/modules/module_otd.h"
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/system/modules/module_power.h"
@@ -933,7 +933,8 @@ void SystemState::setupParams()
     */
 }
 
-bool SystemState::sendCommand(CmdActionModule* command)
+void SystemState::sendCommand(CmdActionModule* command, const char* onFinish)
 {
-    return false;
+    connect(this, SIGNAL(commandFinished(bool)), command, onFinish);
+    emit commandFinished(false);
 }

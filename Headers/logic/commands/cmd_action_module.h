@@ -26,6 +26,7 @@ private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;
     void execute();
+    void onCommandFinished(bool success);
 
 private:
     void updateText();

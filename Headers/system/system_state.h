@@ -36,7 +36,7 @@ public:
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
 
-    bool sendCommand(CmdActionModule* command);
+    void sendCommand(CmdActionModule* command, const char* onFinish);
 
 private slots:
     int simpltst1(int x);
@@ -95,6 +95,8 @@ signals:
     void MKO_cm_r(int x,int y,int z);
     void MKO_ch(int x);
     void MKO_auto(int x,int y,int adr1, int adr2);
+
+    void commandFinished(bool success);
 
 private:
     void setupParams();

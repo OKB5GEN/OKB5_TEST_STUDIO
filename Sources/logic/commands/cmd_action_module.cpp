@@ -31,17 +31,20 @@ void CmdActionModule::run()
 
 void CmdActionModule::execute()
 {
-    if (mSystemState->sendCommand(this))
+    mSystemState->sendCommand(this, SLOT(onCommandFinished(bool)));
+}
+
+void CmdActionModule::onCommandFinished(bool success)
+{
+    if (success)
     {
-        finish(); // command executed
+        finish(); // command succesfully executed
     }
     else
     {
-        int TODO; //some command execution error, stop cyclogram
+        mErrorText = tr("Command '%1' execution failed").arg(mText);
         emit criticalError(this);
     }
-
-    finish();
 }
 
 void CmdActionModule::setParams(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out)
