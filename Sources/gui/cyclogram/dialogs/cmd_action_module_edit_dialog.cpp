@@ -145,7 +145,22 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         break;
     }
 
-    mCommands->setCurrentRow(0);
+    if (mModuleID == mCommand->module())
+    {
+        for (int i = 0; i < mCommands->count(); ++i)
+        {
+            int commandID = mCommands->item(i)->data(Qt::UserRole).toInt();
+            if (commandID == mCommand->operation())
+            {
+                mCommands->setCurrentRow(i);
+                break;
+            }
+        }
+    }
+    else
+    {
+        mCommands->setCurrentRow(0);
+    }
 }
 
 void CmdActionModuleEditDialog::onCommandChanged(int index)
@@ -156,6 +171,9 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     {
         return;
     }
+
+    const QMap<QString, QString>& inputParams = mCommand->inputParams();
+    const QMap<QString, QString>& outputParams = mCommand->outputParams();
 
     mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
@@ -175,6 +193,19 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variables().keys());
         mParams->setCellWidget(i, 1, comboBox);
+
+        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
+        {
+            QMap<QString, QString>::const_iterator it = inputParams.find(name);
+            if (it != inputParams.end())
+            {
+                int index = comboBox->findText(it.value());
+                if (index != -1)
+                {
+                    comboBox->setCurrentIndex(index);
+                }
+            }
+        }
     }
 
     for (int i = 0; i < outCount; ++i)
@@ -189,6 +220,19 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variables().keys());
         mParams->setCellWidget(i + inCount, 1, comboBox);
+
+        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
+        {
+            QMap<QString, QString>::const_iterator it = outputParams.find(name);
+            if (it != outputParams.end())
+            {
+                int index = comboBox->findText(it.value());
+                if (index != -1)
+                {
+                    comboBox->setCurrentIndex(index);
+                }
+            }
+        }
     }
 }
 

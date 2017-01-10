@@ -361,8 +361,8 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:       text = tr("КDS2"); break; // Запрос количества датчиков DS1820 на линии 2
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1: text = tr("ТDS1"); break; // Запрос значений температурных датчиков DS1820 на линии 1
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2: text = tr("ТDS2"); break; // Запрос значений температурных датчиков DS1820 на линии 2
-    case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break;    // Запрос состояния модуля подачи питания 27В
-    case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break;    // Запрос состояния МКО
+    case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break; // Запрос состояния модуля подачи питания 27В
+    case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break; // Запрос состояния МКО
     case ModuleCommands::RESET_LINE_1:                  text = tr("СDS1"); break; // Ресет датчиков на линии 1
     case ModuleCommands::RESET_LINE_2:                  text = tr("СDS2"); break; // Ресет датчиков на линии 2
     case ModuleCommands::START_MEASUREMENT_LINE_1:      text = tr("ИDS1"); break; // Запуск измерений температуры на линии 1
