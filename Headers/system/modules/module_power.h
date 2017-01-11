@@ -23,13 +23,15 @@ public slots:
     void setPowerState(ModuleCommands::PowerState state);
     void setVoltageAndCurrent(qreal voltage, qreal current);
     void setMaxVoltageAndCurrent(qreal voltage, qreal current);
-    void getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error);
+
+    void voltageAndCurrent();
 
 private slots:
     void update();
 
 signals:
     void changedUI(qreal,qreal);
+    void gotUI(qreal, qreal,uint8_t);
 
 private:
     enum ValueID
@@ -41,6 +43,7 @@ private:
     };
 
     void setValue(uint8_t valueID, qreal value, qreal maxValue);
+    void getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error);
 
     ModuleCommands::PowerState mState;
 

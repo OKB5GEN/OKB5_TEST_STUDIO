@@ -24,7 +24,8 @@ SystemState::SystemState(QObject* parent):
     mThreadMKO(Q_NULLPTR),
     mThreadOTD(Q_NULLPTR),
     PAR_VOLTAGE(tr("Напряжение, В")),
-    PAR_CURRENT(tr("Ток, А"))
+    PAR_CURRENT(tr("Ток, А")),
+    mCurCommand(Q_NULLPTR)
 {
 }
 
@@ -979,16 +980,20 @@ bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
 {
     bool result = true;
 
+    mCurCommand = command;
+
     ModulePower* module = (command->module() == ModuleCommands::POWER_UNIT_BUP ? mPowerBUP : mPowerPNA);
     const QMap<QString, QString>& inputParams = command->inputParams();
-    const QMap<QString, QString>& outputParams = command->outputParams();
+    //const QMap<QString, QString>& outputParams = command->outputParams();
     VariableController* varCtrl = command->variableController();
 
     switch (command->operation())
     {
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
         {
-
+            connect(this, SIGNAL(getUI()), module, SLOT(voltageAndCurrent()));
+            connect(module, SIGNAL(gotUI(qreal,qreal,uint8_t)), this, SLOT(onUIGot(qreal, qreal, uint8_t)));
+            emit getUI();
         }
         break;
 
@@ -1001,14 +1006,22 @@ bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
             qreal current = varCtrl->variable(cName);
 
             connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setVoltageAndCurrent(qreal, qreal)));
-            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+            connect(module, SIGNAL(gotUI(QString, qreal, QString, qreal,uint8_t)), this, SLOT(onUIChanged(qreal, qreal)));
             emit setUI(voltage, current);
         }
         break;
 
     case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
         {
+            QString vName = inputParams.value(PAR_VOLTAGE, "ERR");
+            QString cName = inputParams.value(PAR_CURRENT, "ERR");
 
+            qreal voltage = varCtrl->variable(vName);
+            qreal current = varCtrl->variable(cName);
+
+            connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
+            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+            emit setUI(voltage, current);
         }
         break;
 
@@ -1031,9 +1044,39 @@ void SystemState::onUIChanged(qreal voltage, qreal current)
     QObject* sender = QObject::sender();
     if (sender)
     {
+        disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
         disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setVoltageAndCurrent(qreal, qreal)));
         disconnect(sender, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
     }
+
+    onExecutionFinished(0);
+}
+
+void SystemState::onUIGot(qreal voltage, qreal current, uint8_t error)
+{
+    QObject* sender = QObject::sender();
+    if (sender)
+    {
+        disconnect(this, SIGNAL(getUI()), sender, SLOT(voltageAndCurrent()));
+        disconnect(sender, SIGNAL(gotUI(qreal,qreal,uint8_t)), this, SLOT(onUIGot(qreal, qreal, uint8_t)));
+    }
+
+    const QMap<QString, QString>& outputParams = mCurCommand->outputParams();
+    VariableController* varCtrl = mCurCommand->variableController();
+    QString vName = outputParams.value(PAR_VOLTAGE, "ERR");
+    QString cName = outputParams.value(PAR_CURRENT, "ERR");
+
+    varCtrl->setVariable(vName, voltage);
+    varCtrl->setVariable(cName, current);
+
+    onExecutionFinished(error);
+}
+
+void SystemState::onExecutionFinished(uint8_t error)
+{
+    int TODO; // process error
+
+    mCurCommand = Q_NULLPTR;
 
     emit commandFinished(true);
 }

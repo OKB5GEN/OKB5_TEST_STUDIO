@@ -40,6 +40,7 @@ public:
 
 private slots:
     void onUIChanged(qreal voltage, qreal current);
+    void onUIGot(qreal voltage, qreal current, uint8_t error);
 
     //TODO refactor
     int simpltst1(int x);
@@ -82,6 +83,7 @@ signals:
 
     // Power unit commands
     void setUI(qreal,qreal);
+    void getUI();
 
     // TODO refactor >>>
     void OTD1();
@@ -109,6 +111,7 @@ signals:
 
 private:
     void setupParams();
+    void onExecutionFinished(uint8_t error);
 
     bool sendPowerUnitCommand(CmdActionModule* command);
     bool sendOTDCommand(CmdActionModule* command);
@@ -141,5 +144,7 @@ private:
     // param names constants
     const QString PAR_VOLTAGE;
     const QString PAR_CURRENT;
+
+    CmdActionModule* mCurCommand;
 };
 #endif // SYSTEM_STATE_H

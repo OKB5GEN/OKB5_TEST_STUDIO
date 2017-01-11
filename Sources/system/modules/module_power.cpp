@@ -97,13 +97,6 @@ void ModulePower::startPower()
 
 void ModulePower::setPowerState(ModuleCommands::PowerState state)
 {
-    int TODO; // remove parameter
-
-    if (mState == ModuleCommands::POWER_ON)
-    {
-
-    }
-
     QByteArray request(7, 0);
     request[0] = 0xf1;//power on/off
     request[1] = 0x00;
@@ -170,6 +163,16 @@ void ModulePower::setVoltageAndCurrent(qreal voltage, qreal current)
     emit changedUI(u, i);
 }
 
+void ModulePower::voltageAndCurrent()
+{
+    qreal voltage;
+    qreal current;
+    uint8_t error;
+    getCurVoltageAndCurrent(voltage, current, error);
+
+    emit gotUI(voltage, current, error);
+}
+
 void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error)
 {
     QByteArray request(5, 0);
@@ -182,18 +185,21 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
     QByteArray response;
     send(request, response);
 
-    uint8_t uu1, uu2;
-    error = (response[4] >> 4);
+    if (response.size() == 8)
+    {
+        uint8_t uu1, uu2;
+        error = (response[4] >> 4);
 
-    uu1 = response[5];
-    uu2 = response[6];
-    voltage = (uu1 << 8) | uu2;
-    voltage = voltage * MAX_VOLTAGE / 256;
+        uu1 = response[5];
+        uu2 = response[6];
+        voltage = (uu1 << 8) | uu2;
+        voltage = voltage * MAX_VOLTAGE / 256;
 
-    uu1 = response[7];
-    uu2 = response[8];
-    current = (uu1 << 8) | uu2;
-    current = current * MAX_CURRENT / 256;
+        uu1 = response[7];
+        uu2 = response[8];
+        current = (uu1 << 8) | uu2;
+        current = current * MAX_CURRENT / 256;
+    }
 }
 
 void ModulePower::setUpdatePeriod(int msec, bool startTimer)
