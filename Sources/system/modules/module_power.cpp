@@ -22,11 +22,11 @@ ModulePower::ModulePower(QObject* parent):
     int TODO; // проверять перед установкой на максимум, ограничения ставим сразу, текущее значение, ограничиваем по максимуму
     /*
     QString S1 = ui->setU1->text();
-    double u1 = S1.toDouble();
+    qreal u1 = S1.toDouble();
     QString S3 = ui->setlimU1->text();
-    double ul1 = S3.toDouble();
+    qreal ul1 = S3.toDouble();
     QString S4 = ui->setlimI1->text();
-    double Il1 = S4.toDouble();
+    qreal Il1 = S4.toDouble();
     if(u1 > ul1)
     {
         u1 = ul1;
@@ -92,7 +92,7 @@ void ModulePower::startPower()
     QByteArray response2;
     send(request1, response2);
 
-    setVoltageAndCurrent(0.5);
+    setVoltageAndCurrent(0.5, 0.1);
 }
 
 void ModulePower::setPowerState(ModuleCommands::PowerState state)
@@ -119,14 +119,14 @@ void ModulePower::setPowerState(ModuleCommands::PowerState state)
     mState = state;
 }
 
-void ModulePower::setPowerValue(uint8_t valueID, double value, double maxValue)
+void ModulePower::setValue(uint8_t valueID, qreal value, qreal maxValue)
 {
     QByteArray request(7, 0);
-    uint32_t val = uint32_t((value * 256 * 100) / maxValue);
+    uint32_t val = uint32_t((value * 0x100 * 100) / maxValue);
 
-    if(val > (256 * 100))
+    if(val > (0x100 * 100))
     {
-        val = (256 * 100);
+        val = (0x100 * 100);
     }
 
     request[0] = 0xf1;
@@ -143,23 +143,34 @@ void ModulePower::setPowerValue(uint8_t valueID, double value, double maxValue)
 
     request[5] = ((sum >> 8) & 0xFF);
     request[6] = (sum & 0xFF);
+
     QByteArray response;
     send(request, response);
 }
 
-void ModulePower::setMaxVoltageAndCurrent(double voltage, double current)
+void ModulePower::setMaxVoltageAndCurrent(qreal voltage, qreal current)
 {
-    setPowerValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
-    setPowerValue(MAX_CURRENT_VAL, current, MAX_CURRENT);
+    setValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
+    setValue(MAX_CURRENT_VAL, current, MAX_CURRENT);
 }
 
-void ModulePower::setVoltageAndCurrent(double voltage)
+void ModulePower::setVoltageAndCurrent(qreal voltage, qreal current)
 {
-    setPowerValue(CUR_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
-    setPowerValue(CUR_CURRENT_VAL, ((double)MAX_POWER) / voltage, MAX_CURRENT);
+    // set voltage first, limitated by hardware value
+    setValue(CUR_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
+
+    // set current, limitated by max hardware power and voltage value that was set
+    qreal u = qMin(voltage, (qreal)MAX_VOLTAGE);
+    qreal maxCurrent = qMin((qreal)MAX_POWER / u, (qreal)MAX_CURRENT);
+
+    // the result power must be less than max allowed
+    setValue(CUR_CURRENT_VAL, current, maxCurrent);
+    qreal i = qMin(current, maxCurrent);
+
+    emit changedUI(u, i);
 }
 
-void ModulePower::getCurVoltageAndCurrent(double& voltage, double& current, uint8_t& error)
+void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error)
 {
     QByteArray request(5, 0);
     request[0] = 0x75;

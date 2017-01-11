@@ -31,11 +31,14 @@ void CmdActionModule::run()
 
 void CmdActionModule::execute()
 {
-    mSystemState->sendCommand(this, SLOT(onCommandFinished(bool)));
+    connect(mSystemState, SIGNAL(commandFinished(bool)), this, SLOT(onCommandFinished(bool)));
+    mSystemState->sendCommand(this);
 }
 
 void CmdActionModule::onCommandFinished(bool success)
 {
+    disconnect(mSystemState, SIGNAL(commandFinished(bool)), this, SLOT(onCommandFinished(bool)));
+
     if (success)
     {
         finish(); // command succesfully executed

@@ -16,16 +16,20 @@ public:
     bool postInit() override;
     void resetError() override;
 
+    void setUpdatePeriod(int msec, bool startTimer = true);
+
+public slots:
     void startPower();
     void setPowerState(ModuleCommands::PowerState state);
-    void setVoltageAndCurrent(double voltage);
-    void setMaxVoltageAndCurrent(double voltage, double current);
-    void getCurVoltageAndCurrent(double& voltage, double& current, uint8_t& error);
-
-    void setUpdatePeriod(int msec, bool startTimer = true);
+    void setVoltageAndCurrent(qreal voltage, qreal current);
+    void setMaxVoltageAndCurrent(qreal voltage, qreal current);
+    void getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error);
 
 private slots:
     void update();
+
+signals:
+    void changedUI(qreal,qreal);
 
 private:
     enum ValueID
@@ -36,7 +40,7 @@ private:
         CUR_CURRENT_VAL = 0x33
     };
 
-    void setPowerValue(uint8_t valueID, double value, double maxValue);
+    void setValue(uint8_t valueID, qreal value, qreal maxValue);
 
     ModuleCommands::PowerState mState;
 

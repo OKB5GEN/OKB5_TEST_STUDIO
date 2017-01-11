@@ -36,9 +36,12 @@ public:
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
 
-    void sendCommand(CmdActionModule* command, const char* onFinish);
+    void sendCommand(CmdActionModule* command);
 
 private slots:
+    void onUIChanged(qreal voltage, qreal current);
+
+    //TODO refactor
     int simpltst1(int x);
 
     void OTDtemd(QString data);
@@ -72,8 +75,15 @@ private slots:
     void on_pushButton_12_clicked();
     void on_MKO_avt_clicked();
     void on_OTD_avt_2_clicked();
+    //<<<
 
 signals:
+    void commandFinished(bool success);
+
+    // Power unit commands
+    void setUI(qreal,qreal);
+
+    // TODO refactor >>>
     void OTD1();
     void OTD_reset1();
     void OTD_reset2();
@@ -95,11 +105,16 @@ signals:
     void MKO_cm_r(int x,int y,int z);
     void MKO_ch(int x);
     void MKO_auto(int x,int y,int adr1, int adr2);
-
-    void commandFinished(bool success);
+    // <<<
 
 private:
     void setupParams();
+
+    bool sendPowerUnitCommand(CmdActionModule* command);
+    bool sendOTDCommand(CmdActionModule* command);
+    bool sendSTMCommand(CmdActionModule* command);
+    bool sendMKOCommand(CmdActionModule* command);
+    bool sendTechCommand(CmdActionModule* command);
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
@@ -122,5 +137,9 @@ private:
     //int m_dat1[1000]={0};
     QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
+
+    // param names constants
+    const QString PAR_VOLTAGE;
+    const QString PAR_CURRENT;
 };
 #endif // SYSTEM_STATE_H

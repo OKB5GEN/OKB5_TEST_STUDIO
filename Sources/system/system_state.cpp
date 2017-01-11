@@ -22,7 +22,9 @@ SystemState::SystemState(QObject* parent):
     VariableController(parent),
     m_mko_kits(ModuleMKO::NO_KIT),
     mThreadMKO(Q_NULLPTR),
-    mThreadOTD(Q_NULLPTR)
+    mThreadOTD(Q_NULLPTR),
+    PAR_VOLTAGE(tr("Напряжение, В")),
+    PAR_CURRENT(tr("Ток, А"))
 {
 }
 
@@ -833,7 +835,7 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
 
 void SystemState::setupParams()
 {
-    QStringList powerParams({tr("Напряжение, В"), tr("Ток, А")});
+    QStringList powerParams({PAR_VOLTAGE, PAR_CURRENT});
     {
         QMap<int, QStringList> params;
         params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
@@ -933,8 +935,129 @@ void SystemState::setupParams()
     */
 }
 
-void SystemState::sendCommand(CmdActionModule* command, const char* onFinish)
+void SystemState::sendCommand(CmdActionModule* command)
 {
-    connect(this, SIGNAL(commandFinished(bool)), command, onFinish);
-    emit commandFinished(false);
+    bool result = false;
+    // 1. По типу модуля взять модуль из имеющихся
+    // 2. По типу команды определить сигнал, к которму коннектиться
+    // 3. Послать модулю сигнал на выполнение той или иной команды
+    // 4. Когда модуль получит сигнал и отпроцует команду, он пошлет сигнал, на который мы приконнектились
+    // 5. В слоте мы полученными значениями проинициализируем переменные VariableController'а (если это выходные параметры)
+    // 6. Посылаем сигнал commandFinished()
+    // 7. Disconnect'имся от команды
+
+    switch (command->module())
+    {
+    case ModuleCommands::POWER_UNIT_BUP:
+    case ModuleCommands::POWER_UNIT_PNA:
+        result = sendPowerUnitCommand(command);
+        break;
+    case ModuleCommands::OTD:
+        result = sendOTDCommand(command);
+        break;
+    case ModuleCommands::STM:
+        result = sendSTMCommand(command);
+        break;
+    case ModuleCommands::MKO:
+        result = sendMKOCommand(command);
+        break;
+    case ModuleCommands::TECH:
+        result = sendTechCommand(command);
+        break;
+
+    default:
+        break;
+    }
+
+    if (!result)
+    {
+        emit commandFinished(result);
+    }
+}
+
+bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
+{
+    bool result = true;
+
+    ModulePower* module = (command->module() == ModuleCommands::POWER_UNIT_BUP ? mPowerBUP : mPowerPNA);
+    const QMap<QString, QString>& inputParams = command->inputParams();
+    const QMap<QString, QString>& outputParams = command->outputParams();
+    VariableController* varCtrl = command->variableController();
+
+    switch (command->operation())
+    {
+    case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
+        {
+
+        }
+        break;
+
+    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
+        {
+            QString vName = inputParams.value(PAR_VOLTAGE, "ERR");
+            QString cName = inputParams.value(PAR_CURRENT, "ERR");
+
+            qreal voltage = varCtrl->variable(vName);
+            qreal current = varCtrl->variable(cName);
+
+            connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setVoltageAndCurrent(qreal, qreal)));
+            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+            emit setUI(voltage, current);
+        }
+        break;
+
+    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
+        {
+
+        }
+        break;
+
+    case ModuleCommands::SET_POWER_STATE:
+        {
+
+        }
+        break;
+
+    default:
+        result = false;
+        break;
+    }
+
+    return result;
+}
+
+void SystemState::onUIChanged(qreal voltage, qreal current)
+{
+    QObject* sender = QObject::sender();
+    if (sender)
+    {
+        disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setVoltageAndCurrent(qreal, qreal)));
+        disconnect(sender, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+    }
+
+    emit commandFinished(true);
+}
+
+bool SystemState::sendOTDCommand(CmdActionModule* command)
+{
+    int TODO;
+    return false;
+}
+
+bool SystemState::sendSTMCommand(CmdActionModule* command)
+{
+    int TODO;
+    return false;
+}
+
+bool SystemState::sendMKOCommand(CmdActionModule* command)
+{
+    int TODO;
+    return false;
+}
+
+bool SystemState::sendTechCommand(CmdActionModule* command)
+{
+    int TODO;
+    return false;
 }
