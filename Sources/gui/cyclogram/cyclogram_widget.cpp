@@ -107,6 +107,8 @@ void CyclogramWidget::clear(bool onDestroy)
 {
     qDeleteAll(mCommands);
     qDeleteAll(mSihlouette);
+    mCommands.clear();
+    mSihlouette.clear();
 
     if (!onDestroy && mCurrentCyclogram)
     {
