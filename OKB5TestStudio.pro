@@ -62,7 +62,9 @@ SOURCES += main.cpp\
     Sources/system/com_port_module.cpp \
     Sources/system/okb_module.cpp \
     Sources/logic/commands/cmd_action_module.cpp \
-    Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp
+    Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp \
+    Sources/file_writer.cpp \
+    Sources/file_reader.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -111,7 +113,9 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/com_port_module.h \
     Headers/system/okb_module.h \
     Headers/logic/commands/cmd_action_module.h \
-    Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h
+    Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h \
+    Headers/file_writer.h \
+    Headers/file_reader.h
 
 
 FORMS    += mainwindow.ui
