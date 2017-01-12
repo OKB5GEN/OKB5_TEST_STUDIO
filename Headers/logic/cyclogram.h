@@ -57,6 +57,8 @@ public:
 
     static bool isCyclogramEndBranch(Command* cmd);
 
+    void clear(); //TODO possibly temporary
+
 private slots:
     void onCommandFinished(Command* cmd);
     void onCriticalError(Command* cmd);
@@ -64,7 +66,7 @@ private slots:
     void onCommandTextChanged(const QString& text);
 
 private:
-    void clear();
+
     void deleteCommandTree(Command* cmd, bool silent);
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);

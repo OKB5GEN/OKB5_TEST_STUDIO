@@ -10,6 +10,9 @@
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/system/system_state.h"
 
+#include "Headers/file_reader.h"
+#include "Headers/file_writer.h"
+
 namespace
 {
     static const int TOOLBAR_ICON_SIZE = 64;
@@ -88,7 +91,9 @@ void EditorWindow::open()
 {
     if (maybeSave())
     {
-        QString fileName = QFileDialog::getOpenFileName(this);
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"),
+                                                        QDir::currentPath(),
+                                                        tr("OKB5 Cyclogram Files (*.cgr)"));
         if (!fileName.isEmpty())
         {
             loadFile(fileName);
@@ -110,15 +115,26 @@ bool EditorWindow::save()
 
 bool EditorWindow::saveAs()
 {
-    QFileDialog dialog(this);
-    dialog.setWindowModality(Qt::WindowModal);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    if (dialog.exec() != QDialog::Accepted)
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"),
+                                         QDir::currentPath(),
+                                         tr("OKB5 Cyclogram Files (*.cgr)"));
+
+    if (fileName.isEmpty())
     {
         return false;
     }
 
-    return saveFile(dialog.selectedFiles().first());
+    return saveFile(fileName);
+
+    //QFileDialog dialog(this);
+    //dialog.setWindowModality(Qt::WindowModal);
+    //dialog.setAcceptMode(QFileDialog::AcceptSave);
+    //if (dialog.exec() != QDialog::Accepted)
+    //{
+    //    return false;
+    //}
+
+    //return saveFile(dialog.selectedFiles().first());
 }
 
 void EditorWindow::about()
@@ -280,8 +296,8 @@ bool EditorWindow::maybeSave()
         return true;
     }
 
-    const QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Application"),
-                               tr("The document has been modified.\n"
+    const QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("OKB5 Test Studio"),
+                               tr("The cyclogram has been modified.\n"
                                   "Do you want to save your changes?"),
                                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     switch (ret)
@@ -296,89 +312,42 @@ bool EditorWindow::maybeSave()
 
     return true;
 }
-/*
-void MainWindow::open()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Bookmark File"),
-                                         QDir::currentPath(),
-                                         tr("XBEL Files (*.xbel *.xml)"));
-    if (fileName.isEmpty())
-    {
-        return;
-    }
 
-    treeWidget->clear();
-
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox::warning(this, tr("QXmlStream Bookmarks"),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return;
-    }
-
-    XbelReader reader(treeWidget);
-    if (!reader.read(&file))
-    {
-        QMessageBox::warning(this, tr("QXmlStream Bookmarks"),
-                             tr("Parse error in file %1:\n\n%2")
-                             .arg(fileName)
-                             .arg(reader.errorString()));
-    }
-    else
-    {
-        statusBar()->showMessage(tr("File loaded"), 2000);
-    }
-
-}
-
-
-void MainWindow::saveAs()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Bookmark File"),
-                                         QDir::currentPath(),
-                                         tr("XBEL Files (*.xbel *.xml)"));
-    if (fileName.isEmpty())
-    {
-        return;
-    }
-
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text))
-    {
-        QMessageBox::warning(this, tr("QXmlStream Bookmarks"),
-                             tr("Cannot write file %1:\n%2.")
-                             .arg(fileName)
-                             .arg(file.errorString()));
-        return;
-    }
-
-    XbelWriter writer(treeWidget);
-    if (writer.writeFile(&file))
-    {
-        statusBar()->showMessage(tr("File saved"), 2000);
-    }
-}
-*/
 void EditorWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        QMessageBox::warning(this, tr("Application"), tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        QMessageBox::warning(this, tr("OKB5 Test Studio"),
+                                   tr("Cannot read file %1:\n%2.").
+                                   arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return;
     }
 
+    mCyclogram->clear();
+    mCyclogramWidget->clear();
+
     //QTextStream in(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
+    //QApplication::setOverrideCursor(Qt::WaitCursor);
     //textEdit->setPlainText(in.readAll());
-    QApplication::restoreOverrideCursor();
+    //QApplication::restoreOverrideCursor();
 
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File loaded"), 2000);
+    FileReader reader(mCyclogram);
+    if (!reader.read(&file))
+    {
+        QMessageBox::warning(this, tr("OKB5 Test Studio"),
+                                   tr("Parse error in file %1:\n%2.").
+                                   arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+
+        mCyclogram->createDefault();
+    }
+    else
+    {
+        setCurrentFile(fileName);
+        statusBar()->showMessage(tr("File loaded"), 2000);
+    }
+
+    mCyclogramWidget->load(mCyclogram);
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -386,20 +355,26 @@ bool EditorWindow::saveFile(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
-        QMessageBox::warning(this, tr("Application"), tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        QMessageBox::warning(this, tr("OKB5 Test Studio"),
+                                   tr("Cannot write file %1:\n%2.").
+                                   arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
 
     //QTextStream out(&file);
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
+    //QApplication::setOverrideCursor(Qt::WaitCursor);
     //out << textEdit->toPlainText();
-    QApplication::restoreOverrideCursor();
+    //QApplication::restoreOverrideCursor();
 
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
+    FileWriter writer(mCyclogram);
+    if (writer.writeFile(&file))
+    {
+        setCurrentFile(fileName);
+        statusBar()->showMessage(tr("File saved"), 2000);
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 void EditorWindow::setCurrentFile(const QString &fileName)

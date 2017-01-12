@@ -26,6 +26,8 @@ public:
     CyclogramWidget(QWidget* parent);
     ~CyclogramWidget();
 
+    void clear(bool onDestroy = false);
+
 public slots:
     void load(Cyclogram* cyclogram);
     void showValidationError(Command* cmd);
@@ -47,7 +49,6 @@ private slots:
     void onNeedToDelete(ShapeItem* shape);
 
 private:
-    void clear(bool onDestroy = false);
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
 
