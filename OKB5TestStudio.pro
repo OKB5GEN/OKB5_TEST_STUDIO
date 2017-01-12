@@ -36,13 +36,9 @@ SOURCES += main.cpp\
     Sources/logic/commands/cmd_action.cpp \
     Sources/logic/commands/cmd_action_math.cpp \
     Sources/logic/commands/cmd_case.cpp \
-    Sources/logic/commands/cmd_cycle_do_while.cpp \
-    Sources/logic/commands/cmd_cycle_for.cpp \
-    Sources/logic/commands/cmd_cycle_while.cpp \
     Sources/logic/commands/cmd_delay.cpp \
     Sources/logic/commands/cmd_parallel_process.cpp \
     Sources/logic/commands/cmd_question.cpp \
-    Sources/logic/commands/cmd_send_msg_result_fail.cpp \
     Sources/logic/commands/cmd_set_state.cpp \
     Sources/logic/commands/cmd_state_start.cpp \
     Sources/logic/commands/cmd_sub_program.cpp \
@@ -89,13 +85,9 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_action.h \
     Headers/logic/commands/cmd_action_math.h \
     Headers/logic/commands/cmd_case.h \
-    Headers/logic/commands/cmd_cycle_do_while.h \
-    Headers/logic/commands/cmd_cycle_for.h \
-    Headers/logic/commands/cmd_cycle_while.h \
     Headers/logic/commands/cmd_delay.h \
     Headers/logic/commands/cmd_parallel_process.h \
     Headers/logic/commands/cmd_question.h \
-    Headers/logic/commands/cmd_send_msg_result_fail.h \
     Headers/logic/commands/cmd_set_state.h \
     Headers/logic/commands/cmd_state_start.h \
     Headers/logic/commands/cmd_sub_program.h \
