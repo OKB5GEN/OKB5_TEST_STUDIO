@@ -145,6 +145,10 @@ void ModulePower::setMaxVoltageAndCurrent(qreal voltage, qreal current)
 {
     setValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
     setValue(MAX_CURRENT_VAL, current, MAX_CURRENT);
+
+    qreal u = qMin(voltage, (qreal)MAX_VOLTAGE);
+    qreal i = qMin(current, (qreal)MAX_CURRENT);
+    emit changedMaxUI(u, i);
 }
 
 void ModulePower::setVoltageAndCurrent(qreal voltage, qreal current)

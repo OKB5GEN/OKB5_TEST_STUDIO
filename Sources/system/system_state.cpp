@@ -1006,7 +1006,7 @@ bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
             qreal current = varCtrl->variable(cName);
 
             connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setVoltageAndCurrent(qreal, qreal)));
-            connect(module, SIGNAL(gotUI(QString, qreal, QString, qreal,uint8_t)), this, SLOT(onUIChanged(qreal, qreal)));
+            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
             emit setUI(voltage, current);
         }
         break;
@@ -1020,7 +1020,7 @@ bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
             qreal current = varCtrl->variable(cName);
 
             connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
-            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+            connect(module, SIGNAL(changedMaxUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
             emit setUI(voltage, current);
         }
         break;
@@ -1047,6 +1047,7 @@ void SystemState::onUIChanged(qreal voltage, qreal current)
         disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
         disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setVoltageAndCurrent(qreal, qreal)));
         disconnect(sender, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
+        disconnect(sender, SIGNAL(changedMaxUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
     }
 
     onExecutionFinished(0);

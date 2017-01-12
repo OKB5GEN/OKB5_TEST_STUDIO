@@ -31,6 +31,7 @@ private slots:
 
 signals:
     void changedUI(qreal,qreal);
+    void changedMaxUI(qreal,qreal);
     void gotUI(qreal, qreal,uint8_t);
 
 private:
