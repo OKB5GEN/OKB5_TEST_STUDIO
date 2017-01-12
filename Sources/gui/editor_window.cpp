@@ -34,12 +34,12 @@ EditorWindow::EditorWindow():
     mScrollArea->setWidget(mCyclogramWidget);
     setCentralWidget(mScrollArea);
 
-    //resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
-
     createActions();
     createStatusBar();
 
     readSettings();
+
+    connect(mCyclogram, SIGNAL(modified()), this, SLOT(documentWasModified()));
 
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &EditorWindow::commitData);
@@ -130,15 +130,11 @@ void EditorWindow::about()
 
 void EditorWindow::documentWasModified()
 {
-    bool isModified = true; // TODO check cyclogram modified
-
-    setWindowModified(isModified);
+    setWindowModified(mCyclogram->isModified());
 }
 
 void EditorWindow::createActions()
 {
-    // uncomment to create file menu
-    /*
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     QToolBar *fileToolBar = addToolBar(tr("File"));
     fileToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
@@ -178,44 +174,10 @@ void EditorWindow::createActions()
     QAction *exitAct = fileMenu->addAction(exitIcon, tr("E&xit"), this, &QWidget::close);
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
-    */
 
     /*
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     QToolBar *editToolBar = addToolBar(tr("Edit"));
-
-#ifndef QT_NO_CLIPBOARD
-    const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(":/images/cut.png"));
-    QAction *cutAct = new QAction(cutIcon, tr("Cu&t"), this);
-
-    cutAct->setShortcuts(QKeySequence::Cut);
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
-                            "clipboard"));
-    //connect(cutAct, &QAction::triggered, textEdit, &QPlainTextEdit::cut);
-    editMenu->addAction(cutAct);
-    editToolBar->addAction(cutAct);
-
-    const QIcon copyIcon = QIcon::fromTheme("edit-copy", QIcon(":/images/copy.png"));
-    QAction *copyAct = new QAction(copyIcon, tr("&Copy"), this);
-    copyAct->setShortcuts(QKeySequence::Copy);
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
-                             "clipboard"));
-    //connect(copyAct, &QAction::triggered, textEdit, &QPlainTextEdit::copy);
-    editMenu->addAction(copyAct);
-    editToolBar->addAction(copyAct);
-
-    const QIcon pasteIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.png"));
-    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
-    pasteAct->setShortcuts(QKeySequence::Paste);
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
-                              "selection"));
-    //connect(pasteAct, &QAction::triggered, textEdit, &QPlainTextEdit::paste);
-    editMenu->addAction(pasteAct);
-    editToolBar->addAction(pasteAct);
-
-    menuBar()->addSeparator();
-
-#endif // !QT_NO_CLIPBOARD
 
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &EditorWindow::about);
@@ -223,13 +185,6 @@ void EditorWindow::createActions()
 
     QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-
-#ifndef QT_NO_CLIPBOARD
-    cutAct->setEnabled(false);
-    copyAct->setEnabled(false);
-    //connect(textEdit, &QPlainTextEdit::copyAvailable, cutAct, &QAction::setEnabled);
-    //connect(textEdit, &QPlainTextEdit::copyAvailable, copyAct, &QAction::setEnabled);
-#endif // !QT_NO_CLIPBOARD
 */
     QMenu *runMenu = menuBar()->addMenu(tr("&Run"));
     QToolBar *runToolBar = addToolBar(tr("Run"));
@@ -319,7 +274,7 @@ void EditorWindow::writeSettings()
 
 bool EditorWindow::maybeSave()
 {
-    bool isModified = false; // TODO is cyclogram modified
+    bool isModified = mCyclogram->isModified();
 
     if (!isModified)
     {
@@ -371,7 +326,6 @@ bool EditorWindow::saveFile(const QString &fileName)
         return false;
     }
 
-
     //QTextStream out(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -380,13 +334,14 @@ bool EditorWindow::saveFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File saved"), 2000);
+
     return true;
 }
 
 void EditorWindow::setCurrentFile(const QString &fileName)
 {
     mCurFile = fileName;
-    //textEdit->document()->setModified(false);
+    mCyclogram->setModified(false, false);
     setWindowModified(false);
 
     QString shownName = mCurFile;
@@ -550,7 +505,7 @@ void EditorWindow::commitData(QSessionManager &manager)
     else
     {
         // Non-interactive: save without asking
-        //if (textEdit->document()->isModified())
+        if (mCyclogram->isModified())
         {
             save();
         }

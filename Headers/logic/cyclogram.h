@@ -33,6 +33,9 @@ public:
     void pause();
     void resume();
 
+    bool isModified() const;
+    void setModified(bool isModified, bool sendSignal);
+
     //void setExecuteOneCmd(bool enable);
 
     Command* first() const;
@@ -58,10 +61,12 @@ private slots:
     void onCommandFinished(Command* cmd);
     void onCriticalError(Command* cmd);
     void runCurrentCommand();
+    void onCommandTextChanged(const QString& text);
 
 private:
     void clear();
-    void deleteCommandTree(Command* cmd);
+    void deleteCommandTree(Command* cmd, bool silent);
+    void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);
 
     Command* mFirst = Q_NULLPTR;
@@ -75,11 +80,14 @@ private:
     SystemState* mSystemState;
 
     //bool mExecuteOneCmd;
+    bool mModified;
 
 signals:
     void changed();
     void finished(const QString& error);
     void stateChanged(int state);
     void deleted(Command* cmd);
+
+    void modified(); //TODO send signal + vs "changed" signal
 };
 #endif // CYCLOGRAM_H

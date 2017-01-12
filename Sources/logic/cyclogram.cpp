@@ -63,7 +63,8 @@ namespace
 
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
-    mState(STOPPED)
+    mState(STOPPED),
+    mModified(false)
 //  , mExecuteOneCmd(false)
 {
     mVarController = new VariableController(this);
@@ -253,7 +254,7 @@ void Cyclogram::clear()
 {
     if (mFirst)
     {
-        deleteCommandTree(mFirst);
+        deleteCommandTree(mFirst, true);
     }
 
     mFirst = Q_NULLPTR;
@@ -262,7 +263,7 @@ void Cyclogram::clear()
     mCommands.clear();
 }
 
-void Cyclogram::deleteCommandTree(Command* cmd)
+void Cyclogram::deleteCommandTree(Command* cmd, bool silent)
 {
     emit deleted(cmd);
 
@@ -279,18 +280,18 @@ void Cyclogram::deleteCommandTree(Command* cmd)
     {
         if (cmd->nextCommands()[i])
         {
-            deleteCommandTree(cmd->nextCommands()[i]);
+            deleteCommandTree(cmd->nextCommands()[i], silent);
         }
     }
 
-    cmd->deleteLater();
+    deleteCommandImpl(cmd, silent);
 }
 
 void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 {
     if (recursive)
     {
-        deleteCommandTree(cmd);
+        deleteCommandTree(cmd, false);
         return;
     }
 
@@ -318,10 +319,17 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
         if (mCommands[i] == cmd)
         {
             Command* tmp = mCommands.takeAt(i);
-            tmp->deleteLater();
+            deleteCommandImpl(tmp, false);
             break;
         }
     }
+}
+
+void Cyclogram::deleteCommandImpl(Command* cmd, bool silent)
+{
+    disconnect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
+    cmd->deleteLater();
+    setModified(true, !silent); // modified on command deletion
 }
 
 Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
@@ -404,6 +412,8 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
     if (cmd)
     {
         mCommands.push_back(cmd);
+        connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
+        setModified(true, true); // modified on command adding
     }
 
     return cmd;
@@ -510,4 +520,24 @@ bool Cyclogram::isCyclogramEndBranch(Command* cmd)
     }
 
     return false;
+}
+
+bool Cyclogram::isModified() const
+{
+    return mModified;
+}
+
+void Cyclogram::setModified(bool isModified, bool sendSignal)
+{
+    mModified = isModified;
+
+    if (sendSignal)
+    {
+        emit modified();
+    }
+}
+
+void Cyclogram::onCommandTextChanged(const QString& text)
+{
+    setModified(true, true);
 }
