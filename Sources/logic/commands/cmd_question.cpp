@@ -295,3 +295,13 @@ void CmdQuestion::setQuestionType(CmdQuestion::QuestionType type)
 {
     mQuestionType = type;
 }
+
+void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}

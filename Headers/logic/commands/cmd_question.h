@@ -63,6 +63,10 @@ public:
     qreal value(OperandID operand) const;
     QuestionType questionType() const;
 
+protected:
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;

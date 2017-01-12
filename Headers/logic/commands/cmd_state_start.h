@@ -13,6 +13,10 @@ public:
 public slots:
     void setText(const QString& text);
 
+protected:
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
 private:
 };
 

@@ -30,6 +30,10 @@ private slots:
 
 private:
     void updateText();
+
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
     QString moduleName() const;
     QString commandName() const;
 

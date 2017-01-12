@@ -278,3 +278,13 @@ void CmdActionMath::onVariableRemoved(const QString& name)
 
     updateText();
 }
+
+void CmdActionMath::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}

@@ -32,3 +32,14 @@ void CmdTitle::setTitleType(CmdTitle::TitleType type)
          mText = tr("FINISH");
     }
 }
+
+void CmdTitle::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdTitle::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}
+

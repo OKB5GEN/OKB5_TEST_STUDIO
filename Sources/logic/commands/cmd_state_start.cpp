@@ -11,3 +11,13 @@ void CmdStateStart::setText(const QString& text)
     mText = text;
     emit textChanged(mText);
 }
+
+void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}

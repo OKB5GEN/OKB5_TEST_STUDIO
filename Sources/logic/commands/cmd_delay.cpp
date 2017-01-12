@@ -116,3 +116,13 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 
      emit textChanged(mText);
 }
+
+void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdDelay::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}

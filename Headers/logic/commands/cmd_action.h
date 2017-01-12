@@ -17,7 +17,6 @@ protected slots:
 
 protected:
 
-
 private:
 };
 #endif // CMD_ACTION_H

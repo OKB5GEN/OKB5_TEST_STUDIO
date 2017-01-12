@@ -22,6 +22,10 @@ public:
     void setDelay(int hours, int minutes, int seconds, int msec);
     int delay() const; // milliseconds
 
+protected:
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
 private slots:
     void finish();
 

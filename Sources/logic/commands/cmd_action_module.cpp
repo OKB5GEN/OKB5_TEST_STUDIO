@@ -310,3 +310,13 @@ QString CmdActionModule::commandName() const
 
     return text;
 }
+
+void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO_XML;
+}
+
+void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO_XML;
+}

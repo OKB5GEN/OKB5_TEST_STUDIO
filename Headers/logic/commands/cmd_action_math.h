@@ -64,6 +64,9 @@ private:
 
     void updateText();
 
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
     Operation mOperation;
     OperandData mOperands[OperandsCount];
 };

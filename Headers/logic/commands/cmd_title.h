@@ -19,6 +19,10 @@ public:
     void setTitleType(TitleType type);
     TitleType titleType() const;
 
+protected:
+    void writeCustomAttributes(QXmlStreamWriter* writer) override;
+    void readCustomAttributes(QXmlStreamReader* reader) override;
+
 private:
     TitleType mTitleType;
 };
