@@ -453,7 +453,7 @@ Command* Cyclogram::validate() const
     return Q_NULLPTR;
 }
 
-VariableController* Cyclogram::varCtrl() const
+VariableController* Cyclogram::variableController() const
 {
     return mVarController;
 }

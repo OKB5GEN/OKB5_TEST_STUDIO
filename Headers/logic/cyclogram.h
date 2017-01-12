@@ -52,7 +52,7 @@ public:
 
     Command* validate() const; //
 
-    VariableController* varCtrl() const;
+    VariableController* variableController() const;
     void setSystemState(SystemState* state);
 
     static bool isCyclogramEndBranch(Command* cmd);
@@ -66,7 +66,6 @@ private slots:
     void onCommandTextChanged(const QString& text);
 
 private:
-
     void deleteCommandTree(Command* cmd, bool silent);
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);

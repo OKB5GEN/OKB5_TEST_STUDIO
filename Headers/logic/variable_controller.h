@@ -39,7 +39,7 @@ signals:
     void nameChanged(const QString& newName, const QString& oldName);
 
 private:
-    QMap<QString, qreal> mCurrent;
+    QMap<QString, qreal> mCurrent; //TODO create structure Variable and remove copypaste
     QMap<QString, qreal> mInitial;
 };
 #endif // VARIABLE_CONTROLLER_H

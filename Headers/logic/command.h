@@ -2,9 +2,12 @@
 #define COMMAND_H
 
 #include <QObject>
-#include <QSize>
+//#include <QSize>
 #include "Headers/shape_types.h"
 #include "Headers/gui/cyclogram/valency_point.h"
+
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 class VariableController;
 class SystemState;
@@ -31,6 +34,11 @@ public:
     virtual void stop();
     virtual void pause();
     virtual void resume();
+
+    qint64 id() const;
+
+    void write(QXmlStreamWriter* writer);
+    void read(QXmlStreamReader* reader);
 
     const QString& text() const;
     const QString& errorDesc() const;
@@ -76,6 +84,9 @@ protected slots:
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed
 
+    virtual void writeCustomAttributes(QXmlStreamWriter* writer);
+    virtual void readCustomAttributes(QXmlStreamReader* reader);
+
     DRAKON::IconType mType;
     QString mText;
     QString mErrorText;
@@ -98,6 +109,7 @@ private:
     void replaceReferences(Command* oldCmd, Command* newCmd, Command* tree);
 
     bool mHasError;
+    qint64 mID;
 };
 
 #endif // COMMAND_H

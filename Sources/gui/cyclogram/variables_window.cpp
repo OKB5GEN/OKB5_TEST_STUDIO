@@ -68,7 +68,7 @@ void VariablesWindow::setCyclogram(Cyclogram * cyclogram)
     mTableWidget->clearContents();
     mTableWidget->setRowCount(0);
 
-    VariableController* controller = mCyclogram->varCtrl();
+    VariableController* controller = mCyclogram->variableController();
 
     connect(controller, SIGNAL(valueChanged(const QString&,qreal,int)), this, SLOT(onValueChanged(const QString&,qreal,int)));
 
@@ -88,7 +88,7 @@ void VariablesWindow::onAddClicked()
     QString prefix = "V";
     QString name = prefix;
     int index = 0;
-    VariableController* controller = mCyclogram->varCtrl();
+    VariableController* controller = mCyclogram->variableController();
 
     while (controller->isVariableExist(name))
     {
@@ -110,7 +110,7 @@ void VariablesWindow::updateTableSize()
 
 void VariablesWindow::onRemoveClicked()
 {
-    VariableController* controller = mCyclogram->varCtrl();
+    VariableController* controller = mCyclogram->variableController();
     QItemSelectionModel* selectionModel = mTableWidget->selectionModel();
 
     QList<int> rowsForDeletion;
@@ -139,7 +139,7 @@ void VariablesWindow::onRemoveClicked()
 
 void VariablesWindow::onNameChanged()
 {
-    VariableController* controller = mCyclogram->varCtrl();
+    VariableController* controller = mCyclogram->variableController();
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(QObject::sender());
     if (!lineEdit)
     {
@@ -174,7 +174,7 @@ void VariablesWindow::onNameChanged()
 
 void VariablesWindow::onInitialValueChanged()
 {
-    VariableController* controller = mCyclogram->varCtrl();
+    VariableController* controller = mCyclogram->variableController();
     QLineEdit* valueLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
     if (!valueLineEdit)
     {

@@ -1,5 +1,8 @@
 #include <QTime>
 #include <QTimer>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QMetaEnum>
 
 #include "Headers/logic/command.h"
 #include "Headers/logic/variable_controller.h"
@@ -28,6 +31,8 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     {
         mNextCommands.push_back(Q_NULLPTR);
     }
+
+    mID = QDateTime::currentMSecsSinceEpoch();
 }
 
 Command::~Command()
@@ -552,4 +557,66 @@ Command* Command::nextCommand(ValencyPoint::Role role) const
     }
 
     return Q_NULLPTR;
+}
+
+void Command::write(QXmlStreamWriter* writer)
+{
+    static QMetaEnum metaEnum;
+    if (metaEnum.keyCount() == 0)
+    {
+        metaEnum = QMetaEnum::fromType<DRAKON::IconType>();
+    }
+
+    writer->writeStartElement("command"); // open command tag
+
+    // write common commands attributes
+    writer->writeAttribute("type", metaEnum.valueToKey(type()));
+
+    writeCustomAttributes(writer);
+
+    // write command links
+    writer->writeStartElement("next_commands");
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* down = nextCommand(ValencyPoint::Down);
+    Command* right = nextCommand(ValencyPoint::Right);
+
+    if (underArrow)
+    {
+        writer->writeAttribute("under_arrow", QString::number(underArrow->id()));
+    }
+
+    if (down)
+    {
+        writer->writeAttribute("down", QString::number(down->id()));
+    }
+
+    if (right)
+    {
+        writer->writeAttribute("right", QString::number(right->id()));
+    }
+
+    writer->writeEndElement();
+
+    writer->writeEndElement(); // close command tag
+}
+
+void Command::read(QXmlStreamReader* reader)
+{
+    int TODO;
+}
+
+void Command::writeCustomAttributes(QXmlStreamWriter* writer)
+{
+    int TODO;// reimplement in inherited commmands classes
+}
+
+void Command::readCustomAttributes(QXmlStreamReader* reader)
+{
+    int TODO;// reimplement in inherited commmands classes
+}
+
+qint64 Command::id() const
+{
+    return mID;
 }

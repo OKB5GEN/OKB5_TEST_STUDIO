@@ -12,6 +12,9 @@ public:
     bool writeFile(QIODevice *device);
 
 private:
+    void writeVariables();
+    void writeCommands();
+
     QXmlStreamWriter mXML;
     Cyclogram* mCyclogram;
 };
