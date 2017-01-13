@@ -1,4 +1,7 @@
 #include "Headers/logic/commands/cmd_state_start.h"
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+
 
 CmdStateStart::CmdStateStart(QObject * parent):
     Command(DRAKON::BRANCH_BEGIN, 1, parent)
@@ -14,7 +17,7 @@ void CmdStateStart::setText(const QString& text)
 
 void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    writer->writeAttribute("name", mText);
 }
 
 void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)

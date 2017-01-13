@@ -612,7 +612,6 @@ void Command::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void Command::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO;// reimplement in inherited commmands classes
 }
 
 qint64 Command::id() const

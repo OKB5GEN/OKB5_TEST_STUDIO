@@ -14,11 +14,15 @@ public:
         CYCLE
     };
 
+    Q_ENUM(QuestionType)
+
     enum Orientation
     {
         YesDown,
         YesRight
     };
+
+    Q_ENUM(Orientation)
 
     enum Operation
     {
@@ -30,6 +34,8 @@ public:
         NotEqual        // !=
     };
 
+    Q_ENUM(Operation)
+
     enum OperandID
     {
         Left,
@@ -38,6 +44,8 @@ public:
         OperandsCount
     };
 
+    Q_ENUM(OperandID)
+
     enum OperandType
     {
         Variable,
@@ -45,6 +53,8 @@ public:
 
         OperandNotSet
     };
+
+    Q_ENUM(OperandType)
 
     CmdQuestion(QObject* parent);
 

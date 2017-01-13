@@ -17,6 +17,8 @@ public:
         Assign      // = by default
     };
 
+    Q_ENUM(Operation)
+
     enum OperandID
     {
         Result,
@@ -26,6 +28,8 @@ public:
         OperandsCount
     };
 
+    Q_ENUM(OperandID)
+
     enum OperandType
     {
         Variable,
@@ -33,6 +37,8 @@ public:
 
         OperandNotSet
     };
+
+    Q_ENUM(OperandType)
 
     CmdActionMath(QObject* parent);
 

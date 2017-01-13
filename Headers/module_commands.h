@@ -101,6 +101,8 @@ public:
 
         MODULES_COUNT
     };
+
+    Q_ENUM(ModuleID)
 };
 
 #endif // MODULE_COMMANDS_H

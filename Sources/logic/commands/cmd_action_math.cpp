@@ -2,6 +2,9 @@
 #include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QMetaEnum>
 
 CmdActionMath::OperandData::OperandData()
 {
@@ -281,7 +284,21 @@ void CmdActionMath::onVariableRemoved(const QString& name)
 
 void CmdActionMath::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    QMetaEnum operation = QMetaEnum::fromType<CmdActionMath::Operation>();
+    QMetaEnum operandType = QMetaEnum::fromType<CmdActionMath::OperandType>();
+    QMetaEnum operandId = QMetaEnum::fromType<CmdActionMath::OperandID>();
+
+    writer->writeAttribute("operation", operation.valueToKey(mOperation));
+
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        writer->writeStartElement("operand");
+        writer->writeAttribute("id", operandId.valueToKey(OperandID(i)));
+        writer->writeAttribute("type", operandType.valueToKey(mOperands[i].type));
+        writer->writeAttribute("value", QString::number(mOperands[i].value));
+        writer->writeAttribute("variable", mOperands[i].variable);
+        writer->writeEndElement();
+    }
 }
 
 void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)

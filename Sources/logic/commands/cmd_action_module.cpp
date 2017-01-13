@@ -8,6 +8,9 @@
 //#include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QMetaEnum>
 
 CmdActionModule::CmdActionModule(QObject* parent):
     CmdAction(DRAKON::ACTION_MODULE, parent),
@@ -313,7 +316,35 @@ QString CmdActionModule::commandName() const
 
 void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    QMetaEnum module = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+    QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
+
+    writer->writeAttribute("module", module.valueToKey(mModule));
+    writer->writeAttribute("command", command.valueToKey(mOperation));
+
+    // input params
+    writer->writeStartElement("input_params");
+    for (QMap<QString, QString>::const_iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        writer->writeStartElement("param");
+        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("variable", it.value());
+        writer->writeEndElement();
+    }
+
+    writer->writeEndElement();
+
+    // output params
+    writer->writeStartElement("output_params");
+    for (QMap<QString, QString>::const_iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        writer->writeStartElement("param");
+        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("variable", it.value());
+        writer->writeEndElement();
+    }
+
+    writer->writeEndElement();
 }
 
 void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)

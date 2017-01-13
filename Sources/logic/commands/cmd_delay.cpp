@@ -1,6 +1,8 @@
 #include "Headers/logic/commands/cmd_delay.h"
 #include <QTimer>
 #include <QTime>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 CmdDelay::CmdDelay(QObject* parent):
     Command(DRAKON::DELAY, 1, parent),
@@ -119,7 +121,7 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 
 void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    writer->writeAttribute("delay", QString::number(mDelay));
 }
 
 void CmdDelay::readCustomAttributes(QXmlStreamReader* reader)

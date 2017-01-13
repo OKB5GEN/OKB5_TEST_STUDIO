@@ -23,8 +23,8 @@ SystemState::SystemState(QObject* parent):
     m_mko_kits(ModuleMKO::NO_KIT),
     mThreadMKO(Q_NULLPTR),
     mThreadOTD(Q_NULLPTR),
-    PAR_VOLTAGE(tr("Напряжение, В")),
-    PAR_CURRENT(tr("Ток, А")),
+    PAR_VOLTAGE(tr("Voltage, V")),
+    PAR_CURRENT(tr("Current, A")),
     mCurCommand(Q_NULLPTR)
 {
 }

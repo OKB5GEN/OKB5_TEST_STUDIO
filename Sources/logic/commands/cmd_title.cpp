@@ -1,12 +1,7 @@
 #include "Headers/logic/commands/cmd_title.h"
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
-/* Что надо сделат для реализации переменных?
- *
- * 1. Надо сделать отрисовку квадратика у TITLE
- * 2. Надо сделать отображение переменных в нем
- * 3. В логике наверное надо как-то сделать привязку к переменнной
- * 4. Для этого надо хотя бы математическую Action команду сделать
-*/
 
 CmdTitle::CmdTitle(QObject * parent):
     Command(DRAKON::TERMINATOR, 1, parent)
@@ -29,13 +24,13 @@ void CmdTitle::setTitleType(CmdTitle::TitleType type)
     }
     else
     {
-         mText = tr("FINISH");
+        mText = tr("FINISH");
     }
 }
 
 void CmdTitle::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    writer->writeAttribute("name", mText);
 }
 
 void CmdTitle::readCustomAttributes(QXmlStreamReader* reader)

@@ -3,6 +3,9 @@
 #include "Headers/gui/cyclogram/valency_point.h"
 
 #include <QTimer>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QMetaEnum>
 
 namespace
 {
@@ -298,7 +301,25 @@ void CmdQuestion::setQuestionType(CmdQuestion::QuestionType type)
 
 void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    int TODO_XML;
+    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+    QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();
+    QMetaEnum operation = QMetaEnum::fromType<CmdQuestion::Operation>();
+    QMetaEnum operandId = QMetaEnum::fromType<CmdQuestion::OperandID>();
+    QMetaEnum operandType = QMetaEnum::fromType<CmdQuestion::OperandType>();
+
+    writer->writeAttribute("operation", operation.valueToKey(mOperation));
+    writer->writeAttribute("orientation", orientation.valueToKey(mOrientation));
+    writer->writeAttribute("type", cmdType.valueToKey(mQuestionType));
+
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        writer->writeStartElement("operand");
+        writer->writeAttribute("id", operandId.valueToKey(OperandID(i)));
+        writer->writeAttribute("type", operandType.valueToKey(mOperands[i].type));
+        writer->writeAttribute("value", QString::number(mOperands[i].value));
+        writer->writeAttribute("variable", mOperands[i].variable);
+        writer->writeEndElement();
+    }
 }
 
 void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
