@@ -309,7 +309,7 @@ void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 
     writer->writeAttribute("operation", operation.valueToKey(mOperation));
     writer->writeAttribute("orientation", orientation.valueToKey(mOrientation));
-    writer->writeAttribute("type", cmdType.valueToKey(mQuestionType));
+    writer->writeAttribute("cmd_type", cmdType.valueToKey(mQuestionType));
 
     for (int i = 0; i < OperandsCount; ++i)
     {

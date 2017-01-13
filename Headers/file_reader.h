@@ -14,13 +14,9 @@ public:
     QString errorString() const;
 
 private:
-    //void readXBEL();
-    //void readTitle(QTreeWidgetItem *item);
-    //void readSeparator(QTreeWidgetItem *item);
-    //void readFolder(QTreeWidgetItem *item);
-    //void readBookmark(QTreeWidgetItem *item);
-
-    //QTreeWidgetItem *createChildItem(QTreeWidgetItem *item);
+    void readCyclogram();
+    void readVariables();
+    void readCommands();
 
     Cyclogram* mCyclogram;
     QXmlStreamReader mXML;

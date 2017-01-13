@@ -1,5 +1,6 @@
 #include "Headers/file_reader.h"
 #include "Headers/logic/cyclogram.h"
+#include "Headers/logic/variable_controller.h"
 
 //#include <QtWidgets>
 
@@ -14,14 +15,14 @@ bool FileReader::read(QIODevice *device)
 
     if (mXML.readNextStartElement())
     {
-        //if (mXML.name() == "xbel" && xml.attributes().value("version") == "1.0")
-        //{
-        //    readXBEL();
-        //}
-        //else
-        //{
-        //    mXML.raiseError(QObject::tr("The file is not an XBEL version 1.0 file."));
-        //}
+        if (mXML.name() == "cyclogram" && mXML.attributes().value("version") == "1.0")
+        {
+            readCyclogram();
+        }
+        else
+        {
+            mXML.raiseError(QObject::tr("The file is not an cyclogram version 1.0 file."));
+        }
     }
 
     return !mXML.error();
@@ -35,120 +36,102 @@ QString FileReader::errorString() const
             .arg(mXML.columnNumber());
 }
 
-/*
-
-void FileReader::readXBEL()
+void FileReader::readCyclogram()
 {
-    Q_ASSERT(mXML.isStartElement() && mXML.name() == "xbel");
+    //Q_ASSERT(mXML.isStartElement() && mXML.name() == "cyclogram");
 
+    while (!mXML.atEnd() && !mXML.hasError())
+    {
+        QXmlStreamReader::TokenType token = mXML.readNext();
+
+        if (token == QXmlStreamReader::StartElement)
+        {
+            QString name = mXML.name().toString();
+
+            if (name == "variables")
+            {
+                readVariables();
+            }
+            else if (name == "commands")
+            {
+                readCommands();
+            }
+        }
+    }
+
+
+    /*
     while (mXML.readNextStartElement())
     {
-        if (mXML.name() == "folder")
+        QString name = mXML.name().toString();
+
+        if (mXML.name() == "variables")
         {
-            readFolder(0);
+            readVariables();
         }
-        else if (mXML.name() == "bookmark")
+        else if (mXML.name() == "commands")
         {
-            readBookmark(0);
-        }
-        else if (mXML.name() == "separator")
-        {
-            readSeparator(0);
+            readCommands();
         }
         else
         {
             mXML.skipCurrentElement();
         }
     }
+    */
 }
 
-void FileReader::readTitle(QTreeWidgetItem *item)
+void FileReader::readVariables()
 {
-    Q_ASSERT(mXML.isStartElement() && mXML.name() == "title");
+    while (!(mXML.tokenType() == QXmlStreamReader::EndElement && mXML.name() == "variables"))
+    {
+        if (mXML.tokenType() == QXmlStreamReader::StartElement && mXML.name() == "variable")
+        {
+            QXmlStreamAttributes attributes = mXML.attributes();
+            QString name;
+            QString value;
 
-    QString title = mXML.readElementText();
-    item->setText(0, title);
-}
+            if (attributes.hasAttribute("name"))
+            {
+                name = attributes.value("name").toString();
+            }
 
-void FileReader::readSeparator(QTreeWidgetItem *item)
-{
-    Q_ASSERT(mXML.isStartElement() && mXML.name() == "separator");
+            if (attributes.hasAttribute("value"))
+            {
+                value = attributes.value("value").toString();
+            }
 
-    QTreeWidgetItem *separator = createChildItem(item);
-    separator->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-    separator->setText(0, QString(30, 0xB7));
-    mXML.skipCurrentElement();
-}
+            VariableController* varCtrl = mCyclogram->variableController();
+            varCtrl->addVariable(name, value.toDouble());
+        }
 
-void FileReader::readFolder(QTreeWidgetItem *item)
-{
-    Q_ASSERT(mXML.isStartElement() && mXML.name() == "folder");
+        mXML.readNext();
+    }
 
-    QTreeWidgetItem *folder = createChildItem(item);
-    bool folded = (mXML.attributes().value("folded") != "no");
-    treeWidget->setItemExpanded(folder, !folded);
+    /*Q_ASSERT(mXML.isStartElement() && mXML.name() == "variables");
 
     while (mXML.readNextStartElement())
     {
-        if (mXML.name() == "title")
+        QString name = mXML.name().toString();
+
+        if (mXML.name() == "variable")
         {
-            readTitle(folder);
-        }
-        else if (mXML.name() == "folder")
-        {
-            readFolder(folder);
-        }
-        else if (mXML.name() == "bookmark")
-        {
-            readBookmark(folder);
-        }
-        else if (mXML.name() == "separator")
-        {
-            readSeparator(folder);
+            QString name = mXML.attributes().value("name").toString();
+            QString value = mXML.attributes().value("value").toString();
+
+            VariableController* varCtrl = mCyclogram->variableController();
+            varCtrl->addVariable(name, value.toDouble());
         }
         else
         {
             mXML.skipCurrentElement();
         }
-    }
+    }*/
 }
 
-void FileReader::readBookmark(QTreeWidgetItem *item)
+void FileReader::readCommands()
 {
-    Q_ASSERT(mXML.isStartElement() && mXML.name() == "bookmark");
+    Q_ASSERT(mXML.isStartElement() && mXML.name() == "commands");
 
-    QTreeWidgetItem *bookmark = createChildItem(item);
-    bookmark->setFlags(bookmark->flags() | Qt::ItemIsEditable);
-    bookmark->setIcon(0, bookmarkIcon);
-    bookmark->setText(0, QObject::tr("Unknown title"));
-    bookmark->setText(1, xml.attributes().value("href").toString());
-
-    while (mXML.readNextStartElement())
-    {
-        if (mXML.name() == "title")
-        {
-            readTitle(bookmark);
-        }
-        else
-        {
-            mXML.skipCurrentElement();
-        }
-    }
+    mCyclogram->createDefault(); //TODO temporary
 }
-
-QTreeWidgetItem *FileReader::createChildItem(QTreeWidgetItem *item)
-{
-    QTreeWidgetItem *childItem;
-    if (item)
-    {
-        childItem = new QTreeWidgetItem(item);
-    }
-    else
-    {
-        childItem = new QTreeWidgetItem(treeWidget);
-    }
-
-    childItem->setData(0, Qt::UserRole, mXML.name().toString());
-    return childItem;
-}
-*/
