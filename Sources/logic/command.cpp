@@ -135,7 +135,10 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
         }
     }
 
-    mNextCommands[role] = newCmd;
+    if (role < mNextCommands.size())
+    {
+        mNextCommands[role] = newCmd;
+    }
 }
 
 void Command::replaceCommand(Command* newCmd, Command* oldCmd)

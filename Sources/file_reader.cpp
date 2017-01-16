@@ -44,8 +44,6 @@ QString FileReader::errorString() const
 
 void FileReader::readCyclogram()
 {
-    //Q_ASSERT(mXML.isStartElement() && mXML.name() == "cyclogram");
-
     while (!mXML.atEnd() && !mXML.hasError())
     {
         QXmlStreamReader::TokenType token = mXML.readNext();
@@ -68,27 +66,6 @@ void FileReader::readCyclogram()
             }
         }
     }
-
-
-    /*
-    while (mXML.readNextStartElement())
-    {
-        QString name = mXML.name().toString();
-
-        if (mXML.name() == "variables")
-        {
-            readVariables();
-        }
-        else if (mXML.name() == "commands")
-        {
-            readCommands();
-        }
-        else
-        {
-            mXML.skipCurrentElement();
-        }
-    }
-    */
 }
 
 void FileReader::readVariables()
@@ -117,26 +94,6 @@ void FileReader::readVariables()
 
         mXML.readNext();
     }
-
-    /*Q_ASSERT(mXML.isStartElement() && mXML.name() == "variables");
-
-    while (mXML.readNextStartElement())
-    {
-        QString name = mXML.name().toString();
-
-        if (mXML.name() == "variable")
-        {
-            QString name = mXML.attributes().value("name").toString();
-            QString value = mXML.attributes().value("value").toString();
-
-            VariableController* varCtrl = mCyclogram->variableController();
-            varCtrl->addVariable(name, value.toDouble());
-        }
-        else
-        {
-            mXML.skipCurrentElement();
-        }
-    }*/
 }
 
 void FileReader::readCommands()
@@ -145,8 +102,6 @@ void FileReader::readCommands()
 
     QMetaEnum commandTypes = QMetaEnum::fromType<DRAKON::IconType>();
     QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
-
-    //mCyclogram->clear();
 
     // read file, create commands and create links data
     while (!(mXML.tokenType() == QXmlStreamReader::EndElement && mXML.name() == "commands"))
@@ -199,7 +154,7 @@ void FileReader::readCommandsLinks()
         if (mXML.tokenType() == QXmlStreamReader::StartElement && mXML.name() == "item")
         {
             QXmlStreamAttributes attributes = mXML.attributes();
-            QList<qint64> nextCommmands;
+            QList<qint64> nextCommmands = {-1, -1, -1};
 
             qint64 commandID = -1;
             if (attributes.hasAttribute("id"))
@@ -236,6 +191,8 @@ void FileReader::readCommandsLinks()
                 commandLinks[commandID] = nextCommmands;
             }
         }
+
+        mXML.readNext();
     }
 
     // create command links
