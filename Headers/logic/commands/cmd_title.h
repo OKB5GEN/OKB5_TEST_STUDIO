@@ -14,6 +14,8 @@ public:
         END
     };
 
+    Q_ENUM(TitleType)
+
     CmdTitle(QObject * parent);
 
     void setTitleType(TitleType type);

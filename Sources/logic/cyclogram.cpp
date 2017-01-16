@@ -541,3 +541,13 @@ void Cyclogram::onCommandTextChanged(const QString& text)
 {
     setModified(true, true);
 }
+
+void Cyclogram::setFirst(Command* first)
+{
+    mFirst = first;
+}
+
+void Cyclogram::setLast(Command* last)
+{
+    mLast = last;
+}

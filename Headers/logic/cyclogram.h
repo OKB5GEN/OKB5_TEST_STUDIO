@@ -43,6 +43,9 @@ public:
     Command* current() const;
     Command* createCommand(DRAKON::IconType type, int param = -1);
 
+    void setFirst(Command* first);
+    void setLast(Command* last);
+
     const QList<Command*>& commands() const;
     void getBranches(QList<Command*>& branches) const;
 

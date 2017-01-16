@@ -6,6 +6,7 @@
 
 #include "Headers/logic/command.h"
 #include "Headers/logic/commands/cmd_question.h"
+#include "Headers/logic/commands/cmd_title.h"
 #include "Headers/gui/cyclogram/valency_point.h"
 
 #include <QMetaEnum>
@@ -98,8 +99,6 @@ void FileReader::readVariables()
 
 void FileReader::readCommands()
 {
-    //Q_ASSERT(mXML.isStartElement() && mXML.name() == "commands");
-
     QMetaEnum commandTypes = QMetaEnum::fromType<DRAKON::IconType>();
     QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
 
@@ -131,6 +130,19 @@ void FileReader::readCommands()
             {
                 command->read(&mXML); // read command custom data
                 mCommands[command->id()] = command;
+
+                if (command->type() == DRAKON::TERMINATOR)
+                {
+                    CmdTitle* titleCmd = qobject_cast<CmdTitle*>(command);
+                    if (titleCmd->titleType() == CmdTitle::BEGIN)
+                    {
+                        mCyclogram->setFirst(command);
+                    }
+                    else
+                    {
+                        mCyclogram->setLast(command);
+                    }
+                }
             }
         }
 
