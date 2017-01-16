@@ -3,8 +3,6 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logic/command.h"
 
-//#include <QtWidgets>
-
 FileWriter::FileWriter(Cyclogram* cyclogram)
     : mCyclogram(cyclogram)
 {
@@ -22,6 +20,7 @@ bool FileWriter::writeFile(QIODevice *device)
 
     writeVariables();
     writeCommands();
+    writeCommandTree();
 
     mXML.writeEndDocument();
     return true;
@@ -57,37 +56,25 @@ void FileWriter::writeCommands()
     mXML.writeEndElement();
 }
 
-/*
-void FileWriter::writeItem(QTreeWidgetItem *item)
+void FileWriter::writeCommandTree()
 {
-    QString tagName = item->data(0, Qt::UserRole).toString();
-    if (tagName == "folder")
-    {
-        bool folded = !treeWidget->isItemExpanded(item);
-        mXML.writeStartElement(tagName);
-        mXML.writeAttribute("folded", folded ? "yes" : "no");
-        mXML.writeTextElement("title", item->text(0));
-        for (int i = 0; i < item->childCount(); ++i)
-        {
-            writeItem(item->child(i));
-        }
+    mXML.writeStartElement("tree");
 
+    foreach (Command* command, mCyclogram->commands())
+    {
+        mXML.writeStartElement("item");
+        mXML.writeAttribute("id", QString::number(command->id()));
+
+        Command* down = command->nextCommand(ValencyPoint::Down);
+        Command* right = command->nextCommand(ValencyPoint::Right);
+        Command* underArrow = command->nextCommand(ValencyPoint::UnderArrow);
+
+        mXML.writeAttribute("down", down ? QString::number(down->id()) : "-1");
+        mXML.writeAttribute("right", right ? QString::number(right->id()) : "-1");
+        mXML.writeAttribute("under_arrow", underArrow ? QString::number(underArrow->id()) : "-1");
         mXML.writeEndElement();
     }
-    else if (tagName == "bookmark")
-    {
-        mXML.writeStartElement(tagName);
-        if (!item->text(1).isEmpty())
-        {
-            mXML.writeAttribute("href", item->text(1));
-        }
 
-        mXML.writeTextElement("title", item->text(0));
-        mXML.writeEndElement();
-    }
-    else if (tagName == "separator")
-    {
-        mXML.writeEmptyElement(tagName);
-    }
+    mXML.writeEndElement();
 }
-*/
+

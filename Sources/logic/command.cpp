@@ -15,6 +15,8 @@ namespace
     static const int EXECUTION_DELAY = 50;
 }
 
+qint64 Command::smCounter = 0;
+
 Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     QObject(parent),
     mType(type),
@@ -32,7 +34,8 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
         mNextCommands.push_back(Q_NULLPTR);
     }
 
-    mID = QDateTime::currentMSecsSinceEpoch();
+    mID = (QDateTime::currentMSecsSinceEpoch() + smCounter);
+    ++smCounter;
 }
 
 Command::~Command()
@@ -571,39 +574,47 @@ void Command::write(QXmlStreamWriter* writer)
 
     // write common commands attributes
     writer->writeAttribute("type", metaEnum.valueToKey(type()));
+    writer->writeAttribute("id", QString::number(id()));
 
     writeCustomAttributes(writer);
 
     // write command links
-    writer->writeStartElement("next_commands");
+    //writer->writeStartElement("next_commands");
 
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* down = nextCommand(ValencyPoint::Down);
-    Command* right = nextCommand(ValencyPoint::Right);
+    //Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    //Command* down = nextCommand(ValencyPoint::Down);
+    //Command* right = nextCommand(ValencyPoint::Right);
 
-    if (underArrow)
-    {
-        writer->writeAttribute("under_arrow", QString::number(underArrow->id()));
-    }
+    //if (underArrow)
+    //{
+    //    writer->writeAttribute("under_arrow", QString::number(underArrow->id()));
+    //}
 
-    if (down)
-    {
-        writer->writeAttribute("down", QString::number(down->id()));
-    }
+    //if (down)
+    //{
+    //    writer->writeAttribute("down", QString::number(down->id()));
+    //}
 
-    if (right)
-    {
-        writer->writeAttribute("right", QString::number(right->id()));
-    }
+    //if (right)
+    //{
+    //    writer->writeAttribute("right", QString::number(right->id()));
+    //}
 
-    writer->writeEndElement();
+    //writer->writeEndElement();
 
     writer->writeEndElement(); // close command tag
 }
 
 void Command::read(QXmlStreamReader* reader)
 {
-    int TODO;
+    QXmlStreamAttributes attributes = reader->attributes();
+
+    if (attributes.hasAttribute("id"))
+    {
+        mID = attributes.value("id").toString().toLongLong();
+    }
+
+    readCustomAttributes(reader);
 }
 
 void Command::writeCustomAttributes(QXmlStreamWriter* writer)

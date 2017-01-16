@@ -110,6 +110,7 @@ private:
 
     bool mHasError;
     qint64 mID;
+    static qint64 smCounter; // command creation counter in current session
 };
 
 #endif // COMMAND_H

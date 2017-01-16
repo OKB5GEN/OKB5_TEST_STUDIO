@@ -2,8 +2,10 @@
 #define FILE_READER_H
 
 #include <QXmlStreamReader>
+#include <QMap>
 
 class Cyclogram;
+class Command;
 
 class FileReader
 {
@@ -17,8 +19,10 @@ private:
     void readCyclogram();
     void readVariables();
     void readCommands();
+    void readCommandsLinks();
 
     Cyclogram* mCyclogram;
+    QMap<qint64, Command*> mCommands;
     QXmlStreamReader mXML;
 };
 

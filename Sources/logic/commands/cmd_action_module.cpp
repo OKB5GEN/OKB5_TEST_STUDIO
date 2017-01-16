@@ -349,5 +349,80 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QMetaEnum module = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+    QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
+
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("module"))
+    {
+        QString str = attributes.value("module").toString();
+        mModule = ModuleCommands::ModuleID(module.keyToValue(qPrintable(str)));
+    }
+
+    if (attributes.hasAttribute("command"))
+    {
+        QString str = attributes.value("command").toString();
+        mOperation = ModuleCommands::CommandID(command.keyToValue(qPrintable(str)));
+    }
+
+    while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
+    {
+        if (reader->tokenType() == QXmlStreamReader::StartElement)
+        {
+            QString tokenName = reader->name().toString();
+
+            if (tokenName == "input_params")
+            {
+                while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == tokenName))
+                {
+                    if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
+                    {
+                        attributes = reader->attributes();
+                        QString name;
+                        QString variable;
+                        if (attributes.hasAttribute("name"))
+                        {
+                            name = attributes.value("name").toString();
+                        }
+
+                        if (attributes.hasAttribute("variable"))
+                        {
+                            variable = attributes.value("variable").toString();
+                        }
+
+                        mInputParams[name] = variable;
+                    }
+
+                    reader->readNext();
+                }
+            }
+            else if (tokenName == "output_params")
+            {
+                while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == tokenName))
+                {
+                    if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
+                    {
+                        attributes = reader->attributes();
+                        QString name;
+                        QString variable;
+                        if (attributes.hasAttribute("name"))
+                        {
+                            name = attributes.value("name").toString();
+                        }
+
+                        if (attributes.hasAttribute("variable"))
+                        {
+                            variable = attributes.value("variable").toString();
+                        }
+
+                        mOutputParams[name] = variable;
+                    }
+
+                    reader->readNext();
+                }
+            }
+
+            reader->readNext();
+        }
+    }
 }

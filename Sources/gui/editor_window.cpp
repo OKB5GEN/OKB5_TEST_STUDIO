@@ -50,7 +50,7 @@ EditorWindow::EditorWindow():
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
 
-    setWindowTitle(tr("OKB5 Test Studio"));
+    setWindowTitle(tr("OKB5 Test Studio[*]"));
 
     mSystemState = new SystemState(this);
 

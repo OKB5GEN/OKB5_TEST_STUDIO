@@ -303,5 +303,54 @@ void CmdActionMath::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QMetaEnum operation = QMetaEnum::fromType<CmdActionMath::Operation>();
+    QMetaEnum operandType = QMetaEnum::fromType<CmdActionMath::OperandType>();
+    QMetaEnum operandId = QMetaEnum::fromType<CmdActionMath::OperandID>();
+
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("operation"))
+    {
+        QString str = attributes.value("operation").toString();
+        mOperation = Operation(operation.keyToValue(qPrintable(str)));
+    }
+
+    while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
+    {
+        if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "operand")
+        {
+            attributes = reader->attributes();
+            OperandID id;
+            qreal value;
+            OperandType type;
+            QString variable;
+
+            if (attributes.hasAttribute("id"))
+            {
+                QString str = attributes.value("id").toString();
+                id = OperandID(operandId.keyToValue(qPrintable(str)));
+            }
+
+            if (attributes.hasAttribute("type"))
+            {
+                QString str = attributes.value("type").toString();
+                type = OperandType(operandType.keyToValue(qPrintable(str)));
+            }
+
+            if (attributes.hasAttribute("value"))
+            {
+                value = attributes.value("value").toDouble();
+            }
+
+            if (attributes.hasAttribute("variable"))
+            {
+                variable = attributes.value("variable").toString();
+            }
+
+            mOperands[id].type = type;
+            mOperands[id].value = value;
+            mOperands[id].variable = variable;
+        }
+
+        reader->readNext();
+    }
 }

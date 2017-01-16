@@ -22,5 +22,13 @@ void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("name"))
+    {
+        mText = attributes.value("name").toString();
+    }
+    else
+    {
+        qDebug("CmdStateStart: File read error");
+    }
 }

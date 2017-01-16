@@ -35,6 +35,14 @@ void CmdTitle::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdTitle::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("name"))
+    {
+        mText = attributes.value("name").toString();
+    }
+    else
+    {
+        qDebug("CmdTitle: File read error");
+    }
 }
 

@@ -14,6 +14,7 @@ public:
 private:
     void writeVariables();
     void writeCommands();
+    void writeCommandTree();
 
     QXmlStreamWriter mXML;
     Cyclogram* mCyclogram;

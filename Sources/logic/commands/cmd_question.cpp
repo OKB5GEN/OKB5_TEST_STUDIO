@@ -324,5 +324,68 @@ void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+    QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();
+    QMetaEnum operation = QMetaEnum::fromType<CmdQuestion::Operation>();
+    QMetaEnum operandId = QMetaEnum::fromType<CmdQuestion::OperandID>();
+    QMetaEnum operandType = QMetaEnum::fromType<CmdQuestion::OperandType>();
+
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("operation"))
+    {
+        QString str = attributes.value("operation").toString();
+        mOperation = Operation(operation.keyToValue(qPrintable(str)));
+    }
+
+    if (attributes.hasAttribute("orientation"))
+    {
+        QString str = attributes.value("orientation").toString();
+        mOrientation = Orientation(orientation.keyToValue(qPrintable(str)));
+    }
+
+    if (attributes.hasAttribute("cmd_type"))
+    {
+        QString str = attributes.value("cmd_type").toString();
+        mQuestionType = QuestionType(cmdType.keyToValue(qPrintable(str)));
+    }
+
+    while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
+    {
+        if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "operand")
+        {
+            attributes = reader->attributes();
+            OperandID id;
+            qreal value;
+            OperandType type;
+            QString variable;
+
+            if (attributes.hasAttribute("id"))
+            {
+                QString str = attributes.value("id").toString();
+                id = OperandID(operandId.keyToValue(qPrintable(str)));
+            }
+
+            if (attributes.hasAttribute("type"))
+            {
+                QString str = attributes.value("type").toString();
+                type = OperandType(operandType.keyToValue(qPrintable(str)));
+            }
+
+            if (attributes.hasAttribute("value"))
+            {
+                value = attributes.value("value").toDouble();
+            }
+
+            if (attributes.hasAttribute("variable"))
+            {
+                variable = attributes.value("variable").toString();
+            }
+
+            mOperands[id].type = type;
+            mOperands[id].value = value;
+            mOperands[id].variable = variable;
+        }
+
+        reader->readNext();
+    }
 }

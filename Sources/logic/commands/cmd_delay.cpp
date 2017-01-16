@@ -126,5 +126,13 @@ void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdDelay::readCustomAttributes(QXmlStreamReader* reader)
 {
-    int TODO_XML;
+    QXmlStreamAttributes attributes = reader->attributes();
+    if (attributes.hasAttribute("delay"))
+    {
+        mDelay = attributes.value("delay").toInt();
+    }
+    else
+    {
+        qDebug("CmdDelay: File read error");
+    }
 }
