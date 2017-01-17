@@ -879,7 +879,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
         cell.setY(item->cell().y() + 1);
 
         ShapeItem* shape = addShape(it, cell, item);
-        drawChildren(shape);
+        drawChildren(shape, true);
         branchesShapes.push_back(shape);
 
         QRect rect = shape->rect();
@@ -910,7 +910,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
     item->setRect(rect, false);
 }
 
-void CyclogramWidget::drawChildren(ShapeItem* item)
+void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
 {
     Command* cmd = item->command();
 
@@ -927,6 +927,12 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
         }
 
         Command* nextCmd = cmd->nextCommand();
+
+        if (nextCmd->type() == DRAKON::GO_TO_BRANCH && !drawGoToBranch)
+        {
+            return;
+        }
+
         QPoint cell = item->cell();
         cell.setY(cell.y() + 1);
 
@@ -935,7 +941,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
 
         if (nextCmd->type() != DRAKON::GO_TO_BRANCH)
         {
-            drawChildren(shape);
+            drawChildren(shape, drawGoToBranch);
         }
 
         QRect rect = item->rect();
@@ -963,7 +969,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
                 QRect rightRect;
                 QRect underArrowRect;
 
-                if (down)
+                if (down && down != underArrow)
                 {
                     QPoint cell = item->cell();
                     cell.setY(cell.y() + 1);
@@ -973,13 +979,13 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape);
+                        drawChildren(shape, drawGoToBranch && underArrow == Q_NULLPTR);
                     }
 
                     downRect = shape->rect();
                 }
 
-                if (right)
+                if (right && right != underArrow)
                 {
                     QPoint cell = item->cell();
                     cell.setY(cell.y() + 1);
@@ -998,7 +1004,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape);
+                        drawChildren(shape, drawGoToBranch && underArrow == Q_NULLPTR);
                     }
 
                     rightRect = shape->rect();
@@ -1015,7 +1021,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape);
+                        drawChildren(shape, drawGoToBranch);
                     }
 
                     underArrowRect = shape->rect();

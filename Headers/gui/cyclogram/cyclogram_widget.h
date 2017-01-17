@@ -53,7 +53,7 @@ private:
     void clearSelection(bool needUpdate = true);
 
     void drawCyclogram(ShapeItem* item);
-    void drawChildren(ShapeItem* item);
+    void drawChildren(ShapeItem* item, bool drawGoToBranch);
 
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
     ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
