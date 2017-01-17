@@ -926,13 +926,14 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
             return; // empty valency point or branch end
         }
 
+        Command* nextCmd = cmd->nextCommand();
         QPoint cell = item->cell();
         cell.setY(cell.y() + 1);
 
-        ShapeItem* shape = addShape(cmd->nextCommand(), cell, item);
-        item->setChildShape(shape, 0);
+        ShapeItem* shape = addShape(nextCmd, cell, item);
+        item->setChildShape(shape, ValencyPoint::Down);
 
-        if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+        if (nextCmd->type() != DRAKON::GO_TO_BRANCH)
         {
             drawChildren(shape);
         }
@@ -941,11 +942,91 @@ void CyclogramWidget::drawChildren(ShapeItem* item)
         rect.setBottom(rect.bottom() + shape->rect().height());
         rect.setRight(rect.right() + shape->rect().width() - rect.width());
         item->setRect(rect, false);
+
     }
     else if (cmd->nextCommands().size() == 3)
     {
-        int i = 0;
-        int TODO; // loading from file
+        if (cmd->type() == DRAKON::QUESTION)
+        {
+            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
+            if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            {
+                int TODO; // depending on role and shape type
+            }
+            else // IF-QUESTION
+            {
+                Command* down = cmd->nextCommand(ValencyPoint::Down);
+                Command* right = cmd->nextCommand(ValencyPoint::Right);
+                Command* underArrow = cmd->nextCommand(ValencyPoint::UnderArrow);
+
+                QRect downRect;
+                QRect rightRect;
+                QRect underArrowRect;
+
+                if (down)
+                {
+                    QPoint cell = item->cell();
+                    cell.setY(cell.y() + 1);
+
+                    ShapeItem* shape = addShape(down, cell, item);
+                    item->setChildShape(shape, ValencyPoint::Down);
+
+                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+                    {
+                        drawChildren(shape);
+                    }
+
+                    downRect = shape->rect();
+                }
+
+                if (right)
+                {
+                    QPoint cell = item->cell();
+                    cell.setY(cell.y() + 1);
+
+                    if (down)
+                    {
+                        cell.setX(cell.x() + downRect.width());
+                    }
+                    else
+                    {
+                        cell.setX(cell.x() + 1);
+                    }
+
+                    ShapeItem* shape = addShape(right, cell, item);
+                    item->setChildShape(shape, ValencyPoint::Right);
+
+                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+                    {
+                        drawChildren(shape);
+                    }
+
+                    rightRect = shape->rect();
+                }
+
+                if (underArrow)
+                {
+                    int maxHeight = qMax(downRect.height(), rightRect.height());
+                    QPoint cell = item->cell();
+                    cell.setY(cell.y() + maxHeight + 1);
+
+                    ShapeItem* shape = addShape(underArrow, cell, item);
+                    item->setChildShape(shape, ValencyPoint::UnderArrow);
+
+                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+                    {
+                        drawChildren(shape);
+                    }
+
+                    underArrowRect = shape->rect();
+                }
+
+                QRect newRect = downRect.united(rightRect);
+                newRect = newRect.united(underArrowRect);
+                newRect.setTop(newRect.top() - 1);
+                item->setRect(newRect, false);
+            }
+        }
     }
 }
 
