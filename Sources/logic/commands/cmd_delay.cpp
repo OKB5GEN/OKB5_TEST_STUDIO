@@ -127,12 +127,30 @@ void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)
 void CmdDelay::readCustomAttributes(QXmlStreamReader* reader)
 {
     QXmlStreamAttributes attributes = reader->attributes();
+    int delay = 0;
     if (attributes.hasAttribute("delay"))
     {
-        mDelay = attributes.value("delay").toInt();
+        delay = attributes.value("delay").toInt();
     }
-    else
-    {
-        qDebug("CmdDelay: File read error");
-    }
+
+    setDelay(delay);
+}
+
+void CmdDelay::setDelay(int msec)
+{
+    int delay = msec;
+
+    int hours = delay / (3600 * 1000);
+    delay -= hours * 3600 * 1000;
+
+    int minutes = delay / (60 * 1000);
+    delay -= minutes * 60 * 1000;
+
+    int seconds = delay / 1000;
+    delay -= seconds * 1000;
+
+    int milliseconds = delay;
+
+    setDelay(hours, minutes, seconds, milliseconds);
+
 }

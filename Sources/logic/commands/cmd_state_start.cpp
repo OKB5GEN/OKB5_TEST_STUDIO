@@ -27,8 +27,4 @@ void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
     {
         mText = attributes.value("name").toString();
     }
-    else
-    {
-        qDebug("CmdStateStart: File read error");
-    }
 }

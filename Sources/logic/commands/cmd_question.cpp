@@ -388,4 +388,6 @@ void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
 
         reader->readNext();
     }
+
+    updateText();
 }

@@ -30,6 +30,8 @@ private slots:
     void finish();
 
 private:
+    void setDelay(int msec);
+
     QTimer* mTimer;
     int mDelay; // msec
     int mTimeLeft;

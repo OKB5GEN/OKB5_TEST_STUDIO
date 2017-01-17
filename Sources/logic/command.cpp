@@ -112,7 +112,7 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
         newCmd->setRole(role);
     }
 
-    if (mType == DRAKON::GO_TO_BRANCH)
+    if (mType == DRAKON::GO_TO_BRANCH && role == ValencyPoint::Down)
     {
         if (newCmd)
         {
