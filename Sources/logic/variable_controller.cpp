@@ -89,3 +89,10 @@ void VariableController::restart()
         setVariable(key, variable(key, -1, Initial), Current);
     }
 }
+
+void VariableController::clear()
+{
+    mCurrent.clear();
+    mInitial.clear();
+
+}

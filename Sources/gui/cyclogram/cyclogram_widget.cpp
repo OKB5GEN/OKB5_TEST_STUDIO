@@ -80,7 +80,10 @@
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
-    mCurrentCyclogram(Q_NULLPTR)
+    mCurrentCyclogram(Q_NULLPTR),
+    mSihlouetteLine(Q_NULLPTR),
+    mSihlouetteArrow(Q_NULLPTR),
+    mUpdateOnShapeRemove(true)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -106,9 +109,7 @@ CyclogramWidget::~CyclogramWidget()
 void CyclogramWidget::clear(bool onDestroy)
 {
     qDeleteAll(mCommands);
-    qDeleteAll(mSihlouette);
     mCommands.clear();
-    mSihlouette.clear();
 
     if (!onDestroy && mCurrentCyclogram)
     {
@@ -226,7 +227,11 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    drawItems(mSihlouette, painter);
+    QList<ShapeItem*> sihlouetteItems;
+    sihlouetteItems.push_back(mSihlouetteLine);
+    sihlouetteItems.push_back(mSihlouetteArrow);
+
+    drawItems(sihlouetteItems, painter);
     drawItems(mCommands, painter);
 }
 
@@ -420,10 +425,6 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
 
 void CyclogramWidget::drawSilhouette()
 {
-    int TODO; // not good handling
-    qDeleteAll(mSihlouette);
-    mSihlouette.clear();
-
     QPoint bottomRight(INT_MIN, INT_MIN);
     QPoint bottomLeft(ShapeItem::origin().x(), mRootShape->rect().height() * ShapeItem::itemSize().height());
     QPoint topLeft(ShapeItem::origin().x(), ShapeItem::origin().y() + ShapeItem::itemSize().height());
@@ -460,26 +461,30 @@ void CyclogramWidget::drawSilhouette()
     silhouette.lineTo(topLeft);
     silhouette.lineTo(topRight);
 
-    ShapeItem* sihlouetteItem = new ShapeItem(this);
-    sihlouetteItem->setPath(silhouette);
-    sihlouetteItem->setColor(QColor::fromRgba(0x00ffffff));
+    if (!mSihlouetteLine)
+    {
+        mSihlouetteLine = new ShapeItem(this);
+        mSihlouetteLine->setColor(QColor::fromRgba(0x00ffffff));
+    }
 
-    // draw arrow
-    QPainterPath arrow;
-    QPoint pos;
-    pos.setX(topLeft.x() + ShapeItem::itemSize().width() / 2);
-    pos.setY(topLeft.y());
-    arrow.moveTo(pos);
-    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
-    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
-    arrow.lineTo(pos);
+    mSihlouetteLine->setPath(silhouette);
 
-    ShapeItem* arrowItem = new ShapeItem(this);
-    arrowItem->setPath(arrow);
-    arrowItem->setColor(QColor::fromRgba(0xff000000));
+    if (!mSihlouetteArrow)
+    {
+        // draw arrow
+        QPainterPath arrow;
+        QPoint pos;
+        pos.setX(topLeft.x() + ShapeItem::itemSize().width() / 2);
+        pos.setY(topLeft.y());
+        arrow.moveTo(pos);
+        arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
+        arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
+        arrow.lineTo(pos);
 
-    mSihlouette.push_back(sihlouetteItem);
-    mSihlouette.push_back(arrowItem);
+        mSihlouetteArrow = new ShapeItem(this);
+        mSihlouetteArrow->setPath(arrow);
+        mSihlouetteArrow->setColor(QColor::fromRgba(0xff000000));
+    }
 }
 
 void CyclogramWidget::load(Cyclogram* cyclogram)
@@ -632,7 +637,10 @@ void CyclogramWidget::removeShape(Command* command)
         }
     }
 
-    onNeedUpdate();
+    if (mUpdateOnShapeRemove)
+    {
+        onNeedUpdate();
+    }
 }
 
 void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
@@ -1274,4 +1282,9 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
 
     // 5. Update entire cyclogram rect
     mRootShape->adjust();
+}
+
+void CyclogramWidget::setUpdateOnRemove(bool updateOnShapeRemove)
+{
+    mUpdateOnShapeRemove = updateOnShapeRemove;
 }

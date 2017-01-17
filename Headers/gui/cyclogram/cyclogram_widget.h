@@ -27,6 +27,7 @@ public:
     ~CyclogramWidget();
 
     void clear(bool onDestroy = false);
+    void setUpdateOnRemove(bool updateOnShapeRemove);
 
 public slots:
     void load(Cyclogram* cyclogram);
@@ -79,7 +80,8 @@ private:
     void showEditDialog(Command* command);
 
     QList<ShapeItem*> mCommands;
-    QList<ShapeItem*> mSihlouette; // sihlouette (TODO temporary)
+    ShapeItem* mSihlouetteArrow;
+    ShapeItem* mSihlouetteLine;
 
     QPoint mPreviousPosition;
     ShapeItem * mMovingItem;
@@ -88,6 +90,8 @@ private:
     ShapeItem* mRootShape;
 
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
+
+    bool mUpdateOnShapeRemove;
 };
 
 #endif //CYCLOGRAM_WIDGET_H

@@ -79,7 +79,9 @@ void EditorWindow::newFile()
 {
     if (maybeSave())
     {
+        mCyclogramWidget->setUpdateOnRemove(false);
         mCyclogram->createDefault();
+        mCyclogramWidget->setUpdateOnRemove(true);
         mCyclogramWidget->load(mCyclogram);
         setCurrentFile(QString());
 

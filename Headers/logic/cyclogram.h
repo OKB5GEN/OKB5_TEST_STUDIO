@@ -67,6 +67,7 @@ private slots:
     void onCriticalError(Command* cmd);
     void runCurrentCommand();
     void onCommandTextChanged(const QString& text);
+    void variablesChanged();
 
 private:
     void deleteCommandTree(Command* cmd, bool silent);

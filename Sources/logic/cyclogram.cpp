@@ -68,6 +68,11 @@ Cyclogram::Cyclogram(QObject * parent):
 //  , mExecuteOneCmd(false)
 {
     mVarController = new VariableController(this);
+
+    connect(mVarController, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(variablesChanged()));
+    connect(mVarController, SIGNAL(variableRemoved(const QString&)), this, SLOT(variablesChanged()));
+    connect(mVarController, SIGNAL(valueChanged(const QString&, qreal, int)), this, SLOT(variablesChanged()));
+    connect(mVarController, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
 }
 
 void Cyclogram::createDefault()
@@ -252,21 +257,24 @@ Cyclogram::State Cyclogram::state() const
 
 void Cyclogram::clear()
 {
-    if (mFirst)
+    foreach (Command* cmd, mCommands)
     {
-        deleteCommandTree(mFirst, true);
+        emit deleted(cmd);
+        deleteCommandImpl(cmd, true);
     }
 
     mFirst = Q_NULLPTR;
     mCurrent = Q_NULLPTR;
     mLast = Q_NULLPTR;
     mCommands.clear();
+    mVarController->clear();
 }
 
 void Cyclogram::deleteCommandTree(Command* cmd, bool silent)
 {
     emit deleted(cmd);
 
+    // put command out of commands list
     for (int i = 0, sz = mCommands.size(); i < sz; ++i)
     {
         if (mCommands[i] == cmd)
@@ -276,6 +284,7 @@ void Cyclogram::deleteCommandTree(Command* cmd, bool silent)
         }
     }
 
+    // recursively delete all child commands
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
         if (cmd->nextCommands()[i])
@@ -538,6 +547,11 @@ void Cyclogram::setModified(bool isModified, bool sendSignal)
 }
 
 void Cyclogram::onCommandTextChanged(const QString& text)
+{
+    setModified(true, true);
+}
+
+void Cyclogram::variablesChanged()
 {
     setModified(true, true);
 }

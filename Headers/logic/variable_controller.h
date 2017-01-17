@@ -31,6 +31,7 @@ public:
 
 public slots:
     void restart();
+    void clear();
 
 signals:
     void variableAdded(const QString& name, qreal value);
