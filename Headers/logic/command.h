@@ -45,7 +45,7 @@ public:
     DRAKON::IconType type() const;
 
     const QList<Command*>& nextCommands() const;
-    void insertCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
+    virtual void insertCommand(Command* newCmd, ValencyPoint::Role role);
     void replaceCommand(Command* newCmd, ValencyPoint::Role role = ValencyPoint::Down);
     void replaceCommand(Command* newCmd, Command* oldCmd);
 
@@ -83,6 +83,7 @@ protected slots:
 
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed
+    void replaceReferences(Command* oldCmd, Command* newCmd, Command* tree);
 
     virtual void writeCustomAttributes(QXmlStreamWriter* writer);
     virtual void readCustomAttributes(QXmlStreamReader* reader);
@@ -106,8 +107,6 @@ private slots:
     void end();
 
 private:
-    void replaceReferences(Command* oldCmd, Command* newCmd, Command* tree);
-
     bool mHasError;
     qint64 mID;
     static qint64 smCounter; // command creation counter in current session

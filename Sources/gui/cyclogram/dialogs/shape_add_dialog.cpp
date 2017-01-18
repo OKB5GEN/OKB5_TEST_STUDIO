@@ -46,20 +46,30 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     mComboBox->clear();
 
     ShapeItem* item = point.owner();
+    DRAKON::IconType type = item->command()->type();
 
-    switch (item->command()->type())
+    switch (type)
     {
     case DRAKON::DELAY:
     case DRAKON::ACTION_MATH:
     case DRAKON::ACTION_MODULE:
-    case DRAKON::QUESTION:
         {
             setDefaultList();
         }
         break;
+    case DRAKON::QUESTION:
+        {
+            setDefaultList();
+
+            if (point.canBeLanded())
+            {
+                mComboBox->addItem(tr("Switch state"), QVariant(int(DRAKON::QUESTION)));
+            }
+        }
+        break;
     case DRAKON::BRANCH_BEGIN:
         {
-            if (point.role() == 0) // add usual command
+            if (point.role() == ValencyPoint::Down) // add usual command
             {
                 setDefaultList();
             }
@@ -104,6 +114,10 @@ void ShapeAddDialog::onCurrentIndexChanged(int index)
         else if (mComboBox->itemText(index) == tr("Cycle"))
         {
             mParam = CmdQuestion::CYCLE;
+        }
+        else if (mComboBox->itemText(index) == tr("Switch state"))
+        {
+            mParam = CmdQuestion::SWITCH_STATE;
         }
     }
     else

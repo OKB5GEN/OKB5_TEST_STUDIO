@@ -199,282 +199,34 @@ bool Command::hasError() const
 
 void Command::insertCommand(Command* newCmd, ValencyPoint::Role role)
 {
-    // TODO very complex function, split it on small
+    Command* next = nextCommand();
 
-    // LOGIC of this function
-    // insertion in QUESTION
-    //     insertion in QUESTION-CYCLE
-    //         insertion of QUESTION-CYCLE
-    //         insertion of QUESTION-IF
-    //         insertion of "one-cell" command
-    //     insertion in QUESTION-IF
-    //         insertion of QUESTION-CYCLE
-    //         insertion of QUESTION-IF
-    //         insertion of "one-cell" command
-    // insertion in "one-cell" command
-    //     insertion of QUESTION
-    //     insertion of "one-cell" command
-
-    if (!newCmd)
+    if (newCmd->type() == DRAKON::QUESTION)
     {
-        return;
-    }
-
-    newCmd->setRole(role);
-
-    if (mType == DRAKON::QUESTION) // insertion in QUSTION command
-    {
-        CmdQuestion* thisCmd = qobject_cast<CmdQuestion*>(this);
-        Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-        Command* right = nextCommand(ValencyPoint::Right);
-        Command* down = nextCommand(ValencyPoint::Down);
-
-        if (thisCmd->questionType() == CmdQuestion::CYCLE) // insertions in QUESTION-CYCLE
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+        if (questionCmd->questionType() == CmdQuestion::CYCLE)
         {
-            if (newCmd->type() == DRAKON::QUESTION)
-            {
-                CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-
-                if (questionCmd->questionType() == CmdQuestion::CYCLE) // QUESTION-CYCLE insertion in QUESTION-CYCLE
-                {
-                    if (role == ValencyPoint::UnderArrow)
-                    {
-                        // update "under arrow" branch
-                        Command* cmd = (underArrow == this) ? this : underArrow;
-
-                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-                        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-
-                        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-                        // update "right" branch
-                        if (right == this)
-                        {
-                            mNextCommands[ValencyPoint::Right] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(cmd, newCmd, right);
-                        }
-                    }
-                    else
-                    {
-                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-                        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-                        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-
-                        mNextCommands[role] = newCmd;
-                    }
-                }
-                else // QUESTION-IF insertion in QUESTION-CYCLE
-                {
-                    if (role == ValencyPoint::UnderArrow)
-                    {
-                        // update "under arrow" branch
-                        Command* cmd = (underArrow == this) ? this : underArrow;
-
-                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                        newCmd->replaceCommand(cmd, ValencyPoint::Right);
-                        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-
-                        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-                        // update "right" branch
-                        if (right == this)
-                        {
-                            mNextCommands[ValencyPoint::Right] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(cmd, newCmd, right);
-                        }
-                    }
-                    else
-                    {
-                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
-                        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
-
-                        mNextCommands[role] = newCmd;
-                    }
-                }
-            }
-            else // simple command insertion in QUESTION-CYCLE
-            {
-                if (role == ValencyPoint::UnderArrow)
-                {
-                    // update "under arrow" branch
-                    Command* cmd = (underArrow == this) ? this : underArrow;
-
-                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                    mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-                    // update "right" branch
-                    if (right == this)
-                    {
-                        mNextCommands[ValencyPoint::Right] = newCmd;
-                    }
-                    else
-                    {
-                        replaceReferences(cmd, newCmd, right);
-                    }
-                }
-                else
-                {
-                    newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-                    mNextCommands[role] = newCmd;
-                }
-            }
+            questionCmd->replaceCommand(next, ValencyPoint::Down);
+            questionCmd->replaceCommand(questionCmd, ValencyPoint::UnderArrow);
+            questionCmd->replaceCommand(questionCmd, ValencyPoint::Right);
         }
-        else // insertions in QUESTION-IF
+        else if (questionCmd->questionType() == CmdQuestion::IF) // by default IF-type command refers with all branches to command below
         {
-            if (newCmd->type() == DRAKON::QUESTION)
-            {
-                CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-
-                if (questionCmd->questionType() == CmdQuestion::CYCLE) // QUESTION-CYCLE insertion in QUESTION-IF
-                {
-                    if (role == ValencyPoint::UnderArrow)
-                    {
-                        // recursively replace references to current "under arrow" command with new "under arrow" command
-                        if (down == underArrow)
-                        {
-                            mNextCommands[ValencyPoint::Down] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(underArrow, newCmd, down);
-                        }
-
-                        if (right == underArrow)
-                        {
-                            mNextCommands[ValencyPoint::Right] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(underArrow, newCmd, right);
-                        }
-
-                        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
-                        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
-                    }
-                    else
-                    {
-                        Command* existing = mNextCommands[role];
-                        Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-                        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                    }
-
-                    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-                    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-                    mNextCommands[role] = newCmd;
-                }
-                else // QUESTION-IF insertion in QUESTION-IF
-                {
-                    Command* cmd = Q_NULLPTR;
-
-                    if (role == ValencyPoint::UnderArrow)
-                    {
-                        cmd = underArrow;
-
-                        // recursively replace references to current "under arrow" command with new "under arrow" command
-                        if (down == underArrow)
-                        {
-                            mNextCommands[ValencyPoint::Down] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(underArrow, newCmd, down);
-                        }
-
-                        if (right == underArrow)
-                        {
-                            mNextCommands[ValencyPoint::Right] = newCmd;
-                        }
-                        else
-                        {
-                            replaceReferences(underArrow, newCmd, right);
-                        }
-                    }
-                    else
-                    {
-                        Command* existing = mNextCommands[role];
-                        cmd = (existing == underArrow) ? underArrow : existing;
-                    }
-
-                    // old "under arrow" command now become "under arrow, etc" command for new command
-                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                    newCmd->replaceCommand(cmd, ValencyPoint::Right);
-                    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-                    mNextCommands[role] = newCmd;
-                }
-            }
-            else // simple command insertion in QUESTION-IF
-            {
-                if (role == ValencyPoint::UnderArrow)
-                {
-                    // recursively replace references to current "under arrow" command with new "under arrow" command
-                    if (down == underArrow)
-                    {
-                        mNextCommands[ValencyPoint::Down] = newCmd;
-                    }
-                    else
-                    {
-                        replaceReferences(underArrow, newCmd, down);
-                    }
-
-                    if (right == underArrow)
-                    {
-                        mNextCommands[ValencyPoint::Right] = newCmd;
-                    }
-                    else
-                    {
-                        replaceReferences(underArrow, newCmd, right);
-                    }
-
-                    newCmd->replaceCommand(underArrow, ValencyPoint::Down);
-                }
-                else
-                {
-                    Command* existing = mNextCommands[role];
-                    Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-                    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-                }
-
-                mNextCommands[role] = newCmd;
-            }
+            questionCmd->replaceCommand(next, ValencyPoint::UnderArrow);
+            questionCmd->replaceCommand(next, ValencyPoint::Down);
+            questionCmd->replaceCommand(next, ValencyPoint::Right);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+        {
+            questionCmd->replaceCommand(next, ValencyPoint::Down);
         }
     }
-    else // QUESTION insertion in simple command
+    else
     {
-        Command* next = nextCommand();
-
-        if (newCmd->type() == DRAKON::QUESTION)
-        {
-            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-            if (questionCmd->questionType() == CmdQuestion::CYCLE)
-            {
-                questionCmd->replaceCommand(next, ValencyPoint::Down);
-                questionCmd->replaceCommand(questionCmd, ValencyPoint::UnderArrow);
-                questionCmd->replaceCommand(questionCmd, ValencyPoint::Right);
-            }
-            else // by default IF-type command refers with all branches to command below
-            {
-                questionCmd->replaceCommand(next, ValencyPoint::UnderArrow);
-                questionCmd->replaceCommand(next, ValencyPoint::Down);
-                questionCmd->replaceCommand(next, ValencyPoint::Right);
-            }
-        }
-        else
-        {
-            newCmd->replaceCommand(next, role);
-        }
-
-        mNextCommands[role] = newCmd;
+        newCmd->replaceCommand(next, role);
     }
+
+    mNextCommands[role] = newCmd;
 }
 
 void Command::setErrorStatus(bool status)
@@ -580,30 +332,6 @@ void Command::write(QXmlStreamWriter* writer)
     writer->writeAttribute("id", QString::number(id()));
 
     writeCustomAttributes(writer);
-
-    // write command links
-    //writer->writeStartElement("next_commands");
-
-    //Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    //Command* down = nextCommand(ValencyPoint::Down);
-    //Command* right = nextCommand(ValencyPoint::Right);
-
-    //if (underArrow)
-    //{
-    //    writer->writeAttribute("under_arrow", QString::number(underArrow->id()));
-    //}
-
-    //if (down)
-    //{
-    //    writer->writeAttribute("down", QString::number(down->id()));
-    //}
-
-    //if (right)
-    //{
-    //    writer->writeAttribute("right", QString::number(right->id()));
-    //}
-
-    //writer->writeEndElement();
 
     writer->writeEndElement(); // close command tag
 }

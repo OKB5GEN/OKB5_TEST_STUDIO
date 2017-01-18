@@ -380,16 +380,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         {
             CmdQuestion* tmp = new CmdQuestion(this);
             tmp->setVariableController(mVarController);
-
-            if (param == CmdQuestion::IF)
-            {
-                tmp->setQuestionType(CmdQuestion::IF);
-            }
-            else if (param == CmdQuestion::CYCLE)
-            {
-                tmp->setQuestionType(CmdQuestion::CYCLE);
-            }
-
+            tmp->setQuestionType(CmdQuestion::QuestionType(param));
             cmd = tmp;
         }
         break;

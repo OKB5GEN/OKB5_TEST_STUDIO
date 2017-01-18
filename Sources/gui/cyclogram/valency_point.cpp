@@ -4,8 +4,8 @@
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),
-    mAttachedShape(Q_NULLPTR),
-    mRole(Down)
+    mRole(Down),
+    mCanBeLanded(false)
 {
 }
 
@@ -39,16 +39,6 @@ ShapeItem* ValencyPoint::owner() const
     return mOwner;
 }
 
-void ValencyPoint::setAttachedShape(ShapeItem* item)
-{
-    mAttachedShape = item;
-}
-
-ShapeItem* ValencyPoint::attachedShape() const
-{
-    return mAttachedShape;
-}
-
 void ValencyPoint::setRole(ValencyPoint::Role role)
 {
     mRole = role;
@@ -57,4 +47,14 @@ void ValencyPoint::setRole(ValencyPoint::Role role)
 ValencyPoint::Role ValencyPoint::role() const
 {
     return mRole;
+}
+
+void ValencyPoint::setCanBeLanded(bool canBeLanded)
+{
+    mCanBeLanded = canBeLanded;
+}
+
+bool ValencyPoint::canBeLanded() const
+{
+    return mCanBeLanded;
 }

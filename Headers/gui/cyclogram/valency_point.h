@@ -20,23 +20,23 @@ public:
     ValencyPoint();
 
     void setOwner(ShapeItem* owner);
-    void setAttachedShape(ShapeItem* item);
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);
     void setRole(Role role);
+    void setCanBeLanded(bool canBeLanded);
 
     QPainterPath path() const;
     QColor color() const;
     ShapeItem* owner() const;
     Role role() const;
-    ShapeItem* attachedShape() const;
+    bool canBeLanded() const;
 
 private:
     ShapeItem* mOwner = Q_NULLPTR;
-    ShapeItem* mAttachedShape = Q_NULLPTR;
     QPainterPath mPath;
     QColor mColor;
     Role mRole;
+    bool mCanBeLanded;
 };
 
 #endif // VALENCY_POINT_H

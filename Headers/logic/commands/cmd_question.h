@@ -11,7 +11,8 @@ public:
     enum QuestionType
     {
         IF,
-        CYCLE
+        CYCLE,
+        SWITCH_STATE
     };
 
     Q_ENUM(QuestionType)
@@ -76,6 +77,7 @@ public:
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
+    void insertCommand(Command* newCmd, ValencyPoint::Role role) override;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
@@ -93,6 +95,22 @@ private:
     };
 
     void updateText();
+
+    void insertInCycle(Command* newCmd, ValencyPoint::Role role);
+    void insertInIf(Command* newCmd, ValencyPoint::Role role);
+    void insertInSwitchState(Command* newCmd, ValencyPoint::Role role);
+
+    void insertCycleToCycle(Command* newCmd, ValencyPoint::Role role);
+    void insertCycleToIf(Command* newCmd, ValencyPoint::Role role);
+    void insertCycleToSwitchState(Command* newCmd, ValencyPoint::Role role);
+
+    void insertIfToCycle(Command* newCmd, ValencyPoint::Role role);
+    void insertIfToIf(Command* newCmd, ValencyPoint::Role role);
+    void insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role);
+
+    void insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role role);
+    void insertSwitchStateToIf(Command* newCmd, ValencyPoint::Role role);
+    void insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::Role role);
 
     Operation mOperation;
     Orientation mOrientation;

@@ -161,15 +161,6 @@ const QList<ValencyPoint>& ShapeItem::valencyPoints() const
     return mValencyPoints;
 }
 
-void ShapeItem::setValencyPoints(const QList<ValencyPoint>& points)
-{
-    mValencyPoints = points;
-    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
-    {
-        mValencyPoints[i].setOwner(this);
-    }
-}
-
 ValencyPoint ShapeItem::valencyPoint(int role) const
 {
     for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
@@ -214,7 +205,6 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
             CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
             if (question->questionType() == CmdQuestion::CYCLE)
             {
-                int i = 0;
                 int TODO;
             }
             else // QUESTION-IF
@@ -492,7 +482,7 @@ void ShapeItem::createPath()
                 path.lineTo(w, H / 2);
 
                 QPainterPath addPath;
-                if (questionCmd->questionType() == CmdQuestion::IF)
+                if (questionCmd->questionType() == CmdQuestion::IF || questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
                 {
                     ShapeItem* down = mChildShapes[ValencyPoint::Down];
                     ShapeItem* right = mChildShapes[ValencyPoint::Right];
@@ -538,21 +528,23 @@ void ShapeItem::createPath()
                     // update valency point positions
                     for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
                     {
-                        int role = mValencyPoints[i].role();
+                        ValencyPoint::Role role = mValencyPoints[i].role();
+                        bool canBeLanded = mValencyPoints[i].canBeLanded();
 
                         if (role == ValencyPoint::Right)
                         {
-                            mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), ValencyPoint::Right);
+                            mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), role);
+                            mValencyPoints[i].setCanBeLanded(canBeLanded);
                         }
                         else if (role == ValencyPoint::UnderArrow)
                         {
                             if (underArrow)
                             {
-                                mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), ValencyPoint::UnderArrow);
+                                mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), role);
+                                mValencyPoints[i].setCanBeLanded(canBeLanded);
                             }
                             else // question with "landed" right/down branches, or question, added to down/right branch of another question
                             {
-                                int j = 0;
                                 int TODO;
                             }
                         }
@@ -657,7 +649,6 @@ void ShapeItem::pushDown()
         CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
         if (question->questionType() == CmdQuestion::CYCLE)
         {
-            int i = 0;
             int TODO;
         }
         else // QUESTION-IF
@@ -1194,7 +1185,7 @@ void ShapeItem::remove()
             else // only right branch was
             {
                 mRect.setBottom(mRect.top());
-                mParentShape->replaceChildShape(0, this);
+                mParentShape->replaceChildShape(Q_NULLPTR, this);
                 mParentShape->onChildRectChanged(this);
             }
         }
@@ -1337,6 +1328,7 @@ ValencyPoint ShapeItem::createValencyPoint(const QPointF& point, ValencyPoint::R
     vPoint.setColor(QColor::fromRgba(0xff00ff00));
     vPoint.setRole(role);
     vPoint.setOwner(this);
+    vPoint.setCanBeLanded(false); // false by default
 
     return vPoint;
 }
@@ -1355,14 +1347,10 @@ void ShapeItem::createValencyPoints(Command* cmd)
     // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
     // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
 
-    // QUESTION shape valency points transformations while adding forms
-    //
-    // 1.
-
     mValencyPoints.clear();
     qreal W = itemSize().width();
     qreal H = itemSize().height();
-    qreal w = cellSize().width();
+    //qreal w = cellSize().width();
     qreal h = cellSize().height();
 
     DRAKON::IconType type = cmd->type();
@@ -1410,10 +1398,73 @@ void ShapeItem::createValencyPoints(Command* cmd)
                     ValencyPoint underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
                     mValencyPoints.push_back(underArrowPoint);
                 }
+                else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+                {
+                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+                    mValencyPoints.push_back(downPoint);
+                }
             }
         }
         break;
     default:
         break;
+    }
+}
+
+void ShapeItem::updateFlags()
+{
+    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
+    {
+        for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+        {
+            if (mValencyPoints[i].role() == ValencyPoint::Down)
+            {
+                mValencyPoints[i].setCanBeLanded(true);
+                return;
+            }
+        }
+    }
+
+    if (!mParentShape || mValencyPoints.empty())
+    {
+        return;
+    }
+
+    ValencyPoint::Role role = mCommand->role();
+    ValencyPoint point = mParentShape->valencyPoint(role);
+
+    if (mCommand->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+        if (question->questionType() == CmdQuestion::CYCLE)
+        {
+            int TODO;
+        }
+        else if (question->questionType() == CmdQuestion::IF)
+        {
+            for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+            {
+                ValencyPoint::Role pointRole = mValencyPoints[i].role();
+                if (pointRole == ValencyPoint::Down || pointRole == ValencyPoint::Right)
+                {
+                    mValencyPoints[i].setCanBeLanded(false);
+                }
+                else if (pointRole == ValencyPoint::UnderArrow)
+                {
+                    mValencyPoints[i].setCanBeLanded(point.canBeLanded());
+                }
+            }
+        }
+        else if (question->questionType() == CmdQuestion::SWITCH_STATE)
+        {
+            for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+            {
+                mValencyPoints[i].setCanBeLanded(true);
+            }
+        }
+    }
+    else
+    {
+        mValencyPoints[0].setCanBeLanded(point.canBeLanded());
     }
 }

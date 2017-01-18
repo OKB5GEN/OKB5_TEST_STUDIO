@@ -416,6 +416,8 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
 
+    shapeItem->updateFlags();
+
     mCommands.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
     connect(shapeItem, SIGNAL(needToDelete(ShapeItem*)), this, SLOT(onNeedToDelete(ShapeItem*)));
@@ -1069,6 +1071,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
     else
     {
+        newCmd->setRole(role);
         pointCmd->insertCommand(newCmd, role);
     }
 

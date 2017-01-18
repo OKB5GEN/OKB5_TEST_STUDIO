@@ -391,3 +391,591 @@ void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
 
     updateText();
 }
+
+void CmdQuestion::insertCommand(Command* newCmd, ValencyPoint::Role role)
+{
+    if (questionType() == CmdQuestion::CYCLE)
+    {
+        insertInCycle(newCmd, role);
+    }
+    else if (questionType() == CmdQuestion::IF)
+    {
+        insertInIf(newCmd, role);
+    }
+    else if (questionType() == CmdQuestion::SWITCH_STATE)
+    {
+        insertInSwitchState(newCmd, role);
+    }
+}
+
+void CmdQuestion::insertInCycle(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    if (newCmd->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+        {
+            insertCycleToCycle(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::IF)
+        {
+            insertIfToCycle(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+        {
+            insertSwitchStateToCycle(newCmd, role);
+        }
+
+        return;
+    }
+
+    // simple command insertion in QUESTION-CYCLE
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // update "under arrow" branch
+        Command* cmd = (underArrow == this) ? this : underArrow;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+        // update "right" branch
+        if (right == this)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(cmd, newCmd, right);
+        }
+    }
+    else
+    {
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+        mNextCommands[role] = newCmd;
+    }
+}
+
+void CmdQuestion::insertInIf(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    if (newCmd->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+        {
+            insertCycleToIf(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::IF)
+        {
+            insertIfToIf(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+        {
+            insertSwitchStateToIf(newCmd, role);
+        }
+
+        return;
+    }
+
+    // simple command insertion
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+
+        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    }
+
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertInSwitchState(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    if (newCmd->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+        {
+            insertCycleToSwitchState(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::IF)
+        {
+            insertIfToSwitchState(newCmd, role);
+        }
+        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+        {
+            insertSwitchStateToSwitchState(newCmd, role);
+        }
+
+        return;
+    }
+
+    // simple command insertion
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+
+        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    }
+
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertCycleToCycle(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // update "under arrow" branch
+        Command* cmd = (underArrow == this) ? this : underArrow;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+
+        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+        // update "right" branch
+        if (right == this)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(cmd, newCmd, right);
+        }
+    }
+    else
+    {
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+
+        mNextCommands[role] = newCmd;
+    }
+}
+
+void CmdQuestion::insertCycleToIf(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+
+        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
+        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    }
+
+    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertCycleToSwitchState(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+
+        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
+        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    }
+
+    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertIfToCycle(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // update "under arrow" branch
+        Command* cmd = (underArrow == this) ? this : underArrow;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+        newCmd->replaceCommand(cmd, ValencyPoint::Right);
+        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+
+        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+        // update "right" branch
+        if (right == this)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(cmd, newCmd, right);
+        }
+    }
+    else
+    {
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
+
+        mNextCommands[role] = newCmd;
+    }
+}
+
+void CmdQuestion::insertIfToIf(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    Command* cmd = Q_NULLPTR;
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        cmd = underArrow;
+
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        cmd = (existing == underArrow) ? underArrow : existing;
+    }
+
+    // old "under arrow" command now become "under arrow, etc" command for new command
+    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    Command* cmd = Q_NULLPTR;
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        cmd = underArrow;
+
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        cmd = (existing == underArrow) ? underArrow : existing;
+    }
+
+    // old "under arrow" command now become "under arrow, etc" command for new command
+    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+
+}
+
+void CmdQuestion::insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        // update "under arrow" branch
+        Command* cmd = (underArrow == this) ? this : underArrow;
+
+        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+        newCmd->replaceCommand(cmd, ValencyPoint::Right);
+        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+
+        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+        // update "right" branch
+        if (right == this)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(cmd, newCmd, right);
+        }
+    }
+    else
+    {
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
+        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
+
+        mNextCommands[role] = newCmd;
+    }
+}
+
+void CmdQuestion::insertSwitchStateToIf(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    Command* cmd = Q_NULLPTR;
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        cmd = underArrow;
+
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        cmd = (existing == underArrow) ? underArrow : existing;
+    }
+
+    // old "under arrow" command now become "under arrow, etc" command for new command
+    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+}
+
+void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::Role role)
+{
+    int TODO; // need check
+
+    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+    Command* right = nextCommand(ValencyPoint::Right);
+    Command* down = nextCommand(ValencyPoint::Down);
+
+    Command* cmd = Q_NULLPTR;
+
+    if (role == ValencyPoint::UnderArrow)
+    {
+        cmd = underArrow;
+
+        // recursively replace references to current "under arrow" command with new "under arrow" command
+        if (down == underArrow)
+        {
+            mNextCommands[ValencyPoint::Down] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, down);
+        }
+
+        if (right == underArrow)
+        {
+            mNextCommands[ValencyPoint::Right] = newCmd;
+        }
+        else
+        {
+            replaceReferences(underArrow, newCmd, right);
+        }
+    }
+    else
+    {
+        Command* existing = mNextCommands[role];
+        cmd = (existing == underArrow) ? underArrow : existing;
+    }
+
+    // old "under arrow" command now become "under arrow, etc" command for new command
+    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+    mNextCommands[role] = newCmd;
+}

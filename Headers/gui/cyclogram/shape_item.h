@@ -34,6 +34,7 @@ public:
 
     void remove();
     void adjust();
+    void updateFlags();
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -71,7 +72,6 @@ private slots:
 
 private:
     void createPath();
-    void setValencyPoints(const QList<ValencyPoint>& points);
     ValencyPoint createValencyPoint(const QPointF& point, ValencyPoint::Role role);
     void createValencyPoints(Command* cmd);
 
