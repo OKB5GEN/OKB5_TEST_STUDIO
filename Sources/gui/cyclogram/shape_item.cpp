@@ -471,105 +471,105 @@ void ShapeItem::createPath()
         {
             CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());
 
-            if (questionCmd)
+            path.moveTo(w, H / 2);
+            path.lineTo(w * 2, H - h);
+            path.lineTo(W - 2 * w, H - h);
+            path.lineTo(W - w, H / 2);
+            path.lineTo(W - 2 * w, h);
+            path.lineTo(w * 2, h);
+            path.lineTo(w, H / 2);
+
+            QPainterPath addPath;
+            if (questionCmd->questionType() == CmdQuestion::IF || questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
             {
-                path.moveTo(w, H / 2);
-                path.lineTo(w * 2, H - h);
-                path.lineTo(W - 2 * w, H - h);
-                path.lineTo(W - w, H / 2);
-                path.lineTo(W - 2 * w, h);
-                path.lineTo(w * 2, h);
-                path.lineTo(w, H / 2);
+                ShapeItem* down = mChildShapes[ValencyPoint::Down];
+                ShapeItem* right = mChildShapes[ValencyPoint::Right];
+                ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
 
-                QPainterPath addPath;
-                if (questionCmd->questionType() == CmdQuestion::IF || questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+                QRect downRect;
+                QRect rightRect;
+                int xOffset = W;
+
+                if (down)
                 {
-                    ShapeItem* down = mChildShapes[ValencyPoint::Down];
-                    ShapeItem* right = mChildShapes[ValencyPoint::Right];
-                    ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+                    downRect = down->rect();
+                    xOffset += W * (downRect.width() - 1);
+                }
 
-                    QRect downRect;
-                    QRect rightRect;
-                    int xOffset = W;
+                if (right)
+                {
+                    rightRect = right->rect();
+                    xOffset += W / 2;
+                }
 
-                    if (down)
-                    {
-                        downRect = down->rect();
-                        xOffset += W * (downRect.width() - 1);
-                    }
+                int yOffset = H * (qMax(downRect.height(), rightRect.height()) + 1);
 
-                    if (right)
-                    {
-                        rightRect = right->rect();
-                        xOffset += W / 2;
-                    }
+                // if underArrow && !down && !right, i.e. by default
+                addPath.moveTo(W - w, H / 2);
+                addPath.lineTo(xOffset, H / 2);
+                addPath.lineTo(xOffset, H);
 
-                    int yOffset = H * (qMax(downRect.height(), rightRect.height()) + 1);
+                if (!right && down)
+                {
+                    addPath.lineTo(xOffset, yOffset);
+                }
 
-                    // if underArrow && !down && !right, i.e. by default
-                    addPath.moveTo(W - w, H / 2);
-                    addPath.lineTo(xOffset, H / 2);
-                    addPath.lineTo(xOffset, H);
+                if (right && !down)
+                {
+                    addPath.moveTo(W / 2, H);
+                    addPath.lineTo(W / 2, yOffset);
+                }
 
-                    if (!right && down)
-                    {
-                        addPath.lineTo(xOffset, yOffset);
-                    }
-
-                    if (right && !down)
-                    {
-                        addPath.moveTo(W / 2, H);
-                        addPath.lineTo(W / 2, yOffset);
-                    }
-
+                if (questionCmd->questionType() == CmdQuestion::IF)
+                {
                     addPath.moveTo(xOffset, yOffset);
                     addPath.lineTo(W / 2, yOffset);
+                }
 
-                    // update valency point positions
-                    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+                // update valency point positions
+                for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+                {
+                    ValencyPoint::Role role = mValencyPoints[i].role();
+                    bool canBeLanded = mValencyPoints[i].canBeLanded();
+
+                    if (role == ValencyPoint::Right)
                     {
-                        ValencyPoint::Role role = mValencyPoints[i].role();
-                        bool canBeLanded = mValencyPoints[i].canBeLanded();
-
-                        if (role == ValencyPoint::Right)
+                        mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), role);
+                        mValencyPoints[i].setCanBeLanded(canBeLanded);
+                    }
+                    else if (role == ValencyPoint::UnderArrow)
+                    {
+                        if (underArrow)
                         {
-                            mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), role);
+                            mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), role);
                             mValencyPoints[i].setCanBeLanded(canBeLanded);
                         }
-                        else if (role == ValencyPoint::UnderArrow)
+                        else // question with "landed" right/down branches, or question, added to down/right branch of another question
                         {
-                            if (underArrow)
-                            {
-                                mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), role);
-                                mValencyPoints[i].setCanBeLanded(canBeLanded);
-                            }
-                            else // question with "landed" right/down branches, or question, added to down/right branch of another question
-                            {
-                                int TODO;
-                            }
+                            int TODO;
                         }
                     }
                 }
-                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
-                {
-                    int TODO; // very complex logics for QUESTION-CYCLE connections drawing will be here
-
-                    addPath.moveTo(W - w, H / 2);
-                    addPath.lineTo(W, H / 2);
-                    addPath.lineTo(W, 0);
-                    addPath.lineTo(W / 2, 0);
-
-                    QPainterPath arrowPath;
-                    QPoint pos(W / 2, 0);
-                    arrowPath.moveTo(pos);
-                    arrowPath.lineTo(QPoint(pos.x() + w, pos.y() + h / 4));
-                    arrowPath.lineTo(QPoint(pos.x() + w, pos.y() - h / 4));
-                    arrowPath.lineTo(pos);
-                    mArrowPath = arrowPath;
-                }
-
-                mAdditionalPath = addPath;
             }
+            else if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            {
+                int TODO; // very complex logics for QUESTION-CYCLE connections drawing will be here
+
+                addPath.moveTo(W - w, H / 2);
+                addPath.lineTo(W, H / 2);
+                addPath.lineTo(W, 0);
+                addPath.lineTo(W / 2, 0);
+
+                QPainterPath arrowPath;
+                QPoint pos(W / 2, 0);
+                arrowPath.moveTo(pos);
+                arrowPath.lineTo(QPoint(pos.x() + w, pos.y() + h / 4));
+                arrowPath.lineTo(QPoint(pos.x() + w, pos.y() - h / 4));
+                arrowPath.lineTo(pos);
+                mArrowPath = arrowPath;
+            }
+
+            mAdditionalPath = addPath;
         }
         break;
     default:

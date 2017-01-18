@@ -1138,7 +1138,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
         if (newShape->command()->type() == DRAKON::QUESTION)
         {
             CmdQuestion* command = qobject_cast<CmdQuestion*>(newShape->command());
-            if (command->questionType() == CmdQuestion::CYCLE)
+            if (command->questionType() == CmdQuestion::CYCLE || command->questionType() == CmdQuestion::SWITCH_STATE)
             {
                 newShape->setChildShape(prevChildShape, ValencyPoint::Down);
             }
@@ -1182,6 +1182,12 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
 
     owner->onChildRectChanged(newShape);
+
+    if (type == DRAKON::QUESTION && param == CmdQuestion::SWITCH_STATE)
+    {
+        ShapeItem* goToBranchItem = addCommand(DRAKON::GO_TO_BRANCH, newShape->valencyPoint(ValencyPoint::Right));
+        //goToBranchItem->command()->replaceCommand(newBranchItem->command());
+    }
 
     update();
 

@@ -53,10 +53,6 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     case DRAKON::DELAY:
     case DRAKON::ACTION_MATH:
     case DRAKON::ACTION_MODULE:
-        {
-            setDefaultList();
-        }
-        break;
     case DRAKON::QUESTION:
         {
             setDefaultList();
@@ -72,6 +68,11 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
             if (point.role() == ValencyPoint::Down) // add usual command
             {
                 setDefaultList();
+
+                if (point.canBeLanded())
+                {
+                    mComboBox->addItem(tr("Switch state"), QVariant(int(DRAKON::QUESTION)));
+                }
             }
             else // add new branch
             {
