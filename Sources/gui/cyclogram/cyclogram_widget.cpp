@@ -25,6 +25,8 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
 #include "Headers/gui/cyclogram/shape_item.h"
 
+#include "Headers/logger/Logger.h"
+
 /* Алгоритм построения ДРАКОН-схемы на основе дерева команд (с нуля)
  *
  * 1. Берем список бранчей
@@ -271,6 +273,8 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        LOG_INFO("Mouse clicked");
+
         // no interaction while cyclogram running
         if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
         {

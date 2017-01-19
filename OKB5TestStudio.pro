@@ -60,7 +60,14 @@ SOURCES += main.cpp\
     Sources/logic/commands/cmd_action_module.cpp \
     Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp \
     Sources/file_writer.cpp \
-    Sources/file_reader.cpp
+    Sources/file_reader.cpp \
+    Sources/logger/AbstractAppender.cpp \
+    Sources/logger/AbstractStringAppender.cpp \
+    Sources/logger/ConsoleAppender.cpp \
+    Sources/logger/FileAppender.cpp \
+    Sources/logger/Logger.cpp \
+    Sources/logger/OutputDebugAppender.cpp \
+    Sources/logger/RollingFileAppender.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -107,7 +114,15 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_action_module.h \
     Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h \
     Headers/file_writer.h \
-    Headers/file_reader.h
+    Headers/file_reader.h \
+    Headers/logger/AbstractAppender.h \
+    Headers/logger/AbstractStringAppender.h \
+    Headers/logger/ConsoleAppender.h \
+    Headers/logger/CuteLogger_global.h \
+    Headers/logger/FileAppender.h \
+    Headers/logger/Logger.h \
+    Headers/logger/OutputDebugAppender.h \
+    Headers/logger/RollingFileAppender.h
 
 
 FORMS    += mainwindow.ui

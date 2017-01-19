@@ -13,6 +13,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
 
 /* Переменные циклограммы (мысли вслух)
  * 1. Каждая циклограмма может иметь свои переменные
@@ -434,7 +435,7 @@ void Cyclogram::setState(State state)
 
     QString text(metaEnum.valueToKey(state));
 
-    qDebug("[%s] Cyclogram state changed to %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text));
+    LOG_DEBUG("Cyclogram state changed to %s", qUtf8Printable(text));
 
     mState = state;
     emit stateChanged(mState);

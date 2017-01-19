@@ -5,6 +5,10 @@
 
 #include "Headers/gui/editor_window.h"
 
+#include "Headers/logger/Logger.h"
+#include "Headers/logger/FileAppender.h"
+#include "Headers/logger/ConsoleAppender.h"
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(application);
@@ -22,6 +26,18 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::c());
 
+    // logging initialization (create console and file outputs)
+    ConsoleAppender* consoleAppender = new ConsoleAppender();
+    //consoleAppender->setFormat("[%-7l] <%C> %m\n");
+    consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
+
+    Logger::globalInstance()->registerAppender(consoleAppender);
+
+    FileAppender* fileAppender = new FileAppender("OKB5Studio.log");
+    Logger::globalInstance()->registerAppender(fileAppender);
+
+    LOG_INFO("========== APPLICATION STARTED ==========");
+
     EditorWindow mainWin;
     if (!parser.positionalArguments().isEmpty())
     {
@@ -30,7 +46,11 @@ int main(int argc, char *argv[])
 
     mainWin.show();
     mainWin.init();
-    return app.exec();
+    int result = app.exec();
+
+    LOG_INFO("========== APPLICATION FINISHED ==========");
+
+    return result;
 }
 
 
