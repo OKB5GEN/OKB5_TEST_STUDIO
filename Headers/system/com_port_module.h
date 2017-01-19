@@ -11,8 +11,20 @@ class COMPortModule: public QObject
     Q_OBJECT
 
 public:
+    struct Identifier
+    {
+        QString description;
+        QString manufacturer;
+        QString serialNumber;
+        quint16 vendorId;
+        quint16 productId;
+    };
+
     COMPortModule(QObject* parent);
     virtual ~COMPortModule();
+
+    void setId(const Identifier& id);
+    const Identifier& id() const;
 
     bool init();
 
@@ -22,12 +34,14 @@ public:
 protected:
     bool send(const QByteArray& request, QByteArray& response);
 
+
     void resetPort();
 
     QSerialPort* mPort;
+    Identifier mID;
 
 private:
-    void createPort();
+    void createPort(const QString& portName);
 };
 
 #endif // MODULE_H

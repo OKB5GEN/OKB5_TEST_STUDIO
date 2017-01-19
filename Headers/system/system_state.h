@@ -119,6 +119,13 @@ private:
     bool sendMKOCommand(CmdActionModule* command);
     bool sendTechCommand(CmdActionModule* command);
 
+    bool createMKO();
+    bool createOTD();
+    bool createSTM();
+    bool createTech();
+    bool createPowerBUP();
+    bool createPowerPNA();
+
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
     ModuleSTM* mSTM;

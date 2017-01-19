@@ -6,6 +6,8 @@
 #include "Headers/system/modules/module_stm.h"
 #include "Headers/system/modules/module_tech.h"
 
+#include "Headers/logger/Logger.h"
+
 #include <QtSerialPort>
 #include <windows.h>
 #include "qapplication.h"
@@ -54,35 +56,6 @@ SystemState::~SystemState()
 
 void SystemState::init()
 {
-    //return;
-
-    /*
-     * Что надо сделать?
-     *
-     * 1. Тупо создаем все модули в НУЖНОМ ПОРЯДКЕ!
-     * 2. Создаем два модуля питания, оставляя один класс module_power, избавляясь от module_power_bup и module_power_pna
-     * 3. класс Module переиименовываем в COMPortModule и переносим туда весь функционал работы с COM-портом
-     * 4. туда же наверное переносим команды, принимаемые всеми "нашими" модулями, но делаем их виртуальными и в модуле питания их переопределяем на пустышки
-     * 5. здесь создаем объекты всех модулей в нужном порядке
-     * 6. здесь же из инитим, безо всякой поебени типа "стартовали тред-шлем сигнал себе-инициализируемся"
-     * 7. пусть инит пройдет здесь, а далее каждый тред живет в своем потоке
-     * 8. свой поток важен в том плане, что какой-то модуль может затупить, и, если это случится, то повиснет все, а не только поток модуля
-     * 9. модули с систем стэйтом будут общаться через сигналы-слоты
-     * 10. систем стэйт по идее будет просто слушать модули и слать сигналв в их слоты
-     * 11. напрямую модули нихера не выдают
-     * 12. также систем стэйт держит флажки активности модулей, которые при перезагрузках как-то модифицируются
-     * 13. MyClass вообще удалить нахуй
-     *
-     * Далее, общий принцип работы такой:
-     *
-     * 1. Модули вертятся каждый в своем потоке
-     * 2. Они обновляются по таймеру и серут сигналами, что тот или иной параметр обновился
-     * 3. System State аккумулирует то, что модули серут и через сигналы их может попинывать
-     * 4. Внутри себя модули не хранят данные
-     *
-     *
-    */
-
     //QThread* mThreadOTD;
     //QThread* mThreadMKO;
     //QThread* mThreadSTM;
@@ -92,45 +65,49 @@ void SystemState::init()
 
     setupParams();
 
-    // TODO: The order of modules creation possibly important!
-    mPowerPNA = new ModulePower(this);
-    mPowerBUP = new ModulePower(this);
-    mSTM = new ModuleSTM(this);
-    mTech = new ModuleTech(this);
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
 
-    mOTD = new ModuleOTD(Q_NULLPTR);
-    //connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
-    //connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
-    //connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
-    //connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
-    //connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
-    //connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
-    //connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
-    //connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
-    //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
-    //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
+    if (!createPowerPNA())
+    {
+        LOG_ERROR("PNA Power Unit not created!");
+    }
 
-    mMKO = new ModuleMKO(Q_NULLPTR);
-    //connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
-    //connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
-    //connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
-    //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
+    if (!createPowerBUP())
+    {
+        LOG_ERROR("BUP Power Unit not created!");
+    }
 
-    mPowerPNA->init();
-    mPowerBUP->init();
-    mSTM->init();
-    mTech->init();
-    mOTD->init();
+    if (!createSTM())
+    {
+        LOG_ERROR("STM not created!");
+    }
+
+    if (!createOTD())
+    {
+        LOG_ERROR("OTD not created!");
+    }
+
+    if (!createTech())
+    {
+        LOG_ERROR("Tech not created!");
+    }
+
+    if (!createMKO())
+    {
+        LOG_ERROR("MKO not created!");
+    }
 
     mPowerBUP->startPower();
+    mPowerBUP->setVoltageAndCurrent(0.5, 0.2);
     //mPowerBUP->setUpdatePeriod(5000); //TODO
 
     mPowerPNA->startPower();
+    mPowerBUP->setVoltageAndCurrent(0.4, 0.1);
     //mPowerPNA->setUpdatePeriod(5000); //TODO
 
     mSTM->stm_on_mko(1, 0);
     mSTM->stm_on_mko(2, 0);
-
+/*
     mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);
     mThreadMKO->start();
@@ -138,19 +115,7 @@ void SystemState::init()
     mThreadOTD = new QThread(this);
     mOTD->moveToThread(mThreadOTD);
     connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
-    mThreadOTD->start();
-
-    //QThread *thread = new QThread;
-    //MyClass *my = new MyClass("B");
-    //my->moveToThread(thread);
-    //connect(my, SIGNAL(send()), this, SLOT(paintvalue()));
-    //connect(my, SIGNAL(send3()), this, SLOT(statusRS()));
-    //connect(my, SIGNAL(send4()), this, SLOT(statusCAN()));
-    //connect(my, SIGNAL(send5()), this, SLOT(checkModulesStatus()));
-    //connect(thread, SIGNAL(started()), my, SLOT(doWork()));
-    //thread->start();
-
-    //startpower(); // Ivan Semenchuk: what for to do it twice?
+    mThreadOTD->start();*/
 }
 
 int SystemState::simpltst1(int z)
@@ -1105,3 +1070,111 @@ bool SystemState::sendTechCommand(CmdActionModule* command)
     int TODO;
     return false;
 }
+
+bool SystemState::createMKO()
+{
+    mMKO = new ModuleMKO(Q_NULLPTR);
+    //connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
+    //connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
+    //connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
+    //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
+
+    int TODO;
+    return false;
+}
+
+bool SystemState::createOTD()
+{
+    int TODO; // create config
+    COMPortModule::Identifier id;
+    id.description = "STMicroelectronics Virtual COM Port";
+    id.manufacturer = "STMicroelectronics.";
+    id.productId = 22336;
+    id.serialNumber = "000000000012";
+    id.vendorId = 1155;
+
+    mOTD = new ModuleOTD(Q_NULLPTR);
+    mOTD->setId(id);
+    //connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
+    //connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
+    //connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
+    //connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
+    //connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
+    //connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
+    //connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
+    //connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
+    //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
+    //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
+
+    mOTD->init();
+    return false;
+}
+
+bool SystemState::createSTM()
+{
+    int TODO; // create config
+    COMPortModule::Identifier id;
+    id.description = "STMicroelectronics Virtual COM Port";
+    id.manufacturer = "STMicroelectronics.";
+    id.productId = 22336;
+    id.serialNumber = "000000000014";
+    id.vendorId = 1155;
+
+    mSTM = new ModuleSTM(this);
+    mSTM->setId(id);
+    mSTM->init();
+
+    return false;
+}
+
+bool SystemState::createTech()
+{
+    int TODO; // create config AND get tech module
+    COMPortModule::Identifier id;
+//  id.description = "STMicroelectronics Virtual COM Port";
+//  id.manufacturer = "STMicroelectronics.";
+//  id.productId = 22336;
+//  id.serialNumber = "2761250046"; //TODO
+//  id.vendorId = 9006;
+
+    mTech = new ModuleTech(this);
+    mTech->setId(id);
+    mTech->init();
+
+    return false;
+}
+
+bool SystemState::createPowerBUP()
+{
+    int TODO; // create config
+    COMPortModule::Identifier id;
+    id.description = "PS 2000 B Series";
+    id.manufacturer = "EA Elektro-Automatik GmbH & Co. KG";
+    id.productId = 16;
+    id.serialNumber = "2761250046";
+    id.vendorId = 9006;
+
+    mPowerBUP = new ModulePower(this);
+    mPowerBUP->setId(id);
+    mPowerBUP->init();
+
+    return false;
+}
+
+bool SystemState::createPowerPNA()
+{
+    int TODO; // create config
+    COMPortModule::Identifier id;
+    id.description = "PS 2000 B Series";
+    id.manufacturer = "EA Elektro-Automatik GmbH & Co. KG";
+    id.productId = 16;
+    id.serialNumber = "2761250178";
+    id.vendorId = 9006;
+
+    mPowerPNA = new ModulePower(this);
+    mPowerPNA->setId(id);
+    mPowerPNA->init();
+
+    return false;
+}
+

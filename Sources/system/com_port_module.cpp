@@ -44,20 +44,52 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response)
 
 bool COMPortModule::init()
 {
-    createPort();
+    QString portName;
+
+    foreach (QSerialPortInfo info, QSerialPortInfo::availablePorts())
+    {
+        if (   !info.hasVendorIdentifier()
+            || !info.hasProductIdentifier()
+            || info.productIdentifier() != mID.productId
+            || info.vendorIdentifier() != mID.vendorId
+            || info.description() != mID.description
+            || info.manufacturer() != mID.manufacturer
+            || info.serialNumber() != mID.serialNumber
+           )
+        {
+            continue;
+        }
+
+        portName = info.portName();
+        break;
+    }
+
+    if (portName.isNull())
+    {
+        return false;
+    }
+
+    createPort(portName);
 
     return postInit();
 }
 
-void COMPortModule::createPort()
+void COMPortModule::createPort(const QString& portName)
 {
-    mPort = new QSerialPort();
-    mPort->open(QIODevice::ReadWrite);
-    mPort->setBaudRate(QSerialPort::Baud115200);
-    mPort->setDataBits(QSerialPort::Data5);
-    mPort->setParity(QSerialPort::OddParity);
-    mPort->setStopBits(QSerialPort::OneStop);
-    mPort->setFlowControl(QSerialPort::NoFlowControl);
+    mPort = new QSerialPort(portName);
+    if (mPort->open(QIODevice::ReadWrite))
+    {
+        mPort->setBaudRate(QSerialPort::Baud115200);
+        mPort->setDataBits(QSerialPort::Data5);
+        mPort->setParity(QSerialPort::OddParity);
+        mPort->setStopBits(QSerialPort::OneStop);
+        mPort->setFlowControl(QSerialPort::NoFlowControl);
+    }
+    else
+    {
+        int TODO;
+        mPort->errorString();
+    }
 }
 
 void COMPortModule::resetError()
@@ -67,6 +99,8 @@ void COMPortModule::resetError()
 
 void COMPortModule::resetPort()
 {
+    QString portName = mPort->portName();
+
     if (mPort)
     {
         mPort->close();
@@ -80,5 +114,15 @@ void COMPortModule::resetPort()
         QApplication::processEvents();
     }
 
-    createPort();
+    createPort(portName);
+}
+
+const COMPortModule::Identifier& COMPortModule::id() const
+{
+    return mID;
+}
+
+void COMPortModule::setId(const Identifier& id)
+{
+    mID = id;
 }
