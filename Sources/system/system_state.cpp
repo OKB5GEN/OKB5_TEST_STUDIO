@@ -98,15 +98,15 @@ void SystemState::init()
     }
 
     mPowerBUP->startPower();
-    mPowerBUP->setVoltageAndCurrent(0.5, 0.2);
+    //mPowerBUP->setVoltageAndCurrent(0.5, 0.2);
     //mPowerBUP->setUpdatePeriod(5000); //TODO
 
     mPowerPNA->startPower();
-    mPowerBUP->setVoltageAndCurrent(0.4, 0.1);
+    //mPowerPNA->setVoltageAndCurrent(0.4, 0.1);
     //mPowerPNA->setUpdatePeriod(5000); //TODO
 
-    mSTM->stm_on_mko(1, 0);
-    mSTM->stm_on_mko(2, 0);
+    //mSTM->stm_on_mko(1, 0);
+    //mSTM->stm_on_mko(2, 0);
 /*
     mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);

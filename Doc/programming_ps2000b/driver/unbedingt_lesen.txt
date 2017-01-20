@@ -1,0 +1,25 @@
+Hinweis zum USB-Treiber für Windows
+
+Kompatibel mit folgenden Windows-Versionen:
+- Windows XP 32bit, Home + Professional
+- Windows Vista 32bit
+- Windows Server 2008
+- Windows 7, 32bit + 64bit, Home + Professional + Ultimate
+- Windows 7 Embedded, 32bit + 64bit
+
+Hinweis: Andere Windows-Versionen könnten funktionieren, sind aber nicht getestet worden.
+
+Kompatibel mit folgenden Geräteserien:
+- ELR 9000
+- PSI 9000 3U
+- PS 9000 3U
+- PS 5000
+- PSI 5000
+
+Dieser Treiber besteht aus einer Treiberinstallations-Datei (*.INF), welche auf dieser CD mitgeliefert wird oder als Download von der Webseite des Geräteherstellers verfügbar ist,
+und den eigentlichen USB-Treiber (Typ: CDC, Communications Device Class) installiert, der auf allen "normalen" Windows-Versionen seit Windows XP enthalten ist.
+Falls der Treiber nicht enthalten ist oder aus irgendeinem Grund nicht gefunden werden kann, kann das USB-Gerät zunächst nicht installiert werden. 
+Als Alternative gibt es kommerzielle Treiber, die im Internet gefunden werden können.
+Die Installation erfolgt wie bei Windows üblich über einen Treiberinstallationsdialog, in welchem auf die *.INF Datei verwiesen werden muß.
+
+(c) 2014, Elektro-Automatik 

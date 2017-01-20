@@ -67,8 +67,10 @@ void ModulePower::resetError()
 
 void ModulePower::startPower()
 {
+    resetError(); // reset error if it exist
+
     // PowerON
-    QByteArray request1(7, 0);
+    QByteArray request1(7, 0); // switch "remote mode" on
     request1[0] = 0xf1;
     request1[1] = 0x00;
     request1[2] = 0x36;
@@ -80,7 +82,7 @@ void ModulePower::startPower()
     QByteArray response1;
     send(request1, response1);
 
-    QByteArray request2(7, 0);
+    QByteArray request2(7, 0); // switch "give power supply" off
     request2[0] = 0xf1;//power off
     request2[1] = 0x00;
     request2[2] = 0x36;
@@ -90,9 +92,12 @@ void ModulePower::startPower()
     request2[6] = 0x28;
 
     QByteArray response2;
-    send(request1, response2);
+    send(request2, response2);
 
-    setVoltageAndCurrent(0.5, 0.1);
+    setMaxVoltageAndCurrent(28, 0.5); // set voltage and current limitations
+    setVoltageAndCurrent(27, 0.4); // set current value for voltage and current
+
+    setPowerState(ModuleCommands::POWER_ON); // switch "give power supply" on
 }
 
 void ModulePower::setPowerState(ModuleCommands::PowerState state)
@@ -194,7 +199,7 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
     QByteArray response;
     send(request, response);
 
-    if (response.size() == 8)
+    if (response.size() >= 8)
     {
         uint8_t uu1, uu2;
         error = (response[4] >> 4);

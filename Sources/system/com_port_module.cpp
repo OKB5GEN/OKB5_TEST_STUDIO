@@ -80,7 +80,7 @@ void COMPortModule::createPort(const QString& portName)
     if (mPort->open(QIODevice::ReadWrite))
     {
         mPort->setBaudRate(QSerialPort::Baud115200);
-        mPort->setDataBits(QSerialPort::Data5);
+        mPort->setDataBits(QSerialPort::Data8);
         mPort->setParity(QSerialPort::OddParity);
         mPort->setStopBits(QSerialPort::OneStop);
         mPort->setFlowControl(QSerialPort::NoFlowControl);

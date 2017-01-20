@@ -1,0 +1,154 @@
+;------------------------------------------------------------------------------
+; EA Elektro-Automatik GmbH & Co. KG
+; CDC ACM WE7 Setup File
+;------------------------------------------------------------------------------
+
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%MFGNAME%
+LayoutFile=layout.inf
+CatalogFile=%MFGFILENAME%.cat
+DriverVer=12/12/2012,2.0.0.3
+
+[Manufacturer]
+%MFGNAME%=EA,NT,NTx86
+
+[DestinationDirs]
+DefaultDestDir=12
+
+
+;------------------------------------------------------------------------------
+;  Vendor and Product ID Definitions
+;------------------------------------------------------------------------------
+
+[SourceDisksNames]
+1 = %INSTDISK%,,,\
+
+[SourceDisksFiles]
+usbser.sys = 1,\
+
+[EA]
+%USB\VID_232E&PID_0010.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0010	; PS 2000 B Series
+%USB\VID_232E&PID_0011.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0011	; Measurement System
+%USB\VID_232E&PID_0012.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0012 	; PS 8000 PB Series
+%USB\VID_232E&PID_0014.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0014 	; ELR 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0015 	; PSI 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0016 	; BF9 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0017	; PS 5000 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0018	; PS 2300 B Series
+%USB\VID_232E&PID_001C.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001C	; PS 9000 Series
+%USB\VID_232E&PID_001D.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001D	; PSI 5000 Series
+%USB\VID_232E&PID_001E.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001E	; PS 9000 Series
+%USB\VID_232E&PID_001F.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001F	; PS 9000 Series
+%USB\VID_232E&PID_0020.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0020 	; ELR 9000 Series
+%USB\VID_232E&PID_0021.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0021 	; PSI 9000 Series
+%USB\VID_232E&PID_0022.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0022 	; ELR 9000 Series
+%USB\VID_232E&PID_0023.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0023 	; PSI 9000 Series
+%USB\VID_232E&PID_0024.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0024 	; ELR 9000 Series
+%USB\VID_232E&PID_0025.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0025 	; PSI 9000 Series
+%USB\VID_232E&PID_0026.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0026	; PS 9000 Series
+
+[EA.NTx86]
+%USB\VID_232E&PID_0010.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0010	; PS 2000 B Series
+%USB\VID_232E&PID_0011.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0011	; Measurement System
+%USB\VID_232E&PID_0012.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0012 	; PS 8000 PB Series
+%USB\VID_232E&PID_0014.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0014 	; ELR 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0015 	; PSI 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0016 	; BF9 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0017	; PS 5000 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0018	; PS 2300 B Series
+%USB\VID_232E&PID_001C.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001C	; PS 9000 Series
+%USB\VID_232E&PID_001D.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001D	; PSI 5000 Series
+%USB\VID_232E&PID_001E.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001E	; PS 9000 Series
+%USB\VID_232E&PID_001F.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001F	; PS 9000 Series
+%USB\VID_232E&PID_0020.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0020 	; ELR 9000 Series
+%USB\VID_232E&PID_0021.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0021 	; PSI 9000 Series
+%USB\VID_232E&PID_0022.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0022 	; ELR 9000 Series
+%USB\VID_232E&PID_0023.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0023 	; PSI 9000 Series
+%USB\VID_232E&PID_0024.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0024 	; ELR 9000 Series
+%USB\VID_232E&PID_0025.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0025 	; PSI 9000 Series
+%USB\VID_232E&PID_0026.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0026	; PS 9000 Series
+
+[EA.NTamd64]
+%USB\VID_232E&PID_0010.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0010	; PS 2000 B Series
+%USB\VID_232E&PID_0011.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0011	; Measurement System
+%USB\VID_232E&PID_0012.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0012 	; PS 8000 PB Series
+%USB\VID_232E&PID_0014.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0014 	; ELR 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0015 	; PSI 9000 Series
+%USB\VID_232E&PID_0015.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0016 	; BF9 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0017	; PS 5000 Series
+%USB\VID_232E&PID_0018.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0018	; PS 2300 B Series
+%USB\VID_232E&PID_001C.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001C	; PS 9000 Series
+%USB\VID_232E&PID_001D.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001D	; PSI 5000 Series
+%USB\VID_232E&PID_001E.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001E	; PS 9000 Series
+%USB\VID_232E&PID_001F.DeviceDesc% = DriverInstall, USB\VID_232E&PID_001F	; PS 9000 Series
+%USB\VID_232E&PID_0020.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0020 	; ELR 9000 Series
+%USB\VID_232E&PID_0021.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0021 	; PSI 9000 Series
+%USB\VID_232E&PID_0022.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0022 	; ELR 9000 Series
+%USB\VID_232E&PID_0023.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0023 	; PSI 9000 Series
+%USB\VID_232E&PID_0024.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0024 	; ELR 9000 Series
+%USB\VID_232E&PID_0025.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0025 	; PSI 9000 Series
+%USB\VID_232E&PID_0026.DeviceDesc% = DriverInstall, USB\VID_232E&PID_0026	; PS 9000 Series
+
+
+;------------------------------------------------------------------------------
+;  Windows Embedded 7 32bit
+;------------------------------------------------------------------------------
+
+[DriverInstall.nt]
+include=mdmcpq.inf
+CopyFiles=DriverCopyFiles.nt
+AddReg=DriverInstall.nt.AddReg
+
+[DriverCopyFiles.nt]
+usbser.sys,,,0x20
+
+[DriverInstall.nt.AddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,%DRIVERFILENAME%.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[DriverInstall.nt.Services]
+include=mdmcpq.inf
+AddService=usbser, 0x00000002, DriverService.nt
+
+[DriverService.nt]
+DisplayName=%SERVICE%
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%12%\%DRIVERFILENAME%.sys
+
+
+;------------------------------------------------------------------------------
+;  String Definitions
+;------------------------------------------------------------------------------
+
+[Strings]
+MFGNAME        = "EA Elektro-Automatik GmbH & Co. KG"
+INSTDISK       = "EA Driver Installation Disc"
+SERVICE        = "EA CDC ACM Driver"
+MFGFILENAME    = "EA_CDC_ACM_Driver"
+DRIVERFILENAME = "usbser"
+
+USB\VID_232E&PID_0010.DeviceDesc = "PS 2000 B Series"
+USB\VID_232E&PID_0011.DeviceDesc = "Measurement System"
+USB\VID_232E&PID_0012.DeviceDesc = "PS 8000 PB Series"
+USB\VID_232E&PID_0014.DeviceDesc = "ELR 9000 Series"
+USB\VID_232E&PID_0015.DeviceDesc = "PSI 9000 Series"
+USB\VID_232E&PID_0016.DeviceDesc = "BF9 Series"
+USB\VID_232E&PID_0017.DeviceDesc = "PS 5000 Series"
+USB\VID_232E&PID_0018.DeviceDesc = "PS 2300 B Series"
+USB\VID_232E&PID_001C.DeviceDesc = "PS 9000 Series"
+USB\VID_232E&PID_001D.DeviceDesc = "PSI 5000 Series"
+USB\VID_232E&PID_001E.DeviceDesc = "PS 9000 Series"
+USB\VID_232E&PID_001F.DeviceDesc = "PS 9000 Series"
+USB\VID_232E&PID_0020.DeviceDesc = "ELR 9000 Series"
+USB\VID_232E&PID_0021.DeviceDesc = "PSI 9000 Series"
+USB\VID_232E&PID_0022.DeviceDesc = "ELR 9000 Series"
+USB\VID_232E&PID_0023.DeviceDesc = "PSI 9000 Series"
+USB\VID_232E&PID_0024.DeviceDesc = "ELR 9000 Series"
+USB\VID_232E&PID_0025.DeviceDesc = "PSI 9000 Series"
+USB\VID_232E&PID_0026.DeviceDesc = "PS 9000 Series"
