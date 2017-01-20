@@ -174,6 +174,11 @@ void ModulePower::voltageAndCurrent()
     uint8_t error;
     getCurVoltageAndCurrent(voltage, current, error);
 
+    //if (error == 1) ui->err1->setText("Overvoltage protection!"); //TODO - ошибки установки на блоке питания, если 0 - ошибки нет
+    //if (error == 2) ui->err1->setText("Overcurrent protection!");
+    //if (error == 4) ui->err1->setText("Overpower protection!");
+    //if (error == 8) ui->err1->setText("Overtemperature protection!");
+
     emit gotUI(voltage, current, error);
 }
 

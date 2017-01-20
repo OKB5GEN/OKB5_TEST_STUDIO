@@ -364,7 +364,7 @@ void SystemState::MKO_cm_data(QString data)
         //ui->pushButton_start_com5->setChecked(false);
     //}
 
-    //if (er1 == 1) ui->err1->setText("Overvoltage protection!");
+    //if (er1 == 1) ui->err1->setText("Overvoltage protection!"); //TODO - ошибки установки на блоке питания, если 0 - ошибки нет
     //if (er1 == 2) ui->err1->setText("Overcurrent protection!");
     //if (er1 == 4) ui->err1->setText("Overpower protection!");
     //if (er1 == 8) ui->err1->setText("Overtemperature protection!");
