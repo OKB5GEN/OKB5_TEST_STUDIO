@@ -15,12 +15,12 @@ ModuleOKB::~ModuleOKB()
 
 bool ModuleOKB::postInit()
 {
-    if (!send(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT))
+    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT))
     {
         return false;
     }
 
-    if (!send(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT))
+    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT))
     {
         return false;
     }
@@ -33,7 +33,7 @@ bool ModuleOKB::postInit()
     return true;
 }
 
-bool ModuleOKB::send(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
+bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
     QByteArray request(4, 0);
     request[0] = (cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress;

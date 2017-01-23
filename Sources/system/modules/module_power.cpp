@@ -199,7 +199,7 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
     QByteArray response;
     send(request, response);
 
-    if (response.size() >= 8)
+    if (response.size() >= 9)
     {
         uint8_t uu1, uu2;
         error = (response[4] >> 4);
