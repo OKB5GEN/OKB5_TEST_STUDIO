@@ -14,7 +14,6 @@ public:
     uint8_t defaultAddress() const;
     uint8_t currentAddress() const;
 
-    bool postInit() override;
     void resetError() override;
 
     int softResetModule();
@@ -22,6 +21,9 @@ public:
     QString checkStatusWord();
 
 protected:
+    bool postInit() override;
+    virtual bool postInitOKBModule();
+
     bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* response = Q_NULLPTR);
 
     uint8_t mAddress;

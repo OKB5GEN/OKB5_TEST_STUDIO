@@ -30,7 +30,7 @@ bool ModuleOKB::postInit()
         emit incorrectSlot(mDefaultAddress);
     }
 
-    return true;
+    return postInitOKBModule();
 }
 
 bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* responseExt)
@@ -196,6 +196,11 @@ int ModuleOKB::getSoftwareVersion()
     QByteArray response;
     COMPortModule::send(buffer, response);
     return (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
+}
+
+bool ModuleOKB::postInitOKBModule()
+{
+    return true;
 }
 
 QString ModuleOKB::checkStatusWord()
