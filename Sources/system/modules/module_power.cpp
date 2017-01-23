@@ -94,7 +94,7 @@ void ModulePower::startPower()
     QByteArray response2;
     send(request2, response2);
 
-    setMaxVoltageAndCurrent(28, 0.5); // set voltage and current limitations
+    setMaxVoltageAndCurrent(28, 1.5); // set voltage and current limitations
     setVoltageAndCurrent(27, 0.4); // set current value for voltage and current
 
     setPowerState(ModuleCommands::POWER_ON); // switch "give power supply" on
@@ -120,11 +120,11 @@ void ModulePower::setPowerState(ModuleCommands::PowerState state)
 void ModulePower::setValue(uint8_t valueID, qreal value, qreal maxValue)
 {
     QByteArray request(7, 0);
-    uint32_t val = uint32_t((value * 0x100 * 100) / maxValue);
+    uint32_t val = uint32_t((value * 25600) / maxValue);
 
-    if(val > (0x100 * 100))
+    if(val > 25600)
     {
-        val = (0x100 * 100);
+        val = 25600;
     }
 
     request[0] = 0xf1;
@@ -207,12 +207,12 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
         uu1 = response[5];
         uu2 = response[6];
         voltage = (uu1 << 8) | uu2;
-        voltage = voltage * MAX_VOLTAGE / 256;
+        voltage = voltage * MAX_VOLTAGE / 25600;
 
         uu1 = response[7];
         uu2 = response[8];
         current = (uu1 << 8) | uu2;
-        current = current * MAX_CURRENT / 256;
+        current = current * MAX_CURRENT / 25600;
     }
 }
 
