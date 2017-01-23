@@ -22,7 +22,7 @@ public:
     QString checkStatusWord();
 
 protected:
-    bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
+    bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* response = Q_NULLPTR);
 
     uint8_t mAddress;
     uint8_t mDefaultAddress;

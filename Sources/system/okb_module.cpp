@@ -33,7 +33,7 @@ bool ModuleOKB::postInit()
     return true;
 }
 
-bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
+bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* responseExt)
 {
     QByteArray request(4, 0);
     request[0] = (cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress;
@@ -43,6 +43,16 @@ bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8
 
     QByteArray response;
     if (!COMPortModule::send(request, response))
+    {
+        return false;
+    }
+
+    if (responseExt)
+    {
+        *responseExt = response;
+    }
+
+    if (response.size() != 4) //TODO remove magic number
     {
         return false;
     }
@@ -64,44 +74,6 @@ bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8
         {
             mAddress = value;
         }
-
-        int TODO;
-        /*
-    QByteArray buffer(4, 0);
-    buffer[0] = 0xff;
-    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
-    buffer[2] = 0x00;
-    buffer[3] = ModuleCommands::CURRENT;
-    QByteArray readData1 = send(getPort(TECH), buffer);
-
-    buffer[0] = 0xff;
-    buffer[1] = ModuleCommands::GET_MODULE_ADDRESS;
-    buffer[2] = 0x00;
-    buffer[3] = ModuleCommands::DEFAULT;
-
-    QByteArray readData2 = send(getPort(TECH), buffer);
-
-    if (readData1[2] == readData2[2] && readData1[3] == readData2[3])
-    {
-        return 1;
-    }
-
-    return 0;
-
-    //////////////////////////////////////////
-    QString error_m;
-    if(id_stm() != 1)
-    {
-        error_m += " Модуль СТМ установлен не в свой слот!";
-    }
-
-    if(id_tech() != 1)
-    {
-        error_m += " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
-    }
-
-    //ui->error_mod->setText(error_m);
-*/
     }
 
     return true;

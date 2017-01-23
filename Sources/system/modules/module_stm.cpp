@@ -1,13 +1,19 @@
 #include "Headers/system/modules/module_stm.h"
+#include "Headers/logger/Logger.h"
+
+#include <QMetaEnum>
 
 namespace
 {
     static const int STM_DEFAULT_ADDR = 0x22;
+    static const qreal CHANNEL_CONNECTED_BORDER = 2.0;
+    static const int MAX_CHANNELS_COUNT = 16;
 }
 
 ModuleSTM::ModuleSTM(QObject* parent):
     ModuleOKB(parent)
 {
+    mChannelStates.fill(ModuleCommands::POWER_OFF, MAX_CHANNELS_COUNT);
 }
 
 ModuleSTM::~ModuleSTM()
@@ -15,111 +21,71 @@ ModuleSTM::~ModuleSTM()
 
 }
 
-int ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState state)
+void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState state)
 {
-    QByteArray request(4, 0);
-    request[0] = STM_DEFAULT_ADDR;
-    request[1] = ModuleCommands::POWER_CHANNEL_CTRL;
-    request[2] = channel;
-    request[3] = (state == ModuleCommands::POWER_ON) ? 1 : 0;
+    int TODO; // valid channel values 1 to 6
+
+    if (!sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0))
+    {
+        LOG_ERROR("Channel %i is not set to %i state", channel, state);
+        return;
+    }
+
+    if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
+    {
+        mChannelStates[state];
+    }
+    else
+    {
+        LOG_ERROR("Invalid STM channel index %i", channel);
+    }
+}
+
+ModuleCommands::PowerState ModuleSTM::powerChannelState(int channel)
+{
+    QByteArray response;
+
+    if (!sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0, &response))
+    {
+        LOG_ERROR("Can not get channel %i telemetry", channel);
+        return ModuleCommands::POWER_OFF;
+    }
+
+    uint8_t uu1, uu2;
+    uu1 = response[2];
+    uu2 = response[3];
+    qreal voltage = qreal((uu1 << 8) | uu2) / 10000;
+
+    LOG_INFO("Channel voltage is %f", voltage);
+
+    if (voltage >= CHANNEL_CONNECTED_BORDER)
+    {
+        return ModuleCommands::POWER_ON;
+    }
+
+    return ModuleCommands::POWER_OFF;
+}
+
+ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
+{
+    // valid values 1 to 8 //TODO
+    if (fuseIndex < 1 || fuseIndex > 8)
+    {
+        LOG_ERROR("Invalid fuse index %i", fuseIndex);
+        return ModuleSTM::ERROR;
+    }
 
     QByteArray response;
-    COMPortModule::send(request, response);
-    return response[3];
-
-    int TODO; // следить за состоянием подключения - в исходном было, что если питание подано/отключено, то ставим флажок подключено/отключено
-    /*
-     *     if(setPowerChannelState(1, POWER_ON) == 1 && m_flag_con1 == 0)
+    if (!sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0, &response))
     {
-        m_flag_con1 = 1;
-    }
-    else if(setPowerChannelState(1, POWER_OFF) == 1 && m_flag_con1 == 1)
-    {
-        m_flag_con1 = 0;
-    }
-*/
-}
-
-double ModuleSTM::stm_data_ch(int ch)
-{
-    int TODO;
-
-    return 0;
-
-    //if (isActive(STM))
-    //{
-    //    QByteArray buffer(4, 0);
-    //    buffer[0] = STM_DEFAULT_ADDR;
-    //    buffer[1] = ModuleCommands::GET_CHANNEL_TELEMETRY;
-    //    buffer[2] = ch;
-    //    buffer[3] = 0x00;
-
-    //    QByteArray readData1 = send(getPort(STM), buffer);
-
-    //    uint8_t uu1, uu2;
-    //    uu1 = readData1[2];
-    //    uu2 = readData1[3];
-    //    double res = (uu1 << 8) | uu2;
-    //    return res;
-    //}
-
-    //return 50000;
-
-
-    /*
-     *     double res = stm_data_ch(15)/10000;
-    if(res >= 0.5)
-    {
-        //ui->pushButton_ctm_ch_15->setText ("Разъединена");
-    }
-    else if(res >= 0 && res < 0.51 && req_stm()=="")
-    {
-        //ui->pushButton_ctm_ch_15->setText ("Соединена");
+        LOG_ERROR("Can not check fuse %i state", fuseIndex);
+        return ModuleSTM::ERROR;
     }
 
-    все остальные /10000
+    int state = response[3];
 
-    double res = stm_data_ch(n)/10000;
-*/
-}
+    QMetaEnum e = QMetaEnum::fromType<ModuleSTM::FuseStates>();
+    LOG_INFO("Fuse %i state %s", fuseIndex, e.valueToKey(ModuleSTM::FuseStates(state)));
 
-int ModuleSTM::stm_on_mko(int x, int y)
-{
-    int TODO;
-    //QByteArray buffer(4, 0);
-    //buffer[0] = STM_DEFAULT_ADDR;
-    //buffer[1] = ModuleCommands::SET_MKO_PWR_CHANNEL_STATE;
-    //buffer[2] = x;
-    //buffer[3] = y;
-
-    //QByteArray readData1 = send(getPort(STM), buffer);
-    //return readData1[3];
-
-    return 0;
-}
-
-int ModuleSTM::stm_check_fuse(int fuse)
-{
-    int TODO;
-
-    //QByteArray buffer(4, 0);
-    //buffer[0] = STM_DEFAULT_ADDR;
-    //buffer[1] = ModuleCommands::GET_PWR_MODULE_FUSE_STATE;
-    //buffer[2] = fuse;
-    //buffer[3] = 0x00;
-    //QByteArray readData1 = send(getPort(STM), buffer);
-    //return readData1[3];
-
-    return 0;
-
-    /*
-    int cf = stm_check_fuse(1);
-    if (cf == 0)
-        ui->lineEdit_fuse_1->setText(" Исправен");
-    else if (cf == 1)
-        ui->lineEdit_fuse_1->setText(" Неисправен");
-    else if (cf == 2)
-        ui->lineEdit_fuse_1->setText(" Ошибка");
-        */
-
+    return ModuleSTM::FuseStates(state); //TODO undefined values
 }

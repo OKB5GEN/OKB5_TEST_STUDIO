@@ -676,7 +676,7 @@ void SystemState::on_pushButton_12_clicked()
 
 void SystemState::MKO_change_ch(int x, int y)
 {
-    mSTM->stm_on_mko(x,y);
+    mSTM->setPowerChannelState(x, (y == 0) ? ModuleCommands::POWER_OFF : ModuleCommands::POWER_ON);//TODO temporary
 }
 
 void SystemState::on_MKO_avt_clicked()
@@ -1075,7 +1075,7 @@ bool SystemState::createMKO()
     //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
 
     int TODO;
-    return false;
+    return true;
 }
 
 bool SystemState::createOTD()
@@ -1085,7 +1085,7 @@ bool SystemState::createOTD()
     id.description = "STMicroelectronics Virtual COM Port";
     id.manufacturer = "STMicroelectronics.";
     id.productId = 22336;
-    id.serialNumber = "000000000012";
+    id.serialNumber = "000000000014";
     id.vendorId = 1155;
 
     mOTD = new ModuleOTD(Q_NULLPTR);
@@ -1101,25 +1101,25 @@ bool SystemState::createOTD()
     //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
     //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
 
-    mOTD->init();
-    return false;
+    return mOTD->init();
 }
 
 bool SystemState::createSTM()
 {
+    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
+
     int TODO; // create config
     COMPortModule::Identifier id;
     id.description = "STMicroelectronics Virtual COM Port";
     id.manufacturer = "STMicroelectronics.";
     id.productId = 22336;
-    id.serialNumber = "000000000014";
+    id.serialNumber = "000000000012";
     id.vendorId = 1155;
 
     mSTM = new ModuleSTM(this);
     mSTM->setId(id);
-    mSTM->init();
 
-    return false;
+    return mSTM->init();
 }
 
 bool SystemState::createTech()
@@ -1134,9 +1134,8 @@ bool SystemState::createTech()
 
     mTech = new ModuleTech(this);
     mTech->setId(id);
-    mTech->init();
 
-    return false;
+    return mTech->init();
 }
 
 bool SystemState::createPowerBUP()
@@ -1151,9 +1150,8 @@ bool SystemState::createPowerBUP()
 
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setId(id);
-    mPowerBUP->init();
 
-    return false;
+    return mPowerBUP->init();
 }
 
 bool SystemState::createPowerPNA()
@@ -1168,8 +1166,7 @@ bool SystemState::createPowerPNA()
 
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setId(id);
-    mPowerPNA->init();
 
-    return false;
+    return mPowerPNA->init();
 }
 

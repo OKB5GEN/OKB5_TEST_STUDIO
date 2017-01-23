@@ -32,7 +32,7 @@ ModuleOTD::~ModuleOTD()
 void ModuleOTD::resetLine(LineID line)
 {
     ModuleCommands::CommandID command = (line == PSY) ? ModuleCommands::RESET_LINE_1 : ModuleCommands::RESET_LINE_2;
-    if (!send(command, 0, 0))
+    if (!sendCommand(command, 0, 0))
     {
         int TODO;
         //emit err_OTD("Ошибка при перезагрузке!");
