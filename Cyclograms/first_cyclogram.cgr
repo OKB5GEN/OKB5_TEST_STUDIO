@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="I" value="0.4"/>
+        <variable name="Im" value="0.5"/>
+        <variable name="T1" value="5"/>
+        <variable name="Tall" value="60"/>
+        <variable name="U" value="27"/>
+        <variable name="Um" value="28"/>
+        <variable name="t" value="0"/>
+        <variable name="t1" value="0"/>
+        <variable name="tmp" value="0"/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1484565136470" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1484565136471" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1484565136472"/>
+        <command type="BRANCH_BEGIN" id="1484565136473" name="End"/>
+        <command type="TERMINATOR" id="1484565136474" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1484565211006" module="POWER_UNIT_BUP" command="SET_VOLTAGE_AND_CURRENT">
+            <input_params>
+                <param name="Current, A" variable="I"/>
+                <param name="Voltage, V" variable="U"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1484565212879" module="POWER_UNIT_BUP" command="SET_MAX_VOLTAGE_AND_CURRENT">
+            <input_params>
+                <param name="Current, A" variable="Im"/>
+                <param name="Voltage, V" variable="Um"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="BRANCH_BEGIN" id="1484565333740" name="Delay"/>
+        <command type="GO_TO_BRANCH" id="1484565333744"/>
+        <command type="BRANCH_BEGIN" id="1484565335513" name="Measure"/>
+        <command type="GO_TO_BRANCH" id="1484565335517"/>
+        <command type="DELAY" id="1484565377209" delay="1000"/>
+        <command type="ACTION_MATH" id="1484565385528" operation="Add">
+            <operand id="Result" type="Variable" value="60" variable="t"/>
+            <operand id="Operand1" type="Variable" value="59" variable="t"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1484565442394" operation="Subtract">
+            <operand id="Result" type="Variable" value="4" variable="tmp"/>
+            <operand id="Operand1" type="Variable" value="59" variable="t"/>
+            <operand id="Operand2" type="Variable" value="55" variable="t1"/>
+        </command>
+        <command type="QUESTION" id="1484565460498" operation="GreaterOrEqual" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="4" variable="tmp"/>
+            <operand id="Right" type="Variable" value="5" variable="T1"/>
+        </command>
+        <command type="ACTION_MODULE" id="1484565474964" module="POWER_UNIT_BUP" command="GET_VOLTAGE_AND_CURRENT">
+            <input_params/>
+            <output_params>
+                <param name="Current, A" variable="I"/>
+                <param name="Voltage, V" variable="U"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MATH" id="1484565503566" operation="Add">
+            <operand id="Result" type="Variable" value="55" variable="t1"/>
+            <operand id="Operand1" type="Variable" value="50" variable="t1"/>
+            <operand id="Operand2" type="Variable" value="5" variable="tmp"/>
+        </command>
+        <command type="QUESTION" id="1484804207890" operation="GreaterOrEqual" orientation="YesRight" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="60" variable="t"/>
+            <operand id="Right" type="Variable" value="60" variable="Tall"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1484804207894"/>
+    </commands>
+    <tree>
+        <item id="1484565136470" down="1484565136471" right="-1" under_arrow="-1"/>
+        <item id="1484565136471" down="1484565211006" right="-1" under_arrow="-1"/>
+        <item id="1484565136472" down="1484565335513" right="-1" under_arrow="-1"/>
+        <item id="1484565136473" down="1484565136474" right="-1" under_arrow="-1"/>
+        <item id="1484565136474" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1484565211006" down="1484565212879" right="-1" under_arrow="-1"/>
+        <item id="1484565212879" down="1484565136472" right="-1" under_arrow="-1"/>
+        <item id="1484565333740" down="1484565377209" right="-1" under_arrow="-1"/>
+        <item id="1484565333744" down="1484565335513" right="-1" under_arrow="-1"/>
+        <item id="1484565335513" down="1484565442394" right="-1" under_arrow="-1"/>
+        <item id="1484565335517" down="1484565333740" right="-1" under_arrow="-1"/>
+        <item id="1484565377209" down="1484565385528" right="-1" under_arrow="-1"/>
+        <item id="1484565385528" down="1484804207890" right="-1" under_arrow="-1"/>
+        <item id="1484565442394" down="1484565460498" right="-1" under_arrow="-1"/>
+        <item id="1484565460498" down="1484565503566" right="1484565335517" under_arrow="1484565335517"/>
+        <item id="1484565474964" down="1484565335517" right="-1" under_arrow="-1"/>
+        <item id="1484565503566" down="1484565474964" right="-1" under_arrow="-1"/>
+        <item id="1484804207890" down="1484565333744" right="1484804207894" under_arrow="-1"/>
+        <item id="1484804207894" down="1484565136473" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>
