@@ -8,13 +8,14 @@
 
 HANDLE hEvent, hEvent1;
 int flag_ch = 0;
-int ch_cur = 0;
-int addr1;
-int addr2;
+//int ch_cur = 0;
+//int addr1;
+//int addr2;
 //QTimer *MyTimerMKO;
 
 ModuleMKO::ModuleMKO(QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    mActiveKits(NO_KIT)
 {
 //    m_timer = new QTimer(this);
 //    m_timer->setSingleShot(true);
@@ -33,14 +34,14 @@ void ModuleMKO::MKO_chan(int x)
     {
         stopMKO();
         flag_ch = 0;
-        ch_cur = 0;
+        mActiveKits = NO_KIT;
     }
 
     if (flag_ch == 30)
     {
         stopMKO1();
         flag_ch = 0;
-        ch_cur = 0;
+        mActiveKits = NO_KIT;
     }
 }
 
@@ -62,7 +63,7 @@ void ModuleMKO::MKO_avt(int x, int y, int adr1, int adr2)
 
 void ModuleMKO::MKO_timer()
 {
-    MKO_rc_cm(flag_ch, addr1,  addr2);
+    //MKO_rc_cm(flag_ch, addr1,  addr2);
 }
 
 void ModuleMKO::startMKO1()
@@ -221,14 +222,14 @@ QString ModuleMKO::OCcontrol(uint16_t oc)
     return data1;
 }
 
-void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
+void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 {
     WORD buf[11];
     WORD buff[13];
 
     QString err = "";
     int err_count = 0;
-    if (x == 0)
+    if (kit == NO_KIT)
     {
         err += "МКО: Выберите полукомплект для проверки! \n";
     }
@@ -238,11 +239,12 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
         buf[i] = 0;
     }
 
-    if (x == 1)
+    if (kit == MAIN_KIT)
     {
         err += "МКО: Основной полукомплект передача массива: \n";
         mAddr = adr1;
-        if (ch_cur == 2)
+
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -251,13 +253,13 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -266,13 +268,13 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 1;
+        mActiveKits = MAIN_KIT;
     }
-    else if (x == 2)
+    else if (kit == RESERVE_KIT)
     {
         err += "МКО: Резервный полукомплект передача массива: \n";
         mAddr = adr2;
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -281,13 +283,13 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(2, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -296,28 +298,28 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 2;
+        mActiveKits = RESERVE_KIT;
     }
 
-    if (x == 1 || x == 2)
+    if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
         tx_mes(buf, 11, buff, 1);
         err += OCcontrol(buff[0]);
     }
 
-    if (x == 1)
+    if (kit == MAIN_KIT)
     {
         err += "МКО: Основной полукомплект прием массива: \n";
         mAddr = adr1;
     }
-    else if (x == 2)
+    else if (kit == RESERVE_KIT)
     {
         err += "МКО: Резервный полукомплект прием массива: \n";
         mAddr = adr2;
     }
 
-    if (x == 1 || x == 2)
+    if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
         rx_mes(buff, 12);
@@ -347,9 +349,9 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
         err_count = 0;
     }
 
-    if (x == 3)
+    if (kit == ALL_KITS)
     {
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -358,7 +360,7 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -367,7 +369,7 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 0)
+        if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             emit MKO_CTM(2, 1);
@@ -375,7 +377,8 @@ void ModuleMKO::MKO_start_test(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        ch_cur = 3;
+        mActiveKits = ALL_KITS;
+
         if (tmkselect(0) != 0)
         {
             err+= "МКО: Ошибка tmk0!\n";
@@ -548,7 +551,7 @@ void ModuleMKO::rx_mes(uint16_t* receiveBuffer, uint16_t receiveCount)
     bcgetblk(0, receiveBuffer, receiveCount);
 }
 
-void ModuleMKO::pow_DY(int x, int adr)
+void ModuleMKO::pow_DY(int kit, int adr)
 {
     QString err1 = "";
     WORD buf[3];
@@ -557,9 +560,9 @@ void ModuleMKO::pow_DY(int x, int adr)
     mAddr = adr;
     buf[0] = 0;
 
-    if (x == 0)
+    if (kit == NO_KIT)
     {
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -568,13 +571,13 @@ void ModuleMKO::pow_DY(int x, int adr)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             if (tmkselect(0) != 0)
             {
@@ -584,13 +587,13 @@ void ModuleMKO::pow_DY(int x, int adr)
             bcreset();
         }
 
-        ch_cur = 1;
+        mActiveKits = MAIN_KIT;
         buf[1] = 32;
         buf[2] = 32;
     }
     else
     {
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -599,13 +602,13 @@ void ModuleMKO::pow_DY(int x, int adr)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(2, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             if (tmkselect(1) != 0)
             {
@@ -615,7 +618,7 @@ void ModuleMKO::pow_DY(int x, int adr)
             bcreset();
         }
 
-        ch_cur = 2;
+        mActiveKits = RESERVE_KIT;
         buf[1] = 64;
         buf[2] = 64;
     }
@@ -630,7 +633,7 @@ void ModuleMKO::pow_DY(int x, int adr)
     emit start_MKO(err1);
 }
 
-void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
+void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
 {
     WORD buf1[11];
     WORD buff[13];
@@ -638,9 +641,9 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
     QStringList list1 = cm.split(" ");
     QString err2 = "";
 
-    if (x >= 10)
+    if (kit >= 10) //WTF?
     {
-        x = x - 10;
+        kit -= 10;
         bool ok;
         buf1[0] = list1[0].toInt(&ok, 16);
         buf1[1] = list1[1].toInt(&ok, 16) >> 16;
@@ -669,7 +672,7 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         buf1[10] = 0;
     }
 
-    if (x == 0)
+    if (kit == NO_KIT)
     {
         err2 += "МКО: Выберите полукомплект для передачи массива! \n";
     }
@@ -679,11 +682,11 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         buf1[10] = buf1[10] + buf1[i];
     }
 
-    if (x == 1)
+    if (kit == MAIN_KIT)
     {
         err2 += "МКО: Основной полукомплект передача массива: \n";
         mAddr = adr1;
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -692,13 +695,13 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -707,13 +710,13 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 1;
+        mActiveKits = MAIN_KIT;
     }
-    else if (x == 2)
+    else if (kit == RESERVE_KIT)
     {
         err2 += "МКО: Резервный полукомплект передача массива: \n";
         mAddr = adr2;
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -722,13 +725,13 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(2, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -737,10 +740,10 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 2;
+        mActiveKits = RESERVE_KIT;
     }
 
-    if (x == 1 || x == 2)
+    if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
         tx_mes(buf1, 11, buff, 1);
@@ -755,7 +758,7 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
         }
     }
 
-    if (x == 3)
+    if (kit == ALL_KITS)
     {
         WORD buf2[6];
         WORD buf3[6];
@@ -781,7 +784,7 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             buf3[5] = buf3[5] + buf3[k];
         }
 
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -790,7 +793,7 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -799,7 +802,7 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 0)
+        if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             emit MKO_CTM(2, 1);
@@ -807,11 +810,12 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
             startMKO1();
         }
 
-        ch_cur = 3;
+        mActiveKits = ALL_KITS;
+
         //bcreset();
         if (tmkselect(0) != 0)
         {
-            err2+= "Ошибка! tmk0!\n";
+            err2 += "Ошибка! tmk0!\n";
         }//
 
         bcreset();
@@ -865,20 +869,20 @@ void ModuleMKO::MKO_tr_cm(int x, QString cm, int adr1, int adr2)
     emit start_MKO(err2);
 }
 
-void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
+void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
 {
     QString data = "";
     QString err3 = "";
-    if (x == 0)
+    if (kit == NO_KIT)
     {
         err3 += "МКО: Выберите полукомплект для приема массива! \n";
     }
 
-    if (x == 1)
+    if (kit == MAIN_KIT)
     {
         err3 += "МКО: Основной полукомплект прием массива: \n";
         mAddr = adr1;
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -887,13 +891,13 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -902,14 +906,14 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 1;
+        mActiveKits = MAIN_KIT;
     }
 
-    if (x == 2)
+    if (kit == RESERVE_KIT)
     {
         err3 += "МКО: Резервный полукомплект прием массива: \n";
         mAddr = adr2;
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -918,13 +922,13 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 0)
+        else if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(2, 1);
             Sleep(1100);
             startMKO();
         }
-        else if (ch_cur == 3)
+        else if (mActiveKits == ALL_KITS)
         {
             stopMKO1();
             Sleep(100);
@@ -933,10 +937,10 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             startMKO();
         }
 
-        ch_cur = 2;
+        mActiveKits = RESERVE_KIT;
     }
 
-    if (x == 1 || x == 2)
+    if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 13;
         WORD buff1[23];
@@ -957,10 +961,10 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
         }
     }
 
-    if (x == 3)
+    if (kit == ALL_KITS)
     {
         mAddr = adr1;
-        if (ch_cur == 1)
+        if (mActiveKits == MAIN_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -969,7 +973,7 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 2)
+        if (mActiveKits == RESERVE_KIT)
         {
             stopMKO();
             Sleep(100);
@@ -978,7 +982,7 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        if (ch_cur == 0)
+        if (mActiveKits == NO_KIT)
         {
             emit MKO_CTM(1, 1);
             emit MKO_CTM(2, 1);
@@ -986,7 +990,7 @@ void ModuleMKO::MKO_rc_cm(int x, int adr1, int adr2)
             startMKO1();
         }
 
-        ch_cur = 3;
+        mActiveKits = ALL_KITS;
         if (tmkselect(1) != 0)
         {
             err3 += "МКО: Ошибка tmk0!\n";
