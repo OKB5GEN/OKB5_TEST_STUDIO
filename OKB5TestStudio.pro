@@ -125,7 +125,7 @@ HEADERS  += Headers/shape_types.h \
     Headers/logger/RollingFileAppender.h
 
 
-FORMS    += mainwindow.ui
+FORMS    +=
 
 RESOURCES += \
     application.qrc
