@@ -802,6 +802,8 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
 
 void SystemState::setupParams()
 {
+    int TODO;
+
     QStringList powerParams({PAR_VOLTAGE, PAR_CURRENT});
     {
         QMap<int, QStringList> params;
@@ -820,6 +822,7 @@ void SystemState::setupParams()
         params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
         mInParams[ModuleCommands::POWER_UNIT_PNA] = params;
 
+        params.clear();
         params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
         mOutParams[ModuleCommands::POWER_UNIT_PNA] = params;
     }
@@ -829,9 +832,25 @@ void SystemState::setupParams()
         mInParams[ModuleCommands::MKO] = params;
     }
 
+    // STM
     {
         QMap<int, QStringList> params;
-        mInParams[ModuleCommands::STM] = params;
+        //mInParams[ModuleCommands::STM] = params;
+
+        // STM
+        //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
+        //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
+        //addCommand(tr("Сброс ошибки"), ModuleCommands::RESET_ERROR);
+        //addCommand(tr("Перезагрузить"), ModuleCommands::SOFT_RESET);
+        //addCommand(tr("Получить версию прошивки"), ModuleCommands::GET_SOWFTWARE_VER);
+        //addCommand(tr("Эхо"), ModuleCommands::ECHO);
+        //addCommand(tr("Включить канал СТМ к БП"), ModuleCommands::POWER_CHANNEL_CTRL);
+        //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
+        //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
+        //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
+        //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
+        //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
+
     }
 
     {
@@ -843,6 +862,8 @@ void SystemState::setupParams()
         QMap<int, QStringList> params;
         mInParams[ModuleCommands::TECH] = params;
     }
+
+
 
     /*
     GET_MODULE_ADDRESS              = 0x01,

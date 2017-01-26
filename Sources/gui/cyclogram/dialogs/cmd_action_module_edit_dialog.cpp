@@ -28,11 +28,11 @@ void CmdActionModuleEditDialog::setupUI()
 
     mModules = new QListWidget(this);
     mModules->addItem(tr("Блок питания БУП"));
-    //mModules->addItem(tr("Блок питания ПНА"));
-    //mModules->addItem(tr("МКО"));
-    //mModules->addItem(tr("СТМ"));
-    //mModules->addItem(tr("ОТД"));
-    //mModules->addItem(tr("ТЕХ"));
+    mModules->addItem(tr("Блок питания ПНА"));
+    mModules->addItem(tr("МКО"));
+    mModules->addItem(tr("СТМ"));
+    mModules->addItem(tr("ОТД"));
+    mModules->addItem(tr("Технологический"));
 
     layout->addWidget(mModules, 0, 0, 5, 4);
 
@@ -80,64 +80,61 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     case ModuleCommands::POWER_UNIT_BUP:
     case ModuleCommands::POWER_UNIT_PNA:
         {
-            QListWidgetItem* item1 = new QListWidgetItem();
-            item1->setText(tr("Установить текущее значение"));
-            item1->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_VOLTAGE_AND_CURRENT));
-            mCommands->addItem(item1);
+            addCommand(tr("Установить текущее значение"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
+            addCommand(tr("Установить ограничение"), ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT);
 
-            QListWidgetItem* item2 = new QListWidgetItem();
-            item2->setText(tr("Установить ограничение"));
-            item2->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT));
-            mCommands->addItem(item2);
+            //QList<int> params;
+            //params.push_back(ModuleCommands::SET_POWER_STATE);
+            //params.push_back(ModuleCommands::POWER_ON);
+            //addCommand(tr("Включить питание"), params);
 
-            QListWidgetItem* item3 = new QListWidgetItem();
-            item3->setText(tr("Включить питание"));
-            item3->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_POWER_STATE));
-            item3->setData(Qt::UserRole + 1, QVariant((int)ModuleCommands::POWER_ON));
-            mCommands->addItem(item3);
+            //params.clear();
+            //params.push_back(ModuleCommands::SET_POWER_STATE);
+            //params.push_back(ModuleCommands::POWER_OFF);
+            //addCommand(tr("Выключить питание"), params);
 
-            QListWidgetItem* item4 = new QListWidgetItem();
-            item4->setText(tr("Выключить питание"));
-            item4->setData(Qt::UserRole, QVariant((int)ModuleCommands::SET_POWER_STATE));
-            item4->setData(Qt::UserRole + 1, QVariant((int)ModuleCommands::POWER_OFF));
-            mCommands->addItem(item4);
-
-            QListWidgetItem* item5 = new QListWidgetItem();
-            item5->setText(tr("Получить текущее значение"));
-            item5->setData(Qt::UserRole, QVariant((int)ModuleCommands::GET_VOLTAGE_AND_CURRENT));
-            mCommands->addItem(item5);
+            addCommand(tr("Получить текущее значение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
         }
         break;
 
     case ModuleCommands::MKO: //TODO
         {
-            mCommands->addItem(tr("МКО1"));
-            mCommands->addItem(tr("МКО2"));
-            mCommands->addItem(tr("МКО3"));
+            //mCommands->addItem(tr("МКО1"));
+            //mCommands->addItem(tr("МКО2"));
+            //mCommands->addItem(tr("МКО3"));
         }
         break;
 
     case ModuleCommands::STM: //TODO
         {
-            mCommands->addItem(tr("СТМ1"));
-            mCommands->addItem(tr("СТМ2"));
-            mCommands->addItem(tr("СТМ3"));
+            //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
+            //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
+            //addCommand(tr("Сброс ошибки"), ModuleCommands::RESET_ERROR);
+            //addCommand(tr("Перезагрузить"), ModuleCommands::SOFT_RESET);
+            //addCommand(tr("Получить версию прошивки"), ModuleCommands::GET_SOWFTWARE_VER);
+            //addCommand(tr("Эхо"), ModuleCommands::ECHO);
+            //addCommand(tr("Включить канал СТМ к БП"), ModuleCommands::POWER_CHANNEL_CTRL);
+            //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
+            //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
+            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
+            //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
+            //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
         }
         break;
 
     case ModuleCommands::OTD://TODO
         {
-            mCommands->addItem(tr("ОТД1"));
-            mCommands->addItem(tr("ОТД2"));
-            mCommands->addItem(tr("ОТД3"));
+            //mCommands->addItem(tr("ОТД1"));
+            //mCommands->addItem(tr("ОТД2"));
+            //mCommands->addItem(tr("ОТД3"));
         }
         break;
 
     case ModuleCommands::TECH://TODO
         {
-            mCommands->addItem(tr("ТЕХ1"));
-            mCommands->addItem(tr("ТЕХ2"));
-            mCommands->addItem(tr("ТЕХ3"));
+            //mCommands->addItem(tr("ТЕХ1"));
+            //mCommands->addItem(tr("ТЕХ2"));
+            //mCommands->addItem(tr("ТЕХ3"));
         }
         break;
 
@@ -163,12 +160,33 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     }
 }
 
+void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID)
+{
+    QList<int> params;
+    params.push_back(commandID);
+    addCommand(text, params);
+}
+
+void CmdActionModuleEditDialog::addCommand(const QString& text, const QList<int>& params)
+{
+    QListWidgetItem* item = new QListWidgetItem();
+    item->setText(text);
+
+    for (int i = 0, sz = params.size(); i < sz; ++i)
+    {
+        item->setData(Qt::UserRole + i, QVariant(params[i]));
+    }
+
+    mCommands->addItem(item);
+}
+
 void CmdActionModuleEditDialog::onCommandChanged(int index)
 {
     mParams->clearContents();
 
     if (index == -1)
     {
+        mParams->setRowCount(0);
         return;
     }
 

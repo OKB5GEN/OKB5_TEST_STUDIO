@@ -2,6 +2,7 @@
 #define CMD_ACTION_MODULE_EDIT_DIALOG_H
 
 #include <QDialog>
+#include <QList>
 
 class QListWidget;
 class QTableWidget;
@@ -25,6 +26,8 @@ private slots:
 
 private:
     void setupUI();
+    void addCommand(const QString& text, int param);
+    void addCommand(const QString& text, const QList<int>& params);
 
     CmdActionModule* mCommand;
 

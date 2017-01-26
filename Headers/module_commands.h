@@ -11,7 +11,6 @@ public:
     enum CommandID
     {
         // Own modules commands (documented) >>>>>
-
         GET_MODULE_ADDRESS              = 0x01,
         GET_STATUS_WORD                 = 0x02,
         RESET_ERROR                     = 0x03,

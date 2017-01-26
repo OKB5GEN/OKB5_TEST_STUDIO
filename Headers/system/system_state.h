@@ -148,9 +148,10 @@ private:
     QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
 
-    // param names constants
+    // TODO param names constants
     const QString PAR_VOLTAGE;
     const QString PAR_CURRENT;
+    const QString SW_VERSION;
 
     CmdActionModule* mCurCommand;
 };
