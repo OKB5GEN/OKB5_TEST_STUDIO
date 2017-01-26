@@ -41,6 +41,26 @@ void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState sta
     }
 }
 
+void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState state)
+{
+    //int TODO; // valid channel values 1 to 6
+
+    if (!sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0))
+    {
+        LOG_ERROR("MKO Channel %i is not set to %i state", channel, state);
+        return;
+    }
+
+    /*if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
+    {
+        mChannelStates[state];
+    }
+    else
+    {
+        LOG_ERROR("Invalid STM channel index %i", channel);
+    }*/
+}
+
 ModuleCommands::PowerState ModuleSTM::powerChannelState(int channel)
 {
     QByteArray response;

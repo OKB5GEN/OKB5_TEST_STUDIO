@@ -100,8 +100,14 @@ void SystemState::init()
     mPowerBUP->startPower();
     mPowerPNA->startPower();
 
-    //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
-    //mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
+    // disable MKO power supply to BUP and PNA
+    mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
+    mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
+
+    // enable MKO power supply
+    mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
+    mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
+
 /*
     mThreadMKO = new QThread(this);
     mMKO->moveToThread(mThreadMKO);
