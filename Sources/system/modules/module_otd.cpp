@@ -208,3 +208,7 @@ void ModuleOTD::readDS1820Data(LineID line)
     //}
 }
 
+void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+{
+    int TODO; // just execute and fill response, do not send any signals
+}

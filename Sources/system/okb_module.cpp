@@ -1,5 +1,8 @@
 #include "Headers/system/okb_module.h"
 
+#include <QMap>
+#include <QVariant>
+
 ModuleOKB::ModuleOKB(QObject* parent):
     COMPortModule(parent),
       mAddress(0xff),
@@ -243,3 +246,21 @@ QString ModuleOKB::checkStatusWord()
     */
 }
 
+void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
+{
+    QMap<uint32_t, QVariant> response;
+
+    int TODO;
+
+
+    if (false) // if it is common command (reset, reset error, sw version, echo, get module address) -> process here
+    {
+
+    }
+    else // if it is custom comman type -> process by inherited module
+    {
+        processCustomCommand(params, response);
+    }
+
+    emit commandResult(response);
+}

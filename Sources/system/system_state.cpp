@@ -12,6 +12,17 @@
 #include <windows.h>
 #include "qapplication.h"
 
+/* Делаем универсализацию модульных команд
+ *
+ * 1. Вся информация между системой и модулями ходит в виде QMap (пока для упрощения положим что QMap<uint32, QVariant>)
+ * 2. Каждый модуль имеет сигнал commandResult(QMap) и слот processCommand(QMap)
+ * 3. SystemState при пинке от модульной команды в виде "модуль-команда-input-output" формирует QMap и шлет сигнал processXXXCommand(QMap) + запускает таймер (5-10 секунд)
+ * 4. (По таймауту/получении ошибки от можуля считаем, что команда где-то протерялась и шлем ответку, что типа "не шмогла" и циклограмма аварийно завершается (перед этим поднасрав в лог))
+ * 5. Сигнал processXXXCommand(QMap) для каждого модуля будет свой и слот-обработчик сигнала commandXXXResult(QMap) тоже будет свой
+*/
+
+/* Что будет находиться в QMap?
+*/
 
 namespace
 {
@@ -97,6 +108,10 @@ void SystemState::init()
         LOG_ERROR("MKO not created!");
     }
 
+    QMap<uint32_t, QVariant> request;
+    emit sendToSTM(request);
+
+    // TODO possibly move "initialization" functionality to cyclograms
     mPowerBUP->startPower();
     mPowerPNA->startPower();
 
@@ -1101,6 +1116,9 @@ bool SystemState::createMKO()
     //connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
     //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
 
+    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
     int TODO;
     return true;
 }
@@ -1128,6 +1146,9 @@ bool SystemState::createOTD()
     //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
     //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
 
+    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
     return mOTD->init();
 }
 
@@ -1146,6 +1167,9 @@ bool SystemState::createSTM()
     mSTM = new ModuleSTM(this);
     mSTM->setId(id);
 
+    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
     return mSTM->init();
 }
 
@@ -1161,6 +1185,9 @@ bool SystemState::createTech()
 
     mTech = new ModuleTech(this);
     mTech->setId(id);
+
+    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
     return mTech->init();
 }
@@ -1178,6 +1205,9 @@ bool SystemState::createPowerBUP()
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setId(id);
 
+    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
     return mPowerBUP->init();
 }
 
@@ -1194,6 +1224,15 @@ bool SystemState::createPowerPNA()
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setId(id);
 
+    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
     return mPowerPNA->init();
 }
 
+void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
+{
+    int i = 0;
+    i = 1;
+    int TODO;
+}

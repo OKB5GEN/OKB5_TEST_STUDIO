@@ -1,12 +1,12 @@
-#ifndef MODULE_H
-#define MODULE_H
+#ifndef COM_PORT_MODULE_H
+#define COM_PORT_MODULE_H
 
-#include <QObject>
+#include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
 class QSerialPort;
 
-class COMPortModule: public QObject
+class COMPortModule: public AbstractModule
 {
     Q_OBJECT
 
@@ -34,7 +34,6 @@ public:
 protected:
     bool send(const QByteArray& request, QByteArray& response);
 
-
     void resetPort();
 
     QSerialPort* mPort;
@@ -44,4 +43,4 @@ private:
     void createPort(const QString& portName);
 };
 
-#endif // MODULE_H
+#endif // COM_PORT_MODULE_H

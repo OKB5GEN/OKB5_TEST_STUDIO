@@ -28,6 +28,9 @@ public:
     ModuleCommands::PowerState powerChannelState(int channel);
     FuseStates fuseState(int fuseIndex);
 
+public slots:
+    void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+
 private:
     QVector<ModuleCommands::PowerState> mChannelStates;
 };

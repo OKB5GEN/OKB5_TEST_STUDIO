@@ -21,6 +21,9 @@ public:
     int tech_read(int x);
     QString tech_read_buf(int x, int len);
 
+public slots:
+    void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+
 private:
     void statusRS();
     void statusCAN();

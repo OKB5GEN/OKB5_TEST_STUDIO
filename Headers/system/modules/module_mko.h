@@ -1,11 +1,11 @@
 #ifndef MODULE_MKO_H
 #define MODULE_MKO_H
 
-#include <QObject>
+#include "Headers/system/abstract_module.h"
 
 class QTimer;
 
-class ModuleMKO: public QObject
+class ModuleMKO: public AbstractModule
 {
     Q_OBJECT
 
@@ -50,6 +50,8 @@ public slots:
     void MKO_chan(int x);
     void MKO_avt(int x,int y,int adr1, int adr2);
     void MKO_timer();
+
+    void processCommand(const QMap<uint32_t, QVariant>& params) override;
 
 signals:
     void test_MKO(int x);

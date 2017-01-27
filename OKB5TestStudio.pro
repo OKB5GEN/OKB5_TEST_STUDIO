@@ -122,7 +122,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/logger/FileAppender.h \
     Headers/logger/Logger.h \
     Headers/logger/OutputDebugAppender.h \
-    Headers/logger/RollingFileAppender.h
+    Headers/logger/RollingFileAppender.h \
+    Headers/system/abstract_module.h
 
 
 FORMS    +=

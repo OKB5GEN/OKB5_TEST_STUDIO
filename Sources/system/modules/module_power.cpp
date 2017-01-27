@@ -238,3 +238,8 @@ void ModulePower::update()
 {
     getCurVoltageAndCurrent(mVoltage, mCurrent, mError);
 }
+
+void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
+{
+    int TODO;
+}

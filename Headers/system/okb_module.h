@@ -20,9 +20,13 @@ public:
     int getSoftwareVersion();
     QString checkStatusWord();
 
+public slots:
+    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+
 protected:
     bool postInit() override;
     virtual bool postInitOKBModule();
+    virtual void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) = 0;
 
     bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* response = Q_NULLPTR);
 

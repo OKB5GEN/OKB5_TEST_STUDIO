@@ -10,7 +10,7 @@ namespace
 }
 
 COMPortModule::COMPortModule(QObject* parent):
-    QObject(parent),
+    AbstractModule(parent),
     mPort(Q_NULLPTR)
 {
 }
@@ -108,6 +108,7 @@ void COMPortModule::resetPort()
         mPort = Q_NULLPTR;
     }
 
+    //TODO possibly just open-close is enough without deletion
     for(int i = 0; i < 500; i++) // i guess some sort of govnomagics here "freeze app for 5 seconds to restore COM port with module after reset"
     {
         Sleep(10);

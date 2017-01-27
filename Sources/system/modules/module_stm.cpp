@@ -109,3 +109,9 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
 
     return ModuleSTM::FuseStates(state); //TODO undefined values
 }
+
+void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+{
+    int i = 0;
+    int TODO; // just fill respons eand do not send any signals
+}

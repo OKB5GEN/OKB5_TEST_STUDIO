@@ -14,7 +14,7 @@ int flag_ch = 0;
 //QTimer *MyTimerMKO;
 
 ModuleMKO::ModuleMKO(QObject* parent):
-    QObject(parent),
+    AbstractModule(parent),
     mActiveKits(NO_KIT)
 {
 //    m_timer = new QTimer(this);
@@ -30,7 +30,7 @@ ModuleMKO::~ModuleMKO()
 void ModuleMKO::MKO_chan(int x)
 {
     flag_ch = x;
-    if (flag_ch == 10 || flag_ch == 20)
+    if (flag_ch == 10 || flag_ch == 20) //TODO: какая-то Сашина залипуха для выключения активных МКО комплектов
     {
         stopMKO();
         flag_ch = 0;
@@ -1040,4 +1040,9 @@ void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
 
     emit data_MKO(data);
     emit start_MKO(err3);
+}
+
+void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
+{
+    int TODO;
 }

@@ -78,6 +78,9 @@ private slots:
     void on_OTD_avt_2_clicked();
     //<<<
 
+    // new slots
+    void processResponse(const QMap<uint32_t, QVariant>& response);
+
 signals:
     void commandFinished(bool success);
 
@@ -108,6 +111,14 @@ signals:
     void MKO_ch(int x);
     void MKO_auto(int x,int y,int adr1, int adr2);
     // <<<
+
+    // new signals
+    void sendToSTM(const QMap<uint32_t, QVariant>& request);
+    void sendToOTD(const QMap<uint32_t, QVariant>& request);
+    void sendToTech(const QMap<uint32_t, QVariant>& request);
+    void sendToMKO(const QMap<uint32_t, QVariant>& request);
+    void sendToPowerUnitBUP(const QMap<uint32_t, QVariant>& request);
+    void sendToPowerUnitPNA(const QMap<uint32_t, QVariant>& request);
 
 private:
     void setupParams();

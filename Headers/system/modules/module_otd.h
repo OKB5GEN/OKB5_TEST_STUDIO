@@ -27,7 +27,7 @@ public slots:
     void measureDS1820(LineID line);
     void measurePT100();
 
-signals:
+    void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
 
 private:
     QTimer * m_timer;

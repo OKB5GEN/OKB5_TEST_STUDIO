@@ -26,6 +26,8 @@ public slots:
 
     void voltageAndCurrent();
 
+    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+
 private slots:
     void update();
 
