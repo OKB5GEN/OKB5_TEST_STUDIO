@@ -3,11 +3,29 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 
+#include <QDateTime>
+
 #include "Headers/gui/editor_window.h"
 
 #include "Headers/logger/Logger.h"
 #include "Headers/logger/FileAppender.h"
 #include "Headers/logger/ConsoleAppender.h"
+
+void initializeLogger()
+{
+    // create console output
+    ConsoleAppender* consoleAppender = new ConsoleAppender();
+    consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
+    Logger::globalInstance()->registerAppender(consoleAppender);
+
+    // create file output
+    QString appStartTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HH_mm_ss");
+    QString fileBaseName = "OKB5TS_";
+    QString fileExtenstion = ".log";
+
+    FileAppender* fileAppender = new FileAppender(fileBaseName + appStartTime + fileExtenstion);
+    Logger::globalInstance()->registerAppender(fileAppender);
+}
 
 int main(int argc, char *argv[])
 {
@@ -26,15 +44,7 @@ int main(int argc, char *argv[])
 
     QLocale::setDefault(QLocale::c());
 
-    // logging initialization (create console and file outputs)
-    ConsoleAppender* consoleAppender = new ConsoleAppender();
-    //consoleAppender->setFormat("[%-7l] <%C> %m\n");
-    consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
-
-    Logger::globalInstance()->registerAppender(consoleAppender);
-
-    FileAppender* fileAppender = new FileAppender("OKB5Studio.log");
-    Logger::globalInstance()->registerAppender(fileAppender);
+    initializeLogger();
 
     LOG_INFO("========== APPLICATION STARTED ==========");
 
