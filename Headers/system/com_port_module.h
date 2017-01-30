@@ -14,7 +14,6 @@ public:
     struct Identifier
     {
         QString description;
-        QString manufacturer;
         QString serialNumber;
         quint16 vendorId;
         quint16 productId;

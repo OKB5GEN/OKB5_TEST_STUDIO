@@ -8,6 +8,7 @@
 
 #include "Headers/logger/Logger.h"
 
+#include <QMetaEnum>
 #include <QtSerialPort>
 #include <windows.h>
 #include "qapplication.h"
@@ -29,8 +30,105 @@ namespace
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
     static const uint8_t STM_DEFAULT_ADDR = 0x22;
     static const uint8_t TECH_DEFAULT_ADDR = 0x56;
+
+    bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules)
+    {
+        modules.clear();
+
+        QXmlStreamReader xml;
+
+        QString fileName = QDir::currentPath() + "/system_config.xml";
+        QFile file(fileName);
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            LOG_FATAL("No system_config.xml found");
+            //QMessageBox::warning(this, tr("OKB5 Test Studio"), tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+            return false;
+        }
+
+        xml.setDevice(&file);
+        QMetaEnum metaEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+
+        if (xml.readNextStartElement())
+        {
+            if (xml.name() == "system_config" && xml.attributes().value("version") == "1.0")
+            {
+                while (!xml.atEnd() && !xml.hasError())
+                {
+                    QXmlStreamReader::TokenType token = xml.readNext();
+
+                    if (token == QXmlStreamReader::StartElement)
+                    {
+                        QString name = xml.name().toString();
+
+                        if (name == "modules")
+                        {
+                            while (!(xml.tokenType() == QXmlStreamReader::EndElement && xml.name() == "modules"))
+                            {
+                                if (xml.tokenType() == QXmlStreamReader::StartElement && xml.name() == "module")
+                                {
+                                    QXmlStreamAttributes attributes = xml.attributes();
+
+                                    COMPortModule::Identifier id;
+                                    ModuleCommands::ModuleID moduleID = ModuleCommands::MODULES_COUNT;
+
+                                    if (attributes.hasAttribute("type"))
+                                    {
+                                        QString str = attributes.value("type").toString();
+                                        moduleID = ModuleCommands::ModuleID(metaEnum.keyToValue(qPrintable(str)));
+                                    }
+
+                                    if (attributes.hasAttribute("description"))
+                                    {
+                                        id.description = attributes.value("description").toString();
+                                    }
+
+                                    if (attributes.hasAttribute("productId"))
+                                    {
+                                        id.productId = attributes.value("productId").toUShort();
+                                    }
+
+                                    if (attributes.hasAttribute("serialNumber"))
+                                    {
+                                        id.serialNumber = attributes.value("serialNumber").toString();
+                                    }
+
+                                    if (attributes.hasAttribute("vendorId"))
+                                    {
+                                        id.vendorId = attributes.value("vendorId").toUShort();
+                                    }
+
+                                    if (moduleID != ModuleCommands::MODULES_COUNT)
+                                    {
+                                        modules[moduleID] = id;
+                                    }
+                                }
+
+                                xml.readNext();
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                xml.raiseError(QObject::tr("The file is not an system_config version 1.0 file."));
+            }
+        }
+
+        if (!xml.errorString().isEmpty())
+        {
+            LOG_ERROR(QObject::tr("%1\nLine %2, column %3")
+                      .arg(xml.errorString())
+                      .arg(xml.lineNumber())
+                      .arg(xml.columnNumber()));
+        }
+
+        return !xml.error();
+    }
 }
 
+///////////////////////////////////////////////////////////////
 SystemState::SystemState(QObject* parent):
     VariableController(parent),
     m_mko_kits(ModuleMKO::NO_KIT),
@@ -74,54 +172,82 @@ void SystemState::init()
     //QThread* mThreadPowerBUP;
     //QThread* mThreadPowerPNA;
 
+    QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
+    loadSystemConfig(modules);
     setupParams();
 
-    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    // MKO creation
+    mMKO = new ModuleMKO(this); //TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!createPowerPNA())
-    {
-        LOG_ERROR("PNA Power Unit not created!");
-    }
+    // OTD creation
+    mOTD = new ModuleOTD(this);//TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    mOTD->setId(modules.value(ModuleCommands::OTD));
+    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!createPowerBUP())
-    {
-        LOG_ERROR("BUP Power Unit not created!");
-    }
+    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
 
-    if (!createSTM())
-    {
-        LOG_ERROR("STM not created!");
-    }
-
-    if (!createOTD())
+    if (!mOTD->init())
     {
         LOG_ERROR("OTD not created!");
     }
 
-    if (!createTech())
+    // STM creation
+    mSTM = new ModuleSTM(this);
+    mSTM->setId(modules.value(ModuleCommands::STM));
+    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mSTM->init())
+    {
+        LOG_ERROR("STM not created!");
+    }
+
+    // Tech creation
+    mTech = new ModuleTech(this);
+    mTech->setId(modules.value(ModuleCommands::TECH));
+    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mTech->init())
     {
         LOG_ERROR("Tech not created!");
     }
 
-    if (!createMKO())
+    // Power unit BUP creation
+    mPowerBUP = new ModulePower(this);
+    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
+    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mPowerBUP->init())
     {
-        LOG_ERROR("MKO not created!");
+        LOG_ERROR("BUP Power Unit not created!");
     }
 
-    QMap<uint32_t, QVariant> request;
-    emit sendToSTM(request);
+    mPowerPNA = new ModulePower(this);
+    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
+    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mPowerPNA->init())
+    {
+        LOG_ERROR("PNA Power Unit not created!");
+    }
 
     // TODO possibly move "initialization" functionality to cyclograms
-    mPowerBUP->startPower();
-    mPowerPNA->startPower();
+    //mPowerBUP->startPower();
+    //mPowerPNA->startPower();
 
     // disable MKO power supply to BUP and PNA
-    mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
-    mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
+    //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
+    //mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
 
     // enable MKO power supply
-    mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
-    mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
+    //mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
+    //mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
 
 /*
     mThreadMKO = new QThread(this);
@@ -1108,131 +1234,7 @@ bool SystemState::sendTechCommand(CmdActionModule* command)
     return false;
 }
 
-bool SystemState::createMKO()
-{
-    mMKO = new ModuleMKO(Q_NULLPTR);
-    //connect(mMKO, SIGNAL(test_MKO(int)), this, SLOT(simpltst1(int)));
-    //connect(mMKO, SIGNAL(MKO_CTM(int, int)), this, SLOT(MKO_change_ch(int, int)));
-    //connect(mMKO, SIGNAL(start_MKO(QString)), this, SLOT(MKO_data(QString)));
-    //connect(mMKO, SIGNAL(data_MKO(QString)), this, SLOT(MKO_cm_data(QString)));
-
-    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    int TODO;
-    return true;
-}
-
-bool SystemState::createOTD()
-{
-    int TODO; // create config
-    COMPortModule::Identifier id;
-    id.description = "STMicroelectronics Virtual COM Port";
-    id.manufacturer = "STMicroelectronics.";
-    id.productId = 22336;
-    id.serialNumber = "000000000014";
-    id.vendorId = 1155;
-
-    mOTD = new ModuleOTD(Q_NULLPTR);
-    mOTD->setId(id);
-    //connect(mOTD, SIGNAL(start_OTDPT(double,double)), this, SLOT(OTDPTdata(double,double)));
-    //connect(mOTD, SIGNAL(temp_OTD(QString)), this, SLOT(OTDtemd(QString)));
-    //connect(mOTD, SIGNAL(OTD_res(int)), this, SLOT(OTD_res_st(int)));
-    //connect(mOTD, SIGNAL(OTD_reqr(QString)), this, SLOT(status_OTD(QString)));
-    //connect(mOTD, SIGNAL(OTD_err_res(int)), this, SLOT(OTD_err_res(int)));
-    //connect(mOTD, SIGNAL(OTD_id1()), this, SLOT(OTD_id()));
-    //connect(mOTD, SIGNAL(OTD_vfw(double)), this, SLOT(OTD_fw(double)));
-    //connect(mOTD, SIGNAL(err_OTD(QString)), this, SLOT(OTDerror(QString)));
-    //connect(mOTD, SIGNAL(tm_OTD1(QString)), this, SLOT(OTDtm1(QString)));
-    //connect(mOTD, SIGNAL(tm_OTD2(QString)), this, SLOT(OTDtm2(QString)));
-
-    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    return mOTD->init();
-}
-
-bool SystemState::createSTM()
-{
-    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
-
-    int TODO; // create config
-    COMPortModule::Identifier id;
-    id.description = "STMicroelectronics Virtual COM Port";
-    id.manufacturer = "STMicroelectronics.";
-    id.productId = 22336;
-    id.serialNumber = "000000000012";
-    id.vendorId = 1155;
-
-    mSTM = new ModuleSTM(this);
-    mSTM->setId(id);
-
-    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    return mSTM->init();
-}
-
-bool SystemState::createTech()
-{
-    int TODO; // create config AND get tech module
-    COMPortModule::Identifier id;
-//  id.description = "STMicroelectronics Virtual COM Port";
-//  id.manufacturer = "STMicroelectronics.";
-//  id.productId = 22336;
-//  id.serialNumber = "2761250046"; //TODO
-//  id.vendorId = 9006;
-
-    mTech = new ModuleTech(this);
-    mTech->setId(id);
-
-    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    return mTech->init();
-}
-
-bool SystemState::createPowerBUP()
-{
-    int TODO; // create config
-    COMPortModule::Identifier id;
-    id.description = "PS 2000 B Series";
-    id.manufacturer = "EA Elektro-Automatik GmbH & Co. KG";
-    id.productId = 16;
-    id.serialNumber = "2761250046";
-    id.vendorId = 9006;
-
-    mPowerBUP = new ModulePower(this);
-    mPowerBUP->setId(id);
-
-    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    return mPowerBUP->init();
-}
-
-bool SystemState::createPowerPNA()
-{
-    int TODO; // create config
-    COMPortModule::Identifier id;
-    id.description = "PS 2000 B Series";
-    id.manufacturer = "EA Elektro-Automatik GmbH & Co. KG";
-    id.productId = 16;
-    id.serialNumber = "2761250178";
-    id.vendorId = 9006;
-
-    mPowerPNA = new ModulePower(this);
-    mPowerPNA->setId(id);
-
-    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    return mPowerPNA->init();
-}
-
 void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
 {
-    int i = 0;
-    i = 1;
     int TODO;
 }

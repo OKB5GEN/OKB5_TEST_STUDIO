@@ -53,7 +53,6 @@ bool COMPortModule::init()
             || info.productIdentifier() != mID.productId
             || info.vendorIdentifier() != mID.vendorId
             || info.description() != mID.description
-            || info.manufacturer() != mID.manufacturer
             || info.serialNumber() != mID.serialNumber
            )
         {
