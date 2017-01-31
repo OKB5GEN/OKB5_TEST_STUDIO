@@ -1,4 +1,5 @@
 #include "Headers/system/com_port_module.h"
+#include "Headers/logger/Logger.h"
 
 #include <QtSerialPort>
 #include <QApplication>
@@ -39,6 +40,9 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response)
         return true;
     }
 
+    QString str (request.toHex().toStdString().c_str());
+    int i = 0;
+    LOG_ERROR("Can not send request: %s", request.toHex().toStdString().c_str());
     return false;
 }
 

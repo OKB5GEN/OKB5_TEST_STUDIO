@@ -21,28 +21,44 @@ class SystemState: public VariableController
     Q_OBJECT
 
 public:
+    enum ParamID // command parameters
+    {
+        // common command params
+        MODULE_ID           = 0x00000000,
+        COMMAND_ID          = 0x00000001,
+        INPUT_PARAMS_COUNT  = 0x00000002,
+        OUTPUT_PARAMS_COUNT = 0x00000003,
+        ERROR_CODE          = 0x00000004,
+
+        // param types
+        VOLTAGE             = 0x00000005,
+        CURRENT             = 0x00000006,
+
+        // custom command params
+        INPUT_PARAM_BASE    = 0x00001000, // all input params will have code "in base + i"
+        OUTPUT_PARAM_BASE   = 0x10000000, // all output params will have code "out base + i"
+
+        UNDEFINED           = 0xffffffff
+    };
+
+    Q_ENUM(ParamID)
+
     SystemState(QObject* parent);
     ~SystemState();
 
     void init();
 
-    ModuleMKO* moduleMKO() const;
-    ModuleOTD* moduleOTD() const;
-    ModuleSTM* moduleSTM() const;
-    ModuleTech* moduleTech() const;
-    ModulePower* modulePowerBUP() const;
-    ModulePower* modulePowerPNA() const;
-
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
+
+    QString paramName(ParamID param) const;
+    ParamID paramID(const QString& name) const;
 
     void sendCommand(CmdActionModule* command);
 
 private slots:
-    void onUIChanged(qreal voltage, qreal current);
-    void onUIGot(qreal voltage, qreal current, uint8_t error);
 
-    //TODO refactor
+    //TODO refactor/remove
     int simpltst1(int x);
 
     void OTDtemd(QString data);
@@ -84,10 +100,6 @@ private slots:
 signals:
     void commandFinished(bool success);
 
-    // Power unit commands
-    void setUI(qreal,qreal);
-    void getUI();
-
     // TODO refactor >>>
     void OTD1();
     void OTD_reset1();
@@ -122,7 +134,14 @@ signals:
 
 private:
     void setupParams();
-    void onExecutionFinished(uint8_t error);
+    void onExecutionFinished(uint32_t error);
+
+    ModuleMKO* moduleMKO() const;
+    ModuleOTD* moduleOTD() const;
+    ModuleSTM* moduleSTM() const;
+    ModuleTech* moduleTech() const;
+    ModulePower* modulePowerBUP() const;
+    ModulePower* modulePowerPNA() const;
 
     bool sendPowerUnitCommand(CmdActionModule* command);
     bool sendOTDCommand(CmdActionModule* command);
@@ -144,26 +163,16 @@ private:
     ModulePower* mPowerBUP;
     ModulePower* mPowerPNA;
 
-    int m_mko_kits;
+    int m_mko_kits; //TODO remove/move to MKO
 
     QThread* mThreadMKO;
     QThread* mThreadOTD;
 
-    //int m_flag_rem1 = 0;
-    //int m_flag_rem2 = 0;
-    //int m_k = 0;
-    //int m_flag_mko_auto = 0;
-    //int m_flag_otd_auto = 0;
-    //int m_dat[1000]={0};
-    //int m_dat1[1000]={0};
     QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
 
-    // TODO param names constants
-    const QString PAR_VOLTAGE;
-    const QString PAR_CURRENT;
-    const QString SW_VERSION;
-
     CmdActionModule* mCurCommand;
+
+    QMap<ParamID, QString> mParamNames;
 };
 #endif // SYSTEM_STATE_H

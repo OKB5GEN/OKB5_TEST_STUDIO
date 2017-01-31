@@ -134,10 +134,10 @@ SystemState::SystemState(QObject* parent):
     m_mko_kits(ModuleMKO::NO_KIT),
     mThreadMKO(Q_NULLPTR),
     mThreadOTD(Q_NULLPTR),
-    PAR_VOLTAGE(tr("Voltage, V")),
-    PAR_CURRENT(tr("Current, A")),
     mCurCommand(Q_NULLPTR)
 {
+    mParamNames[VOLTAGE] = tr("Voltage, V");
+    mParamNames[CURRENT] = tr("Current, A");
 }
 
 SystemState::~SystemState()
@@ -151,7 +151,7 @@ SystemState::~SystemState()
     {
         mThreadOTD->terminate();
     }
-
+/*
     if (mMKO)
     {
         delete mMKO;
@@ -160,7 +160,7 @@ SystemState::~SystemState()
     if (mOTD)
     {
         delete mOTD;
-    }
+    }*/
 }
 
 void SystemState::init()
@@ -943,9 +943,12 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
 
 void SystemState::setupParams()
 {
-    int TODO;
+    int TODO; // replace by constant usage
 
-    QStringList powerParams({PAR_VOLTAGE, PAR_CURRENT});
+    QStringList powerParams;
+    powerParams.push_back(paramName(VOLTAGE));
+    powerParams.push_back(paramName(CURRENT));
+
     {
         QMap<int, QStringList> params;
         params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
@@ -1066,175 +1069,127 @@ void SystemState::setupParams()
 
 void SystemState::sendCommand(CmdActionModule* command)
 {
-    bool result = false;
-    // 1. По типу модуля взять модуль из имеющихся
-    // 2. По типу команды определить сигнал, к которму коннектиться
-    // 3. Послать модулю сигнал на выполнение той или иной команды
-    // 4. Когда модуль получит сигнал и отпроцует команду, он пошлет сигнал, на который мы приконнектились
-    // 5. В слоте мы полученными значениями проинициализируем переменные VariableController'а (если это выходные параметры)
-    // 6. Посылаем сигнал commandFinished()
-    // 7. Disconnect'имся от команды
+    mCurCommand = command;
+
+    const QMap<QString, QString>& inputParams = command->inputParams();
+    const QMap<QString, QString>& outputParams = command->outputParams();
+    VariableController* vc = command->variableController();
+
+    QMap<uint32_t, QVariant> params;
+    params[MODULE_ID] = QVariant(uint32_t(command->module()));
+    params[COMMAND_ID] = QVariant(uint32_t(command->operation()));
+    params[INPUT_PARAMS_COUNT] = QVariant(uint32_t(inputParams.size()));
+    params[OUTPUT_PARAMS_COUNT] = QVariant(uint32_t(outputParams.size()));
+
+    int TODO; // start "waiting for execution" protection timer
+
+    // input params -> [type, value]
+
+    uint32_t i = 0;
+    for (auto it = inputParams.begin(); it != inputParams.end(); ++it)
+    {
+        params[INPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
+        ++i;
+
+        qreal value = vc->variable(it.value());
+        params[INPUT_PARAM_BASE + i] = QVariant(value);
+        ++i;
+    }
+
+    // output params -> [type, vaiableName]
+    i = 0;
+    for (auto it = outputParams.begin(); it != outputParams.end(); ++it)
+    {
+        params[OUTPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
+        ++i;
+
+        params[OUTPUT_PARAM_BASE + i] = QVariant(it.value());
+        ++i;
+    }
 
     switch (command->module())
     {
     case ModuleCommands::POWER_UNIT_BUP:
+        emit sendToPowerUnitBUP(params);
+        break;
     case ModuleCommands::POWER_UNIT_PNA:
-        result = sendPowerUnitCommand(command);
+        emit sendToPowerUnitPNA(params);
         break;
     case ModuleCommands::OTD:
-        result = sendOTDCommand(command);
+        emit sendToOTD(params);
         break;
     case ModuleCommands::STM:
-        result = sendSTMCommand(command);
+        emit sendToSTM(params);
         break;
     case ModuleCommands::MKO:
-        result = sendMKOCommand(command);
+        emit sendToMKO(params);
         break;
     case ModuleCommands::TECH:
-        result = sendTechCommand(command);
+        emit sendToTech(params);
         break;
 
     default:
         break;
     }
-
-    if (!result)
-    {
-        emit commandFinished(result);
-    }
 }
 
-bool SystemState::sendPowerUnitCommand(CmdActionModule* command)
+void SystemState::onExecutionFinished(uint32_t error)
 {
-    bool result = true;
-
-    mCurCommand = command;
-
-    ModulePower* module = (command->module() == ModuleCommands::POWER_UNIT_BUP ? mPowerBUP : mPowerPNA);
-    const QMap<QString, QString>& inputParams = command->inputParams();
-    //const QMap<QString, QString>& outputParams = command->outputParams();
-    VariableController* varCtrl = command->variableController();
-
-    switch (command->operation())
+    if (error != 0) // 0 - successful execution
     {
-    case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-        {
-            connect(this, SIGNAL(getUI()), module, SLOT(voltageAndCurrent()));
-            connect(module, SIGNAL(gotUI(qreal,qreal,uint8_t)), this, SLOT(onUIGot(qreal, qreal, uint8_t)));
-            emit getUI();
-        }
-        break;
+        QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+        QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
 
-    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-        {
-            QString vName = inputParams.value(PAR_VOLTAGE, "ERR");
-            QString cName = inputParams.value(PAR_CURRENT, "ERR");
-
-            qreal voltage = varCtrl->variable(vName);
-            qreal current = varCtrl->variable(cName);
-
-            connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setVoltageAndCurrent(qreal, qreal)));
-            connect(module, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
-            emit setUI(voltage, current);
-        }
-        break;
-
-    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
-        {
-            QString vName = inputParams.value(PAR_VOLTAGE, "ERR");
-            QString cName = inputParams.value(PAR_CURRENT, "ERR");
-
-            qreal voltage = varCtrl->variable(vName);
-            qreal current = varCtrl->variable(cName);
-
-            connect(this, SIGNAL(setUI(qreal,qreal)), module, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
-            connect(module, SIGNAL(changedMaxUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
-            emit setUI(voltage, current);
-        }
-        break;
-
-    case ModuleCommands::SET_POWER_STATE:
-        {
-
-        }
-        break;
-
-    default:
-        result = false;
-        break;
+        LOG_ERROR("Command execution failed. Module:%s Command:%s Error:%s",
+                  moduleEnum.valueToKey(mCurCommand->module()),
+                  commandEnum.valueToKey(mCurCommand->operation()),
+                  QString::number(error));
     }
-
-    return result;
-}
-
-void SystemState::onUIChanged(qreal voltage, qreal current)
-{
-    QObject* sender = QObject::sender();
-    if (sender)
-    {
-        disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setMaxVoltageAndCurrent(qreal, qreal)));
-        disconnect(this, SIGNAL(setUI(qreal,qreal)), sender, SLOT(setVoltageAndCurrent(qreal, qreal)));
-        disconnect(sender, SIGNAL(changedUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
-        disconnect(sender, SIGNAL(changedMaxUI(qreal,qreal)), this, SLOT(onUIChanged(qreal, qreal)));
-    }
-
-    onExecutionFinished(0);
-}
-
-void SystemState::onUIGot(qreal voltage, qreal current, uint8_t error)
-{
-    QObject* sender = QObject::sender();
-    if (sender)
-    {
-        disconnect(this, SIGNAL(getUI()), sender, SLOT(voltageAndCurrent()));
-        disconnect(sender, SIGNAL(gotUI(qreal,qreal,uint8_t)), this, SLOT(onUIGot(qreal, qreal, uint8_t)));
-    }
-
-    const QMap<QString, QString>& outputParams = mCurCommand->outputParams();
-    VariableController* varCtrl = mCurCommand->variableController();
-    QString vName = outputParams.value(PAR_VOLTAGE, "ERR");
-    QString cName = outputParams.value(PAR_CURRENT, "ERR");
-
-    varCtrl->setVariable(vName, voltage);
-    varCtrl->setVariable(cName, current);
-
-    onExecutionFinished(error);
-}
-
-void SystemState::onExecutionFinished(uint8_t error)
-{
-    int TODO; // process error
 
     mCurCommand = Q_NULLPTR;
-
-    emit commandFinished(true);
-}
-
-bool SystemState::sendOTDCommand(CmdActionModule* command)
-{
-    int TODO;
-    return false;
-}
-
-bool SystemState::sendSTMCommand(CmdActionModule* command)
-{
-    int TODO;
-    return false;
-}
-
-bool SystemState::sendMKOCommand(CmdActionModule* command)
-{
-    int TODO;
-    return false;
-}
-
-bool SystemState::sendTechCommand(CmdActionModule* command)
-{
-    int TODO;
-    return false;
+    emit commandFinished(error == 0);
 }
 
 void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
 {
-    int TODO;
+    int TODO; // stop "waiting for execution" protection timer
+
+    VariableController* vc = mCurCommand->variableController();
+    uint32_t paramsCount = response.value(OUTPUT_PARAMS_COUNT).toUInt();
+
+    QString varName;
+    qreal value;
+
+    for (uint32_t i = 0; i < paramsCount; ++i)
+    {
+        if (i % 2 == 0)
+        {
+            varName = response.value(OUTPUT_PARAM_BASE + i).toString();
+        }
+        else
+        {
+            value = response.value(OUTPUT_PARAM_BASE + i).toDouble();
+            vc->setVariable(varName, value);
+        }
+    }
+
+    uint32_t error = response.value(ERROR_CODE, QVariant(uint32_t(0))).toUInt();
+
+    // in case of power unit
+    //if (error == 1) ui->err1->setText("Overvoltage protection!"); //TODO - ошибки установки на блоке питания, если 0 - ошибки нет
+    //if (error == 2) ui->err1->setText("Overcurrent protection!");
+    //if (error == 4) ui->err1->setText("Overpower protection!");
+    //if (error == 8) ui->err1->setText("Overtemperature protection!");
+
+    onExecutionFinished(error);
+}
+
+QString SystemState::paramName(ParamID param) const
+{
+    return mParamNames.value(param, "");
+}
+
+SystemState::ParamID SystemState::paramID(const QString& name) const
+{
+    return mParamNames.key(name, UNDEFINED);
 }
