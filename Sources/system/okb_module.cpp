@@ -223,19 +223,19 @@ bool ModuleOKB::hasErrors()
         uint8_t y = response[2];
         uint8_t x = response[3];
 
-        if (y & MODULE_READY_MASK == 0)
+        if ((y & MODULE_READY_MASK) == 0)
         {
             LOG_ERROR("Module 0x%02x, is not ready", mAddress);
             hasError = true;
         }
 
-        if (y & HAS_ERRORS_MASK > 0)
+        if ((y & HAS_ERRORS_MASK) > 0)
         {
             LOG_ERROR("Module 0x%02x, has errors", mAddress);
             hasError = true;
         }
 
-        if (y & AFTER_RESET_MASK > 0)
+        if ((y & AFTER_RESET_MASK) > 0)
         {
             LOG_ERROR("Module 0x%02x, is after RESET", mAddress);
             hasError = true;

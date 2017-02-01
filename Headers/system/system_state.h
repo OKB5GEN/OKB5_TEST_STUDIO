@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QStringList>
 
-#include "Headers/logic/variable_controller.h"
+#include "Headers/logic/variable_controller.h" //TODO what for?
 #include "Headers/module_commands.h"
 
 class QSerialPort;
@@ -46,7 +46,7 @@ public:
     SystemState(QObject* parent);
     ~SystemState();
 
-    void init();
+    void restart();
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
@@ -101,20 +101,6 @@ signals:
     void commandFinished(bool success);
 
     // TODO refactor >>>
-    void OTD1();
-    void OTD_reset1();
-    void OTD_reset2();
-    void OTD_meas1();
-    void OTD_meas2();
-    void OTD_tm1();
-    void OTD_tm2();
-    void OTD_nd();
-    void OTD_auto(int x,int y);
-    void OTD_sfw();
-    void OTD_res();
-    void OTD_err();
-    void OTD_req();
-
     void MKO_stop();
     void MKO_DY(int x, int y);
     void MKO_ts(int x,int y, int z);
@@ -133,28 +119,16 @@ signals:
     void sendToPowerUnitPNA(const QMap<uint32_t, QVariant>& request);
 
 private:
-    void setupParams();
-    void onExecutionFinished(uint32_t error);
+    void createModules();
+    void setupCommandsParams();
 
-    ModuleMKO* moduleMKO() const;
-    ModuleOTD* moduleOTD() const;
-    ModuleSTM* moduleSTM() const;
-    ModuleTech* moduleTech() const;
-    ModulePower* modulePowerBUP() const;
-    ModulePower* modulePowerPNA() const;
+    void onExecutionFinished(uint32_t error);
 
     bool sendPowerUnitCommand(CmdActionModule* command);
     bool sendOTDCommand(CmdActionModule* command);
     bool sendSTMCommand(CmdActionModule* command);
     bool sendMKOCommand(CmdActionModule* command);
     bool sendTechCommand(CmdActionModule* command);
-
-    bool createMKO();
-    bool createOTD();
-    bool createSTM();
-    bool createTech();
-    bool createPowerBUP();
-    bool createPowerPNA();
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
@@ -174,5 +148,7 @@ private:
     CmdActionModule* mCurCommand;
 
     QMap<ParamID, QString> mParamNames;
+
+    bool mIsInitialized;
 };
 #endif // SYSTEM_STATE_H

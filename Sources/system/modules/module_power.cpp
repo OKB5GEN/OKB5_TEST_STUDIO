@@ -7,10 +7,15 @@
 
 namespace
 {
-    static const uint32_t MAX_VOLTAGE = 42; // volts
-    static const uint32_t MAX_CURRENT = 10; // ampers
-    static const uint32_t MAX_POWER = 155; // watts (actually 160, but for safety purposes reduced to 155)
+    static const uint32_t NOMINAL_VOLTAGE = 42; // volts
+    static const uint32_t NOMINAL_CURRENT = 10; // ampers
+    static const uint32_t NOMINAL_POWER = 155; // watts (actually 160, but for safety purposes reduced to 155)
     static const uint32_t MAX_STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
+
+    static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts
+    static const qreal MAX_ALLOWED_CURRENT = 0.7; // ampers
+    static const qreal NORMAL_VOLTAGE = 27; // volts
+    static const qreal MORMAL_CURRENT = 0.5; // ampers
 }
 
 ModulePower::ModulePower(QObject* parent):
@@ -152,12 +157,12 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
         uu1 = response[5];
         uu2 = response[6];
         voltage = (uu1 << 8) | uu2;
-        voltage = voltage * MAX_VOLTAGE / MAX_STEPS_COUNT;
+        voltage = voltage * NOMINAL_VOLTAGE / MAX_STEPS_COUNT;
 
         uu1 = response[7];
         uu2 = response[8];
         current = (uu1 << 8) | uu2;
-        current = current * MAX_CURRENT / MAX_STEPS_COUNT;
+        current = current * NOMINAL_CURRENT / MAX_STEPS_COUNT;
     }
 }
 
@@ -275,10 +280,10 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
     int TODO; // possibly need to limit values to set by currently set max values
 
     // set voltage first, limitated by hardware value
-    setValue(CUR_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
+    setValue(CUR_VOLTAGE_VAL, voltage, NOMINAL_VOLTAGE);
     // set current, limitated by max hardware power and voltage value that was set
-    qreal uc = qMin(voltage, (qreal)MAX_VOLTAGE);
-    qreal maxCurrent = qMin((qreal)MAX_POWER / uc, (qreal)MAX_CURRENT);
+    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE);
+    qreal maxCurrent = qMin((qreal)NOMINAL_POWER / uc, (qreal)NOMINAL_CURRENT);
     // the result power must be less than max allowed
     setValue(CUR_CURRENT_VAL, current, maxCurrent);
     qreal ic = qMin(current, maxCurrent);
@@ -302,10 +307,10 @@ void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& reques
     qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
 
     // execute command
-    setValue(MAX_VOLTAGE_VAL, voltage, MAX_VOLTAGE);
-    setValue(MAX_CURRENT_VAL, current, MAX_CURRENT);
-    qreal uc = qMin(voltage, (qreal)MAX_VOLTAGE);
-    qreal ic = qMin(current, (qreal)MAX_CURRENT);
+    setValue(MAX_VOLTAGE_VAL, voltage, NOMINAL_VOLTAGE);
+    setValue(MAX_CURRENT_VAL, current, NOMINAL_CURRENT);
+    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE);
+    qreal ic = qMin(current, (qreal)NOMINAL_CURRENT);
 
     int TODO; // possibly need to limit current values to new max values
 

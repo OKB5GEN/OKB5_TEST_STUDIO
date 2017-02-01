@@ -132,9 +132,16 @@ namespace
 SystemState::SystemState(QObject* parent):
     VariableController(parent),
     m_mko_kits(ModuleMKO::NO_KIT),
+    mIsInitialized(false),
     mThreadMKO(Q_NULLPTR),
     mThreadOTD(Q_NULLPTR),
-    mCurCommand(Q_NULLPTR)
+    mCurCommand(Q_NULLPTR),
+    mMKO(Q_NULLPTR),
+    mOTD(Q_NULLPTR),
+    mSTM(Q_NULLPTR),
+    mTech(Q_NULLPTR),
+    mPowerBUP(Q_NULLPTR),
+    mPowerPNA(Q_NULLPTR)
 {
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
@@ -163,7 +170,7 @@ SystemState::~SystemState()
     }*/
 }
 
-void SystemState::init()
+void SystemState::restart()
 {
     /* Что собой представляет инициализация?
      *
@@ -208,79 +215,8 @@ void SystemState::init()
      *
     */
 
-    //QThread* mThreadOTD;
-    //QThread* mThreadMKO;
-    //QThread* mThreadSTM;
-    //QThread* mThreadTech;
-    //QThread* mThreadPowerBUP;
-    //QThread* mThreadPowerPNA;
+    createModules();
 
-    QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
-    loadSystemConfig(modules);
-    setupParams();
-
-    // MKO creation
-    mMKO = new ModuleMKO(this); //TODO really no parent? use Q_NULLPTR - is when moveToThread() used
-    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    // OTD creation
-    mOTD = new ModuleOTD(this);//TODO really no parent? use Q_NULLPTR - is when moveToThread() used
-    mOTD->setId(modules.value(ModuleCommands::OTD));
-    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
-
-    if (!mOTD->init())
-    {
-        LOG_ERROR("OTD not created!");
-    }
-
-    // STM creation
-    mSTM = new ModuleSTM(this);
-    mSTM->setId(modules.value(ModuleCommands::STM));
-    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    if (!mSTM->init())
-    {
-        LOG_ERROR("STM not created!");
-    }
-
-    // Tech creation
-    mTech = new ModuleTech(this);
-    mTech->setId(modules.value(ModuleCommands::TECH));
-    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    if (!mTech->init())
-    {
-        LOG_ERROR("Tech not created!");
-    }
-
-    // Power unit BUP creation
-    mPowerBUP = new ModulePower(this);
-    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
-    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    if (!mPowerBUP->init())
-    {
-        LOG_ERROR("BUP Power Unit not created!");
-    }
-
-    mPowerPNA = new ModulePower(this);
-    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
-    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    if (!mPowerPNA->init())
-    {
-        LOG_ERROR("PNA Power Unit not created!");
-    }
-
-    // TODO possibly move "initialization" functionality to cyclograms
     //mPowerBUP->startPower();
     //mPowerPNA->startPower();
 
@@ -757,7 +693,7 @@ void SystemState::OTDtm2(QString temp)
 void SystemState::on_OTD_nd_clicked()
 {
     connect(this, SIGNAL(OTD_nd()), mOTD, SLOT(OTDtemper()));
-    emit OTD_nd();
+    //emit OTD_nd();
     disconnect(this, SIGNAL(OTD_nd()), mOTD, SLOT(OTDtemper()));
 }
 
@@ -921,36 +857,6 @@ void SystemState::on_OTD_avt_2_clicked()
     */
 }
 
-ModuleMKO* SystemState::moduleMKO() const
-{
-    return mMKO;
-}
-
-ModuleOTD* SystemState::moduleOTD() const
-{
-    return mOTD;
-}
-
-ModuleSTM* SystemState::moduleSTM() const
-{
-    return mSTM;
-}
-
-ModuleTech* SystemState::moduleTech() const
-{
-    return mTech;
-}
-
-ModulePower* SystemState::modulePowerBUP() const
-{
-    return mPowerBUP;
-}
-
-ModulePower* SystemState::modulePowerPNA() const
-{
-    return mPowerPNA;
-}
-
 QString SystemState::paramName(int module, int command, int param, bool isInputParam) const
 {
     if (module >= 0 && module < ModuleCommands::MODULES_COUNT)
@@ -984,7 +890,7 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
     return 0;
 }
 
-void SystemState::setupParams()
+void SystemState::setupCommandsParams()
 {
     int TODO; // replace by constant usage
 
@@ -1235,4 +1141,95 @@ QString SystemState::paramName(ParamID param) const
 SystemState::ParamID SystemState::paramID(const QString& name) const
 {
     return mParamNames.key(name, UNDEFINED);
+}
+
+void SystemState::createModules()
+{
+    if (mIsInitialized)
+    {
+        return;
+    }
+
+    bool isSystemReady = true;
+
+    QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
+    loadSystemConfig(modules);
+
+    // MKO creation
+    mMKO = new ModuleMKO(this); //TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    // OTD creation
+    mOTD = new ModuleOTD(this);//TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    mOTD->setId(modules.value(ModuleCommands::OTD));
+    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
+
+    if (!mOTD->init())
+    {
+        LOG_ERROR("OTD initialization failed!");
+        isSystemReady = false;
+    }
+
+    // STM creation
+    mSTM = new ModuleSTM(this);
+    mSTM->setId(modules.value(ModuleCommands::STM));
+    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mSTM->init())
+    {
+        LOG_ERROR("STM initialization failed!");
+        isSystemReady = false;
+    }
+
+    // Tech creation
+    mTech = new ModuleTech(this);
+    mTech->setId(modules.value(ModuleCommands::TECH));
+    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mTech->init())
+    {
+        LOG_ERROR("Tech initialization failed!");
+        isSystemReady = false;
+    }
+
+    // Power unit BUP creation
+    mPowerBUP = new ModulePower(this);
+    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
+    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mPowerBUP->init())
+    {
+        LOG_ERROR("BUP Power Unit initialization failed!");
+        isSystemReady = false;
+    }
+
+    mPowerPNA = new ModulePower(this);
+    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
+    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+
+    if (!mPowerPNA->init())
+    {
+        LOG_ERROR("PNA Power Unit initialization failed!");
+        isSystemReady = false;
+    }
+
+    setupCommandsParams();
+    mIsInitialized = true;
+
+    if (isSystemReady)
+    {
+        LOG_INFO("Modules creation... OK");
+    }
+    else
+    {
+        LOG_ERROR("Modules creation... FAILED");
+    }
 }

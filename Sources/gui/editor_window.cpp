@@ -59,7 +59,7 @@ EditorWindow::EditorWindow():
 
 void EditorWindow::init()
 {
-    mSystemState->init();
+    mSystemState->restart();
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
