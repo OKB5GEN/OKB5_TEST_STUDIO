@@ -8,6 +8,13 @@ class ModuleOKB: public COMPortModule
     Q_OBJECT
 
 public:
+    enum StatusMask
+    {
+        MODULE_READY_MASK = 0x80,
+        HAS_ERRORS_MASK   = 0x40,
+        AFTER_RESET_MASK  = 0x20,
+    };
+
     ModuleOKB(QObject* parent);
     virtual ~ModuleOKB();
 
@@ -18,7 +25,7 @@ public:
 
     int softResetModule();
     int getSoftwareVersion();
-    QString checkStatusWord();
+    bool hasErrors();
 
 public slots:
     void processCommand(const QMap<uint32_t, QVariant>& params) override;

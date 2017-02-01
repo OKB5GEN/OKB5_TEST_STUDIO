@@ -1,4 +1,6 @@
 #include "Headers/system/okb_module.h"
+#include "Headers/logger/Logger.h"
+#include "Headers/system/system_state.h"
 
 #include <QMap>
 #include <QVariant>
@@ -131,7 +133,7 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
         return false; // always return some data need to be analyzed
 
     default:
-        qDebug("Unknown command %i", cmd);
+        LOG_ERROR("Unknown command %i", cmd);
         break;
     }
 
@@ -206,50 +208,87 @@ bool ModuleOKB::postInitOKBModule()
     return true;
 }
 
-QString ModuleOKB::checkStatusWord()
+bool ModuleOKB::hasErrors()
 {
-    int TODO;
+    QByteArray buffer(4, 0);
+    buffer[0] = mAddress;
+    buffer[1] = ModuleCommands::GET_STATUS_WORD;
+    buffer[2] = 0x00;
+    buffer[3] = 0x00;
 
-    return "";
-
-    /*if(isActive(TECH))
+    QByteArray response;
+    if (COMPortModule::send(buffer, response))
     {
-        QString res;
-        QByteArray buffer(4, 0);
-        buffer[0] = TECH_DEFAULT_ADDR;
-        buffer[1] = ModuleCommands::GET_STATUS_WORD;
-        buffer[2] = 0x00;
-        buffer[3] = 0x00;
+        bool hasError = false;
+        uint8_t y = response[2];
+        uint8_t x = response[3];
 
-        QByteArray readData1 = send(getPort(TECH), buffer);
-        uint8_t x = readData1[2];
-        uint8_t z1, z2, z3;
-        z1 = x >> 7;
-        z2 = x << 1;
-        z2 = z2 >> 7;
-        z3 = x << 2;
-        z3 = z3 >> 7;
-        if(z1 == 0)
-            res += " Технол. модуль не готов к работе! \n";
-        if(z2 == 1)
-            res += " Ошибки у Технол. модуля! \n";
-        if(z3 == 1)
-            res += " Модуль Технол. после перезагрузки! \n";
-        if(readData1.at(3)==0x10)
-            res += " Потеря байта из-за переполнения буфера RS485! \n";
-        return res;
+        if (y & MODULE_READY_MASK == 0)
+        {
+            LOG_ERROR("Module 0x%02x, is not ready", mAddress);
+            hasError = true;
+        }
 
-        int TODO; // крайняя херна проверяется только у СТМ, у остальных есть только три предыдущих
+        if (y & HAS_ERRORS_MASK > 0)
+        {
+            LOG_ERROR("Module 0x%02x, has errors", mAddress);
+            hasError = true;
+        }
+
+        if (y & AFTER_RESET_MASK > 0)
+        {
+            LOG_ERROR("Module 0x%02x, is after RESET", mAddress);
+            hasError = true;
+        }
+
+        if (x == 0x10)
+        {
+            LOG_ERROR("RS485 data byte lost in module 0x%02x due to buffer overflow", mAddress);
+            hasError = true;
+        }
+
+        if (x == 0x11)
+        {
+            LOG_ERROR("UMART data byte lost in module 0x%02x due to buffer overflow", mAddress);
+            hasError = true;
+        }
+
+        return hasError;
     }
 
-    return "";
-    */
+    return true;
 }
 
 void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
 {
     QMap<uint32_t, QVariant> response;
 
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+
+    response[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
+    response[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
+    response[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
+    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+
+    switch (command)
+    {
+    case ModuleCommands::GET_MODULE_ADDRESS:
+    case ModuleCommands::GET_STATUS_WORD:
+    case ModuleCommands::RESET_ERROR:
+    case ModuleCommands::SOFT_RESET:
+    case ModuleCommands::GET_SOWFTWARE_VER:
+    case ModuleCommands::ECHO:
+        {
+
+        }
+        break;
+
+    default: // if command is not in "common" commands list
+        {
+            processCustomCommand(params, response);
+        }
+        break;
+    }
     int TODO;
 
 
@@ -259,7 +298,7 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
     }
     else // if it is custom comman type -> process by inherited module
     {
-        processCustomCommand(params, response);
+
     }
 
     emit commandResult(response);

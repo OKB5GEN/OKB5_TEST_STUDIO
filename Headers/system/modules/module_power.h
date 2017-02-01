@@ -49,8 +49,8 @@ private:
     QTimer* mUpdateTimer;
     int mUpdatePeriod;
 
-    double mVoltage;
-    double mCurrent;
+    qreal mVoltage;
+    qreal mCurrent;
     uint8_t mError;
 };
 
