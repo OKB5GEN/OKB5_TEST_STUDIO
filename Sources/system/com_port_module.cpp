@@ -12,7 +12,8 @@ namespace
 
 COMPortModule::COMPortModule(QObject* parent):
     AbstractModule(parent),
-    mPort(Q_NULLPTR)
+    mPort(Q_NULLPTR),
+    mIsInitialized(false)
 {
 }
 
@@ -40,7 +41,6 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response)
         return true;
     }
 
-//    QString str (request.toHex().toStdString().c_str());
     LOG_ERROR("Can not send request: %s", request.toHex().toStdString().c_str());
     return false;
 }
@@ -70,12 +70,15 @@ bool COMPortModule::init()
 
     if (portName.isNull())
     {
+        LOG_ERROR("No COM port module found");
         return false;
     }
 
     createPort(portName);
 
-    return postInit();
+    mIsInitialized = postInit();
+
+    return mIsInitialized;
 }
 
 void COMPortModule::createPort(const QString& portName)

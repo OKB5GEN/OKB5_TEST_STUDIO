@@ -67,6 +67,12 @@ private:
         DC_OUTPUT_2          = 0x01, // not used (used in triple-model PS2000 device series)
     };
 
+    enum DeviceClass
+    {
+        SINGLE = 0x0010,
+        TRIPLE = 0x0018
+    };
+
     // start delimiter params
     enum Direction
     {
@@ -88,18 +94,25 @@ private:
         SEND_DATA       = 0xc0
     };
 
-    //void setValue(ObjectID objectID, qreal value, qreal maxValue);
+    template<typename T>
+    static T limitValue(const T& value, const T& nominal, const T& threshold)
+    {
+        return qMin(qMin(value, nominal), qMin(value, threshold));
+    }
+
     void getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error);
 
+    //void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response); // TODO not available to user API
     void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
     void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
-    void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
     void setPowerState(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
-
 
     // power units command
     bool sendPowerSupplyControlCommand(PowerSupplyCommandID command);
     bool setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue);
+    qreal getNominalValue(ObjectID objectID);
+    qreal getObjectValue(ObjectID objectID, qreal nominalValue);
+    uint16_t getDeviceClass();
 
     // encoding/decoding
     static uint8_t encodeStartDelimiter(Direction dir, CastType cType, TransmissionType trType, uint8_t dataSize);
@@ -110,7 +123,7 @@ private:
     QTimer* mUpdateTimer;
     int mUpdatePeriod;
 
-    qreal mVoltageThresHold;
+    qreal mVoltageThreshold;
     qreal mCurrentThreshold;
     qreal mVoltage;
     qreal mCurrent;
@@ -118,6 +131,7 @@ private:
     qreal mNominalCurrent;
     qreal mNominalPower;
 
+    uint16_t mDeviceClass; //TODO not used, we use SIMPLE module version
     uint8_t mError;
 };
 

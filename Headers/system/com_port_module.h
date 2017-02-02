@@ -37,6 +37,7 @@ protected:
 
     QSerialPort* mPort;
     Identifier mID;
+    bool mIsInitialized;
 
 private:
     void createPort(const QString& portName);
