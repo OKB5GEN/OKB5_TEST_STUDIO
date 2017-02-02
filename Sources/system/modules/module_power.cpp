@@ -7,10 +7,10 @@
 
 namespace
 {
-    static const uint32_t NOMINAL_VOLTAGE = 42; // volts
-    static const uint32_t NOMINAL_CURRENT = 10; // ampers
-    static const uint32_t NOMINAL_POWER = 155; // watts (actually 160, but for safety purposes reduced to 155)
-    static const uint32_t MAX_STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
+    static const uint32_t NOMINAL_VOLTAGE_VALUE = 42; // volts
+    static const uint32_t NOMINAL_CURRENT_VALUE = 6; // ampers
+    static const uint32_t NOMINAL_POWER_VALUE = 100; // watts (actually 160, but for safety purposes reduced to 155)
+    static const uint32_t STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
 
     static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts
     static const qreal MAX_ALLOWED_CURRENT = 0.7; // ampers
@@ -37,139 +37,101 @@ ModulePower::~ModulePower()
 
 bool ModulePower::postInit()
 {
+    // receive device parameters:
+
+    // MANDATORY:
+    // - nominal voltage
+    // - nominal current
+    // - nominal power
+    // - device class
+    // - OVP threshold
+    // - OCP threshold
+    // - actual device state (voltage, current, alarms)
+
+    // OPTIONAL (for logging only):
+    // - device type
+    // - device serial number
+    // - device article number
+    // - device software version
+    // - device manufacturer
+
     return true;
 }
 
 void ModulePower::resetError()
 {
-    QByteArray request(7, 0);
-
-    request[0] = 0xf1;
-    request[1] = 0x00;
-    request[2] = 0x36;
-    request[3] = 0x0a;
-    request[4] = 0x0a;
-    request[5] = 0x01;
-    request[6] = 0x3b;
-
-    QByteArray response;
-    send(request, response);
+    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS);
 }
 
 void ModulePower::restart()
 {
-    resetError(); // reset error if it exist
+    int TODO;
 
+    //sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if it exist
+    //sendPowerSupplyControlCommand(SWITCH_TO_MANUAL_CTRL); // possibly not necessary?
+    //sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // possibly need to be set once at app start?
+    if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF)) // switch off power output
     {
-    // switch "remote mode" off
-    QByteArray request1(7, 0);
-    request1[0] = 0xf1;
-    request1[1] = 0x00;
-    request1[2] = 0x36;
-    request1[3] = 0x10;
-    request1[4] = 0x00;
-    request1[5] = 0x01;
-    request1[6] = 0x37;
-
-    QByteArray response1;
-    send(request1, response1);
+        mState = ModuleCommands::POWER_OFF;
     }
-
-
-    // switch "remote mode" on
-    QByteArray request1(7, 0);
-    request1[0] = 0xf1;
-    request1[1] = 0x00;
-    request1[2] = 0x36;
-    request1[3] = 0x10;
-    request1[4] = 0x10;
-    request1[5] = 0x01;
-    request1[6] = 0x47;
-
-    QByteArray response1;
-    send(request1, response1);
-
-    setPowerState(ModuleCommands::POWER_OFF); // switch "give power supply" off instead of code below?
-
-    //QByteArray request2(7, 0); // switch "give power supply" off
-    //request2[0] = 0xf1;//power off
-    //request2[1] = 0x00;
-    //request2[2] = 0x36;
-    //request2[3] = 0x01;
-    //request2[4] = 0x00;
-    //request2[5] = 0x01;
-    //request2[6] = 0x28;
-
-    //QByteArray response2;
-    //send(request2, response2);
 
     // set voltage and current limitations
-    setValue(MAX_VOLTAGE_VAL, MAX_ALLOWED_VOLTAGE, NOMINAL_VOLTAGE);
-    setValue(MAX_CURRENT_VAL, MAX_ALLOWED_CURRENT, NOMINAL_CURRENT);
+    setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, NOMINAL_VOLTAGE_VALUE);
+    setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, NOMINAL_CURRENT_VALUE);
 
     // set current value for voltage and current
-    setValue(CUR_VOLTAGE_VAL, NORMAL_VOLTAGE, NOMINAL_VOLTAGE);
-    setValue(CUR_CURRENT_VAL, NORMAL_CURRENT, NOMINAL_CURRENT);
+    setObjectValue(SET_VALUE_U, NORMAL_VOLTAGE, NOMINAL_VOLTAGE_VALUE);
+    setObjectValue(SET_VALUE_I, NORMAL_CURRENT, NOMINAL_CURRENT_VALUE);
 
     // switch "give power supply" on
-    setPowerState(ModuleCommands::POWER_ON);
-}
-
-void ModulePower::setPowerState(ModuleCommands::PowerState state)
-{
-    QByteArray request(7, 0);
-    request[0] = 0xf1;//power on/off
-    request[1] = 0x00;
-    request[2] = 0x36;
-    request[3] = 0x01;
-    request[4] = 0x01;
-    request[5] = 0x01;
-    request[6] = (state == ModuleCommands::POWER_ON) ? 0x29 : 0x28;
-
-    QByteArray response;
-    if (send(request, response))
+    if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON))
     {
-        mState = state;
+        mState = ModuleCommands::POWER_ON;
     }
 }
-
-void ModulePower::setValue(uint8_t valueID, qreal value, qreal maxValue)
+/*
+void ModulePower::setValue(ObjectID objectID, qreal value, qreal maxValue)
 {
-    QByteArray request(7, 0);
-    uint32_t val = qMin(uint32_t((value * MAX_STEPS_COUNT) / maxValue), MAX_STEPS_COUNT);
+    QByteArray request;
+    uint32_t internalValue = qMin(uint32_t((value * STEPS_COUNT) / maxValue), STEPS_COUNT);
 
-    request[0] = 0xf1;
-    request[1] = 0x00;
-    request[2] = valueID;
-    request[3] = (val >> 8) & 0xFF;
-    request[4] = val & 0xFF;
-    uint16_t sum = 0;
-    for(int i = 0; i < 5; i++)
-    {
-        uint8_t s = request[i];
-        sum = (sum + s) & 0xFFFF;
-    }
-
-    request[5] = ((sum >> 8) & 0xFF);
-    request[6] = (sum & 0xFF);
+    request.append(encodeStartDelimiter(TO_DEVICE, SEND, SEND_DATA, 2);
+    request.append(SINGLE_MODEL);
+    request.append(objectID);
+    request.append((internalValue >> 8) & 0x00ff);
+    request.append(internalValue & 0x00ff);
+    addCheckSum(request);
 
     QByteArray response;
     send(request, response);
+}
+*/
+bool ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue)
+{
+    QByteArray request;
+    uint16_t internalValue = uint16_t(qreal(STEPS_COUNT) * actualValue / nominalValue);
+
+    request.append(encodeStartDelimiter(TO_DEVICE, SEND, SEND_DATA, 2));
+    request.append(SINGLE_MODEL);
+    request.append(objectID);
+    request.append((internalValue >> 8) & 0x00ff);
+    request.append(internalValue & 0x00ff);
+    addCheckSum(request);
+
+    QByteArray response;
+    return send(request, response);
 }
 
 void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error)
 {
-    QByteArray request(5, 0);
-    request[0] = 0x75;
-    request[1] = 0x00;
-    request[2] = 0x47;
-    request[3] = 0x00;
-    request[4] = 0xbc;
+    QByteArray request;
+    request.append(encodeStartDelimiter(TO_DEVICE, SEND, QUERY_DATA, 6)); // 6 bytes of data is waiting in response
+    request.append(SINGLE_MODEL);
+    request.append(DEVICE_STATUS_ACTUAL);
+    addCheckSum(request);
 
     QByteArray response;
-    send(request, response);
-
-    if (response.size() >= 9)
+    if (send(request, response))
     {
         uint8_t uu1, uu2;
         error = (response[4] >> 4);
@@ -177,12 +139,12 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
         uu1 = response[5];
         uu2 = response[6];
         voltage = (uu1 << 8) | uu2;
-        voltage = voltage * NOMINAL_VOLTAGE / MAX_STEPS_COUNT;
+        voltage = voltage * NOMINAL_VOLTAGE_VALUE / STEPS_COUNT;
 
         uu1 = response[7];
         uu2 = response[8];
         current = (uu1 << 8) | uu2;
-        current = current * NOMINAL_CURRENT / MAX_STEPS_COUNT;
+        current = current * NOMINAL_CURRENT_VALUE / STEPS_COUNT;
     }
 }
 
@@ -286,6 +248,7 @@ void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 
 void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
+    /*
     // get input params
     uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
     qreal value1        = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toDouble();
@@ -300,12 +263,12 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
     int TODO; // possibly need to limit values to set by currently set max values
 
     // set voltage first, limitated by hardware value
-    setValue(CUR_VOLTAGE_VAL, voltage, NOMINAL_VOLTAGE);
+    setValue(SET_VALUE_U, voltage, NOMINAL_VOLTAGE_VALUE);
     // set current, limitated by max hardware power and voltage value that was set
-    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE);
-    qreal maxCurrent = qMin((qreal)NOMINAL_POWER / uc, (qreal)NOMINAL_CURRENT);
+    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE_VALUE);
+    qreal maxCurrent = qMin((qreal)NOMINAL_POWER_VALUE / uc, (qreal)NOMINAL_CURRENT_VALUE);
     // the result power must be less than max allowed
-    setValue(CUR_CURRENT_VAL, current, maxCurrent);
+    setValue(SET_VALUE_I, current, maxCurrent);
     qreal ic = qMin(current, maxCurrent);
 
     LOG_INFO("setVoltageAndCurrent: try to set values U=%f I=%f", voltage, current);
@@ -313,10 +276,12 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 
     // fill response
     response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+    */
 }
 
 void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
+    /*
     // get input params
     uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
     qreal value1        = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toDouble();
@@ -327,10 +292,10 @@ void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& reques
     qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
 
     // execute command
-    setValue(MAX_VOLTAGE_VAL, voltage, NOMINAL_VOLTAGE);
-    setValue(MAX_CURRENT_VAL, current, NOMINAL_CURRENT);
-    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE);
-    qreal ic = qMin(current, (qreal)NOMINAL_CURRENT);
+    setValue(OVP_THRESHOLD, voltage, NOMINAL_VOLTAGE_VALUE);
+    setValue(OCP_THRESHOLD, current, NOMINAL_CURRENT_VALUE);
+    qreal uc = qMin(voltage, (qreal)NOMINAL_VOLTAGE_VALUE);
+    qreal ic = qMin(current, (qreal)NOMINAL_CURRENT_VALUE);
 
     int TODO; // possibly need to limit current values to new max values
 
@@ -339,9 +304,54 @@ void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& reques
 
     // fill response
     response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+    */
 }
 
 void ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
     int TODO;
+}
+
+bool ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
+{
+    QByteArray request;
+    request.append(encodeStartDelimiter(TO_DEVICE, SEND, SEND_DATA, 2));
+    request.append(SINGLE_MODEL);
+    request.append(POWER_SUPPLY_CONTROL);
+
+    uint16_t cmd = command;
+    request.append(uint8_t((cmd >> 8) & 0x00ff));
+    request.append(uint8_t(cmd & 0x00ff));
+
+    addCheckSum(request);
+
+    QByteArray response;
+    return send(request, response);
+}
+
+uint8_t ModulePower::encodeStartDelimiter(Direction dir, CastType cType, TransmissionType trType, uint8_t dataSize)
+{
+    uint8_t delimiter = 0;
+    delimiter += uint8_t(dir);
+    delimiter += uint8_t(cType);
+    delimiter += uint8_t(trType);
+    delimiter += ((dataSize - 1) & 0x0f);
+    return delimiter;
+}
+
+void ModulePower::addCheckSum(QByteArray& data)
+{
+    uint16_t sum = 0;
+    uint16_t sum2 = 0;
+    int size = data.size();
+
+    for(int i = 0; i < size; ++i)
+    {
+        uint8_t s = data[i];
+        sum = (sum + s) & 0xffff;
+        sum2 = sum2 + s;
+    }
+
+    data.append(uint8_t((sum >> 8) & 0x00ff));
+    data.append(uint8_t(sum & 0x00ff));
 }
