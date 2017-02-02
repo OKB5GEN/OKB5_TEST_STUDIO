@@ -172,6 +172,8 @@ SystemState::~SystemState()
 
 void SystemState::restart()
 {
+    LOG_INFO("System state restarting...");
+
     /* Что собой представляет инициализация?
      *
      * По сути: создать все модули и проверить их готовность к работе:
@@ -217,8 +219,8 @@ void SystemState::restart()
 
     createModules();
 
-    //mPowerBUP->startPower();
-    //mPowerPNA->startPower();
+    mPowerBUP->restart();
+    mPowerPNA->restart();
 
     // disable MKO power supply to BUP and PNA
     //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
@@ -237,6 +239,8 @@ void SystemState::restart()
     mOTD->moveToThread(mThreadOTD);
     connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
     mThreadOTD->start();*/
+
+    LOG_INFO("System state restarted");
 }
 
 int SystemState::simpltst1(int z)

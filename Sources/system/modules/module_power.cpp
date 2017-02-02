@@ -15,7 +15,7 @@ namespace
     static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts
     static const qreal MAX_ALLOWED_CURRENT = 0.7; // ampers
     static const qreal NORMAL_VOLTAGE = 27; // volts
-    static const qreal MORMAL_CURRENT = 0.5; // ampers
+    static const qreal NORMAL_CURRENT = 0.5; // ampers
 }
 
 ModulePower::ModulePower(QObject* parent):
@@ -56,13 +56,28 @@ void ModulePower::resetError()
     send(request, response);
 }
 
-void ModulePower::startPower()
+void ModulePower::restart()
 {
-    /*
     resetError(); // reset error if it exist
 
-    // PowerON
-    QByteArray request1(7, 0); // switch "remote mode" on
+    {
+    // switch "remote mode" off
+    QByteArray request1(7, 0);
+    request1[0] = 0xf1;
+    request1[1] = 0x00;
+    request1[2] = 0x36;
+    request1[3] = 0x10;
+    request1[4] = 0x00;
+    request1[5] = 0x01;
+    request1[6] = 0x37;
+
+    QByteArray response1;
+    send(request1, response1);
+    }
+
+
+    // switch "remote mode" on
+    QByteArray request1(7, 0);
     request1[0] = 0xf1;
     request1[1] = 0x00;
     request1[2] = 0x36;
@@ -74,25 +89,30 @@ void ModulePower::startPower()
     QByteArray response1;
     send(request1, response1);
 
-    // TODO setPowerState(ModuleCommands::POWER_OFF); // switch "give power supply" off instead of code below?
+    setPowerState(ModuleCommands::POWER_OFF); // switch "give power supply" off instead of code below?
 
-    QByteArray request2(7, 0); // switch "give power supply" off
-    request2[0] = 0xf1;//power off
-    request2[1] = 0x00;
-    request2[2] = 0x36;
-    request2[3] = 0x01;
-    request2[4] = 0x00;
-    request2[5] = 0x01;
-    request2[6] = 0x28;
+    //QByteArray request2(7, 0); // switch "give power supply" off
+    //request2[0] = 0xf1;//power off
+    //request2[1] = 0x00;
+    //request2[2] = 0x36;
+    //request2[3] = 0x01;
+    //request2[4] = 0x00;
+    //request2[5] = 0x01;
+    //request2[6] = 0x28;
 
-    QByteArray response2;
-    send(request2, response2);
+    //QByteArray response2;
+    //send(request2, response2);
 
-    setMaxVoltageAndCurrent(28, 1.5); // set voltage and current limitations
-    setVoltageAndCurrent(27, 0.4); // set current value for voltage and current
+    // set voltage and current limitations
+    setValue(MAX_VOLTAGE_VAL, MAX_ALLOWED_VOLTAGE, NOMINAL_VOLTAGE);
+    setValue(MAX_CURRENT_VAL, MAX_ALLOWED_CURRENT, NOMINAL_CURRENT);
 
-    setPowerState(ModuleCommands::POWER_ON); // switch "give power supply" on
-    */
+    // set current value for voltage and current
+    setValue(CUR_VOLTAGE_VAL, NORMAL_VOLTAGE, NOMINAL_VOLTAGE);
+    setValue(CUR_CURRENT_VAL, NORMAL_CURRENT, NOMINAL_CURRENT);
+
+    // switch "give power supply" on
+    setPowerState(ModuleCommands::POWER_ON);
 }
 
 void ModulePower::setPowerState(ModuleCommands::PowerState state)

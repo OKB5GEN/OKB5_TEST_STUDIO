@@ -40,8 +40,7 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response)
         return true;
     }
 
-    QString str (request.toHex().toStdString().c_str());
-    int i = 0;
+//    QString str (request.toHex().toStdString().c_str());
     LOG_ERROR("Can not send request: %s", request.toHex().toStdString().c_str());
     return false;
 }
@@ -50,7 +49,9 @@ bool COMPortModule::init()
 {
     QString portName;
 
-    foreach (QSerialPortInfo info, QSerialPortInfo::availablePorts())
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+
+    foreach (QSerialPortInfo info, ports)
     {
         if (   !info.hasVendorIdentifier()
             || !info.hasProductIdentifier()
@@ -90,8 +91,7 @@ void COMPortModule::createPort(const QString& portName)
     }
     else
     {
-        int TODO;
-        mPort->errorString();
+        LOG_ERROR("Port name '%s' not opened. Error: '%s'", portName, mPort->errorString());
     }
 }
 

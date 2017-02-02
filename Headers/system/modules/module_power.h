@@ -19,7 +19,7 @@ public:
     void setUpdatePeriod(int msec, bool startTimer = true);
 
 public slots:
-    void startPower();
+    void restart();
     void setPowerState(ModuleCommands::PowerState state);
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
