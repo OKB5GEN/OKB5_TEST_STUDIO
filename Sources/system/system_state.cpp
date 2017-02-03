@@ -1001,7 +1001,7 @@ void SystemState::createOTDCommandsParams()
     int ptCount = mOTD->ptCount();
     for (int i = 0; i < ptCount; ++i)
     {
-        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
@@ -1011,7 +1011,7 @@ void SystemState::createOTDCommandsParams()
     int dsCount1 = mOTD->dsCount(ModuleOTD::PSY);
     for (int i = 0; i < dsCount1; ++i)
     {
-        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
@@ -1021,7 +1021,7 @@ void SystemState::createOTDCommandsParams()
     int dsCount2 = mOTD->dsCount(ModuleOTD::NU);
     for (int i = 0; i < dsCount2; ++i)
     {
-        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
