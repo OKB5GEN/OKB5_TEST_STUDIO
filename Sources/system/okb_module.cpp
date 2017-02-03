@@ -40,11 +40,11 @@ bool ModuleOKB::postInit()
 
 bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* responseExt)
 {
-    QByteArray request(4, 0);
-    request[0] = (cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress;
-    request[1] = cmd;
-    request[2] = param1;
-    request[3] = param2;
+    QByteArray request;
+    request.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress);
+    request.append(cmd);
+    request.append(param1);
+    request.append(param2);
 
     QByteArray response;
     if (!COMPortModule::send(request, response))
@@ -59,11 +59,13 @@ bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8
 
     if (response.size() != 4) //TODO remove magic number
     {
+        LOG_ERROR("Incorrect response size=%i", response.size());
         return false;
     }
 
     if (canReturnError(cmd) && response.at(3) == ModuleCommands::CMD_ERROR)
     {
+        LOG_ERROR("Command execution failed on device");
         return false;
     }
 

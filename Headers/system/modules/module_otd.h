@@ -3,6 +3,8 @@
 
 #include "Headers/system/okb_module.h"
 
+#include <QList>
+
 class QTimer;
 
 class ModuleOTD: public ModuleOKB
@@ -12,28 +14,32 @@ class ModuleOTD: public ModuleOKB
 public:
     enum LineID
     {
-        PSY, // line 1
-        NU   // line 2
+        PSY = 1, // line 1
+        NU  = 2  // line 2
     };
 
     ModuleOTD(QObject* parent);
     ~ModuleOTD();
 
-    bool postInitOKBModule() override;
+    int ptCount() const;
+    int dsCount(LineID line) const;
 
 public slots:
-    void resetLine(LineID line);
-    void readDS1820Data(LineID line);
-    void measureDS1820(LineID line);
-    void measurePT100();
-
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
 
-private:
-    QTimer * m_timer;
+protected:
+    bool postInitOKBModule() override;
 
-    int m_sensorsCntAxis1 = 0;
-    int m_sensorsCntAxis2 = 0;
+private:
+    void resetLine(LineID line);
+    void readDS1820Data(LineID line);
+    void measureDS1820(LineID line, QList<qreal>& values);
+    void measurePT100(QList<qreal>& values);
+
+    //QTimer * mTimer;
+
+    int mSensorsCntPsy = 0;
+    int mSensorsCntNu = 0;
 };
 
 #endif // MODULE_OTD_H

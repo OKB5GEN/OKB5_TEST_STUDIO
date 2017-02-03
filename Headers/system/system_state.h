@@ -33,6 +33,7 @@ public:
         // param types
         VOLTAGE             = 0x00000005,
         CURRENT             = 0x00000006,
+        TEMPERATURE         = 0x00000007,
 
         // custom command params
         INPUT_PARAM_BASE    = 0x00001000, // all input params will have code "in base + i"
@@ -129,6 +130,10 @@ private:
     bool sendSTMCommand(CmdActionModule* command);
     bool sendMKOCommand(CmdActionModule* command);
     bool sendTechCommand(CmdActionModule* command);
+
+
+    void createPowerUnitCommandsParams();
+    void createOTDCommandsParams();
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;

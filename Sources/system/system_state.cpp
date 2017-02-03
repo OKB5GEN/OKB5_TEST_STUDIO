@@ -129,6 +129,7 @@ SystemState::SystemState(QObject* parent):
 {
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
+    mParamNames[TEMPERATURE] = tr("Temperature, °C");
 }
 
 SystemState::~SystemState()
@@ -880,33 +881,10 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
 
 void SystemState::setupCommandsParams()
 {
+    createPowerUnitCommandsParams();
+    createOTDCommandsParams();
+
     int TODO; // replace by constant usage
-
-    QStringList powerParams;
-    powerParams.push_back(paramName(VOLTAGE));
-    powerParams.push_back(paramName(CURRENT));
-
-    {
-        QMap<int, QStringList> params;
-        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
-        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
-        mInParams[ModuleCommands::POWER_UNIT_BUP] = params;
-
-        params.clear();
-        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
-        mOutParams[ModuleCommands::POWER_UNIT_BUP] = params;
-    }
-
-    {
-        QMap<int, QStringList> params;
-        params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
-        params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
-        mInParams[ModuleCommands::POWER_UNIT_PNA] = params;
-
-        params.clear();
-        params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
-        mOutParams[ModuleCommands::POWER_UNIT_PNA] = params;
-    }
 
     {
         QMap<int, QStringList> params;
@@ -919,12 +897,6 @@ void SystemState::setupCommandsParams()
         //mInParams[ModuleCommands::STM] = params;
 
         // STM
-        //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
-        //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
-        //addCommand(tr("Сброс ошибки"), ModuleCommands::RESET_ERROR);
-        //addCommand(tr("Перезагрузить"), ModuleCommands::SOFT_RESET);
-        //addCommand(tr("Получить версию прошивки"), ModuleCommands::GET_SOWFTWARE_VER);
-        //addCommand(tr("Эхо"), ModuleCommands::ECHO);
         //addCommand(tr("Включить канал СТМ к БП"), ModuleCommands::POWER_CHANNEL_CTRL);
         //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
         //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
@@ -932,11 +904,6 @@ void SystemState::setupCommandsParams()
         //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
         //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
 
-    }
-
-    {
-        QMap<int, QStringList> params;
-        mInParams[ModuleCommands::OTD] = params;
     }
 
     {
@@ -1002,6 +969,64 @@ void SystemState::setupCommandsParams()
     SET_POWER_STATE                 = 0xFF03,
     GET_CURRENT_VOLTAGE_AND_CURRENT = 0xFF04,
     */
+}
+
+void SystemState::createPowerUnitCommandsParams()
+{
+    QStringList powerParams;
+    powerParams.push_back(paramName(VOLTAGE));
+    powerParams.push_back(paramName(CURRENT));
+
+    // commands input params
+    QMap<int, QStringList> params;
+    params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
+    params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
+    mInParams[ModuleCommands::POWER_UNIT_BUP] = params;
+    mInParams[ModuleCommands::POWER_UNIT_PNA] = params;
+
+    params.clear();
+    params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
+    mOutParams[ModuleCommands::POWER_UNIT_BUP] = params;
+    mOutParams[ModuleCommands::POWER_UNIT_PNA] = params;
+}
+
+void SystemState::createOTDCommandsParams()
+{
+    QMap<int, QStringList> params;
+
+    QStringList temperatureParams;
+
+    // PT-100 params
+    temperatureParams.clear();
+    int ptCount = mOTD->ptCount();
+    for (int i = 0; i < ptCount; ++i)
+    {
+        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+    }
+
+    params[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
+
+    // DS1820 line 1 params
+    temperatureParams.clear();
+    int dsCount1 = mOTD->dsCount(ModuleOTD::PSY);
+    for (int i = 0; i < dsCount1; ++i)
+    {
+        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+    }
+
+    params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
+
+    // DS1820 line 2 params
+    temperatureParams.clear();
+    int dsCount2 = mOTD->dsCount(ModuleOTD::NU);
+    for (int i = 0; i < dsCount2; ++i)
+    {
+        temperatureParams.push_back(QString::number(i + i) + QString(". ") + paramName(TEMPERATURE));
+    }
+
+    params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
+
+    mOutParams[ModuleCommands::OTD] = params;
 }
 
 void SystemState::sendCommand(CmdActionModule* command)
@@ -1209,8 +1234,9 @@ void SystemState::createModules()
         isSystemReady = false;
     }
 
-    setupCommandsParams();
     mIsInitialized = true;
+
+    setupCommandsParams();
 
     if (isSystemReady)
     {
