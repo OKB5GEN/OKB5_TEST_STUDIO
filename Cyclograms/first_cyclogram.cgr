@@ -2,12 +2,10 @@
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
     <variables>
-        <variable name="I" value="0.4"/>
-        <variable name="Im" value="0.5"/>
+        <variable name="I" value="0.5"/>
         <variable name="T1" value="5"/>
         <variable name="Tall" value="60"/>
         <variable name="U" value="27"/>
-        <variable name="Um" value="28"/>
         <variable name="t" value="0"/>
         <variable name="t1" value="0"/>
         <variable name="tmp" value="0"/>
@@ -22,13 +20,6 @@
             <input_params>
                 <param name="Current, A" variable="I"/>
                 <param name="Voltage, V" variable="U"/>
-            </input_params>
-            <output_params/>
-        </command>
-        <command type="ACTION_MODULE" id="1484565212879" module="POWER_UNIT_BUP" command="SET_MAX_VOLTAGE_AND_CURRENT">
-            <input_params>
-                <param name="Current, A" variable="Im"/>
-                <param name="Voltage, V" variable="Um"/>
             </input_params>
             <output_params/>
         </command>
@@ -75,8 +66,7 @@
         <item id="1484565136472" down="1484565335513" right="-1" under_arrow="-1"/>
         <item id="1484565136473" down="1484565136474" right="-1" under_arrow="-1"/>
         <item id="1484565136474" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1484565211006" down="1484565212879" right="-1" under_arrow="-1"/>
-        <item id="1484565212879" down="1484565136472" right="-1" under_arrow="-1"/>
+        <item id="1484565211006" down="1484565136472" right="-1" under_arrow="-1"/>
         <item id="1484565333740" down="1484565377209" right="-1" under_arrow="-1"/>
         <item id="1484565333744" down="1484565335513" right="-1" under_arrow="-1"/>
         <item id="1484565335513" down="1484565442394" right="-1" under_arrow="-1"/>
