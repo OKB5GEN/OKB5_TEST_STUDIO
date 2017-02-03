@@ -7,7 +7,7 @@
 
 namespace
 {
-    static const int WAIT_TIME = 100; // msec
+    static const int WAIT_TIME = 200; // msec
 }
 
 COMPortModule::COMPortModule(QObject* parent):
@@ -29,15 +29,20 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response)
 {
     if (mPort && mPort->isOpen())
     {
+        //LOG_ERROR("Send to COM port:  %s", request.toHex().toStdString().c_str());
+
         mPort->QIODevice::write(request);
         mPort->waitForBytesWritten(-1);
 
-        response = mPort->readAll();
+        //Sleep(WAIT_TIME);
+
+        //response = mPort->readAll();
         while (mPort->waitForReadyRead(WAIT_TIME))
         {
             response.append(mPort->readAll());
         }
 
+        //LOG_ERROR("Receive from COM port: %s", response.toHex().toStdString().c_str());
         return true;
     }
 
@@ -94,7 +99,7 @@ void COMPortModule::createPort(const QString& portName)
     }
     else
     {
-        LOG_ERROR("Port name '%s' not opened. Error: '%s'", portName, mPort->errorString());
+        LOG_ERROR("Port name '%s' not opened. Error: '%s'", portName.toStdString().c_str(), mPort->errorString().toStdString().c_str());
     }
 }
 

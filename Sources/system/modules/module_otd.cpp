@@ -53,6 +53,13 @@ void ModuleOTD::resetLine(LineID line)
 
 bool ModuleOTD::postInitOKBModule()
 {
+    resetError();
+
+    QByteArray response;
+    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0, &response);
+    response.clear();
+    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0, &response);
+
     // 1. Read sensors count on both lines
     // 2. Read sensors addresses on both lines
     // 3. Start measurement on both lines
