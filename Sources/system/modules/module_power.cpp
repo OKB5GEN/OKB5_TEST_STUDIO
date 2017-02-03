@@ -49,7 +49,7 @@ ModulePower::ModulePower(QObject* parent):
 
 ModulePower::~ModulePower()
 {
-
+    int TODO; // power off on app close
 }
 
 bool ModulePower::postInit()
@@ -75,6 +75,13 @@ bool ModulePower::postInit()
 
     getCurVoltageAndCurrent(mVoltage, mCurrent, mError);
 
+    // switch module to remote control
+    sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL);
+
+    // set voltage and current thresholds
+    setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
+    setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
+
     // OPTIONAL (for logging only): //TODO
     // - device type
     // - device serial number
@@ -98,20 +105,13 @@ void ModulePower::restart()
         return;
     }
 
-    return;
-    int TODO;
+    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset errors if it exist
+    mError = 0;
 
-    //sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if it exist
-    //sendPowerSupplyControlCommand(SWITCH_TO_MANUAL_CTRL); // possibly not necessary?
-    //sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // possibly need to be set once at app start?
     if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF)) // switch off power output
     {
         mState = ModuleCommands::POWER_OFF;
     }
-
-    // set voltage and current limitations
-    setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
-    setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
 
     // set current value for voltage and current
     setObjectValue(SET_VALUE_U, NORMAL_VOLTAGE, mNominalVoltage);

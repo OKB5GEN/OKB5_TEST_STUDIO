@@ -15,10 +15,6 @@
 
 namespace
 {
-    static const uint8_t OTD_DEFAULT_ADDR = 0x44;
-    static const uint8_t STM_DEFAULT_ADDR = 0x22;
-    static const uint8_t TECH_DEFAULT_ADDR = 0x56;
-
     bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules)
     {
         modules.clear();
@@ -163,7 +159,7 @@ void SystemState::restart()
     LOG_INFO("System state restarting...");
 
     /* Что собой представляет инициализация?
-     *
+     *  TODO
      * По сути: создать все модули и проверить их готовность к работе:
      * 1. Создать все модули
      * 2. Проверить их готовность к работе (статус) (если не готовы алярмить и не давать запускать циклограммы?)
@@ -210,13 +206,13 @@ void SystemState::restart()
     mPowerBUP->restart();
     mPowerPNA->restart();
 
-    // disable MKO power supply to BUP and PNA
-    //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
-    //mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
-
     // enable MKO power supply
     //mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
     //mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
+
+    // disable MKO power supply to BUP and PNA
+    //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
+    //mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
 
 /*
     mThreadMKO = new QThread(this);

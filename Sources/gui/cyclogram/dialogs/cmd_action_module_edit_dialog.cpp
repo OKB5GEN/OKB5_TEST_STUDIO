@@ -122,11 +122,11 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::OTD://TODO
+    case ModuleCommands::OTD:
         {
-            //mCommands->addItem(tr("ОТД1"));
-            //mCommands->addItem(tr("ОТД2"));
-            //mCommands->addItem(tr("ОТД3"));
+            addCommand(tr("Получить температуру с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
+            addCommand(tr("Получить температуру с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(tr("Получить температуру с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
         }
         break;
 

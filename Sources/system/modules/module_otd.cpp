@@ -13,7 +13,7 @@
 namespace
 {
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
-    static const int SERIAL_NUMER_BYTES_COUNT = 8;
+    static const int SERIAL_NUMBER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
 }
 
@@ -187,7 +187,7 @@ void ModuleOTD::readDS1820Data(LineID line)
 
     for(int j = 1; j <= count; j++)
     {
-        for(int k = 0; k < SERIAL_NUMER_BYTES_COUNT; k++)
+        for(int k = 0; k < SERIAL_NUMBER_BYTES_COUNT; k++)
         {
             QByteArray response1;
             if (!sendCommand(commandGetAddr, j, k, &response1))
