@@ -893,7 +893,8 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
         cell.setY(item->cell().y() + 1);
 
         ShapeItem* shape = addShape(it, cell, item);
-        drawChildren(shape, true);
+        QList<Command*> stopList;
+        drawChildren(shape, stopList, true);
         branchesShapes.push_back(shape);
 
         QRect rect = shape->rect();
@@ -924,7 +925,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
     item->setRect(rect, false);
 }
 
-void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
+void CyclogramWidget::drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch)
 {
     Command* cmd = item->command();
 
@@ -947,6 +948,13 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
             return;
         }
 
+        if (stopDrawingCommands.contains(nextCmd))
+        {
+            QString msg = QString("Stopping draw chidren: Cmd:%1 Next:%2 ").arg(cmd->text()).arg(nextCmd->text());
+            LOG_DEBUG(msg);
+            return;
+        }
+
         QPoint cell = item->cell();
         cell.setY(cell.y() + 1);
 
@@ -955,7 +963,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
 
         if (nextCmd->type() != DRAKON::GO_TO_BRANCH)
         {
-            drawChildren(shape, drawGoToBranch);
+            drawChildren(shape, stopDrawingCommands, drawGoToBranch);
         }
 
         QRect rect = item->rect();
@@ -979,6 +987,13 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
                 Command* right = cmd->nextCommand(ValencyPoint::Right);
                 Command* underArrow = cmd->nextCommand(ValencyPoint::UnderArrow);
 
+                QList<Command*> stopList = stopDrawingCommands;
+
+                if (underArrow)
+                {
+                    stopList.push_back(underArrow);
+                }
+
                 QRect downRect;
                 QRect rightRect;
                 QRect underArrowRect;
@@ -993,7 +1008,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape, drawGoToBranch && underArrow == Q_NULLPTR);
+                        drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
                     }
 
                     downRect = shape->rect();
@@ -1018,7 +1033,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape, drawGoToBranch && underArrow == Q_NULLPTR);
+                        drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
                     }
 
                     rightRect = shape->rect();
@@ -1035,7 +1050,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item, bool drawGoToBranch)
 
                     if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                     {
-                        drawChildren(shape, drawGoToBranch);
+                        drawChildren(shape, stopDrawingCommands, drawGoToBranch);
                     }
 
                     underArrowRect = shape->rect();

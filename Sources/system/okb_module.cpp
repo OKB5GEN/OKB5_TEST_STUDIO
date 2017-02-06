@@ -288,7 +288,7 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
     case ModuleCommands::GET_SOWFTWARE_VER:
     case ModuleCommands::ECHO:
         {
-
+            int TODO; // process commands here
         }
         break;
 
@@ -297,17 +297,6 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
             processCustomCommand(params, response);
         }
         break;
-    }
-    int TODO;
-
-
-    if (false) // if it is common command (reset, reset error, sw version, echo, get module address) -> process here
-    {
-
-    }
-    else // if it is custom comman type -> process by inherited module
-    {
-
     }
 
     emit commandResult(response);

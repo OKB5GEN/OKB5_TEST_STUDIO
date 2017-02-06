@@ -107,6 +107,11 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::STM: //TODO
         {
+            addCommand(tr("Включить нагреватели ПНА на линии 1"), ModuleCommands::POWER_CHANNEL_CTRL);
+            addCommand(tr("Выключить нагреватели ПНА на линии 1"), ModuleCommands::POWER_CHANNEL_CTRL);
+            addCommand(tr("Включить нагреватели ПНА на линии 2"), ModuleCommands::POWER_CHANNEL_CTRL);
+            addCommand(tr("Выключить нагреватели ПНА на линии 2"), ModuleCommands::POWER_CHANNEL_CTRL);
+
             //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
             //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
             //addCommand(tr("Сброс ошибки"), ModuleCommands::RESET_ERROR);

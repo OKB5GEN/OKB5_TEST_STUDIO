@@ -113,6 +113,8 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
 
 void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
+    LOG_ERROR("STM Commands not implemented!");
+
     int i = 0;
     int TODO; // just fill respons eand do not send any signals
 }
