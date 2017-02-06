@@ -3,6 +3,7 @@
 namespace
 {
     static const uint8_t TECH_DEFAULT_ADDR = 0x56;
+    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 }
 
 ModuleTech::ModuleTech(QObject* parent):
@@ -26,7 +27,7 @@ int ModuleTech::tech_send(int com, int x, int y)
     request[2] = x;
     request[3] = y;
     QByteArray response;
-    COMPortModule::send(request, response);
+    COMPortModule::send(request, response, WAIT_FOR_RESPONSE_TIME);
     return response[3];
 }
 

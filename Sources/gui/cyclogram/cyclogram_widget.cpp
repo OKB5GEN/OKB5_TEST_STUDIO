@@ -273,7 +273,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        LOG_INFO("Mouse clicked");
+        //LOG_INFO("Mouse clicked");
 
         // no interaction while cyclogram running
         if (mCurrentCyclogram->state() == Cyclogram::RUNNING)

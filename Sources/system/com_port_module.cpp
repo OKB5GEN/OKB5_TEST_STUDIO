@@ -7,7 +7,7 @@
 
 namespace
 {
-    static const int WAIT_TIME = 200; // msec
+    //static const int WAIT_TIME = 100; // msec
 }
 
 COMPortModule::COMPortModule(QObject* parent):
@@ -25,24 +25,24 @@ COMPortModule::~COMPortModule()
     }
 }
 
-bool COMPortModule::send(const QByteArray& request, QByteArray& response)
+bool COMPortModule::send(const QByteArray& request, QByteArray& response, int waitForReadTime)
 {
     if (mPort && mPort->isOpen())
     {
-        //LOG_ERROR("Send to COM port:  %s", request.toHex().toStdString().c_str());
+        LOG_INFO("Send to COM port:  %s", request.toHex().toStdString().c_str());
 
         mPort->QIODevice::write(request);
         mPort->waitForBytesWritten(-1);
 
         //Sleep(WAIT_TIME);
 
-        //response = mPort->readAll();
-        while (mPort->waitForReadyRead(WAIT_TIME))
+        //response = mPort->readAll(); // i gues its just for make buffer empty
+        while (mPort->waitForReadyRead(waitForReadTime))
         {
             response.append(mPort->readAll());
         }
 
-        //LOG_ERROR("Receive from COM port: %s", response.toHex().toStdString().c_str());
+        LOG_INFO("Receive from COM port: %s", response.toHex().toStdString().c_str());
         return true;
     }
 

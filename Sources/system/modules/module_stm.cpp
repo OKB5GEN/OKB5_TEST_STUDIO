@@ -8,6 +8,7 @@ namespace
     static const int STM_DEFAULT_ADDR = 0x22;
     static const qreal CHANNEL_CONNECTED_BORDER = 2.0;
     static const int MAX_CHANNELS_COUNT = 16;
+    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 }
 
 ModuleSTM::ModuleSTM(QObject* parent):
@@ -25,7 +26,7 @@ void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState sta
 {
     int TODO; // valid channel values 1 to 6
 
-    if (!sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0))
+    if (!sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0, WAIT_FOR_RESPONSE_TIME))
     {
         LOG_ERROR("Channel %i is not set to %i state", channel, state);
         return;
@@ -45,7 +46,7 @@ void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState 
 {
     //int TODO; // valid channel values 1 to 6
 
-    if (!sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0))
+    if (!sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0, WAIT_FOR_RESPONSE_TIME))
     {
         LOG_ERROR("MKO Channel %i is not set to %i state", channel, state);
         return;
@@ -65,7 +66,7 @@ ModuleCommands::PowerState ModuleSTM::powerChannelState(int channel)
 {
     QByteArray response;
 
-    if (!sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0, &response))
+    if (!sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0, WAIT_FOR_RESPONSE_TIME, &response))
     {
         LOG_ERROR("Can not get channel %i telemetry", channel);
         return ModuleCommands::POWER_OFF;
@@ -96,7 +97,7 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
     }
 
     QByteArray response;
-    if (!sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0, &response))
+    if (!sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0, WAIT_FOR_RESPONSE_TIME, &response))
     {
         LOG_ERROR("Can not check fuse %i state", fuseIndex);
         return ModuleSTM::ERROR;

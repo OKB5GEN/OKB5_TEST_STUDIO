@@ -8,6 +8,7 @@
 namespace
 {
     static const uint32_t STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
+    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 
     static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts
     static const qreal MAX_ALLOWED_CURRENT = 0.7; // ampers
@@ -137,7 +138,7 @@ bool ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nom
     addCheckSum(request);
 
     QByteArray response;
-    return send(request, response);
+    return send(request, response, WAIT_FOR_RESPONSE_TIME);
 }
 
 qreal ModulePower::getObjectValue(ObjectID objectID, qreal nominalValue)
@@ -156,7 +157,7 @@ qreal ModulePower::getObjectValue(ObjectID objectID, qreal nominalValue)
             addCheckSum(request);
 
             QByteArray response;
-            if (send(request, response))
+            if (send(request, response, WAIT_FOR_RESPONSE_TIME))
             {
                 uint8_t uu1, uu2;
                 uu1 = response[3];
@@ -185,7 +186,7 @@ void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_
     addCheckSum(request);
 
     QByteArray response;
-    if (send(request, response))
+    if (send(request, response, WAIT_FOR_RESPONSE_TIME))
     {
         uint8_t uu1, uu2;
         error = (response[4] >> 4);
@@ -381,7 +382,7 @@ bool ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
     addCheckSum(request);
 
     QByteArray response;
-    return send(request, response);
+    return send(request, response, WAIT_FOR_RESPONSE_TIME);
 }
 
 uint8_t ModulePower::encodeStartDelimiter(Direction dir, CastType cType, TransmissionType trType, uint8_t dataSize)
@@ -426,7 +427,7 @@ qreal ModulePower::getNominalValue(ObjectID objectID)
             addCheckSum(request);
 
             QByteArray response;
-            if (send(request, response))
+            if (send(request, response, WAIT_FOR_RESPONSE_TIME))
             {
                 QByteArray tmp;
                 tmp.push_back(response[3]);
@@ -457,7 +458,7 @@ uint16_t ModulePower::getDeviceClass()
     addCheckSum(request);
 
     QByteArray response;
-    if (send(request, response))
+    if (send(request, response, WAIT_FOR_RESPONSE_TIME))
     {
         uint8_t uu1, uu2;
         uu1 = response[3];

@@ -5,6 +5,11 @@
 #include <QMap>
 #include <QVariant>
 
+namespace
+{
+    static const int DEAFULT_WAIT_FOR_RESPONSE_TIME = 100; // msec
+}
+
 ModuleOKB::ModuleOKB(QObject* parent):
     COMPortModule(parent),
       mAddress(0xff),
@@ -20,12 +25,12 @@ ModuleOKB::~ModuleOKB()
 
 bool ModuleOKB::postInit()
 {
-    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT))
+    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT, DEAFULT_WAIT_FOR_RESPONSE_TIME))
     {
         return false;
     }
 
-    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT))
+    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT, DEAFULT_WAIT_FOR_RESPONSE_TIME))
     {
         return false;
     }
@@ -38,7 +43,7 @@ bool ModuleOKB::postInit()
     return postInitOKBModule();
 }
 
-bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* responseExt)
+bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, int waitForResponseTime, QByteArray* responseExt)
 {
     QByteArray request;
     request.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress);
@@ -47,7 +52,7 @@ bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8
     request.append(param2);
 
     QByteArray response;
-    if (!COMPortModule::send(request, response))
+    if (!send(request, response, waitForResponseTime))
     {
         return false;
     }
@@ -154,6 +159,7 @@ uint8_t ModuleOKB::currentAddress() const
 
 void ModuleOKB::resetError()
 {
+    int TODO1; // not tested
     QByteArray requset(4, 0);
 
     requset[0] = mAddress;
@@ -162,7 +168,7 @@ void ModuleOKB::resetError()
     requset[3] = 0x00;
 
     QByteArray response;
-    COMPortModule::send(requset, response);
+    send(requset, response, DEAFULT_WAIT_FOR_RESPONSE_TIME);
     int TODO;
 /*    if (readData.size() > 3)
     {
@@ -175,6 +181,7 @@ void ModuleOKB::resetError()
 
 int ModuleOKB::softResetModule()
 {
+    int TODO; // not tested
     //setActive(id, false);
 
     QByteArray buffer(4, 0);
@@ -184,7 +191,7 @@ int ModuleOKB::softResetModule()
     buffer[3] = 0x00;
 
     QByteArray readData1;
-    COMPortModule::send(buffer, readData1);
+    send(buffer, readData1, DEAFULT_WAIT_FOR_RESPONSE_TIME);
 
     resetPort();
     //setActive(id, true);
@@ -201,7 +208,7 @@ int ModuleOKB::getSoftwareVersion()
     buffer[3] = 0x00;
 
     QByteArray response;
-    COMPortModule::send(buffer, response);
+    send(buffer, response, DEAFULT_WAIT_FOR_RESPONSE_TIME);
     return (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
 }
 
@@ -219,7 +226,7 @@ bool ModuleOKB::hasErrors()
     buffer[3] = 0x00;
 
     QByteArray response;
-    if (COMPortModule::send(buffer, response))
+    if (send(buffer, response, DEAFULT_WAIT_FOR_RESPONSE_TIME))
     {
         bool hasError = false;
         uint8_t y = response[2];

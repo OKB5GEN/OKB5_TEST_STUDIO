@@ -35,7 +35,7 @@ protected:
     virtual bool postInitOKBModule();
     virtual void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) = 0;
 
-    bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, QByteArray* response = Q_NULLPTR);
+    bool sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, int waitForResponseTime, QByteArray* response = Q_NULLPTR);
 
     uint8_t mAddress;
     uint8_t mDefaultAddress;

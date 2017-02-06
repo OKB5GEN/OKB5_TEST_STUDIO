@@ -10,6 +10,10 @@ namespace
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
     static const int SERIAL_NUMBER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
+
+    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
+    static const int START_MEASUREMENT_WAIT_TIME = 3000; // msec
+    static const int READ_SENSORS_DATA_WAIT_TIME = 200; // msec
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
@@ -45,7 +49,7 @@ int ModuleOTD::dsCount(LineID line) const
 void ModuleOTD::resetLine(LineID line)
 {
     ModuleCommands::CommandID command = (line == PSY) ? ModuleCommands::RESET_LINE_1 : ModuleCommands::RESET_LINE_2;
-    if (!sendCommand(command, 0, 0))
+    if (!sendCommand(command, 0, 0, WAIT_FOR_RESPONSE_TIME))
     {
         int TODO;
     }
@@ -55,10 +59,8 @@ bool ModuleOTD::postInitOKBModule()
 {
     resetError();
 
-    QByteArray response;
-    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0, &response);
-    response.clear();
-    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0, &response);
+    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0, WAIT_FOR_RESPONSE_TIME);
+    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0, WAIT_FOR_RESPONSE_TIME);
 
     // 1. Read sensors count on both lines
     // 2. Read sensors addresses on both lines
@@ -77,7 +79,7 @@ void ModuleOTD::measureDS1820(LineID line, QList<qreal>& values)
     // start measurement
     LOG_INFO("Start temperature measurement at line %i", line);
     ModuleCommands::CommandID command = (line == PSY) ? ModuleCommands::START_MEASUREMENT_LINE_1 : ModuleCommands::START_MEASUREMENT_LINE_2;
-    if (!sendCommand(command, 0, 0))
+    if (!sendCommand(command, 0, 0, START_MEASUREMENT_WAIT_TIME))
     {
         return;
     }
@@ -98,7 +100,7 @@ void ModuleOTD::measureDS1820(LineID line, QList<qreal>& values)
     {
         ModuleCommands::CommandID getCommand = (line == PSY) ? ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1 : ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2;
         QByteArray response;
-        if (!sendCommand(getCommand, i + 1, 0, &response))
+        if (!sendCommand(getCommand, i + 1, 0, WAIT_FOR_RESPONSE_TIME, &response))
         {
             continue;
         }
@@ -131,7 +133,7 @@ void ModuleOTD::measurePT100(QList<qreal>& values)
     for (int i = 0; i < MAX_PT100_COUNT; ++i)
     {
         QByteArray response;
-        if (!sendCommand(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0, &response))
+        if (!sendCommand(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0, WAIT_FOR_RESPONSE_TIME, &response))
         {
             continue;
         }
@@ -142,7 +144,7 @@ void ModuleOTD::measurePT100(QList<qreal>& values)
         double uu = (uu1 << 8) | uu2;
         uu = uu / 32 - 256;
 
-        values.push_back(uu * 100);
+        values.push_back(uu);
         LOG_INFO("PT100 sensor %i temperature is %f", i + 1, uu);
 
         //x = x / 100;
@@ -162,7 +164,7 @@ void ModuleOTD::readDS1820Data(LineID line)
     // get sensors count
     ModuleCommands::CommandID commandGetCount = (line == PSY) ? ModuleCommands::GET_DS1820_COUNT_LINE_1 : ModuleCommands::GET_DS1820_COUNT_LINE_2;
 
-    if (!sendCommand(commandGetCount, 0, 0, &response))
+    if (!sendCommand(commandGetCount, 0, 0, READ_SENSORS_DATA_WAIT_TIME, &response))
     {
         return;
     }

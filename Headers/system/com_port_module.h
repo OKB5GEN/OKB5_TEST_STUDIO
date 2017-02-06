@@ -31,7 +31,7 @@ public:
     virtual void resetError();
 
 protected:
-    bool send(const QByteArray& request, QByteArray& response);
+    bool send(const QByteArray& request, QByteArray& response, int waitForReadTime); // TODO remove stub
 
     void resetPort();
 
