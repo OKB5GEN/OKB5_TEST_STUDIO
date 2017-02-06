@@ -89,6 +89,18 @@ public:
         POWER_OFF
     };
 
+    enum ChannelID
+    {
+        UNKNOWN_1     = 1,
+        UNKNOWN_2     = 2,
+        UNKNOWN_3     = 3,
+        HEATER_LINE_1 = 4,
+        HEATER_LINE_2 = 5,
+        UNKNOWN_4     = 6,
+    };
+
+    Q_ENUM(ChannelID)
+
     enum ModuleID
     {
         POWER_UNIT_BUP,

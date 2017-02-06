@@ -53,12 +53,13 @@ void CmdActionModule::onCommandFinished(bool success)
     }
 }
 
-void CmdActionModule::setParams(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out)
+void CmdActionModule::setParams(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out, const QList<int>& implicitParams)
 {
     mModule = module;
     mOperation = operation;
     mInputParams = in;
     mOutputParams = out;
+    mImplicitParams = implicitParams;
     updateText();
 }
 
@@ -322,6 +323,20 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeAttribute("module", module.valueToKey(mModule));
     writer->writeAttribute("command", command.valueToKey(mOperation));
 
+    // implicit params (TODO)
+    QString str;
+    for (int i = 0, sz = mImplicitParams.size(); i < sz; ++i)
+    {
+        if (i > 0)
+        {
+            str += QString(",");
+        }
+
+        str += QString::number(mImplicitParams[i]);
+    }
+
+    writer->writeAttribute("implicit_params", str);
+
     // input params
     writer->writeStartElement("input_params");
     for (QMap<QString, QString>::const_iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
@@ -363,6 +378,16 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
     {
         QString str = attributes.value("command").toString();
         mOperation = ModuleCommands::CommandID(command.keyToValue(qPrintable(str)));
+    }
+
+    if (attributes.hasAttribute("implicit_params"))
+    {
+        QString str = attributes.value("implicit_params").toString();
+        QStringList list = str.split(",");
+        foreach (QString param, list)
+        {
+            mImplicitParams.push_back(param.toInt());
+        }
     }
 
     while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
@@ -427,4 +452,9 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
     }
 
     updateText();
+}
+
+const QList<int>& CmdActionModule::implicitParams() const
+{
+    return mImplicitParams;
 }

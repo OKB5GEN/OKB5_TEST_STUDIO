@@ -23,14 +23,14 @@
         <command type="GO_TO_BRANCH" id="1486363263021"/>
         <command type="BRANCH_BEGIN" id="1486363263022" name="End"/>
         <command type="TERMINATOR" id="1486363263023" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1486363329979" module="OTD" command="GET_TEMPERATURE_PT100">
+        <command type="ACTION_MODULE" id="1486363329979" module="OTD" command="GET_TEMPERATURE_PT100" implicit_params="">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="PT1"/>
                 <param name="2. Temperature, °C" variable="PT2"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1486363348593" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_1">
+        <command type="ACTION_MODULE" id="1486363348593" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_1" implicit_params="">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="DS1-1"/>
@@ -38,7 +38,7 @@
                 <param name="3. Temperature, °C" variable="DS1-3"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1486363429391" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_2">
+        <command type="ACTION_MODULE" id="1486363429391" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_2" implicit_params="">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="DS2-1"/>
@@ -127,6 +127,30 @@
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
+        <command type="ACTION_MODULE" id="1486384310734" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="4,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384328176" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="4,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384339992" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="5,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384350585" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="5,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384469842" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="4,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384482771" module="STM" command="POWER_CHANNEL_CTRL" implicit_params="5,1">
+            <input_params/>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1486363263019" down="1486363263020" right="-1" under_arrow="-1"/>
@@ -149,19 +173,25 @@
         <item id="1486372622732" down="1486363263022" right="-1" under_arrow="-1"/>
         <item id="1486372758752" down="1486372819419" right="1486372823930" under_arrow="-1"/>
         <item id="1486372758754" down="1486372431167" right="-1" under_arrow="-1"/>
-        <item id="1486372819419" down="1486372834729" right="1486372414338" under_arrow="1486372414338"/>
-        <item id="1486372823930" down="1486372841614" right="1486372758754" under_arrow="1486372758754"/>
+        <item id="1486372819419" down="1486384310734" right="1486372414338" under_arrow="1486372414338"/>
+        <item id="1486372823930" down="1486384328176" right="1486372758754" under_arrow="1486372758754"/>
         <item id="1486372834729" down="1486372414338" right="-1" under_arrow="-1"/>
         <item id="1486372841614" down="1486372758754" right="-1" under_arrow="-1"/>
         <item id="1486373241709" down="1486373247587" right="1486373251204" under_arrow="-1"/>
         <item id="1486373241711" down="1486372470364" right="-1" under_arrow="-1"/>
-        <item id="1486373247587" down="1486373260297" right="1486372431169" under_arrow="1486372431169"/>
-        <item id="1486373251204" down="1486373264100" right="1486373241711" under_arrow="1486373241711"/>
+        <item id="1486373247587" down="1486384339992" right="1486372431169" under_arrow="1486372431169"/>
+        <item id="1486373251204" down="1486384350585" right="1486373241711" under_arrow="1486373241711"/>
         <item id="1486373260297" down="1486372431169" right="-1" under_arrow="-1"/>
         <item id="1486373264100" down="1486373241711" right="-1" under_arrow="-1"/>
-        <item id="1486373464211" down="1486373483301" right="1486373470116" under_arrow="1486373470116"/>
-        <item id="1486373470116" down="1486373488082" right="1486363263023" under_arrow="1486363263023"/>
+        <item id="1486373464211" down="1486384469842" right="1486373470116" under_arrow="1486373470116"/>
+        <item id="1486373470116" down="1486384482771" right="1486363263023" under_arrow="1486363263023"/>
         <item id="1486373483301" down="1486373470116" right="-1" under_arrow="-1"/>
         <item id="1486373488082" down="1486363263023" right="-1" under_arrow="-1"/>
+        <item id="1486384310734" down="1486372834729" right="-1" under_arrow="-1"/>
+        <item id="1486384328176" down="1486372841614" right="-1" under_arrow="-1"/>
+        <item id="1486384339992" down="1486373260297" right="-1" under_arrow="-1"/>
+        <item id="1486384350585" down="1486373264100" right="-1" under_arrow="-1"/>
+        <item id="1486384469842" down="1486373483301" right="-1" under_arrow="-1"/>
+        <item id="1486384482771" down="1486373488082" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

@@ -81,8 +81,12 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     case ModuleCommands::POWER_UNIT_PNA:
         {
             addCommand(tr("Установить текущее значение"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
+            addCommand(tr("Получить текущее значение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
+
             //addCommand(tr("Установить ограничение"), ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT);
 
+            //TODO здесь подключение основного/резервного полукомплекта БУП и относится оно скорее всего к POWER_UNIT_BUP только
+            //TODO у ПНА кажись нагреватели и двигатели привода подключаются
             //QList<int> params;
             //params.push_back(ModuleCommands::SET_POWER_STATE);
             //params.push_back(ModuleCommands::POWER_ON);
@@ -92,8 +96,6 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             //params.push_back(ModuleCommands::SET_POWER_STATE);
             //params.push_back(ModuleCommands::POWER_OFF);
             //addCommand(tr("Выключить питание"), params);
-
-            addCommand(tr("Получить текущее значение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
         }
         break;
 
@@ -107,10 +109,33 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::STM: //TODO
         {
-            addCommand(tr("Включить нагреватели ПНА на линии 1"), ModuleCommands::POWER_CHANNEL_CTRL);
-            addCommand(tr("Выключить нагреватели ПНА на линии 1"), ModuleCommands::POWER_CHANNEL_CTRL);
-            addCommand(tr("Включить нагреватели ПНА на линии 2"), ModuleCommands::POWER_CHANNEL_CTRL);
-            addCommand(tr("Выключить нагреватели ПНА на линии 2"), ModuleCommands::POWER_CHANNEL_CTRL);
+            QList<int> params;
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::HEATER_LINE_1);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить нагреватели ПНА на линии 1"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::HEATER_LINE_1); //TODO make enum
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить нагреватели ПНА на линии 1"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::HEATER_LINE_2);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить нагреватели ПНА на линии 2"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::HEATER_LINE_2);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить нагреватели ПНА на линии 2"), params);
 
             //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
             //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
@@ -151,11 +176,30 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     {
         for (int i = 0; i < mCommands->count(); ++i)
         {
-            int commandID = mCommands->item(i)->data(Qt::UserRole).toInt();
+            QListWidgetItem* item = mCommands->item(i);
+            int commandID = item->data(Qt::UserRole).toInt();
+            int paramsCount = item->data(Qt::UserRole + 1).toInt();
+
             if (commandID == mCommand->operation())
             {
-                mCommands->setCurrentRow(i);
-                break;
+                const QList<int>& implicitParams = mCommand->implicitParams();
+
+                bool allEqual = true;
+                for (int j = 0; j < paramsCount; ++j)
+                {
+                    int param = item->data(Qt::UserRole + j + 2).toInt();
+                    if (param != implicitParams[j])
+                    {
+                        allEqual = false;
+                        break;
+                    }
+                }
+
+                if (allEqual)
+                {
+                    mCommands->setCurrentRow(i);
+                    break;
+                }
             }
         }
     }
@@ -169,6 +213,7 @@ void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID)
 {
     QList<int> params;
     params.push_back(commandID);
+    params.push_back(0);
     addCommand(text, params);
 }
 
@@ -302,7 +347,17 @@ void CmdActionModuleEditDialog::onAccept()
             }
         }
 
-        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
+        // get implicit params (TODO)
+        QListWidgetItem* item = mCommands->currentItem();
+        int paramsCount = item->data(Qt::UserRole + 1).toInt();
+
+        QList<int> implicitParams;
+        for (int j = 0; j < paramsCount; ++j)
+        {
+            implicitParams.push_back(item->data(Qt::UserRole + j + 2).toInt());
+        }
+
+        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output, implicitParams);
     }
 
     accept();
