@@ -107,9 +107,39 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::STM: //TODO
+    case ModuleCommands::STM:
         {
             QList<int> params;
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::BUP_MAIN);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить основной комплект БУП"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::BUP_MAIN);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить основной комплект БУП"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::BUP_RESERVE);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить резервный комплект БУП"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::BUP_RESERVE);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить резервный комплект БУП"), params);
+
+            params.clear();
             params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::HEATER_LINE_1);
@@ -119,7 +149,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             params.clear();
             params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
             params.push_back(2); //params count
-            params.push_back(ModuleCommands::HEATER_LINE_1); //TODO make enum
+            params.push_back(ModuleCommands::HEATER_LINE_1);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить нагреватели ПНА на линии 1"), params);
 
@@ -137,13 +167,11 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить нагреватели ПНА на линии 2"), params);
 
-            //addCommand(tr("Получить адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS);
-            //addCommand(tr("Получить статусное слово"), ModuleCommands::GET_STATUS_WORD);
-            //addCommand(tr("Сброс ошибки"), ModuleCommands::RESET_ERROR);
-            //addCommand(tr("Перезагрузить"), ModuleCommands::SOFT_RESET);
-            //addCommand(tr("Получить версию прошивки"), ModuleCommands::GET_SOWFTWARE_VER);
-            //addCommand(tr("Эхо"), ModuleCommands::ECHO);
-            //addCommand(tr("Включить канал СТМ к БП"), ModuleCommands::POWER_CHANNEL_CTRL);
+            int TODO;
+            // 1. проверка предохранителей
+            // 2. подключение питания МКО (1, 2) - а нужен ли он выключенный?
+            // 3. получение телеметрии канала
+
             //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
             //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
             //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);

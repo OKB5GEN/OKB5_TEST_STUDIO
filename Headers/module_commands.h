@@ -91,12 +91,12 @@ public:
 
     enum ChannelID
     {
-        UNKNOWN_1     = 1,
-        UNKNOWN_2     = 2,
+        BUP_MAIN      = 1,
+        BUP_RESERVE   = 2,
         UNKNOWN_3     = 3,
         HEATER_LINE_1 = 4,
         HEATER_LINE_2 = 5,
-        UNKNOWN_4     = 6,
+        DRIVE_CONTROL = 6,
     };
 
     Q_ENUM(ChannelID)

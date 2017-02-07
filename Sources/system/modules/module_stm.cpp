@@ -120,39 +120,19 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     {
     case ModuleCommands::POWER_CHANNEL_CTRL:
         {
-            int TODO;
+            int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+            if (paramsCount != 2)
+            {
+                LOG_ERROR("Malformed request for STM command");
+                response[SystemState::ERROR_CODE] = QVariant(1);
+                return;
+            }
 
-            //setPowerChannelState(channel, state); // read from input params (they are implicit params)
+            int channel = request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt();
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 1).toInt());
 
-            // get input params
-            /*uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
-            qreal value1        = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toDouble();
-            uint32_t paramType2 = request.value(SystemState::OUTPUT_PARAM_BASE + 2).toUInt();
-            qreal value2        = request.value(SystemState::OUTPUT_PARAM_BASE + 3).toDouble();
-
-            qreal voltage = (paramType1 == SystemState::VOLTAGE) ? value1 : value2;
-            qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
-
-            LOG_INFO("Try to set power supply params to: U=%f I=%f", voltage, current);
-
-            // execute command
-            qreal voltageToSet = limitValue(voltage, mNominalVoltage, mVoltageThreshold);
-            qreal currentToSet = limitValue(current, mNominalCurrent, mCurrentThreshold);
-
-            // set voltage
-            setObjectValue(SET_VALUE_U, voltageToSet, mNominalVoltage);
-
-            // limitated by max hardware power and voltage value that was set
-            qreal maxCurrentByPower = qMin(mNominalPower / voltageToSet, mNominalCurrent);
-            currentToSet = qMin(currentToSet, maxCurrentByPower);
-
-            // set current
-            setObjectValue(SET_VALUE_I, currentToSet, mNominalCurrent);
-
-            LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, currentToSet);
-
-            // fill response
-            response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);*/
+            setPowerChannelState(channel, state);
+            response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
         }
         break;
 
@@ -160,28 +140,4 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         LOG_ERROR("Unexpected command %i received by STM module", command);
         break;
     }
-
-    /*if (!temperature.empty())
-    {
-        // fill response
-        int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
-        int valuesCount = temperature.size();
-
-        if (paramsCount != valuesCount)
-        {
-            LOG_ERROR("Request output params count (%i) and values count (%i) mismatch", paramsCount, valuesCount);
-            return;
-        }
-
-        for (int i = 0; i < paramsCount; ++i)
-        {
-            uint32_t paramType = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2).toUInt();
-            QString varName    = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-
-            response[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
-            response[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(temperature[i]);
-        }
-
-        response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
-    }}*/
 }

@@ -207,13 +207,11 @@ void SystemState::restart()
     mPowerBUP->restart();
     mPowerPNA->restart();
 
-    // enable MKO power supply
+    //TODO: enable MKO power supply
     //mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
     //mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
 
-    // disable MKO power supply to BUP and PNA
-    //mSTM->setPowerChannelState(1, ModuleCommands::POWER_OFF);
-    //mSTM->setPowerChannelState(2, ModuleCommands::POWER_OFF);
+    //TODO: disable MKO power supply on command exit
 
 /*
     mThreadMKO = new QThread(this);
@@ -789,11 +787,6 @@ void SystemState::on_pushButton_12_clicked()
     */
 }
 
-void SystemState::MKO_change_ch(int x, int y)
-{
-    mSTM->setPowerChannelState(x, (y == 0) ? ModuleCommands::POWER_OFF : ModuleCommands::POWER_ON);//TODO temporary
-}
-
 void SystemState::on_MKO_avt_clicked()
 {
     /*
@@ -1035,6 +1028,8 @@ void SystemState::sendCommand(CmdActionModule* command)
 
     const QMap<QString, QString>& inputParams = command->inputParams();
     const QMap<QString, QString>& outputParams = command->outputParams();
+    const QList<int>& implicitInputParams = command->implicitParams();
+
     VariableController* vc = command->variableController();
 
     QMap<uint32_t, QVariant> params;
@@ -1042,6 +1037,7 @@ void SystemState::sendCommand(CmdActionModule* command)
     params[COMMAND_ID] = QVariant(uint32_t(command->operation()));
     params[INPUT_PARAMS_COUNT] = QVariant(uint32_t(inputParams.size()));
     params[OUTPUT_PARAMS_COUNT] = QVariant(uint32_t(outputParams.size()));
+    params[IMPLICIT_PARAMS_COUNT] = QVariant(uint32_t(implicitInputParams.size()));
 
     int TODO; // start "waiting for execution" protection timer
 
@@ -1066,6 +1062,14 @@ void SystemState::sendCommand(CmdActionModule* command)
         ++i;
 
         params[OUTPUT_PARAM_BASE + i] = QVariant(it.value());
+        ++i;
+    }
+
+    // implicit input params
+    i = 0;
+    for (auto it = implicitInputParams.begin(); it != implicitInputParams.end(); ++it)
+    {
+        params[IMPLICIT_PARAM_BASE + i] = QVariant(*it);
         ++i;
     }
 

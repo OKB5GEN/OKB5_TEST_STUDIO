@@ -24,22 +24,24 @@ public:
     enum ParamID // command parameters
     {
         // common command params
-        MODULE_ID           = 0x00000000,
-        COMMAND_ID          = 0x00000001,
-        INPUT_PARAMS_COUNT  = 0x00000002,
-        OUTPUT_PARAMS_COUNT = 0x00000003,
-        ERROR_CODE          = 0x00000004,
+        MODULE_ID             = 0x00000000,
+        COMMAND_ID            = 0x00000001,
+        INPUT_PARAMS_COUNT    = 0x00000002,
+        OUTPUT_PARAMS_COUNT   = 0x00000003,
+        IMPLICIT_PARAMS_COUNT = 0x00000004,
+        ERROR_CODE            = 0x00000005,
 
         // param types
-        VOLTAGE             = 0x00000005,
-        CURRENT             = 0x00000006,
-        TEMPERATURE         = 0x00000007,
+        VOLTAGE               = 0x00000006,
+        CURRENT               = 0x00000007,
+        TEMPERATURE           = 0x00000008,
 
         // custom command params
-        INPUT_PARAM_BASE    = 0x00001000, // all input params will have code "in base + i"
-        OUTPUT_PARAM_BASE   = 0x10000000, // all output params will have code "out base + i"
+        INPUT_PARAM_BASE      = 0x00001000, // all input params will have code "in base + i"
+        OUTPUT_PARAM_BASE     = 0x00100000, // all output params will have code "out base + i"
+        IMPLICIT_PARAM_BASE   = 0x10000000, // all implicit input params will have code "implicit base + i"
 
-        UNDEFINED           = 0xffffffff
+        UNDEFINED             = 0xffffffff
     };
 
     Q_ENUM(ParamID)
@@ -70,7 +72,6 @@ private slots:
 
     void MKO_data(QString data);
     void MKO_cm_data(QString data);
-    void MKO_change_ch(int x,int y);
 
     void checkModulesStatus();
 
