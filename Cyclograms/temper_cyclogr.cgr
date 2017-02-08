@@ -12,9 +12,9 @@
         <variable name="H2Active" value="0"/>
         <variable name="PT1" value="0"/>
         <variable name="PT2" value="0"/>
-        <variable name="TestTime" value="1800"/>
-        <variable name="Toff" value="35"/>
-        <variable name="Ton" value="30"/>
+        <variable name="TestTime" value="600"/>
+        <variable name="Toff" value="28"/>
+        <variable name="Ton" value="27"/>
         <variable name="time" value="0"/>
     </variables>
     <commands>
@@ -23,14 +23,14 @@
         <command type="GO_TO_BRANCH" id="1486363263021"/>
         <command type="BRANCH_BEGIN" id="1486363263022" name="End"/>
         <command type="TERMINATOR" id="1486363263023" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1486363329979" module="OTD" command="GET_TEMPERATURE_PT100" implicit_params="">
+        <command type="ACTION_MODULE" id="1486363329979" module="OTD" command="GET_TEMPERATURE_PT100" implicit_params="0">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="PT1"/>
                 <param name="2. Temperature, °C" variable="PT2"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1486363348593" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_1" implicit_params="">
+        <command type="ACTION_MODULE" id="1486363348593" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_1" implicit_params="0">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="DS1-1"/>
@@ -38,7 +38,7 @@
                 <param name="3. Temperature, °C" variable="DS1-3"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1486363429391" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_2" implicit_params="">
+        <command type="ACTION_MODULE" id="1486363429391" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_2" implicit_params="0">
             <input_params/>
             <output_params>
                 <param name="1. Temperature, °C" variable="DS2-1"/>
@@ -69,12 +69,12 @@
         </command>
         <command type="GO_TO_BRANCH" id="1486372758754"/>
         <command type="QUESTION" id="1486372819419" operation="Greater" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS1-1"/>
-            <operand id="Right" type="Variable" value="0" variable="Toff"/>
+            <operand id="Left" type="Variable" value="0" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="35" variable="Toff"/>
         </command>
         <command type="QUESTION" id="1486372823930" operation="Less" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS1-1"/>
-            <operand id="Right" type="Variable" value="0" variable="Ton"/>
+            <operand id="Left" type="Variable" value="0" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="30" variable="Ton"/>
         </command>
         <command type="ACTION_MATH" id="1486372834729" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="H1Active"/>
@@ -92,12 +92,12 @@
         </command>
         <command type="GO_TO_BRANCH" id="1486373241711"/>
         <command type="QUESTION" id="1486373247587" operation="Greater" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS2-1"/>
-            <operand id="Right" type="Variable" value="0" variable="Toff"/>
+            <operand id="Left" type="Variable" value="0" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="35" variable="Toff"/>
         </command>
         <command type="QUESTION" id="1486373251204" operation="Less" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS2-1"/>
-            <operand id="Right" type="Variable" value="0" variable="Ton"/>
+            <operand id="Left" type="Variable" value="0" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="30" variable="Ton"/>
         </command>
         <command type="ACTION_MATH" id="1486373260297" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="H2Active"/>
