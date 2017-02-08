@@ -132,7 +132,7 @@ void ModulePower::setCurVoltage(qreal voltage)
 {
     QMap<uint32_t, QVariant> request;
     QMap<uint32_t, QVariant> response;
-    request[SystemState::OUTPUT_PARAM_BASE + 1] = voltage;
+    request[SystemState::INPUT_PARAM_BASE + 1] = voltage;
     setVoltageAndCurrent(request, response);
 }
 
