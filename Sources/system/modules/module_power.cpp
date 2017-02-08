@@ -10,15 +10,20 @@ namespace
     static const uint32_t STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
     static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 
-    static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts
-    static const qreal MAX_ALLOWED_CURRENT = 0.7; // ampers
-    static const qreal NORMAL_VOLTAGE = 27; // volts
-    static const qreal NORMAL_CURRENT = 0.5; // ampers
+    static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts 27-36
+    static const qreal MAX_ALLOWED_CURRENT = 2.0; // ampers <= 2
+    static const qreal MIN_VOLTAGE = 27; // volts
+
+    // nominal device parameters by default
+    static const qreal DEFAULT_NOMINAL_POWER = 160; // watts
+    static const qreal DEFAULT_NOMINAL_VOLTAGE = 42; // volts
+    static const qreal DEFAULT_NOMINAL_CURRENT = 10; // ampers
 
     float byteArrayToFloat(const QByteArray& array)
     {
         if (array.size() != 4)
         {
+            LOG_ERROR("Can not convert byte array to float, incorrect array size");
             return 0;
         }
 
@@ -34,13 +39,13 @@ ModulePower::ModulePower(QObject* parent):
     COMPortModule(parent),
     mState(ModuleCommands::POWER_OFF),
     mUpdatePeriod(0),
-    mVoltageThreshold(0),
-    mCurrentThreshold(0),
+    mVoltageThreshold(MAX_ALLOWED_VOLTAGE),
+    mCurrentThreshold(MAX_ALLOWED_CURRENT),
     mVoltage(0),
     mCurrent(0),
-    mNominalVoltage(0),
-    mNominalCurrent(0),
-    mNominalPower(0),
+    mNominalVoltage(DEFAULT_NOMINAL_VOLTAGE),
+    mNominalCurrent(DEFAULT_NOMINAL_CURRENT),
+    mNominalPower(DEFAULT_NOMINAL_POWER),
     mDeviceClass(0),
     mError(0)
 {
@@ -50,7 +55,7 @@ ModulePower::ModulePower(QObject* parent):
 
 ModulePower::~ModulePower()
 {
-    int TODO; // power off on app close
+
 }
 
 bool ModulePower::postInit()
@@ -114,15 +119,21 @@ void ModulePower::restart()
         mState = ModuleCommands::POWER_OFF;
     }
 
-    // set current value for voltage and current
-    setObjectValue(SET_VALUE_U, NORMAL_VOLTAGE, mNominalVoltage);
-    setObjectValue(SET_VALUE_I, NORMAL_CURRENT, mNominalCurrent);
+    setCurVoltage(MIN_VOLTAGE);
 
     // switch "give power supply" on
     if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON))
     {
         mState = ModuleCommands::POWER_ON;
     }
+}
+
+void ModulePower::setCurVoltage(qreal voltage)
+{
+    QMap<uint32_t, QVariant> request;
+    QMap<uint32_t, QVariant> response;
+    request[SystemState::OUTPUT_PARAM_BASE + 1] = voltage;
+    setVoltageAndCurrent(request, response);
 }
 
 bool ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue)
@@ -307,31 +318,54 @@ void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
     // get input params
-    uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
-    qreal value1        = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toDouble();
-    uint32_t paramType2 = request.value(SystemState::OUTPUT_PARAM_BASE + 2).toUInt();
-    qreal value2        = request.value(SystemState::OUTPUT_PARAM_BASE + 3).toDouble();
+    //uint32_t paramType = request.value(SystemState::INPUT_PARAM_BASE + 0).toUInt();
+    qreal voltage      = request.value(SystemState::INPUT_PARAM_BASE + 1).toDouble();
+    //uint32_t paramType2 = request.value(SystemState::INPUT_PARAM_BASE + 2).toUInt();
+    //qreal value2        = request.value(SystemState::INPUT_PARAM_BASE + 3).toDouble();
 
-    qreal voltage = (paramType1 == SystemState::VOLTAGE) ? value1 : value2;
-    qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
+    //qreal voltage = (paramType1 == SystemState::VOLTAGE) ? value1 : value2;
+    //qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
 
-    LOG_INFO("Try to set power supply params to: U=%f I=%f", voltage, current);
+    LOG_INFO("Try to set current voltage to : U=%f", voltage);
 
-    // execute command
-    qreal voltageToSet = limitValue(voltage, mNominalVoltage, mVoltageThreshold);
-    qreal currentToSet = limitValue(current, mNominalCurrent, mCurrentThreshold);
+    if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
+    {
+        LOG_FATAL("Unsupported voltage values: Umin=%f, OVPThr=%f, Unom=%f", MIN_VOLTAGE, mVoltageThreshold, mNominalVoltage);
+        return;
+    }
 
-    // set voltage
+    // Set voltage value
+    // It must be:
+    // 1. Less than nominal power supply device voltage
+    // 2. Less than max allowed by test stand voltage
+    // 3. Greater than minimum required by test stand voltage
+    qreal voltageToSet = voltage;
+    if (voltageToSet > mNominalVoltage)
+    {
+        LOG_WARNING("Set voltage value has limited by nominal power supply unit voltage from %f to %f volts", voltage, mNominalVoltage);
+        voltageToSet = mNominalVoltage;
+    }
+
+    if (voltageToSet > mVoltageThreshold)
+    {
+        LOG_WARNING("Set voltage value has limited by max allowed test stand voltage from %f to %f volts", voltageToSet, mVoltageThreshold);
+        voltageToSet = mVoltageThreshold;
+    }
+
+    if (voltageToSet < MIN_VOLTAGE)
+    {
+        LOG_WARNING("Set voltage value has limited by min allowed test stand voltage from %f to %f volts", voltageToSet, voltageToSet);
+        voltageToSet = voltageToSet;
+    }
+
     setObjectValue(SET_VALUE_U, voltageToSet, mNominalVoltage);
 
-    // limitated by max hardware power and voltage value that was set
-    qreal maxCurrentByPower = qMin(mNominalPower / voltageToSet, mNominalCurrent);
-    currentToSet = qMin(currentToSet, maxCurrentByPower);
+    // Set current value
+    // We always set maximum allowed current by power supply unit nominal power (take 95% of it for safety purposes)
+    qreal maxCurrentByPower = qMin(mNominalPower * 0.95 / voltageToSet, mNominalCurrent);
+    setObjectValue(SET_VALUE_I, maxCurrentByPower, mNominalCurrent);
 
-    // set current
-    setObjectValue(SET_VALUE_I, currentToSet, mNominalCurrent);
-
-    LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, currentToSet);
+    LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, maxCurrentByPower);
 
     // fill response
     response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
@@ -340,10 +374,10 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 //void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 //{
 //    // get input params
-//    uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
-//    qreal value1        = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toDouble();
-//    uint32_t paramType2 = request.value(SystemState::OUTPUT_PARAM_BASE + 2).toUInt();
-//    qreal value2        = request.value(SystemState::OUTPUT_PARAM_BASE + 3).toDouble();
+//    uint32_t paramType1 = request.value(SystemState::INPUT_PARAM_BASE + 0).toUInt();
+//    qreal value1        = request.value(SystemState::INPUT_PARAM_BASE + 1).toDouble();
+//    uint32_t paramType2 = request.value(SystemState::INPUT_PARAM_BASE + 2).toUInt();
+//    qreal value2        = request.value(SystemState::INPUT_PARAM_BASE + 3).toDouble();
 
 //    qreal voltage = (paramType1 == SystemState::VOLTAGE) ? value1 : value2;
 //    qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
@@ -467,4 +501,9 @@ uint16_t ModulePower::getDeviceClass()
     }
 
     return value;
+}
+
+void ModulePower::onApplicationFinish()
+{
+    int TODO; // power off on app close
 }

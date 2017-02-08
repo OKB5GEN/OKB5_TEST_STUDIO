@@ -29,6 +29,7 @@ public:
 
     virtual bool postInit() = 0;
     virtual void resetError();
+    virtual void onApplicationFinish() = 0;
 
 protected:
     bool send(const QByteArray& request, QByteArray& response, int waitForReadTime); // TODO remove stub

@@ -255,3 +255,8 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
     }
 }
+
+void ModuleOTD::onApplicationFinish()
+{
+    int TODO;
+}

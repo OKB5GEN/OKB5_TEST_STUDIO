@@ -972,7 +972,11 @@ void SystemState::createPowerUnitCommandsParams()
 
     // commands input params
     QMap<int, QStringList> params;
-    params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerParams;
+
+
+    QStringList powerSetParams;
+    powerSetParams.push_back(paramName(VOLTAGE));
+    params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerSetParams;
     params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
     mInParams[ModuleCommands::POWER_UNIT_BUP] = params;
     mInParams[ModuleCommands::POWER_UNIT_PNA] = params;

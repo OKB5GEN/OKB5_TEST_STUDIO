@@ -22,6 +22,7 @@ public slots:
     void restart();
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void onApplicationFinish() override;
 
 private slots:
     void update();
@@ -105,6 +106,7 @@ private:
     //void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response); // TODO not available to user API
     void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
     void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
+    void setCurVoltage(qreal voltage);
     void setPowerState(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
 
     // power units command

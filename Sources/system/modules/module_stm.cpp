@@ -141,3 +141,8 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         break;
     }
 }
+
+void ModuleSTM::onApplicationFinish()
+{
+    int TODO;
+}

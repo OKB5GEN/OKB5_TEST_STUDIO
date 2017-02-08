@@ -24,6 +24,7 @@ public:
 
 public slots:
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+    void onApplicationFinish() override;
 
 private:
     void setPowerChannelState(int channel, ModuleCommands::PowerState state); // Подача питания на БУП и ПНА

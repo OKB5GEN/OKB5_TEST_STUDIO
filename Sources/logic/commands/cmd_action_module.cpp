@@ -249,70 +249,6 @@ QString CmdActionModule::moduleName() const
 QString CmdActionModule::commandName() const
 {
     QString text = tr("ЗАГЛУШКА");
-/*
-    switch (mOperation)
-    {
-    // own modules commands
-    case ModuleCommands::GET_MODULE_ADDRESS:            text = tr("ПА"); break;  // Запрос адреса модуля
-    case ModuleCommands::GET_STATUS_WORD:               text = tr("ПСС"); break; // Запрос статусного слова
-    case ModuleCommands::RESET_ERROR:                   text = tr("СО"); break;  // Команда сброса ошибок
-    case ModuleCommands::SOFT_RESET:                    text = tr("СР"); break;  // Soft reset
-    case ModuleCommands::GET_SOWFTWARE_VER:             text = tr("ПВ"); break;  // Запрос версии прошивки модуля
-    case ModuleCommands::ECHO:                          text = tr("ЭХО"); break; // Echo
-    case ModuleCommands::POWER_CHANNEL_CTRL:            text = tr("УР"); break;  // Управление подачей питания 27В на модуле питания
-    case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:     text = tr("СОСТ"); break;// Запрос проверки целостности предохранителя с модулей питания
-    case ModuleCommands::GET_CHANNEL_TELEMETRY:         text = tr("ТМ"); break;  // Запрос данных сигналов телеметрии СТМ
-    case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:     text = tr("УП"); break;  // Команда управления питанием МКО интерфейсов
-
-    //TODO
-    // Команды CAN/RS/SSI, вероятно, будут доступны по усеченному интерфейсу типа
-    // - "отправить/принять данные по И"
-    // - "очистить буфер И"
-
-    //case ModuleCommands::SET_PACKET_SIZE_CAN:           text = tr(""); break;
-    //case ModuleCommands::ADD_BYTES_CAN:                 text = tr(""); break;
-    //case ModuleCommands::SEND_PACKET_CAN:               text = tr(""); break;
-    //case ModuleCommands::CHECK_RECV_DATA_CAN:           text = tr(""); break;
-    //case ModuleCommands::RECV_DATA_CAN:                 text = tr(""); break;
-    //case ModuleCommands::CLEAN_BUFFER_CAN:              text = tr(""); break;
-
-    //case ModuleCommands::SET_PACKET_SIZE_RS485:         text = tr(""); break;
-    //case ModuleCommands::ADD_BYTES_RS485:               text = tr(""); break;
-    //case ModuleCommands::SEND_PACKET_RS485:             text = tr(""); break;
-    //case ModuleCommands::CHECK_RECV_DATA_RS485:         text = tr(""); break;
-    //case ModuleCommands::RECV_DATA_RS485:               text = tr(""); break;
-    //case ModuleCommands::CLEAN_BUFFER_RS485:            text = tr(""); break;
-
-    //case ModuleCommands::SET_MODE_RS485:                text = tr(""); break;
-    //case ModuleCommands::SET_SPEED_RS485:               text = tr(""); break;
-    //case ModuleCommands::SET_TECH_INTERFACE:            text = tr(""); break;
-    //case ModuleCommands::GET_TECH_INTERFACE:            text = tr(""); break;
-    //case ModuleCommands::RECV_DATA_SSI:                 text = tr(""); break;
-
-    case ModuleCommands::GET_TEMPERATURE_PT100:         text = tr("ТПТ"); break;  // Запрос значений температурных датчиков ПТ-100
-    case ModuleCommands::GET_DS1820_COUNT_LINE_1:       text = tr("КDS1"); break; // Запрос количества датчиков DS1820 на линии 1
-    case ModuleCommands::GET_DS1820_COUNT_LINE_2:       text = tr("КDS2"); break; // Запрос количества датчиков DS1820 на линии 2
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1: text = tr("ТDS1"); break; // Запрос значений температурных датчиков DS1820 на линии 1
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2: text = tr("ТDS2"); break; // Запрос значений температурных датчиков DS1820 на линии 2
-    case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break; // Запрос состояния модуля подачи питания 27В
-    case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break; // Запрос состояния МКО
-    case ModuleCommands::RESET_LINE_1:                  text = tr("СDS1"); break; // Ресет датчиков на линии 1
-    case ModuleCommands::RESET_LINE_2:                  text = tr("СDS2"); break; // Ресет датчиков на линии 2
-    case ModuleCommands::START_MEASUREMENT_LINE_1:      text = tr("ИDS1"); break; // Запуск измерений температуры на линии 1
-    case ModuleCommands::START_MEASUREMENT_LINE_2:      text = tr("ИDS2"); break; // Запуск измерений температуры на линии 2
-    case ModuleCommands::GET_DS1820_ADDR_LINE_1:        text = tr("АDS1"); break; // Чтение адресов датчиков DS1820 на линии 1
-    case ModuleCommands::GET_DS1820_ADDR_LINE_2:        text = tr("АDS2"); break; // Чтение адресов датчиков DS1820 на линии 2
-
-    // Third party modules commands (arbitrary) >>>>
-
-    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:       text = tr("УНТ"); break;
-    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:   text = tr("УО"); break;
-    case ModuleCommands::SET_POWER_STATE:               text = tr("УП"); break;
-    case ModuleCommands::GET_VOLTAGE_AND_CURRENT:       text = tr("ПНТ"); break;
-    default:
-        break;
-    }
-*/
     switch (mOperation)
     {
     case ModuleCommands::POWER_CHANNEL_CTRL: // Управление подачей питания 27В на модуле питания
@@ -324,29 +260,29 @@ QString CmdActionModule::commandName() const
 
                 if (state == ModuleCommands::POWER_ON)
                 {
-                    text = tr("Вкл.");
+                    text = tr("Вкл");
                 }
                 else
                 {
-                    text = tr("Выкл.");
+                    text = tr("Выкл");
                 }
 
                 switch (channel)
                 {
                 case ModuleCommands::BUP_MAIN:
-                    text += tr("БУП.осн");
+                    text += tr("БУПОсн");
                     break;
                 case ModuleCommands::BUP_RESERVE:
-                    text += tr("БУП.рез");
+                    text += tr("БУПРез");
                     break;
                 case ModuleCommands::HEATER_LINE_1:
-                    text += tr("нагр.(1)");
+                    text += tr("Нагр1");
                     break;
                 case ModuleCommands::HEATER_LINE_2:
-                    text += tr("нагр.(2)");
+                    text += tr("Нагр2");
                     break;
                 case ModuleCommands::DRIVE_CONTROL:
-                    text += tr("двиг.");
+                    text += tr("Двиг");
                     break;
                 default:
                     break;
@@ -356,36 +292,26 @@ QString CmdActionModule::commandName() const
         break;
 
     // own modules commands
-    case ModuleCommands::GET_MODULE_ADDRESS:            text = tr("ПА"); break;  // Запрос адреса модуля
-    case ModuleCommands::GET_STATUS_WORD:               text = tr("ПСС"); break; // Запрос статусного слова
-    case ModuleCommands::RESET_ERROR:                   text = tr("СО"); break;  // Команда сброса ошибок
-    case ModuleCommands::SOFT_RESET:                    text = tr("СР"); break;  // Soft reset
-    case ModuleCommands::GET_SOWFTWARE_VER:             text = tr("ПВ"); break;  // Запрос версии прошивки модуля
-    case ModuleCommands::ECHO:                          text = tr("ЭХО"); break; // Echo
-
-    case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:     text = tr("СОСТ"); break;// Запрос проверки целостности предохранителя с модулей питания
-    case ModuleCommands::GET_CHANNEL_TELEMETRY:         text = tr("ТМ"); break;  // Запрос данных сигналов телеметрии СТМ
-    case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:     text = tr("УП"); break;  // Команда управления питанием МКО интерфейсов
-    case ModuleCommands::GET_TEMPERATURE_PT100:         text = tr("Пол.темп.ПТ100"); break;  // Запрос значений температурных датчиков ПТ-100
-    //case ModuleCommands::GET_DS1820_COUNT_LINE_1:       text = tr("КDS1"); break; // Запрос количества датчиков DS1820 на линии 1 (нет в интерфейсе)
-    //case ModuleCommands::GET_DS1820_COUNT_LINE_2:       text = tr("КDS2"); break; // Запрос количества датчиков DS1820 на линии 2 (нет в интерфейсе)
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1: text = tr("Пол.темп.DS(1)"); break; // Запрос значений температурных датчиков DS1820 на линии 1
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2: text = tr("Пол.темп.DS(2)"); break; // Запрос значений температурных датчиков DS1820 на линии 2
-    case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break; // Запрос состояния модуля подачи питания 27В
-    case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break; // Запрос состояния МКО
+    //case ModuleCommands::RESET_ERROR:                   text = tr("СбросОшб"); break;  // Команда сброса ошибок
+    //case ModuleCommands::SOFT_RESET:                    text = tr("Перезагр"); break;  // Soft reset
+    //case ModuleCommands::ECHO:                          text = tr("ЭХО"); break; // Echo
+    //case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:     text = tr("СОСТ"); break;// Запрос проверки целостности предохранителя с модулей питания
+    //case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:     text = tr("УП"); break;  // Команда управления питанием МКО интерфейсов
+    //case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break; // Запрос состояния модуля подачи питания 27В
+    //case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break; // Запрос состояния МКО
     //case ModuleCommands::RESET_LINE_1:                  text = tr("СDS1"); break; // Ресет датчиков на линии 1 (нет в интерфейсе)
     //case ModuleCommands::RESET_LINE_2:                  text = tr("СDS2"); break; // Ресет датчиков на линии 2 (нет в интерфейсе)
-    //case ModuleCommands::START_MEASUREMENT_LINE_1:      text = tr("ИDS1"); break; // Запуск измерений температуры на линии 1 (нет в интерфейсе)
-    //case ModuleCommands::START_MEASUREMENT_LINE_2:      text = tr("ИDS2"); break; // Запуск измерений температуры на линии 2 (нет в интерфейсе)
-    //case ModuleCommands::GET_DS1820_ADDR_LINE_1:        text = tr("АDS1"); break; // Чтение адресов датчиков DS1820 на линии 1 (нет в интерфейсе)
-    //case ModuleCommands::GET_DS1820_ADDR_LINE_2:        text = tr("АDS2"); break; // Чтение адресов датчиков DS1820 на линии 2 (нет в интерфейсе)
+    case ModuleCommands::GET_CHANNEL_TELEMETRY:         text = tr("ПолТелем"); break;  // Запрос данных сигналов телеметрии СТМ
+    case ModuleCommands::GET_TEMPERATURE_PT100:         text = tr("ПолТемпПТ"); break;  // Запрос значений температурных датчиков ПТ-100
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1: text = tr("ПолТемпDS1"); break; // Запрос значений температурных датчиков DS1820 на линии 1
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2: text = tr("ПолТемпDS2"); break; // Запрос значений температурных датчиков DS1820 на линии 2
 
     // Third party modules commands (arbitrary) >>>>
 
-    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:       text = tr("УНТ"); break;
-    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:   text = tr("УО"); break;
-    case ModuleCommands::SET_POWER_STATE:               text = tr("УП"); break;
-    case ModuleCommands::GET_VOLTAGE_AND_CURRENT:       text = tr("ПНТ"); break;
+    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:       text = tr("УстНапр"); break;
+    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:   text = tr("УстОгр"); break;
+    case ModuleCommands::GET_VOLTAGE_AND_CURRENT:       text = tr("ПолНапрТок"); break;
+    case ModuleCommands::SET_POWER_STATE:               text = tr("ВклПит"); break; //TODO Выкл.пит
     default:
         break;
     }

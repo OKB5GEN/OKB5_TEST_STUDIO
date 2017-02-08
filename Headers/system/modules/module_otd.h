@@ -26,6 +26,7 @@ public:
 
 public slots:
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+    void onApplicationFinish() override;
 
 protected:
     bool postInitOKBModule() override;
