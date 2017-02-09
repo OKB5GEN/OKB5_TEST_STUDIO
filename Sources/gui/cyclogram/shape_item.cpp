@@ -25,8 +25,8 @@
 
 namespace
 {
-    static const int CELL_WIDTH = 30;
-    static const int CELL_HEIGHT = 30;
+    static const int CELL_WIDTH = 22;
+    static const int CELL_HEIGHT = 22;
     static const int CELLS_PER_ITEM_V = 4;
     static const int CELLS_PER_ITEM_H = 8;
 }
@@ -40,8 +40,8 @@ ShapeItem::ShapeItem(QObject* parent):
     mCell(QPoint(0, 0)),
     mRect(QRect(0, 0, 0, 0))
 {
-    mFont.setPointSize(14);
-    mFont.setFamily("Arial");
+    mFont.setPointSize(11);
+    mFont.setFamily("Verdana");
 
     mActiveColor = QColor::fromRgba(0xff7f7f7f);
     mAdditionalColor = QColor::fromRgba(0x00ffffff);
@@ -346,15 +346,15 @@ void ShapeItem::onTextChanged(const QString& text)
 
             QPainterPath additionalText;
             QFont font;
-            font.setPointSize(10);
-            font.setFamily("Arial");
+            font.setPointSize(8);
+            font.setFamily("Verdana");
 
             qreal x1 = itemSize().width() - cellSize().width();
-            qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1;
+            qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1; // TODO magic
             additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
 
             qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
-            qreal y2 = itemSize().height() - cellSize().height() * 0.6;
+            qreal y2 = itemSize().height() - cellSize().height() * 0.5; // TODO magic
             additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
 
             mTextPath.addPath(additionalText);
