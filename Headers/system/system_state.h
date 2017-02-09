@@ -16,7 +16,7 @@ class ModuleTech;
 class ModulePower;
 class CmdActionModule;
 
-class SystemState: public VariableController
+class SystemState: public VariableController //TODO possibly it's better to inherit from QObject
 {
     Q_OBJECT
 
@@ -103,7 +103,6 @@ signals:
     void commandFinished(bool success);
 
     // TODO refactor >>>
-    void MKO_stop();
     void MKO_DY(int x, int y);
     void MKO_ts(int x,int y, int z);
     void MKO_cm(int x,QString y,int z, int k);

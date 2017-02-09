@@ -16,6 +16,8 @@
 namespace
 {
     static const int TOOLBAR_ICON_SIZE = 64;
+    static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir";
+    static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
 }
 
 EditorWindow::EditorWindow():
@@ -93,11 +95,19 @@ void EditorWindow::open()
 {
     if (maybeSave())
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"),
-                                                        QDir::currentPath(),
-                                                        tr("OKB5 Cyclogram Files (*.cgr)"));
+        // try read last file open path
+        QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+        QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
+        if (path.isEmpty())
+        {
+            path = QDir::currentPath();
+        }
+
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
         if (!fileName.isEmpty())
         {
+            QString openPath = QFileInfo(fileName).absoluteDir().path();
+            settings.setValue(SETTING_LAST_OPEN_FILE_DIR, openPath);
             loadFile(fileName);
         }
     }
@@ -117,9 +127,15 @@ bool EditorWindow::save()
 
 bool EditorWindow::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"),
-                                         QDir::currentPath(),
-                                         tr("OKB5 Cyclogram Files (*.cgr)"));
+    // try read last file save path
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    QString path = settings.value(SETTING_LAST_SAVE_FILE_DIR).toString();
+    if (path.isEmpty())
+    {
+        path = QDir::currentPath();
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
 
     if (fileName.isEmpty())
     {
@@ -335,11 +351,6 @@ void EditorWindow::loadFile(const QString &fileName)
     mCyclogram->clear();
     mCyclogramWidget->clear();
 
-    //QTextStream in(&file);
-    //QApplication::setOverrideCursor(Qt::WaitCursor);
-    //textEdit->setPlainText(in.readAll());
-    //QApplication::restoreOverrideCursor();
-
     FileReader reader(mCyclogram);
     if (!reader.read(&file))
     {
@@ -369,14 +380,14 @@ bool EditorWindow::saveFile(const QString &fileName)
         return false;
     }
 
-    //QTextStream out(&file);
-    //QApplication::setOverrideCursor(Qt::WaitCursor);
-    //out << textEdit->toPlainText();
-    //QApplication::restoreOverrideCursor();
-
     FileWriter writer(mCyclogram);
     if (writer.writeFile(&file))
     {
+        // save last save dir
+        QSettings settings;
+        QString savePath = QFileInfo(fileName).absoluteDir().path();
+        settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
+
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File saved"), 2000);
         emit documentSaved(true);
