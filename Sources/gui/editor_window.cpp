@@ -150,6 +150,11 @@ void EditorWindow::about()
 void EditorWindow::documentWasModified()
 {
     setWindowModified(mCyclogram->isModified());
+
+    if (mCyclogram->isModified())
+    {
+        emit documentSaved(false);
+    }
 }
 
 void EditorWindow::createActions()
@@ -179,6 +184,7 @@ void EditorWindow::createActions()
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, &QAction::triggered, this, &EditorWindow::save);
+    connect(this, SIGNAL(documentSaved(bool)), saveAct, SLOT(setDisabled(bool)));
     fileMenu->addAction(saveAct);
     fileToolBar->addAction(saveAct);
 
@@ -373,6 +379,7 @@ bool EditorWindow::saveFile(const QString &fileName)
     {
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File saved"), 2000);
+        emit documentSaved(true);
         return true;
     }
 

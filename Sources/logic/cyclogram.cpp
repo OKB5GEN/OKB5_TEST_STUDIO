@@ -72,7 +72,7 @@ Cyclogram::Cyclogram(QObject * parent):
 
     connect(mVarController, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(variablesChanged()));
     connect(mVarController, SIGNAL(variableRemoved(const QString&)), this, SLOT(variablesChanged()));
-    connect(mVarController, SIGNAL(valueChanged(const QString&, qreal, int)), this, SLOT(variablesChanged()));
+    connect(mVarController, SIGNAL(valueChanged(const QString&, qreal, int)), this, SLOT(variableValueChanged(const QString&, qreal, int)));
     connect(mVarController, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
 }
 
@@ -546,6 +546,14 @@ void Cyclogram::onCommandTextChanged(const QString& text)
 void Cyclogram::variablesChanged()
 {
     setModified(true, true);
+}
+
+void Cyclogram::variableValueChanged(const QString& name, qreal value, int container)
+{
+    if (container != VariableController::Current)
+    {
+        variablesChanged();
+    }
 }
 
 void Cyclogram::setFirst(Command* first)

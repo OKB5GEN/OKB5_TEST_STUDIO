@@ -49,6 +49,9 @@ private slots:
 
     void commitData(QSessionManager &);
 
+signals:
+    void documentSaved(bool saved);
+
 private:
     void createActions();
     void createStatusBar();
