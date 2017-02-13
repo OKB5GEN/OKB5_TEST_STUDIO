@@ -1189,7 +1189,7 @@ void SystemState::createModules()
 
     int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
 
-    if (!mOTD->init())
+    if (!mOTD->initialize())
     {
         LOG_ERROR("OTD initialization failed!");
         isSystemReady = false;
@@ -1201,7 +1201,7 @@ void SystemState::createModules()
     connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!mSTM->init())
+    if (!mSTM->initialize())
     {
         LOG_ERROR("STM initialization failed!");
         isSystemReady = false;
@@ -1213,7 +1213,7 @@ void SystemState::createModules()
     connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!mTech->init())
+    if (!mTech->initialize())
     {
         LOG_ERROR("Tech initialization failed!");
         isSystemReady = false;
@@ -1225,7 +1225,7 @@ void SystemState::createModules()
     connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!mPowerBUP->init())
+    if (!mPowerBUP->initialize())
     {
         LOG_ERROR("BUP Power Unit initialization failed!");
         isSystemReady = false;
@@ -1236,7 +1236,7 @@ void SystemState::createModules()
     connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
 
-    if (!mPowerPNA->init())
+    if (!mPowerPNA->initialize())
     {
         LOG_ERROR("PNA Power Unit initialization failed!");
         isSystemReady = false;
@@ -1252,6 +1252,6 @@ void SystemState::createModules()
     }
     else
     {
-        LOG_ERROR("Modules creation... FAILED");
+        LOG_WARNING("Modules creation... FAILED");
     }
 }

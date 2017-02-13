@@ -1,13 +1,14 @@
 #include "Headers/system/com_port_module.h"
 #include "Headers/logger/Logger.h"
 
+#include <QTimer>
 #include <QtSerialPort>
-#include <QApplication>
-#include <windows.h>
+#include <QApplication> // TODO remove
+#include <windows.h> // TODO remove
 
 namespace
 {
-    //static const int WAIT_TIME = 100; // msec
+    static const int PROTECTION_TIMEOUT = 10000; // msec TODO move to config file
 }
 
 COMPortModule::COMPortModule(QObject* parent):
@@ -15,47 +16,57 @@ COMPortModule::COMPortModule(QObject* parent):
     mPort(Q_NULLPTR),
     mIsInitialized(false)
 {
+    mProtectionTimer = new QTimer(this);
+    mProtectionTimer->setSingleShot(true);
+
+    connect(mProtectionTimer, SIGNAL(timeout()), this, SLOT(onResponseTimeout()));
 }
 
 COMPortModule::~COMPortModule()
 {
+    mProtectionTimer->stop();
+
     if (mPort && mPort->isOpen())
     {
         mPort->close();
     }
 }
 
-bool COMPortModule::send(const QByteArray& request, QByteArray& response, int waitForReadTime)
+bool COMPortModule::send(const QByteArray& request)
 {
-    if (mPort && mPort->isOpen())
+    if (!mPort)
     {
-        LOG_TRACE("Send data to COM port:  %s", request.toHex().toStdString().c_str());
-
-        mPort->QIODevice::write(request);
-        if (mPort->waitForBytesWritten(-1))
-        {
-            int TODO;
-            //Returns true if a payload of data was written to the device;
-            //otherwise returns false (i.e. if the operation timed out, or if an error occurred).
-        }
-
-        //Sleep(WAIT_TIME);
-
-        //response = mPort->readAll(); // i gues its just for make buffer empty
-        while (mPort->waitForReadyRead(waitForReadTime))
-        {
-            response.append(mPort->readAll());
-        }
-
-        LOG_TRACE("Receive data from COM port: %s", response.toHex().toStdString().c_str());
-        return true;
+        LOG_ERROR("Send data to COM port failed! No port created!");
+        return false;
     }
 
-    LOG_ERROR("Can not send request (no port open): %s", request.toHex().toStdString().c_str());
-    return false;
+    if (!mPort->isOpen())
+    {
+        LOG_ERROR("Send data to COM port failed! Error: %s",  mPort->errorString().toStdString().c_str());
+        return false;
+    }
+
+    qint64 bytesWritten = mPort->QIODevice::write(request);
+    if (bytesWritten == -1)
+    {
+        LOG_ERROR("Send data to COM port failed! No data written! Error: %s",  mPort->errorString().toStdString().c_str());
+        return false;
+    }
+
+    if (!mPort->waitForBytesWritten(-1))
+    {
+        //Returns true if a payload of data was written to the device;
+        //otherwise returns false (i.e. if the operation timed out, or if an error occurred).
+        LOG_ERROR("Send data to COM port failed! Payload not written! Error: %s",  mPort->errorString().toStdString().c_str());
+        return false;
+    }
+
+    LOG_TRACE("Send data to COM port:  %s", request.toHex().toStdString().c_str());
+    mProtectionTimer->start(PROTECTION_TIMEOUT);
+    return true;
 }
 
-bool COMPortModule::init()
+bool COMPortModule::initialize()
 {
     QString portName;
 
@@ -80,12 +91,12 @@ bool COMPortModule::init()
 
     if (portName.isNull())
     {
-        LOG_ERROR("No COM port module found");
+        LOG_ERROR(QString("No COM port name '%1' module found").arg(portName));
         return false;
     }
 
     createPort(portName);
-
+    connect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
     mIsInitialized = postInit();
 
     return mIsInitialized;
@@ -115,6 +126,7 @@ void COMPortModule::resetError()
 
 void COMPortModule::resetPort()
 {
+    int TODO; // refactor
     QString portName = mPort->portName();
 
     if (mPort)
@@ -142,4 +154,25 @@ const COMPortModule::Identifier& COMPortModule::id() const
 void COMPortModule::setId(const Identifier& id)
 {
     mID = id;
+}
+
+void COMPortModule::onResponseReceived()
+{
+    mProtectionTimer->stop();
+
+    if (mPort && mPort->isOpen())
+    {
+        QByteArray response;
+        response.append(mPort->readAll());
+        processResponse(response);
+    }
+}
+
+void COMPortModule::onResponseTimeout()
+{
+    LOG_ERROR(QString("Wait for response timeout. "));
+
+    // send empty response
+    QByteArray response;
+    processResponse(response);
 }

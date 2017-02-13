@@ -3,6 +3,9 @@
 
 #include "Headers/system/com_port_module.h"
 
+#include <QMap>
+#include <QVariant>
+
 class QTimer;
 
 class ModulePower: public COMPortModule
@@ -16,16 +19,14 @@ public:
     bool postInit() override;
     void resetError() override;
 
-    void setUpdatePeriod(int msec, bool startTimer = true);
-
 public slots:
     void restart();
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
     void onApplicationFinish() override;
 
-private slots:
-    void update();
+protected:
+    void processResponse(const QByteArray& response) override;
 
 private:
     enum ObjectID
@@ -95,35 +96,65 @@ private:
         SEND_DATA       = 0xc0
     };
 
+    enum Operation
+    {
+        GET_DEVICE_CLASS,
+        GET_NOMINAL_CURRENT,
+        GET_NOMINAL_VOLTAGE,
+        GET_NOMINAL_POWER,
+        GET_OVP_THRESHOLD,
+        GET_OCP_THRESHOLD,
+        GET_CUR_VOLTAGE_AND_CURRENT,
+        SET_OVP_THRESHOLD,
+        SET_OCP_THRESHOLD,
+        SET_SET_VALUE_U,
+        SET_SET_VALUE_I,
+        PSC_SWITCH_POWER_OUTPUT_ON,
+        PSC_SWITCH_POWER_OUTPUT_OFF,
+        PSC_ACKNOWLEDGE_ALARMS,
+        PSC_SWITCH_TO_REMOTE_CTRL,
+        PSC_SWITCH_TO_MANUAL_CTRL,
+        PSC_TRACKING_ON,
+        PSC_TRACKING_OFF,
+
+        UNKNOWN_OPERATION
+    };
+
+    struct Request
+    {
+        Operation operation;
+        QByteArray data;
+        QMap<uint32_t, QVariant> response;
+    };
+
     template<typename T>
     static T limitValue(const T& value, const T& nominal, const T& threshold)
     {
         return qMin(qMin(value, nominal), qMin(value, threshold));
     }
 
-    void getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error);
+    void getCurVoltageAndCurrent();
 
-    //void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response); // TODO not available to user API
-    void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
-    void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
+    //void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response); // TODO not available to user API, possibly must be
+    void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
+    void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
     void setCurVoltage(qreal voltage);
-    void setPowerState(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response);
+    void setPowerState(const QMap<uint32_t, QVariant>& request);
 
     // power units command
-    bool sendPowerSupplyControlCommand(PowerSupplyCommandID command);
-    bool setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue);
-    qreal getNominalValue(ObjectID objectID);
-    qreal getObjectValue(ObjectID objectID, qreal nominalValue);
-    uint16_t getDeviceClass();
+    void sendPowerSupplyControlCommand(PowerSupplyCommandID command);
+    void setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue);
+    void getNominalValue(ObjectID objectID);
+    void getObjectValue(ObjectID objectID);
+    void getDeviceClass();
 
     // encoding/decoding
-    static uint8_t encodeStartDelimiter(Direction dir, CastType cType, TransmissionType trType, uint8_t dataSize);
+    static uint8_t encodeStartDelimiter(TransmissionType trType, uint8_t dataSize);
     static void addCheckSum(QByteArray& data);
 
-    ModuleCommands::PowerState mState;
+    void processQueue();
 
-    QTimer* mUpdateTimer;
-    int mUpdatePeriod;
+    ModuleCommands::PowerState mState;
 
     qreal mVoltageThreshold;
     qreal mCurrentThreshold;
@@ -135,6 +166,8 @@ private:
 
     uint16_t mDeviceClass; //TODO not used, we use SIMPLE module version
     uint8_t mError;
+
+    QList<Request> mRequestQueue;
 };
 
 #endif // MODULE_POWER_H

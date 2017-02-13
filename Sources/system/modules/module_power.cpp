@@ -8,7 +8,6 @@
 namespace
 {
     static const uint32_t STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
-    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 
     static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts 27-36
     static const qreal MAX_ALLOWED_CURRENT = 2.0; // ampers <= 2
@@ -38,7 +37,6 @@ namespace
 ModulePower::ModulePower(QObject* parent):
     COMPortModule(parent),
     mState(ModuleCommands::POWER_OFF),
-    mUpdatePeriod(0),
     mVoltageThreshold(MAX_ALLOWED_VOLTAGE),
     mCurrentThreshold(MAX_ALLOWED_CURRENT),
     mVoltage(0),
@@ -49,8 +47,6 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
-    mUpdateTimer = new QTimer(this);
-    connect(mUpdateTimer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
 ModulePower::~ModulePower()
@@ -71,22 +67,13 @@ bool ModulePower::postInit()
     // - OCP threshold
     // - actual device state (voltage, current, alarms)
 
-    mDeviceClass = getDeviceClass();
-    mNominalCurrent = getNominalValue(NOMINAL_CURRENT);
-    mNominalVoltage = getNominalValue(NOMINAL_VOLTAGE);
-    mNominalPower = getNominalValue(NOMINAL_POWER);
+    // perform first step: get nominal values
+    getDeviceClass();
+    getNominalValue(NOMINAL_CURRENT);
+    getNominalValue(NOMINAL_VOLTAGE);
+    getNominalValue(NOMINAL_POWER);
 
-    mVoltageThreshold = getObjectValue(OVP_THRESHOLD, mNominalVoltage);
-    mCurrentThreshold = getObjectValue(OCP_THRESHOLD, mNominalCurrent);
-
-    getCurVoltageAndCurrent(mVoltage, mCurrent, mError);
-
-    // switch module to remote control
-    sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL);
-
-    // set voltage and current thresholds
-    setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
-    setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
+    processQueue();
 
     // OPTIONAL (for logging only): //TODO
     // - device type
@@ -94,7 +81,6 @@ bool ModulePower::postInit()
     // - device article number
     // - device software version
     // - device manufacturer
-
     return true;
 }
 
@@ -111,158 +97,122 @@ void ModulePower::restart()
         return;
     }
 
-    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset errors if it exist
-    mError = 0;
-
-    if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF)) // switch off power output
+    //if (mError != 0)
     {
-        mState = ModuleCommands::POWER_OFF;
+        resetError();
     }
 
+    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off power output
     setCurVoltage(MIN_VOLTAGE);
 
     // switch "give power supply" on
-    if (sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON))
-    {
-        mState = ModuleCommands::POWER_ON;
-    }
+    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
+    processQueue();
 }
 
 void ModulePower::setCurVoltage(qreal voltage)
 {
     QMap<uint32_t, QVariant> request;
-    QMap<uint32_t, QVariant> response;
     request[SystemState::INPUT_PARAM_BASE + 1] = voltage;
-    setVoltageAndCurrent(request, response);
+    setVoltageAndCurrent(request);
 }
 
-bool ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue)
+void ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nominalValue)
 {
-    QByteArray request;
+    static QMap<int, int> operations;
+    if (operations.empty())
+    {
+        operations[OVP_THRESHOLD] = SET_OVP_THRESHOLD;
+        operations[OCP_THRESHOLD] = SET_OCP_THRESHOLD;
+        operations[SET_VALUE_U] = SET_SET_VALUE_U;
+        operations[SET_VALUE_I] = SET_SET_VALUE_I;
+    }
+
+    Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
+    if (operation == UNKNOWN_OPERATION)
+    {
+        LOG_ERROR("Incorrect object id '%i'", objectID);
+        return;
+    }
+
+    Request request;
     uint16_t internalValue = uint16_t(qreal(STEPS_COUNT) * actualValue / nominalValue);
 
-    request.append(encodeStartDelimiter(TO_DEVICE, SEND, SEND_DATA, 2));
-    request.append(SINGLE_MODEL);
-    request.append(objectID);
-    request.append((internalValue >> 8) & 0x00ff);
-    request.append(internalValue & 0x00ff);
-    addCheckSum(request);
+    request.data.append(encodeStartDelimiter(SEND_DATA, 2));
+    request.data.append(SINGLE_MODEL);
+    request.data.append(objectID);
+    request.data.append((internalValue >> 8) & 0x00ff);
+    request.data.append(internalValue & 0x00ff);
+    addCheckSum(request.data);
 
-    QByteArray response;
-    return send(request, response, WAIT_FOR_RESPONSE_TIME);
+    request.operation = operation;
+    mRequestQueue.push_back(request);
 }
 
-qreal ModulePower::getObjectValue(ObjectID objectID, qreal nominalValue)
+void ModulePower::getObjectValue(ObjectID objectID)
 {
-    switch (objectID)
+    static QMap<int, int> operations;
+    if (operations.empty())
     {
-    case OVP_THRESHOLD:
-    case OCP_THRESHOLD:
-    case SET_VALUE_U:
-    case SET_VALUE_I:
-        {
-            QByteArray request;
-            request.append(encodeStartDelimiter(TO_DEVICE, SEND, QUERY_DATA, 2)); // 2 bytes of data is waiting in response
-            request.append(SINGLE_MODEL);
-            request.append(objectID);
-            addCheckSum(request);
-
-            QByteArray response;
-            if (send(request, response, WAIT_FOR_RESPONSE_TIME))
-            {
-                uint8_t uu1, uu2;
-                uu1 = response[3];
-                uu2 = response[4];
-                qreal value  = (uu1 << 8) | uu2;
-                value = value * nominalValue / qreal(STEPS_COUNT);
-                return value;
-            }
-        }
-        break;
-
-    default:
-        LOG_WARNING("Incorrect object id '%i'", objectID);
-        break;
+        operations[OVP_THRESHOLD] = GET_OVP_THRESHOLD;
+        operations[OCP_THRESHOLD] = GET_OCP_THRESHOLD;
     }
 
-    return 0;
-}
-
-void ModulePower::getCurVoltageAndCurrent(qreal& voltage, qreal& current, uint8_t& error)
-{
-    QByteArray request;
-    request.append(encodeStartDelimiter(TO_DEVICE, SEND, QUERY_DATA, 6)); // 6 bytes of data is waiting in response
-    request.append(SINGLE_MODEL);
-    request.append(DEVICE_STATUS_ACTUAL);
-    addCheckSum(request);
-
-    QByteArray response;
-    if (send(request, response, WAIT_FOR_RESPONSE_TIME))
+    Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
+    if (operation == UNKNOWN_OPERATION)
     {
-        uint8_t uu1, uu2;
-        error = (response[4] >> 4);
-        int TODO; // parse error and save it locally
-
-        uu1 = response[5];
-        uu2 = response[6];
-        voltage = (uu1 << 8) | uu2;
-        voltage = voltage * mNominalVoltage / STEPS_COUNT;
-
-        uu1 = response[7];
-        uu2 = response[8];
-        current = (uu1 << 8) | uu2;
-        current = current * mNominalCurrent / STEPS_COUNT;
+        LOG_ERROR("Incorrect object id '%i'", objectID);
+        return;
     }
+
+    Request request;
+    request.data.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
+    request.data.append(SINGLE_MODEL);
+    request.data.append(objectID);
+    addCheckSum(request.data);
+
+    request.operation = operation;
+    mRequestQueue.push_back(request);
 }
 
-void ModulePower::setUpdatePeriod(int msec, bool startTimer)
+void ModulePower::getCurVoltageAndCurrent()
 {
-    mUpdatePeriod = msec;
+    Request request;
+    request.data.append(encodeStartDelimiter(QUERY_DATA, 6)); // 6 bytes of data is waiting in response
+    request.data.append(SINGLE_MODEL);
+    request.data.append(DEVICE_STATUS_ACTUAL);
+    addCheckSum(request.data);
 
-    if (startTimer)
-    {
-        if (mUpdatePeriod > 0)
-        {
-            mUpdateTimer->setInterval(mUpdatePeriod);
-            mUpdateTimer->start();
-        }
-        else
-        {
-            mUpdateTimer->stop();
-        }
-    }
-}
-
-void ModulePower::update()
-{
-    getCurVoltageAndCurrent(mVoltage, mCurrent, mError);
+    request.operation = GET_CUR_VOLTAGE_AND_CURRENT;
+    mRequestQueue.push_back(request);
 }
 
 void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
 {
     QMap<uint32_t, QVariant> response;
 
-    int TODO; // do not process command in not initialized state
+    if (!mIsInitialized)
+    {
+        LOG_ERROR("Power module is not initialized");
+        response[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
+        emit commandResult(response);
+        return;
+    }
 
     ModuleCommands::CommandID command = ModuleCommands::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
-
-    response[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
-    response[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
-    response[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
-    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 
     switch (command)
     {
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-        getVoltageAndCurrent(params, response);
+        getVoltageAndCurrent(params);
         break;
 
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-        setVoltageAndCurrent(params, response);
+        setVoltageAndCurrent(params);
         break;
 
 //    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
-//        setMaxVoltageAndCurrent(params, response);
+//        setMaxVoltageAndCurrent(params);
 //        break;
 
     case ModuleCommands::RESET_ERROR:
@@ -270,27 +220,30 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
         break;
 
     case ModuleCommands::SET_POWER_STATE:
-        setPowerState(params, response);
+        setPowerState(params);
         break;
 
     default:
+        {
+            LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
+            response[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
+            emit commandResult(response);
+            return;
+        }
         break;
     }
 
-    // send response
-    emit commandResult(response);
+    mRequestQueue.back().response[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
+    mRequestQueue.back().response[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
+    mRequestQueue.back().response[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
+    mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+
+    processQueue();
 }
 
-void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
 {
-    // execute command
-    qreal voltage = -1;
-    qreal current = -1;
-    uint8_t error = 0xff;
-    getCurVoltageAndCurrent(voltage, current, error);
-
-    // fill response
-    response[SystemState::ERROR_CODE] = QVariant(uint32_t(error));
+    getCurVoltageAndCurrent(); // add request to queue
 
     uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
     QString varName1    = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toString();
@@ -299,33 +252,20 @@ void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 
     if (paramType1 == SystemState::VOLTAGE)
     {
-        response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName1);
-        response[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(voltage);
-        response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName2);
-        response[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(current);
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName1);
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName2);
     }
     else
     {
-        response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName2);
-        response[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(voltage);
-        response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName1);
-        response[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(current);
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName2);
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName1);
     }
-
-    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(4);
 }
 
-void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
 {
     // get input params
-    //uint32_t paramType = request.value(SystemState::INPUT_PARAM_BASE + 0).toUInt();
-    qreal voltage      = request.value(SystemState::INPUT_PARAM_BASE + 1).toDouble();
-    //uint32_t paramType2 = request.value(SystemState::INPUT_PARAM_BASE + 2).toUInt();
-    //qreal value2        = request.value(SystemState::INPUT_PARAM_BASE + 3).toDouble();
-
-    //qreal voltage = (paramType1 == SystemState::VOLTAGE) ? value1 : value2;
-    //qreal current = (paramType1 == SystemState::VOLTAGE) ? value2 : value1;
-
+    qreal voltage = request.value(SystemState::INPUT_PARAM_BASE + 1).toDouble();
     LOG_INFO("Try to set current voltage to : U=%f", voltage);
 
     if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
@@ -366,9 +306,6 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
     setObjectValue(SET_VALUE_I, maxCurrentByPower, mNominalCurrent);
 
     LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, maxCurrentByPower);
-
-    // fill response
-    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 }
 
 //void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
@@ -397,30 +334,52 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, 
 //    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 //}
 
-void ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+void ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request)
 {
     int TODO;
 }
 
-bool ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
+void ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
 {
-    QByteArray request;
-    request.append(encodeStartDelimiter(TO_DEVICE, SEND, SEND_DATA, 2));
-    request.append(SINGLE_MODEL);
-    request.append(POWER_SUPPLY_CONTROL);
+    static QMap<int, int> operations;
+    if (operations.empty())
+    {
+        operations[SWITCH_POWER_OUTPUT_ON] = PSC_SWITCH_POWER_OUTPUT_ON;
+        operations[SWITCH_POWER_OUTPUT_OFF] = PSC_SWITCH_POWER_OUTPUT_OFF;
+        operations[ACKNOWLEDGE_ALARMS] = PSC_ACKNOWLEDGE_ALARMS;
+        operations[SWITCH_TO_REMOTE_CTRL] = PSC_SWITCH_TO_REMOTE_CTRL;
+        operations[SWITCH_TO_MANUAL_CTRL] = PSC_SWITCH_TO_MANUAL_CTRL;
+        operations[TRACKING_ON] = PSC_TRACKING_ON;
+        operations[TRACKING_OFF] = PSC_TRACKING_OFF;
+    }
+
+    Operation operation = Operation(operations.value(command, UNKNOWN_OPERATION));
+    if (operation == UNKNOWN_OPERATION)
+    {
+        LOG_ERROR("Incorrect command id '%i'", command);
+        return;
+    }
+
+    Request request;
+    request.data.append(encodeStartDelimiter(SEND_DATA, 2));
+    request.data.append(SINGLE_MODEL);
+    request.data.append(POWER_SUPPLY_CONTROL);
 
     uint16_t cmd = command;
-    request.append(uint8_t((cmd >> 8) & 0x00ff));
-    request.append(uint8_t(cmd & 0x00ff));
+    request.data.append(uint8_t((cmd >> 8) & 0x00ff));
+    request.data.append(uint8_t(cmd & 0x00ff));
 
-    addCheckSum(request);
+    addCheckSum(request.data);
 
-    QByteArray response;
-    return send(request, response, WAIT_FOR_RESPONSE_TIME);
+    request.operation = operation;
+    mRequestQueue.push_back(request);
 }
 
-uint8_t ModulePower::encodeStartDelimiter(Direction dir, CastType cType, TransmissionType trType, uint8_t dataSize)
+uint8_t ModulePower::encodeStartDelimiter(TransmissionType trType, uint8_t dataSize)
 {
+    Direction dir = TO_DEVICE;
+    CastType cType = SEND;
+
     uint8_t delimiter = 0;
     delimiter += uint8_t(dir);
     delimiter += uint8_t(cType);
@@ -446,64 +405,250 @@ void ModulePower::addCheckSum(QByteArray& data)
     data.append(uint8_t(sum & 0x00ff));
 }
 
-qreal ModulePower::getNominalValue(ObjectID objectID)
+void ModulePower::getNominalValue(ObjectID objectID)
 {
-    switch (objectID)
+    Operation operation;
+
+    if (objectID == NOMINAL_VOLTAGE)
     {
-    case NOMINAL_VOLTAGE:
-    case NOMINAL_CURRENT:
-    case NOMINAL_POWER:
-        {
-            QByteArray request;
-            request.append(encodeStartDelimiter(TO_DEVICE, SEND, QUERY_DATA, 4));
-            request.append(SINGLE_MODEL);
-            request.append(objectID);
-            addCheckSum(request);
-
-            QByteArray response;
-            if (send(request, response, WAIT_FOR_RESPONSE_TIME))
-            {
-                QByteArray tmp;
-                tmp.push_back(response[3]);
-                tmp.push_back(response[4]);
-                tmp.push_back(response[5]);
-                tmp.push_back(response[6]);
-                return qreal(byteArrayToFloat(tmp));
-            }
-        }
-        break;
-
-    default:
+        operation = GET_NOMINAL_VOLTAGE;
+    }
+    else if (objectID == NOMINAL_CURRENT)
+    {
+        operation = GET_NOMINAL_CURRENT;
+    }
+    else if (objectID == GET_NOMINAL_POWER)
+    {
+        operation = GET_NOMINAL_POWER;
+    }
+    else
+    {
         LOG_WARNING("Incorrect object id '%i'", objectID);
-        break;
+        return;
     }
 
-    return 0;
+    Request request;
+    request.data.append(encodeStartDelimiter(QUERY_DATA, 4));
+    request.data.append(SINGLE_MODEL);
+    request.data.append(objectID);
+    addCheckSum(request.data);
+
+    request.operation = operation;
+    mRequestQueue.push_back(request);
 }
 
-uint16_t ModulePower::getDeviceClass()
+void ModulePower::getDeviceClass()
 {
-    uint16_t value = 0;
+    Request request;
 
-    QByteArray request;
-    request.append(encodeStartDelimiter(TO_DEVICE, SEND, QUERY_DATA, 2)); // 2 bytes of data is waiting in response
-    request.append(SINGLE_MODEL);
-    request.append(DEVICE_CLASS);
-    addCheckSum(request);
+    request.data.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
+    request.data.append(SINGLE_MODEL);
+    request.data.append(DEVICE_CLASS);
+    addCheckSum(request.data);
 
-    QByteArray response;
-    if (send(request, response, WAIT_FOR_RESPONSE_TIME))
-    {
-        uint8_t uu1, uu2;
-        uu1 = response[3];
-        uu2 = response[4];
-        value  = (uu1 << 8) | uu2;
-    }
-
-    return value;
+    request.operation = GET_DEVICE_CLASS;
+    mRequestQueue.push_back(request);
 }
 
 void ModulePower::onApplicationFinish()
 {
     int TODO; // power off on app close
+}
+
+void ModulePower::processQueue()
+{
+    if (!mRequestQueue.isEmpty())
+    {
+        if (!send(mRequestQueue.front().data))
+        {
+            LOG_ERROR(QString("Can no send request to power module. Flushing request queue..."));
+            mRequestQueue.clear();
+            int TODO; // send some signal for cyclogram? error?
+        }
+    }
+}
+
+void ModulePower::processResponse(const QByteArray& response)
+{
+    if (response.isEmpty())
+    {
+        LOG_ERROR(QString("No response received by power module! Flushing request queue..."));
+        mRequestQueue.clear();
+        return;
+    }
+
+    Operation operation = mRequestQueue.front().operation;
+
+    switch (operation)
+    {
+    case GET_DEVICE_CLASS:
+        {
+            uint8_t uu1, uu2;
+            uu1 = response[3];
+            uu2 = response[4];
+            mDeviceClass = (uu1 << 8) | uu2;
+        }
+        break;
+
+    case GET_NOMINAL_CURRENT:
+        {
+            QByteArray tmp;
+            tmp.push_back(response[3]);
+            tmp.push_back(response[4]);
+            tmp.push_back(response[5]);
+            tmp.push_back(response[6]);
+            mNominalCurrent = qreal(byteArrayToFloat(tmp));
+        }
+        break;
+
+    case GET_NOMINAL_VOLTAGE:
+        {
+            QByteArray tmp;
+            tmp.push_back(response[3]);
+            tmp.push_back(response[4]);
+            tmp.push_back(response[5]);
+            tmp.push_back(response[6]);
+            mNominalVoltage = qreal(byteArrayToFloat(tmp));
+        }
+        break;
+
+    case GET_NOMINAL_POWER:
+        {
+            QByteArray tmp;
+            tmp.push_back(response[3]);
+            tmp.push_back(response[4]);
+            tmp.push_back(response[5]);
+            tmp.push_back(response[6]);
+            mNominalPower = qreal(byteArrayToFloat(tmp));
+
+            // second step of initialization, add some requests (TODO move to the initialization cyclogram)
+            getCurVoltageAndCurrent();
+            sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // switch module to remote control to have ability to set U and I
+
+            getObjectValue(OVP_THRESHOLD);
+            getObjectValue(OCP_THRESHOLD);
+
+            // set voltage and current thresholds
+            setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
+            setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
+
+            //mIsInitialized = true; // TODO must be after these commands execution! send signal about initialization result!
+        }
+        break;
+
+    case SET_OVP_THRESHOLD:
+        {
+            int TODO; // parse response that is all OK
+        }
+        break;
+
+    case SET_OCP_THRESHOLD:
+        {
+            int TODO; // parse response that is all OK
+        }
+        break;
+
+    case SET_SET_VALUE_I:
+        {
+            int TODO; // parse response that is all OK
+        }
+        break;
+
+    case SET_SET_VALUE_U:
+        {
+            int TODO; // parse response that is all OK
+        }
+        break;
+
+    case GET_CUR_VOLTAGE_AND_CURRENT:
+        {
+            uint8_t uu1, uu2;
+            mError = (response[4] >> 4);
+            if (mError != 0)
+            {
+                LOG_ERROR("Error occured! TODO");
+            }
+            int TODO; // parse error and save it locally
+
+            uu1 = response[5];
+            uu2 = response[6];
+            mVoltage = (uu1 << 8) | uu2;
+            mVoltage = mVoltage * mNominalVoltage / STEPS_COUNT;
+
+            uu1 = response[7];
+            uu2 = response[8];
+            mCurrent = (uu1 << 8) | uu2;
+            mCurrent = mCurrent * mNominalCurrent / STEPS_COUNT;
+
+            if (!mRequestQueue.front().response.empty())
+            {
+                mRequestQueue.front().response[SystemState::ERROR_CODE] = QVariant(uint32_t(mError));
+                mRequestQueue.front().response[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(mVoltage);
+                mRequestQueue.front().response[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(mCurrent);
+                mRequestQueue.front().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(4);
+            }
+        }
+        break;
+
+    case GET_OVP_THRESHOLD:
+        {
+            uint8_t uu1, uu2;
+            uu1 = response[3];
+            uu2 = response[4];
+            mVoltageThreshold  = (uu1 << 8) | uu2;
+            mVoltageThreshold = mVoltageThreshold * mNominalVoltage / qreal(STEPS_COUNT);
+        }
+        break;
+
+    case GET_OCP_THRESHOLD:
+        {
+            uint8_t uu1, uu2;
+            uu1 = response[3];
+            uu2 = response[4];
+            mCurrentThreshold  = (uu1 << 8) | uu2;
+            mCurrentThreshold = mCurrentThreshold * mNominalCurrent / qreal(STEPS_COUNT);
+        }
+        break;
+
+    case PSC_SWITCH_TO_REMOTE_CTRL:
+    case PSC_SWITCH_TO_MANUAL_CTRL:
+    case PSC_TRACKING_ON:
+    case PSC_TRACKING_OFF:
+        {
+            int TODO; // parse response that is all OK
+        }
+        break;
+    case PSC_ACKNOWLEDGE_ALARMS:
+        {
+            int TODO; // parse response, to not have errors
+            mError = 0;
+        }
+        break;
+
+    case PSC_SWITCH_POWER_OUTPUT_OFF:
+        {
+            int TODO; // parse response, to not have errors
+            mState = ModuleCommands::POWER_OFF;
+        }
+        break;
+
+    case PSC_SWITCH_POWER_OUTPUT_ON:
+        {
+            int TODO; // parse response, to not have errors
+            mState = ModuleCommands::POWER_ON;
+        }
+        break;
+
+    default:
+        LOG_WARNING(QString("Unexpected response received. Operation is %1").arg(int(operation)));
+        break;
+    }
+
+    if (!mRequestQueue.front().response.empty())
+    {
+        emit commandResult(mRequestQueue.front().response);
+    }
+
+    mRequestQueue.pop_front();
+    processQueue();
 }

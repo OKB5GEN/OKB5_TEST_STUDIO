@@ -21,14 +21,20 @@ ModuleTech::~ModuleTech()
 
 int ModuleTech::tech_send(int com, int x, int y)
 {
-    QByteArray request(4, 0);
-    request[0] = TECH_DEFAULT_ADDR;
-    request[1] = com;
-    request[2] = x;
-    request[3] = y;
+    int TODO;
+
+    /*QByteArray request;
+    request.append(TECH_DEFAULT_ADDR);
+    request.append(com);
+    request.append(x);
+    request.append(y);
+
     QByteArray response;
     COMPortModule::send(request, response, WAIT_FOR_RESPONSE_TIME);
-    return response[3];
+    return response[3];*/
+
+    return 0;
+
 }
 
 int ModuleTech::tech_read(int x)

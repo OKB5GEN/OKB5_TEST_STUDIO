@@ -301,3 +301,8 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
 
     emit commandResult(response);
 }
+
+void ModuleOKB::processResponse(const QByteArray& response)
+{
+    TODO; // send to inherited modules
+}
