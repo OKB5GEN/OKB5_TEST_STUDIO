@@ -29,10 +29,15 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response, int wa
 {
     if (mPort && mPort->isOpen())
     {
-        LOG_INFO("Send to COM port:  %s", request.toHex().toStdString().c_str());
+        LOG_TRACE("Send data to COM port:  %s", request.toHex().toStdString().c_str());
 
         mPort->QIODevice::write(request);
-        mPort->waitForBytesWritten(-1);
+        if (mPort->waitForBytesWritten(-1))
+        {
+            int TODO;
+            //Returns true if a payload of data was written to the device;
+            //otherwise returns false (i.e. if the operation timed out, or if an error occurred).
+        }
 
         //Sleep(WAIT_TIME);
 
@@ -42,11 +47,11 @@ bool COMPortModule::send(const QByteArray& request, QByteArray& response, int wa
             response.append(mPort->readAll());
         }
 
-        LOG_INFO("Receive from COM port: %s", response.toHex().toStdString().c_str());
+        LOG_TRACE("Receive data from COM port: %s", response.toHex().toStdString().c_str());
         return true;
     }
 
-    LOG_ERROR("Can not send request: %s", request.toHex().toStdString().c_str());
+    LOG_ERROR("Can not send request (no port open): %s", request.toHex().toStdString().c_str());
     return false;
 }
 
