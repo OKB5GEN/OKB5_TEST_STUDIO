@@ -26,7 +26,7 @@ void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState sta
 {
     int TODO; // valid channel values 1 to 6
 
-    sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
+    addCommandToQueue(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
 
     /*
     if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
@@ -43,7 +43,7 @@ void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState 
 {
     //int TODO; // valid channel values 1 to 6
 
-    sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
+    addCommandToQueue(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
     /*if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
     {
         mChannelStates[state];
@@ -56,7 +56,7 @@ void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState 
 
 ModuleCommands::PowerState ModuleSTM::powerChannelState(int channel)
 {
-    sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0);
+    addCommandToQueue(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0);
 
     int TODO;
     //uint8_t uu1, uu2;
@@ -83,7 +83,7 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
         return ModuleSTM::ERROR;
     }
 
-    sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0);
+    addCommandToQueue(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0);
 //        LOG_ERROR("Can not check fuse %i state", fuseIndex);
 //        return ModuleSTM::ERROR;
 

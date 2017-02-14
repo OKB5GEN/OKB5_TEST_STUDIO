@@ -22,6 +22,8 @@ public:
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
 
+    void initialize();
+
 public slots:
 /*    void startMKO();
     void startMKO1();

@@ -13,8 +13,7 @@ namespace
 
 COMPortModule::COMPortModule(QObject* parent):
     AbstractModule(parent),
-    mPort(Q_NULLPTR),
-    mIsInitialized(false)
+    mPort(Q_NULLPTR)
 {
     mProtectionTimer = new QTimer(this);
     mProtectionTimer->setSingleShot(true);
@@ -66,7 +65,7 @@ bool COMPortModule::send(const QByteArray& request)
     return true;
 }
 
-bool COMPortModule::initialize()
+void COMPortModule::initialize()
 {
     QString portName;
 
@@ -91,15 +90,15 @@ bool COMPortModule::initialize()
 
     if (portName.isNull())
     {
-        LOG_ERROR(QString("No COM port name '%1' module found").arg(portName));
-        return false;
+        QString error = QString("Configuration error. No COM port module found");
+        emit initializationFinished(error);
+        return;
     }
 
     createPort(portName);
     connect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
-    mIsInitialized = postInit();
 
-    return mIsInitialized;
+    initializeCustom();
 }
 
 void COMPortModule::createPort(const QString& portName)

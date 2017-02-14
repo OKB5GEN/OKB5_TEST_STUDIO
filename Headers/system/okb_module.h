@@ -18,9 +18,6 @@ public:
     ModuleOKB(QObject* parent);
     virtual ~ModuleOKB();
 
-    uint8_t defaultAddress() const;
-    uint8_t currentAddress() const;
-
     void resetError() override;
 
     int softResetModule();
@@ -31,20 +28,19 @@ public slots:
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
 
 protected:
-    bool postInit() override;
-    virtual bool postInitOKBModule();
+    void initializeCustom() override;
+    virtual void initializeCustomOKBModule();
     virtual void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) = 0;
     virtual void processCustomResponse(const QByteArray& response) = 0;
+    virtual void onExecutionError();
 
     void processResponse(const QByteArray& response) override;
 
-    void sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
+    void addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
-    uint8_t mAddress;
+    uint8_t mCurrentAddress;
     uint8_t mDefaultAddress;
-
-signals:
-    void incorrectSlot(uint8_t defaultAddr);
+    bool mCommonInitializationFinished;
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;

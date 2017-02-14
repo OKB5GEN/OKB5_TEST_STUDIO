@@ -23,7 +23,7 @@ public:
     EditorWindow();
 
     void loadFile(const QString &fileName);
-    void init();
+    void onApplicationStart();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

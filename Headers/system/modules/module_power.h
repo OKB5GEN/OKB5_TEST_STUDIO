@@ -13,7 +13,7 @@ public:
     ModulePower(QObject* parent);
     ~ModulePower();
 
-    bool postInit() override;
+    void initializeCustom() override;
     void resetError() override;
 
 public slots:

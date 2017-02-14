@@ -29,9 +29,8 @@ public:
     void setId(const Identifier& id);
     const Identifier& id() const;
 
-    bool initialize();
+    void initialize();
 
-    virtual bool postInit() = 0;
     virtual void resetError();
     virtual void onApplicationFinish() = 0;
 
@@ -44,6 +43,7 @@ protected:
     };
 
     virtual void processResponse(const QByteArray& response) = 0;
+    virtual void initializeCustom() = 0;
 
     bool send(const QByteArray& request);
     void processQueue();
@@ -51,8 +51,6 @@ protected:
 
     QSerialPort* mPort;
     Identifier mID;
-    bool mIsInitialized;
-
     QList<Request> mRequestQueue;
 
 private slots:

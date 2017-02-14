@@ -42,7 +42,7 @@ int ModuleOTD::dsCount(LineID line) const
     return mSensorsCntNu;
 }
 
-bool ModuleOTD::postInitOKBModule()
+void ModuleOTD::initializeCustomOKBModule()
 {
     // 1. Read sensors count on both lines
     // 2. Read sensors addresses on both lines
@@ -56,12 +56,12 @@ bool ModuleOTD::postInitOKBModule()
     resetError();
 
     // reset sensors on both lines (it doesn't work without that :))
-    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0);
-    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0);
+    addCommandToQueue(ModuleCommands::RESET_LINE_1, 0, 0);
+    addCommandToQueue(ModuleCommands::RESET_LINE_2, 0, 0);
 
     // read sensors count on both lines
-    sendCommand(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
-    sendCommand(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
+    addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
+    addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
 
     // get sensors adresses TODO (пока пофиг)
     /*
@@ -83,7 +83,6 @@ bool ModuleOTD::postInitOKBModule()
     }*/
 
     processQueue();
-    return true;
 }
 
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
@@ -98,7 +97,7 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
             LOG_INFO("Start temperature measurement with PT100 sensors");
             for (int i = 0; i < MAX_PT100_COUNT; ++i)
             {
-                sendCommand(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
+                addCommandToQueue(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
             }
         }
         break;
@@ -106,10 +105,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
             LOG_INFO("Start temperature measurement at line 1");
-            sendCommand(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
+            addCommandToQueue(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
             for(int i = 0; i < mSensorsCntPsy; ++i)
             {
-                sendCommand(command, i + 1, 0);
+                addCommandToQueue(command, i + 1, 0);
             }
         }
         break;
@@ -117,10 +116,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
             LOG_INFO("Start temperature measurement at line 2");
-            sendCommand(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
+            addCommandToQueue(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
             for(int i = 0; i < mSensorsCntNu; ++i)
             {
-                sendCommand(command, i + 1, 0);
+                addCommandToQueue(command, i + 1, 0);
             }
         }
         break;

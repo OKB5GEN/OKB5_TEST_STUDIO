@@ -28,7 +28,7 @@ public slots:
     void onApplicationFinish() override;
 
 protected:
-    bool postInitOKBModule() override;
+    void initializeCustomOKBModule() override;
 
 private:
     int mSensorsCntPsy = 0;

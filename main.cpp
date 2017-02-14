@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     }
 
     mainWin.show();
-    mainWin.init();
+    mainWin.onApplicationStart();
     int result = app.exec();
 
     LOG_INFO("========== APPLICATION FINISHED ==========");

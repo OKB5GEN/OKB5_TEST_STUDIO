@@ -1046,3 +1046,8 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 {
     int TODO;
 }
+
+void ModuleMKO::initialize()
+{
+    int TODO;
+}

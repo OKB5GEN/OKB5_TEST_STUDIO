@@ -59,15 +59,16 @@ EditorWindow::EditorWindow():
     mCyclogram->setSystemState(mSystemState);
 }
 
-void EditorWindow::init()
+void EditorWindow::onApplicationStart()
 {
-    mSystemState->restart();
+    mSystemState->onApplicationStart();
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
 {
     if (maybeSave())
     {
+        int TODO; // on application finish processing here!
         writeSettings();
         event->accept();
     }

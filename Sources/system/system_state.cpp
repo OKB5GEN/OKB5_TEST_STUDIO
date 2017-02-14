@@ -116,9 +116,9 @@ namespace
 SystemState::SystemState(QObject* parent):
     VariableController(parent),
     m_mko_kits(ModuleMKO::NO_KIT),
-    mIsInitialized(false),
-    mThreadMKO(Q_NULLPTR),
-    mThreadOTD(Q_NULLPTR),
+    mSystemReady(false),
+//    mThreadMKO(Q_NULLPTR),
+//    mThreadOTD(Q_NULLPTR),
     mCurCommand(Q_NULLPTR),
     mMKO(Q_NULLPTR),
     mOTD(Q_NULLPTR),
@@ -134,7 +134,7 @@ SystemState::SystemState(QObject* parent):
 
 SystemState::~SystemState()
 {
-    if (mThreadMKO && mThreadMKO->isRunning())
+/*    if (mThreadMKO && mThreadMKO->isRunning())
     {
         mThreadMKO->terminate();
     }
@@ -143,7 +143,7 @@ SystemState::~SystemState()
     {
         mThreadOTD->terminate();
     }
-/*
+
     if (mMKO)
     {
         delete mMKO;
@@ -153,6 +153,11 @@ SystemState::~SystemState()
     {
         delete mOTD;
     }*/
+}
+
+void SystemState::onApplicationStart()
+{
+    createModules();
 }
 
 void SystemState::restart()
@@ -201,8 +206,6 @@ void SystemState::restart()
      *   - нужны для подачи питания на нагреватели, если температура низкая и их отключения, если температура достигла рабочей
      *
     */
-
-    createModules();
 
     mPowerBUP->restart();
     mPowerPNA->restart();
@@ -1166,92 +1169,113 @@ SystemState::ParamID SystemState::paramID(const QString& name) const
 
 void SystemState::createModules()
 {
-    if (mIsInitialized)
-    {
-        return;
-    }
-
-    bool isSystemReady = true;
-
+    // Load modules configuration file
     QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
     loadSystemConfig(modules);
 
-    // MKO creation
-    mMKO = new ModuleMKO(this); //TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    // Create modules objects
+    mMKO = new ModuleMKO(this);
     connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(mMKO, SIGNAL(initializationFinished(const QString&)), this, SLOT(onMKOInitFinished(const QString&)));
 
-    // OTD creation
-    mOTD = new ModuleOTD(this);//TODO really no parent? use Q_NULLPTR - is when moveToThread() used
+    mOTD = new ModuleOTD(this);
     mOTD->setId(modules.value(ModuleCommands::OTD));
     connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(mOTD, SIGNAL(initializationFinished(const QString&)), this, SLOT(onOTDInitFinished(const QString&)));
 
-    int TODO2; // вообще надо проверять только по типу и идентифицировать модуль запросом адреса модуля
-
-    if (!mOTD->initialize())
-    {
-        LOG_ERROR("OTD initialization failed!");
-        isSystemReady = false;
-    }
-
-    // STM creation
     mSTM = new ModuleSTM(this);
     mSTM->setId(modules.value(ModuleCommands::STM));
     connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(mSTM, SIGNAL(initializationFinished(const QString&)), this, SLOT(onSTMInitFinished(const QString&)));
 
-    if (!mSTM->initialize())
-    {
-        LOG_ERROR("STM initialization failed!");
-        isSystemReady = false;
-    }
-
-    // Tech creation
     mTech = new ModuleTech(this);
     mTech->setId(modules.value(ModuleCommands::TECH));
     connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(mTech, SIGNAL(initializationFinished(const QString&)), this, SLOT(onTechInitFinished(const QString&)));
 
-    if (!mTech->initialize())
-    {
-        LOG_ERROR("Tech initialization failed!");
-        isSystemReady = false;
-    }
-
-    // Power unit BUP creation
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
     connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
-
-    if (!mPowerBUP->initialize())
-    {
-        LOG_ERROR("BUP Power Unit initialization failed!");
-        isSystemReady = false;
-    }
+    connect(mPowerBUP, SIGNAL(initializationFinished(const QString&)), this, SLOT(onPowerBUPInitFinished(const QString&)));
 
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
     connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(mPowerPNA, SIGNAL(initializationFinished(const QString&)), this, SLOT(onPowerPNAInitFinished(const QString&)));
 
-    if (!mPowerPNA->initialize())
-    {
-        LOG_ERROR("PNA Power Unit initialization failed!");
-        isSystemReady = false;
-    }
+    // Start modules initialization. They will send 'initializationFinished' signal on initialization finish depending on its internal logic
+    // The entire system will be initialized and ready to execute commands after 'initializationFinished' signal will be receceived from all modules
+    mPowerBUP->initialize();
+    mPowerPNA->initialize();
+    mOTD->initialize();
+    mSTM->initialize();
+    mTech->initialize();
+    mMKO->initialize();
 
-    mIsInitialized = true;
-
+    // Create templates for internal protocol commands parameters
     setupCommandsParams();
+}
 
-    if (isSystemReady)
+void SystemState::onMKOInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::MKO, error);
+}
+
+void SystemState::onOTDInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::OTD, error);
+}
+
+void SystemState::onSTMInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::STM, error);
+}
+
+void SystemState::onTechInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::TECH, error);
+}
+
+void SystemState::onPowerBUPInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::POWER_UNIT_BUP, error);
+}
+
+void SystemState::onPowerPNAInitFinished(const QString& error)
+{
+    onModuleInitFinished(ModuleCommands::POWER_UNIT_PNA, error);
+}
+
+void SystemState::onModuleInitFinished(ModuleCommands::ModuleID id, const QString& error)
+{
+    QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+
+    if (error.isEmpty())
     {
-        LOG_INFO("Modules creation... OK");
+        LOG_INFO(QString("Module '%1' initialization SUCCESS").arg(moduleEnum.valueToKey(id)));
     }
     else
     {
-        LOG_WARNING("Modules creation... FAILED");
+        LOG_ERROR(QString("Module '%1' initialization FAILED! Error: '%2'").arg(moduleEnum.valueToKey(id)).arg(error));
     }
+
+    mModulesStates[id].ready = (error.isEmpty());
+    mModulesStates[id].initialized = true;
+
+    // check system ready
+    for (int i = 0; i < ModuleCommands::MODULES_COUNT; ++i)
+    {
+        if (!mModulesStates[i].initialized)
+        {
+            return;
+        }
+    }
+
+    mSystemReady = true; // all modules initialization finished
 }

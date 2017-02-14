@@ -54,7 +54,7 @@ ModulePower::~ModulePower()
 
 }
 
-bool ModulePower::postInit()
+void ModulePower::initializeCustom()
 {
     // receive device parameters:
 
@@ -81,7 +81,6 @@ bool ModulePower::postInit()
     // - device article number
     // - device software version
     // - device manufacturer
-    return true;
 }
 
 void ModulePower::resetError()
@@ -91,12 +90,6 @@ void ModulePower::resetError()
 
 void ModulePower::restart()
 {
-    if (!mIsInitialized)
-    {
-        LOG_ERROR("Module is not ready");
-        return;
-    }
-
     //if (mError != 0)
     {
         resetError();
@@ -191,13 +184,13 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
 {
     QMap<uint32_t, QVariant> response;
 
-    if (!mIsInitialized)
-    {
-        LOG_ERROR("Power module is not initialized");
-        response[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
-        emit commandResult(response);
-        return;
-    }
+//    if (!mIsInitialized)
+//    {
+//        LOG_ERROR("Power module is not initialized");
+//        response[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
+//        emit commandResult(response);
+//        return;
+//    }
 
     ModuleCommands::CommandID command = ModuleCommands::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
 
