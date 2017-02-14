@@ -10,6 +10,47 @@ namespace
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
     static const int SERIAL_NUMBER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
+
+    double getDS1820Temp(const QByteArray& response)
+    {
+        uint8_t uu1, uu2, z;
+        uu1 = response[2];
+        uu2 = response[3];
+        double uu = (uu1 << 8) | uu2;
+        uint8_t x = response[2];
+        z = x << 4;
+        z = z >> 7;
+        if (z == 0) //TODO определить что такое 0
+        {
+            uu = uu / 16;
+        }
+
+        if (z == 1) //TODO определить что такое 1
+        {
+            uu = (uu - 4096) / 16;
+        }
+
+        return uu;
+    }
+
+    double getPT100Temp(const QByteArray& response)
+    {
+        uint8_t uu1, uu2;
+        uu1 = response[2];
+        uu2 = response[3];
+        double uu = (uu1 << 8) | uu2;
+        uu = uu / 32 - 256;
+
+        int TODO; // parse error
+        //x = x / 100;
+        //y = y / 100;
+        //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+        //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+        //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+        //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+
+        return uu;
+    }
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
@@ -44,26 +85,19 @@ int ModuleOTD::dsCount(LineID line) const
 
 void ModuleOTD::initializeCustomOKBModule()
 {
-    // 1. Read sensors count on both lines
-    // 2. Read sensors addresses on both lines
-    // 3. Start measurement on both lines
-    // 4. Get temperature on all sensors on both lines
-    // 5. Get PT-100 temperature value
-
-    int TODO;
-
-    // reset error if exist
-    resetError();
+    // 1. Reset sensors on both lines
+    // 2. Read sensors count on both lines
+    // 3. Read sensors addresses on both lines (OPTIONAL)
 
     // reset sensors on both lines (it doesn't work without that :))
     addCommandToQueue(ModuleCommands::RESET_LINE_1, 0, 0);
     addCommandToQueue(ModuleCommands::RESET_LINE_2, 0, 0);
 
-    // read sensors count on both lines
+    // read sensors count on both lines (TODO do not change call order)
     addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
     addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
 
-    // get sensors adresses TODO (пока пофиг)
+    // get sensors adresses TODO (what for this functionality is used?)
     /*
     ModuleCommands::CommandID commandGetAddr = (line == PSY) ? ModuleCommands::GET_DS1820_ADDR_LINE_1 : ModuleCommands::GET_DS1820_ADDR_LINE_2;
 
@@ -81,8 +115,6 @@ void ModuleOTD::initializeCustomOKBModule()
             //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
         }
     }*/
-
-    processQueue();
 }
 
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
@@ -151,88 +183,45 @@ void ModuleOTD::processCustomResponse(const QByteArray& response)
     {
     case ModuleCommands::GET_DS1820_COUNT_LINE_1:
         {
-            int TODO; // check error
-
             mSensorsCntPsy = response[2];
-            LOG_INFO("DS1820 sensors count at 1 (PSY) line is %i", mSensorsCntPsy);
+            LOG_INFO("DS1820 sensors count at line 1 is %i", mSensorsCntPsy);
         }
         break;
 
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
         {
-            int TODO; // check error
-
             mSensorsCntNu = response[2];
-            LOG_INFO("DS1820 sensors count at 2 (NU) line is %i", mSensorsCntNu);
+            LOG_INFO("DS1820 sensors count at line 2 is %i", mSensorsCntNu);
+
+            if (!mCustomInitializationFinished)
+            {
+                mCustomInitializationFinished = true;
+                emit initializationFinished(QString(""));
+            }
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
-            uint8_t uu1, uu2, z;
-            uu1 = response[2];
-            uu2 = response[3];
-            double uu = (uu1 << 8) | uu2;
-            uint8_t x = response[2];
-            z = x << 4;
-            z = z >> 7;
-            if (z == 0) //TODO определить что такое 0
-            {
-                uu = uu / 16;
-            }
-
-            if (z == 1) //TODO определить что такое 1
-            {
-                uu = (uu - 4096) / 16;
-            }
-
-            LOG_INFO("Sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
+            double uu = getDS1820Temp(response);
+            LOG_INFO("Sensor #%i at line 1 temperature is %f", mTemperatureData.size() + 1, uu);
             mTemperatureData.push_back(uu);
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
-            uint8_t uu1, uu2, z;
-            uu1 = response[2];
-            uu2 = response[3];
-            double uu = (uu1 << 8) | uu2;
-            uint8_t x = response[2];
-            z = x << 4;
-            z = z >> 7;
-            if (z == 0) //TODO определить что такое 0
-            {
-                uu = uu / 16;
-            }
-
-            if (z == 1) //TODO определить что такое 1
-            {
-                uu = (uu - 4096) / 16;
-            }
-
-            LOG_INFO("Sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
+            double uu = getDS1820Temp(response);
+            LOG_INFO("Sensor #%i at line 2 temperature is %f", mTemperatureData.size() + 1, uu);
             mTemperatureData.push_back(uu);
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
-            uint8_t uu1, uu2;
-            uu1 = response[2];
-            uu2 = response[3];
-            double uu = (uu1 << 8) | uu2;
-            uu = uu / 32 - 256;
-
+            double uu = getPT100Temp(response);
             LOG_INFO("PT100 sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
             mTemperatureData.push_back(uu);
-
-            //x = x / 100;
-            //y = y / 100;
-            //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-            //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-            //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-            //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-
         }
         break;
 

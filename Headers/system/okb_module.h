@@ -38,12 +38,14 @@ protected:
 
     void addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
-    uint8_t mCurrentAddress;
-    uint8_t mDefaultAddress;
-    bool mCommonInitializationFinished;
+    bool mCustomInitializationFinished;
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;
+
+    uint8_t mCurrentAddress;
+    uint8_t mDefaultAddress;
+    bool mCommonInitializationFinished;
 };
 
 #endif // OKB_MODULE_H

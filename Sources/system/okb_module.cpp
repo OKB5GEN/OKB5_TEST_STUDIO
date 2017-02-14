@@ -14,7 +14,8 @@ ModuleOKB::ModuleOKB(QObject* parent):
     COMPortModule(parent),
     mCurrentAddress(0xff),
     mDefaultAddress(0xff),
-    mCommonInitializationFinished(false)
+    mCommonInitializationFinished(false),
+    mCustomInitializationFinished(false)
 {
     int TODO; // вообще надо проверять ОКБ модули только по типу и идентифицировать модуль запросом адреса модуля
 }
@@ -168,6 +169,7 @@ int ModuleOKB::getSoftwareVersion()
 
 void ModuleOKB::initializeCustomOKBModule()
 {
+    mCustomInitializationFinished = true;
     emit initializationFinished(QString(""));
 }
 

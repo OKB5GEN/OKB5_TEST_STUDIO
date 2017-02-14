@@ -878,7 +878,6 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
 void SystemState::setupCommandsParams()
 {
     createPowerUnitCommandsParams();
-    createOTDCommandsParams();
 
     int TODO; // replace by constant usage
 
@@ -1230,6 +1229,11 @@ void SystemState::onMKOInitFinished(const QString& error)
 void SystemState::onOTDInitFinished(const QString& error)
 {
     onModuleInitFinished(ModuleCommands::OTD, error);
+
+    if (error.isEmpty())
+    {
+        createOTDCommandsParams();
+    }
 }
 
 void SystemState::onSTMInitFinished(const QString& error)
