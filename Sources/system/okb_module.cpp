@@ -41,7 +41,6 @@ void ModuleOKB::initializeCustom()
 
     addCommandToQueue(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
     addCommandToQueue(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
-    addCommandToQueue(ModuleCommands::GET_STATUS_WORD, 0, 0);
     processQueue();
 }
 
@@ -55,7 +54,6 @@ void ModuleOKB::addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1,
     request.data.append(param2);
 
     request.operation = cmd;
-
     mRequestQueue.push_back(request);
 }
 
@@ -275,19 +273,27 @@ void ModuleOKB::processResponse(const QByteArray& response)
             if (address == ModuleCommands::CURRENT)
             {
                 mCurrentAddress = value;
+                LOG_DEBUG("Module current address is 0x%x", mCurrentAddress);
             }
             else if (address == ModuleCommands::DEFAULT)
             {
                 mDefaultAddress = value;
+                LOG_DEBUG("Module default address is 0x%x", mDefaultAddress);
             }
 
             if (   mCurrentAddress != 0xff
                 && mDefaultAddress != 0xff
-                && !mCommonInitializationFinished
-                && mCurrentAddress != mDefaultAddress)
+                && !mCommonInitializationFinished)
             {
-                QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
-                emit initializationFinished(error);
+                if (mCurrentAddress != mDefaultAddress)
+                {
+                    QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
+                    emit initializationFinished(error);
+                }
+                else
+                {
+                    addCommandToQueue(ModuleCommands::GET_STATUS_WORD, 0, 0);
+                }
             }
         }
         break;
@@ -303,6 +309,7 @@ void ModuleOKB::processResponse(const QByteArray& response)
             if ((y & MODULE_READY_MASK) == 0)
             {
                 error = QString("Module 0x%1, is not ready").arg(QString::number(mCurrentAddress, 16));
+                //TODO soft reset module
             }
 
             if ((y & HAS_ERRORS_MASK) > 0)
@@ -330,7 +337,6 @@ void ModuleOKB::processResponse(const QByteArray& response)
                 if (!error.isEmpty())
                 {
                     int TODO; // possibly try to reset error?
-                    QString error = QString("Module has errors");
                     emit initializationFinished(error);
                 }
                 else

@@ -405,7 +405,7 @@ void ModulePower::getNominalValue(ObjectID objectID)
     {
         operations[NOMINAL_VOLTAGE] = GET_NOMINAL_VOLTAGE;
         operations[NOMINAL_CURRENT] = GET_NOMINAL_CURRENT;
-        operations[GET_NOMINAL_POWER] = GET_NOMINAL_POWER;
+        operations[NOMINAL_POWER] = GET_NOMINAL_POWER;
     }
 
     Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
@@ -496,7 +496,7 @@ void ModulePower::processResponse(const QByteArray& response)
             tmp.push_back(response[6]);
             mNominalPower = qreal(byteArrayToFloat(tmp));
 
-            // second step of initialization, add some requests (TODO move to the initialization cyclogram)
+            // second step of initialization, add some requests (TODO move to the initialization cyclogram?)
             getCurVoltageAndCurrent();
             sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // switch module to remote control to have ability to set U and I
 
@@ -506,8 +506,6 @@ void ModulePower::processResponse(const QByteArray& response)
             // set voltage and current thresholds
             setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
             setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
-
-            //mIsInitialized = true; // TODO must be after these commands execution! send signal about initialization result!
         }
         break;
 
@@ -519,6 +517,12 @@ void ModulePower::processResponse(const QByteArray& response)
 
     case SET_OCP_THRESHOLD:
         {
+            if (!mInitializationFinished)
+            {
+                mInitializationFinished = true;
+                emit initializationFinished(QString(""));
+            }
+
             int TODO; // parse response that is all OK
         }
         break;

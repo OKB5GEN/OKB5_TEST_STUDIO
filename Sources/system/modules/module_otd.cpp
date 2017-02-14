@@ -237,8 +237,21 @@ void ModuleOTD::processCustomResponse(const QByteArray& response)
             int TODO; // check error
         }
         break;
+
+    case ModuleCommands::RESET_LINE_1:
+        {
+            int TODO; // check error
+        }
+        break;
+
+    case ModuleCommands::RESET_LINE_2:
+        {
+            int TODO; // check error
+        }
+        break;
+
     default:
-        LOG_WARNING("Unexpected command id=%i response received by OTD module", command);
+        LOG_WARNING(QString("Unexpected command id=0x%1 response received by OTD module: %2").arg(QString::number(command, 16)).arg(QString(response.toHex().toStdString().c_str())));
         break;
     }
 

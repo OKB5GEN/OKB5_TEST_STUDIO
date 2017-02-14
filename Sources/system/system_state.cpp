@@ -1282,4 +1282,6 @@ void SystemState::onModuleInitFinished(ModuleCommands::ModuleID id, const QStrin
     }
 
     mSystemReady = true; // all modules initialization finished
+
+    restart();
 }

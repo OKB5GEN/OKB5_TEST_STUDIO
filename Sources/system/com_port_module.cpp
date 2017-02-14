@@ -60,7 +60,7 @@ bool COMPortModule::send(const QByteArray& request)
         return false;
     }
 
-    LOG_TRACE("Send data to COM port:  %s", request.toHex().toStdString().c_str());
+    LOG_DEBUG(QString("Send data to %1 port:  %2").arg(mPort->portName()).arg(QString(request.toHex().toStdString().c_str())));
     mProtectionTimer->start(PROTECTION_TIMEOUT);
     return true;
 }
@@ -163,6 +163,7 @@ void COMPortModule::onResponseReceived()
     {
         QByteArray response;
         response.append(mPort->readAll());
+        LOG_DEBUG(QString("Receive data from %1 port:  %2").arg(mPort->portName()).arg(QString(response.toHex().toStdString().c_str())));
         processResponse(response);
     }
 }

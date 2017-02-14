@@ -1049,5 +1049,6 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 
 void ModuleMKO::initialize()
 {
+    emit initializationFinished(QString("MKO not implemented"));
     int TODO;
 }
