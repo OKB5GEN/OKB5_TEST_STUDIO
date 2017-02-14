@@ -7,13 +7,12 @@
 
 namespace
 {
-    static const int DEAFULT_WAIT_FOR_RESPONSE_TIME = 100; // msec
 }
 
 ModuleOKB::ModuleOKB(QObject* parent):
     COMPortModule(parent),
-      mAddress(0xff),
-      mDefaultAddress(0xff)
+    mAddress(0xff),
+    mDefaultAddress(0xff)
 {
 
 }
@@ -25,70 +24,24 @@ ModuleOKB::~ModuleOKB()
 
 bool ModuleOKB::postInit()
 {
-    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT, DEAFULT_WAIT_FOR_RESPONSE_TIME))
-    {
-        return false;
-    }
-
-    if (!sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT, DEAFULT_WAIT_FOR_RESPONSE_TIME))
-    {
-        return false;
-    }
-
-    if (mAddress != mDefaultAddress)
-    {
-        emit incorrectSlot(mDefaultAddress);
-    }
+    sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
+    sendCommand(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
 
     return postInitOKBModule();
 }
 
-bool ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2, int waitForResponseTime, QByteArray* responseExt)
+void ModuleOKB::sendCommand(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
-    QByteArray request;
-    request.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress);
-    request.append(cmd);
-    request.append(param1);
-    request.append(param2);
+    Request request;
 
-    QByteArray response;
-    if (!send(request, response, waitForResponseTime))
-    {
-        return false;
-    }
+    request.data.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mAddress);
+    request.data.append(cmd);
+    request.data.append(param1);
+    request.data.append(param2);
 
-    if (responseExt)
-    {
-        *responseExt = response;
-    }
+    request.operation = cmd;
 
-    if (response.size() != 4) //TODO remove magic number
-    {
-        LOG_ERROR("Incorrect response size=%i", response.size());
-        return false;
-    }
-
-    if (canReturnError(cmd) && response.at(3) == ModuleCommands::CMD_ERROR)
-    {
-        LOG_ERROR("Command execution failed on device");
-        return false;
-    }
-
-    if (cmd == ModuleCommands::GET_MODULE_ADDRESS)
-    {
-        uint8_t value = response.at(2);
-
-        if (param2 == ModuleCommands::DEFAULT)
-        {
-            mDefaultAddress = value;
-        }
-        else if (param2 == ModuleCommands::CURRENT)
-        {
-            mAddress = value;
-        }
-    }
-
-    return true;
+    mRequestQueue.push_back(request);
 }
 
 bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
@@ -167,8 +120,7 @@ void ModuleOKB::resetError()
     requset[2] = 0x00;
     requset[3] = 0x00;
 
-    QByteArray response;
-    send(requset, response, DEAFULT_WAIT_FOR_RESPONSE_TIME);
+    send(requset);
     int TODO;
 /*    if (readData.size() > 3)
     {
@@ -190,13 +142,12 @@ int ModuleOKB::softResetModule()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    QByteArray readData1;
-    send(buffer, readData1, DEAFULT_WAIT_FOR_RESPONSE_TIME);
+    send(buffer);
 
     resetPort();
     //setActive(id, true);
 
-    return readData1[3];
+    return 0; //readData1[3]; //TODO
 }
 
 int ModuleOKB::getSoftwareVersion()
@@ -207,9 +158,8 @@ int ModuleOKB::getSoftwareVersion()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    QByteArray response;
-    send(buffer, response, DEAFULT_WAIT_FOR_RESPONSE_TIME);
-    return (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
+    send(buffer);
+    return 0; //TODO (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
 }
 
 bool ModuleOKB::postInitOKBModule()
@@ -225,44 +175,9 @@ bool ModuleOKB::hasErrors()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    QByteArray response;
-    if (send(buffer, response, DEAFULT_WAIT_FOR_RESPONSE_TIME))
+    if (send(buffer))
     {
-        bool hasError = false;
-        uint8_t y = response[2];
-        uint8_t x = response[3];
-
-        if ((y & MODULE_READY_MASK) == 0)
-        {
-            LOG_ERROR("Module 0x%02x, is not ready", mAddress);
-            hasError = true;
-        }
-
-        if ((y & HAS_ERRORS_MASK) > 0)
-        {
-            LOG_ERROR("Module 0x%02x, has errors", mAddress);
-            hasError = true;
-        }
-
-        if ((y & AFTER_RESET_MASK) > 0)
-        {
-            LOG_ERROR("Module 0x%02x, is after RESET", mAddress);
-            hasError = true;
-        }
-
-        if (x == 0x10)
-        {
-            LOG_ERROR("RS485 data byte lost in module 0x%02x due to buffer overflow", mAddress);
-            hasError = true;
-        }
-
-        if (x == 0x11)
-        {
-            LOG_ERROR("UMART data byte lost in module 0x%02x due to buffer overflow", mAddress);
-            hasError = true;
-        }
-
-        return hasError;
+        return false;//TODO
     }
 
     return true;
@@ -299,10 +214,118 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
         break;
     }
 
-    emit commandResult(response);
+    processQueue();
+    //emit commandResult(response);
 }
 
 void ModuleOKB::processResponse(const QByteArray& response)
 {
-    TODO; // send to inherited modules
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mRequestQueue.front().operation);
+
+    if (response.isEmpty())
+    {
+        LOG_ERROR(QString("No response received by power module! Flushing request queue..."));
+        mRequestQueue.clear();
+        return;
+    }
+
+    if (response.size() != 4) //TODO remove magic number
+    {
+        LOG_ERROR("Incorrect response size=%i. Flushing request queue...", response.size());
+        mRequestQueue.clear();
+        return;
+    }
+
+    if (canReturnError(command) && response.at(3) == ModuleCommands::CMD_ERROR)
+    {
+        LOG_ERROR("Command execution failed on device. Flushing request queue...");
+        mRequestQueue.clear();
+        return;
+    }
+
+    switch (command)
+    {
+    case ModuleCommands::GET_MODULE_ADDRESS:
+        {
+            uint8_t value = response.at(2);
+
+            if (mDefaultAddress == 0xff) //TODO unsafe, default ALWAYS must be asked before current address
+            {
+                mDefaultAddress = value;
+            }
+            else if (mAddress == 0xff)
+            {
+                mAddress = value;
+            }
+            else
+            {
+                if (mAddress != mDefaultAddress)
+                {
+                    emit incorrectSlot(mDefaultAddress);
+                }
+            }
+        }
+        break;
+
+    case ModuleCommands::GET_STATUS_WORD:
+        {
+            bool hasError = false;
+            uint8_t y = response[2];
+            uint8_t x = response[3];
+
+            if ((y & MODULE_READY_MASK) == 0)
+            {
+                LOG_ERROR("Module 0x%02x, is not ready", mAddress);
+                hasError = true;
+            }
+
+            if ((y & HAS_ERRORS_MASK) > 0)
+            {
+                LOG_ERROR("Module 0x%02x, has errors", mAddress);
+                hasError = true;
+            }
+
+            if ((y & AFTER_RESET_MASK) > 0)
+            {
+                LOG_ERROR("Module 0x%02x, is after RESET", mAddress);
+                hasError = true;
+            }
+
+            if (x == 0x10)
+            {
+                LOG_ERROR("RS485 data byte lost in module 0x%02x due to buffer overflow", mAddress);
+                hasError = true;
+            }
+
+            if (x == 0x11)
+            {
+                LOG_ERROR("UMART data byte lost in module 0x%02x due to buffer overflow", mAddress);
+                hasError = true;
+            }
+        }
+        break;
+
+    case ModuleCommands::RESET_ERROR:
+    case ModuleCommands::SOFT_RESET:
+    case ModuleCommands::GET_SOWFTWARE_VER:
+    case ModuleCommands::ECHO:
+        {
+            int TODO; // process commands here
+        }
+        break;
+
+    default: // if command is not in "common" commands list
+        {
+            processCustomResponse(response);
+        }
+        break;
+    }
+
+    if (!mRequestQueue.front().response.empty())
+    {
+        emit commandResult(mRequestQueue.front().response);
+    }
+
+    mRequestQueue.pop_front();
+    processQueue();
 }

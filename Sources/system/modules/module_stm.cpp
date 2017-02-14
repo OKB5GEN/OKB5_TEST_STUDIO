@@ -9,7 +9,6 @@ namespace
     static const int STM_DEFAULT_ADDR = 0x22;
     static const qreal CHANNEL_CONNECTED_BORDER = 2.0;
     static const int MAX_CHANNELS_COUNT = 16;
-    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 }
 
 ModuleSTM::ModuleSTM(QObject* parent):
@@ -27,12 +26,9 @@ void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState sta
 {
     int TODO; // valid channel values 1 to 6
 
-    if (!sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0, WAIT_FOR_RESPONSE_TIME))
-    {
-        LOG_ERROR("Channel %i is not set to %i state", channel, state);
-        return;
-    }
+    sendCommand(ModuleCommands::POWER_CHANNEL_CTRL, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
 
+    /*
     if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
     {
         mChannelStates[state];
@@ -40,19 +36,14 @@ void ModuleSTM::setPowerChannelState(int channel, ModuleCommands::PowerState sta
     else
     {
         LOG_ERROR("Invalid STM channel index %i", channel);
-    }
+    }*/
 }
 
 void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState state)
 {
     //int TODO; // valid channel values 1 to 6
 
-    if (!sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0, WAIT_FOR_RESPONSE_TIME))
-    {
-        LOG_ERROR("MKO Channel %i is not set to %i state", channel, state);
-        return;
-    }
-
+    sendCommand(ModuleCommands::SET_MKO_PWR_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
     /*if (channel >= 0 && channel < MAX_CHANNELS_COUNT)
     {
         mChannelStates[state];
@@ -65,24 +56,19 @@ void ModuleSTM::setMKOPowerChannelState(int channel, ModuleCommands::PowerState 
 
 ModuleCommands::PowerState ModuleSTM::powerChannelState(int channel)
 {
-    QByteArray response;
+    sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0);
 
-    if (!sendCommand(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0, WAIT_FOR_RESPONSE_TIME, &response))
+    int TODO;
+    //uint8_t uu1, uu2;
+    //uu1 = response[2];
+    //uu2 = response[3];
+    //qreal voltage = qreal((uu1 << 8) | uu2) / 10000;
+
+    //LOG_INFO("Channel voltage is %f", voltage);
+
+    //if (voltage >= CHANNEL_CONNECTED_BORDER)
     {
-        LOG_ERROR("Can not get channel %i telemetry", channel);
-        return ModuleCommands::POWER_OFF;
-    }
-
-    uint8_t uu1, uu2;
-    uu1 = response[2];
-    uu2 = response[3];
-    qreal voltage = qreal((uu1 << 8) | uu2) / 10000;
-
-    LOG_INFO("Channel voltage is %f", voltage);
-
-    if (voltage >= CHANNEL_CONNECTED_BORDER)
-    {
-        return ModuleCommands::POWER_ON;
+    //    return ModuleCommands::POWER_ON;
     }
 
     return ModuleCommands::POWER_OFF;
@@ -97,14 +83,12 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
         return ModuleSTM::ERROR;
     }
 
-    QByteArray response;
-    if (!sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0, WAIT_FOR_RESPONSE_TIME, &response))
-    {
-        LOG_ERROR("Can not check fuse %i state", fuseIndex);
-        return ModuleSTM::ERROR;
-    }
+    sendCommand(ModuleCommands::GET_PWR_MODULE_FUSE_STATE, fuseIndex, 0);
+//        LOG_ERROR("Can not check fuse %i state", fuseIndex);
+//        return ModuleSTM::ERROR;
 
-    int state = response[3];
+    //TODO
+    int state = 0; //response[3];
 
     QMetaEnum e = QMetaEnum::fromType<ModuleSTM::FuseStates>();
     LOG_INFO("Fuse %i state %s", fuseIndex, e.valueToKey(ModuleSTM::FuseStates(state)));
@@ -138,6 +122,52 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
 
     default:
         LOG_ERROR("Unexpected command %i received by STM module", command);
+        break;
+    }
+}
+
+void ModuleSTM::processCustomResponse(const QByteArray& response)
+{
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mRequestQueue.front().operation);
+
+    switch (command)
+    {
+    case ModuleCommands::POWER_CHANNEL_CTRL:
+        {
+            int TODO;
+        }
+        break;
+
+    case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:
+        {
+            int TODO;
+        }
+        break;
+
+    case ModuleCommands::GET_CHANNEL_TELEMETRY:
+        {
+            int TODO;
+        }
+        break;
+
+    case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:
+        {
+            int TODO;
+        }
+        break;
+
+    case ModuleCommands::GET_POWER_MODULE_STATE:
+        {
+            int TODO;
+        }
+        break;
+    case ModuleCommands::GET_MKO_MODULE_STATE:
+        {
+            int TODO;
+        }
+        break;
+
+    default:
         break;
     }
 }

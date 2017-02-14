@@ -24,6 +24,7 @@ public:
 
 public slots:
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+    void processCustomResponse(const QByteArray& response) override;
     void onApplicationFinish() override;
 
 private:

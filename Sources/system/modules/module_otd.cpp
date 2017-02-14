@@ -10,10 +10,6 @@ namespace
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
     static const int SERIAL_NUMBER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
-
-    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
-    static const int START_MEASUREMENT_WAIT_TIME = 3000; // msec
-    static const int READ_SENSORS_DATA_WAIT_TIME = 200; // msec
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
@@ -46,140 +42,26 @@ int ModuleOTD::dsCount(LineID line) const
     return mSensorsCntNu;
 }
 
-void ModuleOTD::resetLine(LineID line)
-{
-    ModuleCommands::CommandID command = (line == PSY) ? ModuleCommands::RESET_LINE_1 : ModuleCommands::RESET_LINE_2;
-    if (!sendCommand(command, 0, 0, WAIT_FOR_RESPONSE_TIME))
-    {
-        int TODO;
-    }
-}
-
 bool ModuleOTD::postInitOKBModule()
 {
-    resetError();
-
-    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0, WAIT_FOR_RESPONSE_TIME);
-    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0, WAIT_FOR_RESPONSE_TIME);
-
     // 1. Read sensors count on both lines
     // 2. Read sensors addresses on both lines
     // 3. Start measurement on both lines
     // 4. Get temperature on all sensors on both lines
     // 5. Get PT-100 temperature value
 
-    readDS1820Data(PSY);
-    readDS1820Data(NU);
+    int TODO;
 
-    return true;
-}
+    // reset error if exist
+    resetError();
 
-void ModuleOTD::measureDS1820(LineID line, QList<qreal>& values)
-{
-    // start measurement
-    LOG_INFO("Start temperature measurement at line %i", line);
-    ModuleCommands::CommandID command = (line == PSY) ? ModuleCommands::START_MEASUREMENT_LINE_1 : ModuleCommands::START_MEASUREMENT_LINE_2;
-    if (!sendCommand(command, 0, 0, START_MEASUREMENT_WAIT_TIME))
-    {
-        return;
-    }
+    // reset sensors on both lines (it doesn't work without that :))
+    sendCommand(ModuleCommands::RESET_LINE_1, 0, 0);
+    sendCommand(ModuleCommands::RESET_LINE_2, 0, 0);
 
-    LOG_INFO("Retreive temperature data from line %i", line);
-    int count = 0;
-    if (line == PSY)
-    {
-        count = mSensorsCntPsy;
-    }
-    else
-    {
-        count = mSensorsCntNu;
-    }
-
-    // get temperature data
-    for(int i = 0; i < count; ++i)
-    {
-        ModuleCommands::CommandID getCommand = (line == PSY) ? ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1 : ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2;
-        QByteArray response;
-        if (!sendCommand(getCommand, i + 1, 0, WAIT_FOR_RESPONSE_TIME, &response))
-        {
-            continue;
-        }
-
-        uint8_t uu1, uu2, z;
-        uu1 = response[2];
-        uu2 = response[3];
-        double uu = (uu1 << 8) | uu2;
-        uint8_t x = response[2];
-        z = x << 4;
-        z = z >> 7;
-        if (z == 0) //TODO определить что такое 0
-        {
-            uu = uu / 16;
-        }
-
-        if (z == 1) //TODO определить что такое 1
-        {
-            uu = (uu - 4096) / 16;
-        }
-
-        LOG_INFO("Sensor %i temperature is %f", i + 1, uu);
-        values.push_back(uu);
-    }
-}
-
-void ModuleOTD::measurePT100(QList<qreal>& values)
-{
-    LOG_INFO("Start temperature measurement with PT100 sensors");
-    for (int i = 0; i < MAX_PT100_COUNT; ++i)
-    {
-        QByteArray response;
-        if (!sendCommand(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0, WAIT_FOR_RESPONSE_TIME, &response))
-        {
-            continue;
-        }
-
-        uint8_t uu1, uu2;
-        uu1 = response[2];
-        uu2 = response[3];
-        double uu = (uu1 << 8) | uu2;
-        uu = uu / 32 - 256;
-
-        values.push_back(uu);
-        LOG_INFO("PT100 sensor %i temperature is %f", i + 1, uu);
-
-        //x = x / 100;
-        //y = y / 100;
-        //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-        //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-        //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-        //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-    }
-}
-
-void ModuleOTD::readDS1820Data(LineID line)
-{
-    LOG_INFO("Read line %i sensors data", line);
-    QByteArray response;
-
-    // get sensors count
-    ModuleCommands::CommandID commandGetCount = (line == PSY) ? ModuleCommands::GET_DS1820_COUNT_LINE_1 : ModuleCommands::GET_DS1820_COUNT_LINE_2;
-
-    if (!sendCommand(commandGetCount, 0, 0, READ_SENSORS_DATA_WAIT_TIME, &response))
-    {
-        return;
-    }
-
-    int count = response[2];
-    if (line == PSY)
-    {
-        mSensorsCntPsy = count;
-        LOG_INFO("DS1820 sensors count at 1 (PSY) line is %i", count);
-    }
-    else
-    {
-        mSensorsCntNu = count;
-        LOG_INFO("DS1820 sensors count at 2 (NU) line is %i", count);
-    }
+    // read sensors count on both lines
+    sendCommand(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
+    sendCommand(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
 
     // get sensors adresses TODO (пока пофиг)
     /*
@@ -199,43 +81,184 @@ void ModuleOTD::readDS1820Data(LineID line)
             //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
         }
     }*/
+
+    processQueue();
+    return true;
 }
 
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
+    mTemperatureData.clear();
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
-    QList<qreal> temperature;
 
     switch (command)
     {
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
-            measurePT100(temperature);
+            LOG_INFO("Start temperature measurement with PT100 sensors");
+            for (int i = 0; i < MAX_PT100_COUNT; ++i)
+            {
+                sendCommand(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
+            }
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
-            measureDS1820(PSY, temperature);
+            LOG_INFO("Start temperature measurement at line 1");
+            sendCommand(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
+            for(int i = 0; i < mSensorsCntPsy; ++i)
+            {
+                sendCommand(command, i + 1, 0);
+            }
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
-            measureDS1820(NU, temperature);
+            LOG_INFO("Start temperature measurement at line 2");
+            sendCommand(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
+            for(int i = 0; i < mSensorsCntNu; ++i)
+            {
+                sendCommand(command, i + 1, 0);
+            }
         }
         break;
 
     default:
         LOG_ERROR("Unexpected command %i received by OTD module", command);
+        return;
         break;
     }
 
-    if (!temperature.empty())
+    mRequestQueue.back().response = response;
+
+    // set variables
+    int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+    for (int i = 0; i < paramsCount; ++i)
+    {
+        QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
+    }
+
+    mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+}
+
+void ModuleOTD::processCustomResponse(const QByteArray& response)
+{
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mRequestQueue.front().operation);
+
+    switch (command)
+    {
+    case ModuleCommands::GET_DS1820_COUNT_LINE_1:
+        {
+            int TODO; // check error
+
+            mSensorsCntPsy = response[2];
+            LOG_INFO("DS1820 sensors count at 1 (PSY) line is %i", mSensorsCntPsy);
+        }
+        break;
+
+    case ModuleCommands::GET_DS1820_COUNT_LINE_2:
+        {
+            int TODO; // check error
+
+            mSensorsCntNu = response[2];
+            LOG_INFO("DS1820 sensors count at 2 (NU) line is %i", mSensorsCntNu);
+        }
+        break;
+
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+        {
+            uint8_t uu1, uu2, z;
+            uu1 = response[2];
+            uu2 = response[3];
+            double uu = (uu1 << 8) | uu2;
+            uint8_t x = response[2];
+            z = x << 4;
+            z = z >> 7;
+            if (z == 0) //TODO определить что такое 0
+            {
+                uu = uu / 16;
+            }
+
+            if (z == 1) //TODO определить что такое 1
+            {
+                uu = (uu - 4096) / 16;
+            }
+
+            LOG_INFO("Sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
+            mTemperatureData.push_back(uu);
+        }
+        break;
+
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+        {
+            uint8_t uu1, uu2, z;
+            uu1 = response[2];
+            uu2 = response[3];
+            double uu = (uu1 << 8) | uu2;
+            uint8_t x = response[2];
+            z = x << 4;
+            z = z >> 7;
+            if (z == 0) //TODO определить что такое 0
+            {
+                uu = uu / 16;
+            }
+
+            if (z == 1) //TODO определить что такое 1
+            {
+                uu = (uu - 4096) / 16;
+            }
+
+            LOG_INFO("Sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
+            mTemperatureData.push_back(uu);
+        }
+        break;
+
+    case ModuleCommands::GET_TEMPERATURE_PT100:
+        {
+            uint8_t uu1, uu2;
+            uu1 = response[2];
+            uu2 = response[3];
+            double uu = (uu1 << 8) | uu2;
+            uu = uu / 32 - 256;
+
+            LOG_INFO("PT100 sensor %i temperature is %f", mTemperatureData.size() + 1, uu);
+            mTemperatureData.push_back(uu);
+
+            //x = x / 100;
+            //y = y / 100;
+            //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+            //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+            //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+            //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+
+        }
+        break;
+
+
+    case ModuleCommands::START_MEASUREMENT_LINE_1:
+        {
+            int TODO; // check error
+        }
+        break;
+
+    case ModuleCommands::START_MEASUREMENT_LINE_2:
+        {
+            int TODO; // check error
+        }
+        break;
+    default:
+        LOG_WARNING("Unexpected command id=%i response received by OTD module", command);
+        break;
+    }
+
+    if (!mRequestQueue.back().response.empty())
     {
         // fill response
-        int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
-        int valuesCount = temperature.size();
+        int paramsCount = mRequestQueue.back().response.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
+        int valuesCount = mTemperatureData.size();
 
         if (paramsCount != valuesCount)
         {
@@ -245,14 +268,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
 
         for (int i = 0; i < paramsCount; ++i)
         {
-            uint32_t paramType = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2).toUInt();
-            QString varName    = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-
-            response[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
-            response[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(temperature[i]);
+            mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
         }
 
-        response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+        mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
     }
 }
 

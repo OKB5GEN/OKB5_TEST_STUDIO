@@ -5,8 +5,6 @@
 
 #include <QList>
 
-class QTimer;
-
 class ModuleOTD: public ModuleOKB
 {
     Q_OBJECT
@@ -26,21 +24,17 @@ public:
 
 public slots:
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+    void processCustomResponse(const QByteArray& response) override;
     void onApplicationFinish() override;
 
 protected:
     bool postInitOKBModule() override;
 
 private:
-    void resetLine(LineID line);
-    void readDS1820Data(LineID line);
-    void measureDS1820(LineID line, QList<qreal>& values);
-    void measurePT100(QList<qreal>& values);
-
-    //QTimer * mTimer;
-
     int mSensorsCntPsy = 0;
     int mSensorsCntNu = 0;
+
+    QList<qreal> mTemperatureData;
 };
 
 #endif // MODULE_OTD_H

@@ -304,6 +304,11 @@ void ModuleTech::processCustomCommand(const QMap<uint32_t, QVariant>& request, Q
     int TODO; // do not send signals, just execute command and fill response
 }
 
+void ModuleTech::processCustomResponse(const QByteArray& response)
+{
+    int TODO;
+}
+
 void ModuleTech::onApplicationFinish()
 {
     int TODO;

@@ -3,9 +3,6 @@
 
 #include "Headers/system/com_port_module.h"
 
-#include <QMap>
-#include <QVariant>
-
 class QTimer;
 
 class ModulePower: public COMPortModule
@@ -120,13 +117,6 @@ private:
         UNKNOWN_OPERATION
     };
 
-    struct Request
-    {
-        Operation operation;
-        QByteArray data;
-        QMap<uint32_t, QVariant> response;
-    };
-
     template<typename T>
     static T limitValue(const T& value, const T& nominal, const T& threshold)
     {
@@ -152,8 +142,6 @@ private:
     static uint8_t encodeStartDelimiter(TransmissionType trType, uint8_t dataSize);
     static void addCheckSum(QByteArray& data);
 
-    void processQueue();
-
     ModuleCommands::PowerState mState;
 
     qreal mVoltageThreshold;
@@ -166,8 +154,6 @@ private:
 
     uint16_t mDeviceClass; //TODO not used, we use SIMPLE module version
     uint8_t mError;
-
-    QList<Request> mRequestQueue;
 };
 
 #endif // MODULE_POWER_H

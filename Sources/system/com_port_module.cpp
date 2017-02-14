@@ -176,3 +176,16 @@ void COMPortModule::onResponseTimeout()
     QByteArray response;
     processResponse(response);
 }
+
+void COMPortModule::processQueue()
+{
+    if (!mRequestQueue.isEmpty())
+    {
+        if (!send(mRequestQueue.front().data))
+        {
+            LOG_ERROR(QString("Can no send request to power module. Flushing request queue..."));
+            mRequestQueue.clear();
+            int TODO; // send some signal for cyclogram? error?
+        }
+    }
+}

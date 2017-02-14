@@ -4,6 +4,9 @@
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
+#include <QMap>
+#include <QVariant>
+
 class QSerialPort;
 class QTimer;
 
@@ -33,15 +36,24 @@ public:
     virtual void onApplicationFinish() = 0;
 
 protected:
-    bool send(const QByteArray& request);
+    struct Request
+    {
+        uint32_t operation;
+        QByteArray data;
+        QMap<uint32_t, QVariant> response;
+    };
 
     virtual void processResponse(const QByteArray& response) = 0;
 
+    bool send(const QByteArray& request);
+    void processQueue();
     void resetPort();
 
     QSerialPort* mPort;
     Identifier mID;
     bool mIsInitialized;
+
+    QList<Request> mRequestQueue;
 
 private slots:
     void onResponseReceived();

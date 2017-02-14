@@ -407,23 +407,18 @@ void ModulePower::addCheckSum(QByteArray& data)
 
 void ModulePower::getNominalValue(ObjectID objectID)
 {
-    Operation operation;
+    static QMap<int, int> operations;
+    if (operations.empty())
+    {
+        operations[NOMINAL_VOLTAGE] = GET_NOMINAL_VOLTAGE;
+        operations[NOMINAL_CURRENT] = GET_NOMINAL_CURRENT;
+        operations[GET_NOMINAL_POWER] = GET_NOMINAL_POWER;
+    }
 
-    if (objectID == NOMINAL_VOLTAGE)
+    Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
+    if (operation == UNKNOWN_OPERATION)
     {
-        operation = GET_NOMINAL_VOLTAGE;
-    }
-    else if (objectID == NOMINAL_CURRENT)
-    {
-        operation = GET_NOMINAL_CURRENT;
-    }
-    else if (objectID == GET_NOMINAL_POWER)
-    {
-        operation = GET_NOMINAL_POWER;
-    }
-    else
-    {
-        LOG_WARNING("Incorrect object id '%i'", objectID);
+        LOG_ERROR("Incorrect object id '%i'", objectID);
         return;
     }
 
@@ -455,19 +450,6 @@ void ModulePower::onApplicationFinish()
     int TODO; // power off on app close
 }
 
-void ModulePower::processQueue()
-{
-    if (!mRequestQueue.isEmpty())
-    {
-        if (!send(mRequestQueue.front().data))
-        {
-            LOG_ERROR(QString("Can no send request to power module. Flushing request queue..."));
-            mRequestQueue.clear();
-            int TODO; // send some signal for cyclogram? error?
-        }
-    }
-}
-
 void ModulePower::processResponse(const QByteArray& response)
 {
     if (response.isEmpty())
@@ -477,7 +459,7 @@ void ModulePower::processResponse(const QByteArray& response)
         return;
     }
 
-    Operation operation = mRequestQueue.front().operation;
+    Operation operation = Operation(mRequestQueue.front().operation);
 
     switch (operation)
     {
