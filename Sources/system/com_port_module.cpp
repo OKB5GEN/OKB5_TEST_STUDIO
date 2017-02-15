@@ -170,7 +170,7 @@ void COMPortModule::onResponseReceived()
 
 void COMPortModule::onResponseTimeout()
 {
-    LOG_ERROR(QString("Wait for response timeout. "));
+    LOG_ERROR(QString("Port '%1' Wait for response timeout.").arg(mPort->portName()));
 
     // send empty response
     QByteArray response;
