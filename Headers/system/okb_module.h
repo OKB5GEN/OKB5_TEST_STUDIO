@@ -21,28 +21,27 @@ public:
     ModuleOKB(QObject* parent);
     virtual ~ModuleOKB();
 
-    void resetError() override;
-
-    int softResetModule();
-    int getSoftwareVersion();
-    bool hasErrors();
-
 public slots:
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
 
 protected:
     void initializeCustom() override;
+
+    void onTransmissionError(uint32_t operationID) override;
+    void onTransmissionComplete() override;
+    void onSoftResetComplete() override;
+
     virtual void initializeCustomOKBModule();
+    virtual void createResponse(QMap<uint32_t, QVariant>& response);
     virtual void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) = 0;
-    virtual void processCustomResponse(const QByteArray& response) = 0;
-    virtual void onExecutionError();
+    virtual bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;
+    virtual void onModuleError() = 0;
 
-    void processResponse(const QByteArray& response) override;
+    bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
 
-    void addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
+    void addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
     bool mCustomInitializationFinished;
-    QMap<uint32_t, QVariant> mCurrentResponse;
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;

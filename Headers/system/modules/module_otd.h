@@ -24,15 +24,19 @@ public:
 
 public slots:
     void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
-    void processCustomResponse(const QByteArray& response) override;
     void onApplicationFinish() override;
 
 protected:
+    bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
+    void createResponse(QMap<uint32_t, QVariant>& response) override;
     void initializeCustomOKBModule() override;
+    void onModuleError() override;
 
 private:
     int mSensorsCntPsy = 0;
     int mSensorsCntNu = 0;
+
+    QMap<uint32_t, QVariant> mTmpResponse;
 
     QList<qreal> mTemperatureData;
 };

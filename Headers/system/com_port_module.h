@@ -37,7 +37,7 @@ public:
 protected:
     // return true if processing successful
     // return false if processing failed, and request queue must be resetted
-    virtual bool processResponse(uint32_t operationID, const QByteArray& response) = 0;
+    virtual bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;
 
     // called when current request was not send to COM port or response not received
     virtual void onTransmissionError(uint32_t operationID) = 0;

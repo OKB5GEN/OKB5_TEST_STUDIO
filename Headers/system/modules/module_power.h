@@ -17,7 +17,6 @@ public:
     ~ModulePower();
 
     void initializeCustom() override;
-    void resetError() override;
 
 public slots:
     void restart();
@@ -26,7 +25,11 @@ public slots:
     void onApplicationFinish() override;
 
 protected:
-    void processResponse(const QByteArray& response) override;
+    bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
+
+    void onTransmissionError(uint32_t operationID) override;
+    void onTransmissionComplete() override;
+    void onSoftResetComplete() override;
 
 private:
     enum ObjectID

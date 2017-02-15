@@ -3,8 +3,6 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/system/system_state.h"
 
-//#include <QTimer>
-
 namespace
 {
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
@@ -58,9 +56,6 @@ ModuleOTD::ModuleOTD(QObject* parent):
     mSensorsCntPsy(0),
     mSensorsCntNu(0)
 {
-    //mTimer = new QTimer(this);
-    //mTimer->setSingleShot(true);
-    //connect(mTimer, SIGNAL(timeout()), this, SLOT(OTD_timer()));
 }
 
 ModuleOTD::~ModuleOTD()
@@ -90,12 +85,12 @@ void ModuleOTD::initializeCustomOKBModule()
     // 3. Read sensors addresses on both lines (OPTIONAL)
 
     // reset sensors on both lines (it doesn't work without that :))
-    addCommandToQueue(ModuleCommands::RESET_LINE_1, 0, 0);
-    addCommandToQueue(ModuleCommands::RESET_LINE_2, 0, 0);
+    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
+    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
 
     // read sensors count on both lines (TODO do not change call order)
-    addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
-    addCommandToQueue(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
+    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
+    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
 
     // get sensors adresses TODO (what for this functionality is used?)
     /*
@@ -120,6 +115,10 @@ void ModuleOTD::initializeCustomOKBModule()
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
     mTemperatureData.clear();
+    mTmpResponse.clear();
+    mTmpResponse = response;
+    mTmpResponse.detach();
+
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
 
     switch (command)
@@ -129,7 +128,7 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
             LOG_INFO("Start temperature measurement with PT100 sensors");
             for (int i = 0; i < MAX_PT100_COUNT; ++i)
             {
-                addCommandToQueue(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
+                addModuleCmd(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
             }
         }
         break;
@@ -137,10 +136,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
             LOG_INFO("Start temperature measurement at line 1");
-            addCommandToQueue(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
+            addModuleCmd(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
             for(int i = 0; i < mSensorsCntPsy; ++i)
             {
-                addCommandToQueue(command, i + 1, 0);
+                addModuleCmd(command, i + 1, 0);
             }
         }
         break;
@@ -148,10 +147,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
             LOG_INFO("Start temperature measurement at line 2");
-            addCommandToQueue(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
+            addModuleCmd(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
             for(int i = 0; i < mSensorsCntNu; ++i)
             {
-                addCommandToQueue(command, i + 1, 0);
+                addModuleCmd(command, i + 1, 0);
             }
         }
         break;
@@ -162,22 +161,20 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         break;
     }
 
-    mRequestQueue.back().response = response;
-
     // set variables
     int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
     for (int i = 0; i < paramsCount; ++i)
     {
         QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
+        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
     }
 
-    mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+    mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
 }
 
-void ModuleOTD::processCustomResponse(const QByteArray& response)
+bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(mRequestQueue.front().operation);
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(operationID);
 
     switch (command)
     {
@@ -254,29 +251,36 @@ void ModuleOTD::processCustomResponse(const QByteArray& response)
         LOG_WARNING(QString("Unexpected command id=0x%1 response received by OTD module: %2").arg(QString::number(command, 16)).arg(QString(response.toHex().toStdString().c_str())));
         break;
     }
-
-    if (!mRequestQueue.back().response.empty())
-    {
-        // fill response
-        int paramsCount = mRequestQueue.back().response.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
-        int valuesCount = mTemperatureData.size();
-
-        if (paramsCount != valuesCount)
-        {
-            LOG_ERROR("Request output params count (%i) and values count (%i) mismatch", paramsCount, valuesCount);
-            return;
-        }
-
-        for (int i = 0; i < paramsCount; ++i)
-        {
-            mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
-        }
-
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
-    }
 }
 
 void ModuleOTD::onApplicationFinish()
 {
     int TODO;
+}
+
+void ModuleOTD::onModuleError()
+{
+    int TODO; //TODO here will be processing
+}
+
+void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
+{
+    // fill response
+    int paramsCount = mTmpResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
+    int valuesCount = mTemperatureData.size();
+
+    if (paramsCount != valuesCount)
+    {
+        LOG_ERROR("Request output params count (%i) and values count (%i) mismatch", paramsCount, valuesCount);
+        return;
+    }
+
+    for (int i = 0; i < paramsCount; ++i)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
+    }
+
+    mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+
+    response = mTmpResponse;
 }

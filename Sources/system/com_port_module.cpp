@@ -152,7 +152,7 @@ void COMPortModule::onResponseReceived()
     QByteArray response = mPort->readAll();
     LOG_INFO(QString("Recv <---- %1: %2").arg(mPort->portName()).arg(QString(response.toHex().toStdString().c_str())));
 
-    if (!processResponse(mRequestQueue.front().operation, response))
+    if (!processResponse(mRequestQueue.front().operation, mRequestQueue.front().data, response))
     {
         LOG_ERROR(QString("%1 response processing error. Flushing request queue...").arg(mPort->portName()));
         mRequestQueue.clear();
@@ -215,7 +215,7 @@ void COMPortModule::sendRequest()
         return;
     }
 
-    LOG_INFO(QString("Send ----> %1: %2").arg(mPort->portName()).arg(QString(request.toHex().toStdString().c_str())));
+    LOG_INFO(QString("Send ----> %1: %2").arg(mPort->portName()).arg(QString(mRequestQueue.front().data.toHex().toStdString().c_str())));
     mResponseWaitTimer->start(mResponseWaitTime);
 }
 

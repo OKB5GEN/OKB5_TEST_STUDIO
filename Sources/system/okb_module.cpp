@@ -7,7 +7,7 @@
 
 namespace
 {
-    static const int PACKET_SIZE = 4; // all OKB modules commands have 4-byte length
+    static const int OKB_MODULE_MESSAGE_SIZE = 4; // all OKB modules requests/responses have 4-byte length
 }
 
 ModuleOKB::ModuleOKB(QObject* parent):
@@ -39,22 +39,20 @@ void ModuleOKB::initializeCustom()
     //  9. Otherwise initializationFinished signal must be sent from inherited class (SUCCES or ERROR depending on custom logic)
     // 10. If some transmission error will happen during initialization, we consider it as critical error and abort initialization
 
-    addCommandToQueue(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
-    addCommandToQueue(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
-    processQueue();
+    // Initialization step 1: Aquire and check module addresses
+    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
+    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
 }
 
-void ModuleOKB::addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
+void ModuleOKB::addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
-    Request request;
+    QByteArray request;
+    request.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mCurrentAddress);
+    request.append(cmd);
+    request.append(param1);
+    request.append(param2);
 
-    request.data.append((cmd == ModuleCommands::GET_MODULE_ADDRESS) ? 0xff : mCurrentAddress);
-    request.data.append(cmd);
-    request.data.append(param1);
-    request.data.append(param2);
-
-    request.operation = cmd;
-    mRequestQueue.push_back(request);
+    addRequest(cmd, request);
 }
 
 bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
@@ -87,7 +85,7 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     case ModuleCommands::START_MEASUREMENT_LINE_2:
     case ModuleCommands::GET_DS1820_ADDR_LINE_1:
     case ModuleCommands::GET_DS1820_ADDR_LINE_2:
-        return true; // can return ModuleCommands::ERROR in case of hardware failure
+        return true; // can return ModuleCommands::ERROR in case of hardware failure/errors
 
     case ModuleCommands::GET_STATUS_WORD:
     case ModuleCommands::ECHO:
@@ -113,84 +111,11 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     return false;
 }
 
-void ModuleOKB::resetError()
-{
-    int TODO1; // not tested
-    QByteArray requset(4, 0);
-
-    requset[0] = mCurrentAddress;
-    requset[1] = ModuleCommands::RESET_ERROR;
-    requset[2] = 0x00;
-    requset[3] = 0x00;
-
-    sendToPort(requset);
-    int TODO;
-/*    if (readData.size() > 3)
-    {
-        return readData[3];
-    }
-
-    return 0;
-    */
-}
-
-int ModuleOKB::softResetModule()
-{
-    int TODO; // not tested
-    //setActive(id, false);
-
-    QByteArray buffer(4, 0);
-    buffer[0] = mCurrentAddress;
-    buffer[1] = ModuleCommands::SOFT_RESET;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-
-    sendToPort(buffer);
-
-    //softReset(); //TODO call on response to reset receive
-
-    //setActive(id, true);
-
-    return 0; //readData1[3]; //TODO
-}
-
-int ModuleOKB::getSoftwareVersion()
-{
-    QByteArray buffer(4, 0);
-    buffer[0] = mCurrentAddress;
-    buffer[1] = ModuleCommands::GET_SOWFTWARE_VER;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-
-    sendToPort(buffer);
-    return 0; //TODO (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
-}
-
 void ModuleOKB::initializeCustomOKBModule()
 {
+    //TODO stub here
     mCustomInitializationFinished = true;
     emit initializationFinished(QString(""));
-}
-
-void ModuleOKB::onExecutionError()
-{
-    //TODO here will be processing
-}
-
-bool ModuleOKB::hasErrors()
-{
-    QByteArray buffer(4, 0);
-    buffer[0] = mCurrentAddress;
-    buffer[1] = ModuleCommands::GET_STATUS_WORD;
-    buffer[2] = 0x00;
-    buffer[3] = 0x00;
-
-    if (sendToPort(buffer))
-    {
-        return false;//TODO
-    }
-
-    return true;
 }
 
 void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
@@ -213,32 +138,22 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
     case ModuleCommands::GET_SOWFTWARE_VER:
     case ModuleCommands::ECHO:
         {
-            int TODO; // process commands here
+            int TODO; // decode and process common commands here
         }
         break;
 
-    default: // if command is not in "common" commands list
-        {
-            processCustomCommand(params, response);
-        }
+    default: // if command is not in "common" commands list, process it by inherited module
+        processCustomCommand(params, response);
         break;
     }
-
-    processQueue();
-    //emit commandResult(response);
 }
 
-void ModuleOKB::processResponse(const QByteArray& response)
+bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(mRequestQueue.front().operation);
-
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(operationID);
     QString error;
 
-    if (response.isEmpty())
-    {
-        error = QString("No response received by module!");
-    }
-    else if (response.size() != PACKET_SIZE)
+    if (response.size() != OKB_MODULE_MESSAGE_SIZE)
     {
         error = QString("Malformed response packet. Size=%1").arg(response.size());
     }
@@ -256,35 +171,32 @@ void ModuleOKB::processResponse(const QByteArray& response)
         else
         {
             LOG_ERROR(error);
-            onExecutionError();
+            onModuleError();
         }
 
-        LOG_ERROR("Flushing module request queue...");
-        mRequestQueue.clear();
-        return;
+        return false;
     }
 
     switch (command)
     {
     case ModuleCommands::GET_MODULE_ADDRESS:
         {
-            ModuleCommands::ModuleAddress address = ModuleCommands::ModuleAddress(mRequestQueue.front().data.at(3));
+            ModuleCommands::ModuleAddress address = ModuleCommands::ModuleAddress(request.at(3));
             uint8_t value = response.at(2);
 
             if (address == ModuleCommands::CURRENT)
             {
                 mCurrentAddress = value;
-                LOG_DEBUG("Module current address is 0x%x", mCurrentAddress);
+                LOG_INFO("Module current address is 0x%x", mCurrentAddress);
             }
             else if (address == ModuleCommands::DEFAULT)
             {
                 mDefaultAddress = value;
-                LOG_DEBUG("Module default address is 0x%x", mDefaultAddress);
+                LOG_INFO("Module default address is 0x%x", mDefaultAddress);
             }
 
-            if (   mCurrentAddress != 0xff
-                && mDefaultAddress != 0xff
-                && !mCommonInitializationFinished)
+            // Initialization step 1 finish >>>
+            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && !mCommonInitializationFinished)
             {
                 if (mCurrentAddress != mDefaultAddress)
                 {
@@ -293,7 +205,8 @@ void ModuleOKB::processResponse(const QByteArray& response)
                 }
                 else
                 {
-                    addCommandToQueue(ModuleCommands::GET_STATUS_WORD, 0, 0);
+                    // Initialization step 2: Check module status word
+                    addModuleCmd(ModuleCommands::GET_STATUS_WORD, 0, 0);
                 }
             }
         }
@@ -310,7 +223,7 @@ void ModuleOKB::processResponse(const QByteArray& response)
             if ((y & MODULE_READY_MASK) == 0)
             {
                 error = QString("Module 0x%1, is not ready").arg(QString::number(mCurrentAddress, 16));
-                //TODO soft reset module
+                //TODO soft reset module?
             }
 
             if ((y & HAS_ERRORS_MASK) > 0)
@@ -333,11 +246,11 @@ void ModuleOKB::processResponse(const QByteArray& response)
                 LOG_WARNING("UMART data byte lost in module 0x%02x due to buffer overflow", mCurrentAddress);//TODO is it error?
             }
 
-            if (!mCommonInitializationFinished) // application initialization
+            // Initialization step 2 finish >>>
+            if (!mCommonInitializationFinished)
             {
                 if (!error.isEmpty())
                 {
-                    int TODO; // possibly try to reset error?
                     emit initializationFinished(error);
                 }
                 else
@@ -356,27 +269,62 @@ void ModuleOKB::processResponse(const QByteArray& response)
         }
         break;
 
-    case ModuleCommands::RESET_ERROR:
     case ModuleCommands::SOFT_RESET:
+        {
+            // remote module will be reset by watchdog, need to close and reset COM port itself and re-initialize it
+            softReset();
+        }
+        break;
+
+    case ModuleCommands::RESET_ERROR:
+        {
+            int TODO; // need some processing?
+        }
+        break;
+
     case ModuleCommands::GET_SOWFTWARE_VER:
+        {
+            int version = 0; //"response[2].response[3]" типа "0.3" //TODO
+        }
+        break;
+
     case ModuleCommands::ECHO:
         {
-            int TODO; // process commands here
+            int TODO; // check 2 and 3 bytes of request and response
         }
         break;
 
-    default: // if command is not in "common" commands list
-        {
-            processCustomResponse(response);
-        }
+    default: // if command is not in "common" commands list, redirect processing to inherited class
+        return processCustomResponse(operationID, request, response);
         break;
     }
 
-    if (!mRequestQueue.front().response.empty())
+    return true;
+}
+
+void ModuleOKB::onTransmissionError(uint32_t operationID)
+{
+    onModuleError();
+}
+
+void ModuleOKB::onTransmissionComplete()
+{
+    QMap<uint32_t, QVariant> response;
+    createResponse(response);
+
+    if (!response.empty())
     {
-        emit commandResult(mRequestQueue.front().response);
+        LOG_INFO("Send response to cyclogram");
+        emit commandResult(response);
     }
+}
 
-    mRequestQueue.pop_front();
-    processQueue();
+void ModuleOKB::onSoftResetComplete()
+{
+    int TODO; // QSerialPort is up, need some module re-initialization will be here such as initializeCustom() call
+}
+
+void ModuleOKB::createResponse(QMap<uint32_t, QVariant>& response)
+{
+    int TODO; // do nothing?
 }

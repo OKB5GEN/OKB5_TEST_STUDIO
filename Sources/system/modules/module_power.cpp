@@ -73,8 +73,6 @@ void ModulePower::initializeCustom()
     getNominalValue(NOMINAL_VOLTAGE);
     getNominalValue(NOMINAL_POWER);
 
-    processQueue();
-
     // OPTIONAL (for logging only): //TODO
     // - device type
     // - device serial number
@@ -83,24 +81,14 @@ void ModulePower::initializeCustom()
     // - device manufacturer
 }
 
-void ModulePower::resetError()
-{
-    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS);
-}
-
 void ModulePower::restart()
 {
-    //if (mError != 0)
-    {
-        resetError();
-    }
-
+    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
     sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off power output
     setCurVoltage(MIN_VOLTAGE);
 
     // switch "give power supply" on
     sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
-    processQueue();
 }
 
 void ModulePower::setCurVoltage(qreal voltage)
@@ -128,18 +116,17 @@ void ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nom
         return;
     }
 
-    Request request;
+    QByteArray request;
     uint16_t internalValue = uint16_t(qreal(STEPS_COUNT) * actualValue / nominalValue);
 
-    request.data.append(encodeStartDelimiter(SEND_DATA, 2));
-    request.data.append(SINGLE_MODEL);
-    request.data.append(objectID);
-    request.data.append((internalValue >> 8) & 0x00ff);
-    request.data.append(internalValue & 0x00ff);
-    addCheckSum(request.data);
+    request.append(encodeStartDelimiter(SEND_DATA, 2));
+    request.append(SINGLE_MODEL);
+    request.append(objectID);
+    request.append((internalValue >> 8) & 0x00ff);
+    request.append(internalValue & 0x00ff);
+    addCheckSum(request);
 
-    request.operation = operation;
-    mRequestQueue.push_back(request);
+    addRequest(operation, request);
 }
 
 void ModulePower::getObjectValue(ObjectID objectID)
@@ -158,31 +145,29 @@ void ModulePower::getObjectValue(ObjectID objectID)
         return;
     }
 
-    Request request;
-    request.data.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
-    request.data.append(SINGLE_MODEL);
-    request.data.append(objectID);
-    addCheckSum(request.data);
+    QByteArray request;
+    request.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
+    request.append(SINGLE_MODEL);
+    request.append(objectID);
+    addCheckSum(request);
 
-    request.operation = operation;
-    mRequestQueue.push_back(request);
+    addRequest(operation, request);
 }
 
 void ModulePower::getCurVoltageAndCurrent()
 {
-    Request request;
-    request.data.append(encodeStartDelimiter(QUERY_DATA, 6)); // 6 bytes of data is waiting in response
-    request.data.append(SINGLE_MODEL);
-    request.data.append(DEVICE_STATUS_ACTUAL);
-    addCheckSum(request.data);
+    QByteArray request;
+    request.append(encodeStartDelimiter(QUERY_DATA, 6)); // 6 bytes of data is waiting in response
+    request.append(SINGLE_MODEL);
+    request.append(DEVICE_STATUS_ACTUAL);
+    addCheckSum(request);
 
-    request.operation = GET_CUR_VOLTAGE_AND_CURRENT;
-    mRequestQueue.push_back(request);
+    addRequest(GET_CUR_VOLTAGE_AND_CURRENT, request);
 }
 
 void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
 {
-    QMap<uint32_t, QVariant> response;
+    mCurrentResponse.clear();
 
 //    if (!mIsInitialized)
 //    {
@@ -209,7 +194,7 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
 //        break;
 
     case ModuleCommands::RESET_ERROR:
-        resetError();
+        sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS);
         break;
 
     case ModuleCommands::SET_POWER_STATE:
@@ -219,19 +204,17 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
     default:
         {
             LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
-            response[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
-            emit commandResult(response);
+            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
+            emit commandResult(mCurrentResponse);
             return;
         }
         break;
     }
 
-    mRequestQueue.back().response[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
-    mRequestQueue.back().response[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
-    mRequestQueue.back().response[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
-    mRequestQueue.back().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
-
-    processQueue();
+    mCurrentResponse[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
+    mCurrentResponse[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
+    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
+    mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 }
 
 void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
@@ -245,13 +228,13 @@ void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
 
     if (paramType1 == SystemState::VOLTAGE)
     {
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName1);
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName2);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName1);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName2);
     }
     else
     {
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName2);
-        mRequestQueue.back().response[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName1);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName2);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName1);
     }
 }
 
@@ -353,19 +336,16 @@ void ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
         return;
     }
 
-    Request request;
-    request.data.append(encodeStartDelimiter(SEND_DATA, 2));
-    request.data.append(SINGLE_MODEL);
-    request.data.append(POWER_SUPPLY_CONTROL);
-
+    QByteArray request;
+    request.append(encodeStartDelimiter(SEND_DATA, 2));
+    request.append(SINGLE_MODEL);
+    request.append(POWER_SUPPLY_CONTROL);
     uint16_t cmd = command;
-    request.data.append(uint8_t((cmd >> 8) & 0x00ff));
-    request.data.append(uint8_t(cmd & 0x00ff));
+    request.append(uint8_t((cmd >> 8) & 0x00ff));
+    request.append(uint8_t(cmd & 0x00ff));
+    addCheckSum(request);
 
-    addCheckSum(request.data);
-
-    request.operation = operation;
-    mRequestQueue.push_back(request);
+    addRequest(operation, request);
 }
 
 uint8_t ModulePower::encodeStartDelimiter(TransmissionType trType, uint8_t dataSize)
@@ -415,27 +395,25 @@ void ModulePower::getNominalValue(ObjectID objectID)
         return;
     }
 
-    Request request;
-    request.data.append(encodeStartDelimiter(QUERY_DATA, 4));
-    request.data.append(SINGLE_MODEL);
-    request.data.append(objectID);
-    addCheckSum(request.data);
+    QByteArray request;
+    request.append(encodeStartDelimiter(QUERY_DATA, 4));
+    request.append(SINGLE_MODEL);
+    request.append(objectID);
+    addCheckSum(request);
 
-    request.operation = operation;
-    mRequestQueue.push_back(request);
+    addRequest(operation, request);
 }
 
 void ModulePower::getDeviceClass()
 {
-    Request request;
+    QByteArray request;
 
-    request.data.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
-    request.data.append(SINGLE_MODEL);
-    request.data.append(DEVICE_CLASS);
-    addCheckSum(request.data);
+    request.append(encodeStartDelimiter(QUERY_DATA, 2)); // 2 bytes of data is waiting in response
+    request.append(SINGLE_MODEL);
+    request.append(DEVICE_CLASS);
+    addCheckSum(request);
 
-    request.operation = GET_DEVICE_CLASS;
-    mRequestQueue.push_back(request);
+    addRequest(GET_DEVICE_CLASS, request);
 }
 
 void ModulePower::onApplicationFinish()
@@ -443,18 +421,9 @@ void ModulePower::onApplicationFinish()
     int TODO; // power off on app close
 }
 
-void ModulePower::processResponse(const QByteArray& response)
+bool ModulePower::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
-    if (response.isEmpty())
-    {
-        LOG_ERROR(QString("No response received by power module! Flushing request queue..."));
-        mRequestQueue.clear();
-        return;
-    }
-
-    Operation operation = Operation(mRequestQueue.front().operation);
-
-    switch (operation)
+    switch (operationID)
     {
     case GET_DEVICE_CLASS:
         {
@@ -559,12 +528,12 @@ void ModulePower::processResponse(const QByteArray& response)
             mCurrent = (uu1 << 8) | uu2;
             mCurrent = mCurrent * mNominalCurrent / STEPS_COUNT;
 
-            if (!mRequestQueue.front().response.empty())
+            if (!mCurrentResponse.empty())
             {
-                mRequestQueue.front().response[SystemState::ERROR_CODE] = QVariant(uint32_t(mError));
-                mRequestQueue.front().response[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(mVoltage);
-                mRequestQueue.front().response[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(mCurrent);
-                mRequestQueue.front().response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(4);
+                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(mError));
+                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(mVoltage);
+                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(mCurrent);
+                mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(4);
             }
         }
         break;
@@ -619,15 +588,27 @@ void ModulePower::processResponse(const QByteArray& response)
         break;
 
     default:
-        LOG_WARNING(QString("Unexpected response received. Operation is %1").arg(int(operation)));
+        LOG_WARNING(QString("Unexpected response received. Operation is %1").arg(int(operationID)));
         break;
     }
+}
 
-    if (!mRequestQueue.front().response.empty())
+void ModulePower::onTransmissionError(uint32_t operationID)
+{
+    int TODO;
+}
+
+void ModulePower::onTransmissionComplete()
+{
+    if (!mCurrentResponse.empty())
     {
-        emit commandResult(mRequestQueue.front().response);
+        emit commandResult(mCurrentResponse);
     }
 
-    mRequestQueue.pop_front();
-    processQueue();
+    int TODO;
+}
+
+void ModulePower::onSoftResetComplete()
+{
+    int TODO;
 }
