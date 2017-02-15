@@ -3,6 +3,9 @@
 
 #include "Headers/system/com_port_module.h"
 
+#include <QMap>
+#include <QVariant>
+
 class ModuleOKB: public COMPortModule
 {
     Q_OBJECT
@@ -39,6 +42,7 @@ protected:
     void addCommandToQueue(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
     bool mCustomInitializationFinished;
+    QMap<uint32_t, QVariant> mCurrentResponse;
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;

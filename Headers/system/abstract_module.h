@@ -11,6 +11,9 @@ public:
     AbstractModule(QObject* parent): QObject(parent)
     {
     }
+
+    //TODO store module type for logging purposes
+
 public slots:
     virtual void processCommand(const QMap<uint32_t, QVariant>& request) = 0;
 

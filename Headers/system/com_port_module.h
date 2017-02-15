@@ -4,9 +4,6 @@
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
-#include <QMap>
-#include <QVariant>
-
 class QSerialPort;
 class QTimer;
 
@@ -26,41 +23,66 @@ public:
     COMPortModule(QObject* parent);
     virtual ~COMPortModule();
 
+    void setSendInterval(int msec);
+    void setResponseWaitTime(int msec);
+
     void setId(const Identifier& id);
     const Identifier& id() const;
 
     void initialize();
 
-    virtual void resetError();
+    // callback for some actions that must be performed on application finish
     virtual void onApplicationFinish() = 0;
 
 protected:
-    struct Request
-    {
-        uint32_t operation;
-        QByteArray data;
-        QMap<uint32_t, QVariant> response;
-    };
+    // return true if processing successful
+    // return false if processing failed, and request queue must be resetted
+    virtual bool processResponse(uint32_t operationID, const QByteArray& response) = 0;
 
-    virtual void processResponse(const QByteArray& response) = 0;
+    // called when current request was not send to COM port or response not received
+    virtual void onTransmissionError(uint32_t operationID) = 0;
+
+    // call when all requests in queue are succesfully sent and all responses to them are successfully processed
+    virtual void onTransmissionComplete() = 0;
+
+    // inherited class custom initialization. The signal 'initializationFinished' must be sent after initialization finished
     virtual void initializeCustom() = 0;
 
-    bool send(const QByteArray& request);
-    void processQueue();
-    void resetPort();
+    virtual void onSoftResetComplete() = 0;
 
-    QSerialPort* mPort;
-    Identifier mID;
-    QList<Request> mRequestQueue;
+    void addRequest(uint32_t operationID, const QByteArray& request);
+    void softReset();
 
 private slots:
     void onResponseReceived();
     void onResponseTimeout();
+    void sendRequest();
+    void tryCreatePort();
 
 private:
-    void createPort(const QString& portName);
+    struct Request
+    {
+        uint32_t operation;
+        QByteArray data;
+    };
 
-    QTimer* mProtectionTimer;
+    bool sendToPort(const QByteArray& request);
+    QString createPort(const QString& portName);
+    QString findPortName() const;
+
+    QSerialPort* mPort;
+    Identifier mID;
+    bool mIsReady;
+
+    QTimer* mResponseWaitTimer;
+    int mResponseWaitTime;
+
+    QTimer* mSendTimer;
+    int mSendInterval;
+
+    QTimer* mSoftResetTimer;
+
+    QList<Request> mRequestQueue;
 };
 
 #endif // COM_PORT_MODULE_H

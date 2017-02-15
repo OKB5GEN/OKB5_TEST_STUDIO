@@ -123,7 +123,7 @@ void ModuleOKB::resetError()
     requset[2] = 0x00;
     requset[3] = 0x00;
 
-    send(requset);
+    sendToPort(requset);
     int TODO;
 /*    if (readData.size() > 3)
     {
@@ -145,9 +145,10 @@ int ModuleOKB::softResetModule()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    send(buffer);
+    sendToPort(buffer);
 
-    resetPort();
+    //softReset(); //TODO call on response to reset receive
+
     //setActive(id, true);
 
     return 0; //readData1[3]; //TODO
@@ -161,7 +162,7 @@ int ModuleOKB::getSoftwareVersion()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    send(buffer);
+    sendToPort(buffer);
     return 0; //TODO (response[2] * 10 + response[3]); // версия прошивки, ИМХО неправильно считается, т.к. два байта на нее
 }
 
@@ -184,7 +185,7 @@ bool ModuleOKB::hasErrors()
     buffer[2] = 0x00;
     buffer[3] = 0x00;
 
-    if (send(buffer))
+    if (sendToPort(buffer))
     {
         return false;//TODO
     }

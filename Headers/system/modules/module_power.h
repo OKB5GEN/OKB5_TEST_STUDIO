@@ -3,6 +3,9 @@
 
 #include "Headers/system/com_port_module.h"
 
+#include <QMap>
+#include <QVariant>
+
 class QTimer;
 
 class ModulePower: public COMPortModule
@@ -156,6 +159,8 @@ private:
     uint8_t mError;
 
     bool mInitializationFinished;
+
+    QMap<uint32_t, QVariant> mCurrentResponse;
 };
 
 #endif // MODULE_POWER_H
