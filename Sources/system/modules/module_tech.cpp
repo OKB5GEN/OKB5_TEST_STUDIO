@@ -306,6 +306,7 @@ void ModuleTech::processCustomCommand(const QMap<uint32_t, QVariant>& request, Q
 
 bool ModuleTech::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
+    return true;
     int TODO;
 }
 

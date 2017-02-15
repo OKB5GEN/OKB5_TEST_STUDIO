@@ -1124,6 +1124,12 @@ void SystemState::onExecutionFinished(uint32_t error)
 
 void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
 {
+    if (!mCurCommand)
+    {
+        LOG_ERROR("Unexpected response received");
+        return;
+    }
+
     int TODO; // stop "waiting for execution" protection timer
 
     VariableController* vc = mCurCommand->variableController();

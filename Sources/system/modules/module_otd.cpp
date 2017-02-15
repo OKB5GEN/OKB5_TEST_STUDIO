@@ -249,8 +249,11 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     default:
         LOG_WARNING(QString("Unexpected command id=0x%1 response received by OTD module: %2").arg(QString::number(command, 16)).arg(QString(response.toHex().toStdString().c_str())));
+        return false;
         break;
     }
+
+    return true;
 }
 
 void ModuleOTD::onApplicationFinish()

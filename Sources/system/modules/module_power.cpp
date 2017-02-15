@@ -47,6 +47,7 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
+    setSendInterval(300); //TODO
 }
 
 ModulePower::~ModulePower()
@@ -589,12 +590,16 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
     default:
         LOG_WARNING(QString("Unexpected response received. Operation is %1").arg(int(operationID)));
+        return false;
         break;
     }
+
+    return true;
 }
 
 void ModulePower::onTransmissionError(uint32_t operationID)
 {
+    LOG_ERROR("Transmission error");
     int TODO;
 }
 

@@ -23,7 +23,7 @@ COMPortModule::COMPortModule(QObject* parent):
 
     mSendTimer = new QTimer(this);
     mSendTimer->setSingleShot(true);
-    connect(mResponseWaitTimer, SIGNAL(timeout()), this, SLOT(sendRequest()));
+    connect(mSendTimer, SIGNAL(timeout()), this, SLOT(sendRequest()));
 
     mSoftResetTimer = new QTimer(this);
     mSoftResetTimer->setSingleShot(true);

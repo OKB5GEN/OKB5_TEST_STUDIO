@@ -168,8 +168,11 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
         break;
 
     default:
+        return false;
         break;
     }
+
+    return true;
 }
 
 void ModuleSTM::onApplicationFinish()
