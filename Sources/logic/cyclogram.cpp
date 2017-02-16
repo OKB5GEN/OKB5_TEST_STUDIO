@@ -58,7 +58,7 @@ namespace
         text += ":";
         text += cmd->text();
 
-        qDebug("[%s] Command %s %s", qUtf8Printable(QTime::currentTime().toString()), qUtf8Printable(text), qUtf8Printable(state));
+        LOG_INFO(QString("Command '%1' is %2").arg(text).arg(state));
     }
 }
 
@@ -125,9 +125,9 @@ void Cyclogram::createDefault()
 
 void Cyclogram::run()
 {
-    qDebug("==================================");
-    qDebug("[%s] Cyclogram started", qUtf8Printable(QTime::currentTime().toString()));
-    qDebug("==================================");
+    LOG_INFO("==================================");
+    LOG_INFO("Cyclogram started");
+    LOG_INFO("==================================");
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
@@ -156,9 +156,9 @@ void Cyclogram::onCommandFinished(Command* cmd)
     }
     else
     {
-        qDebug("==================================");
-        qDebug("[%s] Cyclogram finished", qUtf8Printable(QTime::currentTime().toString()));
-        qDebug("==================================");
+        LOG_INFO("==================================");
+        LOG_INFO("Cyclogram finished");
+        LOG_INFO("==================================");
         stop();
         emit finished("");
     }
@@ -170,9 +170,9 @@ void Cyclogram::onCriticalError(Command* cmd)
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
 
-    qDebug("==================================");
-    qDebug("[%s] Cyclogram stopped due to critical runtime error", qUtf8Printable(QTime::currentTime().toString()));
-    qDebug("==================================");
+    LOG_INFO("==================================");
+    LOG_INFO("Cyclogram stopped due to critical runtime error");
+    LOG_INFO("==================================");
 
     stop();
     emit finished(tr("Critical error occured: ") + cmd->errorDesc());

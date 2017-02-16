@@ -98,6 +98,10 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
 
 void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
+    mTmpResponse.clear();
+    mTmpResponse = response;
+    mTmpResponse.detach();
+
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
 
     switch (command)
@@ -123,6 +127,19 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     default:
         LOG_ERROR("Unexpected command %i received by STM module", command);
         break;
+    }
+
+    // set variables
+    int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+    for (int i = 0; i < paramsCount; ++i)
+    {
+        QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
+        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
+    }
+
+    if (paramsCount > 0)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
     }
 }
 
@@ -183,4 +200,29 @@ void ModuleSTM::onApplicationFinish()
 void ModuleSTM::onModuleError()
 {
     int TODO; //TODO here will be processing
+}
+
+void ModuleSTM::createResponse(QMap<uint32_t, QVariant>& response)
+{
+    // fill response
+    int paramsCount = mTmpResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
+    int valuesCount = 0; //mTemperatureData.size();
+
+    if (paramsCount != valuesCount)
+    {
+        LOG_ERROR("Request output params count (%i) and values count (%i) mismatch", paramsCount, valuesCount);
+        return;
+    }
+
+    for (int i = 0; i < paramsCount; ++i)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(0/*mTemperatureData[i]*/);
+    }
+
+    if (paramsCount > 0)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+    }
+
+    response = mTmpResponse;
 }

@@ -1294,6 +1294,8 @@ void SystemState::onModuleInitFinished(ModuleCommands::ModuleID id, const QStrin
         }
     }
 
+    LOG_INFO("====== System initialization finished =======");
+
     mSystemReady = true; // all modules initialization finished
 
     restart();

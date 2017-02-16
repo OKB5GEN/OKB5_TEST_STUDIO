@@ -36,8 +36,6 @@ private:
     int mSensorsCntPsy = 0;
     int mSensorsCntNu = 0;
 
-    QMap<uint32_t, QVariant> mTmpResponse;
-
     QList<qreal> mTemperatureData;
 };
 

@@ -29,6 +29,7 @@ public slots:
 protected:
     void onModuleError() override;
     bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
+    void createResponse(QMap<uint32_t, QVariant>& response) override;
 
 private:
     void setPowerChannelState(int channel, ModuleCommands::PowerState state); // Подача питания на БУП и ПНА

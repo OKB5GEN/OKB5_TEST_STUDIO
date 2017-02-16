@@ -169,7 +169,10 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
     }
 
-    mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+    if (paramsCount > 0)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+    }
 }
 
 bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
@@ -284,7 +287,10 @@ void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
         mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
     }
 
-    mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+    if (paramsCount > 0)
+    {
+        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+    }
 
     response = mTmpResponse;
 }

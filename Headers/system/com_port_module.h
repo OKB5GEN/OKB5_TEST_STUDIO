@@ -1,10 +1,12 @@
 #ifndef COM_PORT_MODULE_H
 #define COM_PORT_MODULE_H
 
+#include <QtSerialPort>
+
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
-class QSerialPort;
+//class QSerialPort;
 class QTimer;
 
 class COMPortModule: public AbstractModule
@@ -53,6 +55,9 @@ protected:
     void addRequest(uint32_t operationID, const QByteArray& request);
     void softReset();
 
+    ModuleCommands::ModuleID moduleID() const;
+    const QString& moduleName() const;
+
     bool mModuleReady;
 
 private slots:
@@ -60,6 +65,7 @@ private slots:
     void onResponseTimeout();
     void sendRequest();
     void tryCreatePort();
+    void onErrorOccured(QSerialPort::SerialPortError error);
 
 private:
     struct Request

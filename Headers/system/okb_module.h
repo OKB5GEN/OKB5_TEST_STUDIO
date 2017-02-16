@@ -42,6 +42,7 @@ protected:
     void addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
     bool mCustomInitializationFinished;
+    QMap<uint32_t, QVariant> mTmpResponse;//TODO simplify internal protocol (remove copy-paste)
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;

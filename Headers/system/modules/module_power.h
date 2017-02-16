@@ -13,6 +13,32 @@ class ModulePower: public COMPortModule
     Q_OBJECT
 
 public:
+    enum Operation
+    {
+        GET_DEVICE_CLASS,
+        GET_NOMINAL_CURRENT,
+        GET_NOMINAL_VOLTAGE,
+        GET_NOMINAL_POWER,
+        GET_OVP_THRESHOLD,
+        GET_OCP_THRESHOLD,
+        GET_CUR_VOLTAGE_AND_CURRENT,
+        SET_OVP_THRESHOLD,
+        SET_OCP_THRESHOLD,
+        SET_SET_VALUE_U,
+        SET_SET_VALUE_I,
+        PSC_SWITCH_POWER_OUTPUT_ON,
+        PSC_SWITCH_POWER_OUTPUT_OFF,
+        PSC_ACKNOWLEDGE_ALARMS,
+        PSC_SWITCH_TO_REMOTE_CTRL,
+        PSC_SWITCH_TO_MANUAL_CTRL,
+        PSC_TRACKING_ON,
+        PSC_TRACKING_OFF,
+
+        UNKNOWN_OPERATION
+    };
+
+    Q_ENUM(Operation)
+
     ModulePower(QObject* parent);
     ~ModulePower();
 
@@ -97,30 +123,6 @@ private:
         QUERY_DATA      = 0x40,
         ANSWER_TO_QUERY = 0x80,
         SEND_DATA       = 0xc0
-    };
-
-    enum Operation
-    {
-        GET_DEVICE_CLASS,
-        GET_NOMINAL_CURRENT,
-        GET_NOMINAL_VOLTAGE,
-        GET_NOMINAL_POWER,
-        GET_OVP_THRESHOLD,
-        GET_OCP_THRESHOLD,
-        GET_CUR_VOLTAGE_AND_CURRENT,
-        SET_OVP_THRESHOLD,
-        SET_OCP_THRESHOLD,
-        SET_SET_VALUE_U,
-        SET_SET_VALUE_I,
-        PSC_SWITCH_POWER_OUTPUT_ON,
-        PSC_SWITCH_POWER_OUTPUT_OFF,
-        PSC_ACKNOWLEDGE_ALARMS,
-        PSC_SWITCH_TO_REMOTE_CTRL,
-        PSC_SWITCH_TO_MANUAL_CTRL,
-        PSC_TRACKING_ON,
-        PSC_TRACKING_OFF,
-
-        UNKNOWN_OPERATION
     };
 
     template<typename T>

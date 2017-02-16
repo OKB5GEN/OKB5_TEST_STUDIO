@@ -2,7 +2,7 @@
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
-#include <QtSerialPort>
+//#include <QtSerialPort>
 
 namespace
 {
@@ -131,6 +131,7 @@ QString COMPortModule::createPort(const QString& portName)
         mPort->setStopBits(QSerialPort::OneStop);
         mPort->setFlowControl(QSerialPort::NoFlowControl);
         connect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
+        //connect(mPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(onErrorOccured(QSerialPort::SerialPortError)));
     }
     else
     {
@@ -138,6 +139,12 @@ QString COMPortModule::createPort(const QString& portName)
     }
 
     return error;
+}
+
+void COMPortModule::onErrorOccured(QSerialPort::SerialPortError error)
+{
+    QMetaEnum e = QMetaEnum::fromType<QSerialPort::SerialPortError>();
+    LOG_ERROR(QString("%1 (%2) module QSerialPort error occured: %3").arg(mModuleName).arg(mPort->portName()).arg(e.valueToKey(error)));
 }
 
 void COMPortModule::onResponseReceived()
@@ -174,7 +181,7 @@ void COMPortModule::onResponseReceived()
 
 void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
 {
-    if (!mModuleReady)
+    if (!mPort || !mPort->isOpen())
     {
         LOG_ERROR(QString("Can not add request. Module %1 (%2) not ready").arg(mModuleName).arg(mPort->portName()));
         onTransmissionError(operationID);
@@ -201,10 +208,21 @@ void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
 
 void COMPortModule::onResponseTimeout()
 {
-    LOG_ERROR(QString("%1 (%2) wait for response timeout. Flushing request queue...").arg(mModuleName).arg(mPort->portName()));
     uint32_t operationID = mRequestQueue.front().operation;
-    mRequestQueue.clear();
-    onTransmissionError(operationID);
+
+    bool resend = false;//TODO resend message or abort transmission?
+
+    if (resend)
+    {
+        LOG_ERROR(QString("%1 (%2) wait for response timeout. Try to resend...").arg(mModuleName).arg(mPort->portName()));
+        mSendTimer->start(mSendInterval); // try to resend?
+    }
+    else
+    {
+        LOG_ERROR(QString("%1 (%2) wait for response timeout. Flushing request queue...").arg(mModuleName).arg(mPort->portName()));
+        mRequestQueue.clear();
+        onTransmissionError(operationID);
+    }
 }
 
 void COMPortModule::sendRequest()
@@ -225,6 +243,12 @@ void COMPortModule::sendRequest()
 
     LOG_INFO(QString("Send ----> %1 (%2): %3").arg(mModuleName).arg(mPort->portName()).arg(QString(mRequestQueue.front().data.toHex().toStdString().c_str())));
     mResponseWaitTimer->start(mResponseWaitTime);
+
+    //TODO this is some hack. without it readyRead() signal is not emitted or emitted randomly true random :)
+    if (mPort->waitForReadyRead(1))
+    {
+        LOG_DEBUG(QString("Bytes available %1").arg(mPort->bytesAvailable()));
+    }
 }
 
 void COMPortModule::setSendInterval(int msec)
@@ -260,6 +284,7 @@ void COMPortModule::softReset()
     LOG_INFO(QString("%1 (%2) soft reset started ...").arg(mModuleName).arg(mPort->portName()));
 
     disconnect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
+    //disconnect(mPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(onErrorOccured(QSerialPort::SerialPortError)));
     mPort->close();
     mPort->deleteLater();
     mPort = Q_NULLPTR;
@@ -302,4 +327,14 @@ void COMPortModule::setId(ModuleCommands::ModuleID moduleID, const Identifier& i
     QMetaEnum e = QMetaEnum::fromType<ModuleCommands::ModuleID>();
     mModuleName = e.valueToKey(mModuleID);
     mID = id;
+}
+
+ModuleCommands::ModuleID COMPortModule::moduleID() const
+{
+    return mModuleID;
+}
+
+const QString& COMPortModule::moduleName() const
+{
+    return mModuleName;
 }

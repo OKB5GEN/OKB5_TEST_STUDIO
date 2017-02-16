@@ -3,7 +3,7 @@
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
-#include <QVariant>
+#include <QMetaEnum>
 
 namespace
 {
@@ -47,7 +47,6 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
-    //setSendInterval(300); //TODO
 }
 
 ModulePower::~ModulePower()
@@ -424,6 +423,10 @@ void ModulePower::onApplicationFinish()
 
 bool ModulePower::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
+    QMetaEnum e = QMetaEnum::fromType<ModulePower::Operation>();
+
+    LOG_DEBUG(QString("%1: operation %2 response received").arg(moduleName()).arg(e.valueToKey(operationID)));
+
     switch (operationID)
     {
     case GET_DEVICE_CLASS:
@@ -599,7 +602,9 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
 void ModulePower::onTransmissionError(uint32_t operationID)
 {
-    LOG_ERROR("Transmission error");
+    QMetaEnum e = QMetaEnum::fromType<ModulePower::Operation>();
+    LOG_ERROR(QString("Operation %1 failed due to transmission error").arg(e.valueToKey(operationID)));
+
     int TODO;
 }
 

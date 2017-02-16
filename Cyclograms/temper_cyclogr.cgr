@@ -12,9 +12,9 @@
         <variable name="H2Active" value="0"/>
         <variable name="PT1" value="0"/>
         <variable name="PT2" value="0"/>
-        <variable name="TestTime" value="600"/>
-        <variable name="Toff" value="28"/>
-        <variable name="Ton" value="27"/>
+        <variable name="TestTime" value="120"/>
+        <variable name="Toff" value="27"/>
+        <variable name="Ton" value="26"/>
         <variable name="time" value="0"/>
     </variables>
     <commands>
@@ -52,15 +52,9 @@
         <command type="GO_TO_BRANCH" id="1486372431169"/>
         <command type="BRANCH_BEGIN" id="1486372470364" name="Wait"/>
         <command type="GO_TO_BRANCH" id="1486372470366"/>
-        <command type="DELAY" id="1486372582381" delay="20000"/>
-        <command type="ACTION_MATH" id="1486372595186" operation="Add">
-            <operand id="Result" type="Variable" value="0" variable="time"/>
-            <operand id="Operand1" type="Variable" value="0" variable="time"/>
-            <operand id="Operand2" type="Number" value="20" variable=""/>
-        </command>
         <command type="QUESTION" id="1486372622727" operation="Less" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="time"/>
-            <operand id="Right" type="Variable" value="0" variable="TestTime"/>
+            <operand id="Left" type="Variable" value="120" variable="time"/>
+            <operand id="Right" type="Variable" value="120" variable="TestTime"/>
         </command>
         <command type="GO_TO_BRANCH" id="1486372622732"/>
         <command type="QUESTION" id="1486372758752" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -69,12 +63,12 @@
         </command>
         <command type="GO_TO_BRANCH" id="1486372758754"/>
         <command type="QUESTION" id="1486372819419" operation="Greater" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS1-2"/>
-            <operand id="Right" type="Variable" value="35" variable="Toff"/>
+            <operand id="Left" type="Variable" value="27.0625" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="27" variable="Toff"/>
         </command>
         <command type="QUESTION" id="1486372823930" operation="Less" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS1-2"/>
-            <operand id="Right" type="Variable" value="30" variable="Ton"/>
+            <operand id="Left" type="Variable" value="27.6875" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="26" variable="Ton"/>
         </command>
         <command type="ACTION_MATH" id="1486372834729" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="H1Active"/>
@@ -82,7 +76,7 @@
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
         <command type="ACTION_MATH" id="1486372841614" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="H1Active"/>
+            <operand id="Result" type="Variable" value="1" variable="H1Active"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
@@ -92,12 +86,12 @@
         </command>
         <command type="GO_TO_BRANCH" id="1486373241711"/>
         <command type="QUESTION" id="1486373247587" operation="Greater" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS2-2"/>
-            <operand id="Right" type="Variable" value="35" variable="Toff"/>
+            <operand id="Left" type="Variable" value="27.75" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="27" variable="Toff"/>
         </command>
         <command type="QUESTION" id="1486373251204" operation="Less" orientation="YesDown" cmd_type="IF">
-            <operand id="Left" type="Variable" value="0" variable="DS2-2"/>
-            <operand id="Right" type="Variable" value="30" variable="Ton"/>
+            <operand id="Left" type="Variable" value="28.4375" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="26" variable="Ton"/>
         </command>
         <command type="ACTION_MATH" id="1486373260297" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="H2Active"/>
@@ -105,7 +99,7 @@
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
         <command type="ACTION_MATH" id="1486373264100" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="H2Active"/>
+            <operand id="Result" type="Variable" value="1" variable="H2Active"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
@@ -151,6 +145,12 @@
             <input_params/>
             <output_params/>
         </command>
+        <command type="DELAY" id="1487241697919" delay="20000"/>
+        <command type="ACTION_MATH" id="1487241711293" operation="Add">
+            <operand id="Result" type="Variable" value="120" variable="time"/>
+            <operand id="Operand1" type="Variable" value="120" variable="time"/>
+            <operand id="Operand2" type="Number" value="20" variable=""/>
+        </command>
     </commands>
     <tree>
         <item id="1486363263019" down="1486363263020" right="-1" under_arrow="-1"/>
@@ -165,11 +165,9 @@
         <item id="1486372414338" down="1486372431167" right="-1" under_arrow="-1"/>
         <item id="1486372431167" down="1486373241709" right="-1" under_arrow="-1"/>
         <item id="1486372431169" down="1486372470364" right="-1" under_arrow="-1"/>
-        <item id="1486372470364" down="1486372582381" right="-1" under_arrow="-1"/>
+        <item id="1486372470364" down="1486372622727" right="-1" under_arrow="-1"/>
         <item id="1486372470366" down="1486363263020" right="-1" under_arrow="-1"/>
-        <item id="1486372582381" down="1486372595186" right="-1" under_arrow="-1"/>
-        <item id="1486372595186" down="1486372622727" right="-1" under_arrow="-1"/>
-        <item id="1486372622727" down="1486372470366" right="1486372622732" under_arrow="-1"/>
+        <item id="1486372622727" down="1487241697919" right="1486372622732" under_arrow="-1"/>
         <item id="1486372622732" down="1486363263022" right="-1" under_arrow="-1"/>
         <item id="1486372758752" down="1486372819419" right="1486372823930" under_arrow="-1"/>
         <item id="1486372758754" down="1486372431167" right="-1" under_arrow="-1"/>
@@ -193,5 +191,7 @@
         <item id="1486384350585" down="1486373264100" right="-1" under_arrow="-1"/>
         <item id="1486384469842" down="1486373483301" right="-1" under_arrow="-1"/>
         <item id="1486384482771" down="1486373488082" right="-1" under_arrow="-1"/>
+        <item id="1487241697919" down="1487241711293" right="-1" under_arrow="-1"/>
+        <item id="1487241711293" down="1486372470366" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

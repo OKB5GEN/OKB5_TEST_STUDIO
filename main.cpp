@@ -15,7 +15,8 @@ void initializeLogger()
 {
     // create console output
     ConsoleAppender* consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
+    //consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
+    consoleAppender->setFormat("[%{type}] %{message}\n");
     Logger::globalInstance()->registerAppender(consoleAppender);
 
     // create file output
@@ -24,6 +25,7 @@ void initializeLogger()
     QString fileExtenstion = ".log";
 
     FileAppender* fileAppender = new FileAppender(fileBaseName + appStartTime + fileExtenstion);
+    fileAppender->setFormat("[%{type}] %{message}\n");
     Logger::globalInstance()->registerAppender(fileAppender);
 }
 
