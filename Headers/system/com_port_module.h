@@ -26,7 +26,7 @@ public:
     void setSendInterval(int msec);
     void setResponseWaitTime(int msec);
 
-    void setId(const Identifier& id);
+    void setId(ModuleCommands::ModuleID moduleID, const Identifier& id);
     const Identifier& id() const;
 
     void initialize();
@@ -53,6 +53,8 @@ protected:
     void addRequest(uint32_t operationID, const QByteArray& request);
     void softReset();
 
+    bool mModuleReady;
+
 private slots:
     void onResponseReceived();
     void onResponseTimeout();
@@ -72,7 +74,8 @@ private:
 
     QSerialPort* mPort;
     Identifier mID;
-    bool mIsReady;
+    ModuleCommands::ModuleID mModuleID;
+    QString mModuleName;
 
     QTimer* mResponseWaitTimer;
     int mResponseWaitTime;

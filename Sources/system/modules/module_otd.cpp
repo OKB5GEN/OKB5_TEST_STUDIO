@@ -193,6 +193,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (!mCustomInitializationFinished)
             {
                 mCustomInitializationFinished = true;
+                mModuleReady = true;
                 emit initializationFinished(QString(""));
             }
         }

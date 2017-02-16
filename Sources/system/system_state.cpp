@@ -207,8 +207,15 @@ void SystemState::restart()
      *
     */
 
-    mPowerBUP->restart();
-    mPowerPNA->restart();
+    if (mModulesStates[ModuleCommands::POWER_UNIT_BUP].ready)
+    {
+        mPowerBUP->restart();
+    }
+
+    if (mModulesStates[ModuleCommands::POWER_UNIT_PNA].ready)
+    {
+        mPowerPNA->restart();
+    }
 
     //TODO: enable MKO power supply
     //mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
@@ -1185,31 +1192,31 @@ void SystemState::createModules()
     connect(mMKO, SIGNAL(initializationFinished(const QString&)), this, SLOT(onMKOInitFinished(const QString&)));
 
     mOTD = new ModuleOTD(this);
-    mOTD->setId(modules.value(ModuleCommands::OTD));
+    mOTD->setId(ModuleCommands::OTD, modules.value(ModuleCommands::OTD));
     connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mOTD, SIGNAL(initializationFinished(const QString&)), this, SLOT(onOTDInitFinished(const QString&)));
 
     mSTM = new ModuleSTM(this);
-    mSTM->setId(modules.value(ModuleCommands::STM));
+    mSTM->setId(ModuleCommands::STM, modules.value(ModuleCommands::STM));
     connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mSTM, SIGNAL(initializationFinished(const QString&)), this, SLOT(onSTMInitFinished(const QString&)));
 
     mTech = new ModuleTech(this);
-    mTech->setId(modules.value(ModuleCommands::TECH));
+    mTech->setId(ModuleCommands::TECH, modules.value(ModuleCommands::TECH));
     connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mTech, SIGNAL(initializationFinished(const QString&)), this, SLOT(onTechInitFinished(const QString&)));
 
     mPowerBUP = new ModulePower(this);
-    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
+    mPowerBUP->setId(ModuleCommands::POWER_UNIT_BUP, modules.value(ModuleCommands::POWER_UNIT_BUP));
     connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mPowerBUP, SIGNAL(initializationFinished(const QString&)), this, SLOT(onPowerBUPInitFinished(const QString&)));
 
     mPowerPNA = new ModulePower(this);
-    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
+    mPowerPNA->setId(ModuleCommands::POWER_UNIT_PNA, modules.value(ModuleCommands::POWER_UNIT_PNA));
     connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mPowerPNA, SIGNAL(initializationFinished(const QString&)), this, SLOT(onPowerPNAInitFinished(const QString&)));

@@ -161,8 +161,6 @@ private:
     uint16_t mDeviceClass; //TODO not used, we use SIMPLE module version
     uint8_t mError;
 
-    bool mInitializationFinished;
-
     QMap<uint32_t, QVariant> mCurrentResponse;
 };
 

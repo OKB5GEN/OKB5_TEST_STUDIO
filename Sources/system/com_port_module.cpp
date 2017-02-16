@@ -15,7 +15,8 @@ COMPortModule::COMPortModule(QObject* parent):
     AbstractModule(parent),
     mPort(Q_NULLPTR),
     mResponseWaitTime(DEFAULT_RESPONSE_WAIT_TIME),
-    mSendInterval(DEFAULT_SEND_REQUEST_INTERVAL)
+    mSendInterval(DEFAULT_SEND_REQUEST_INTERVAL),
+    mModuleReady(false)
 {
     mResponseWaitTimer = new QTimer(this);
     mResponseWaitTimer->setSingleShot(true);
@@ -45,20 +46,20 @@ bool COMPortModule::sendToPort(const QByteArray& request)
 {
     if (!mPort)
     {
-        LOG_ERROR(QString("Send data to COM port failed. No port created!"));
+        LOG_ERROR(QString("Send data to %1 failed. No port created!").arg(mModuleName));
         return false;
     }
 
     if (!mPort->isOpen())
     {
-        LOG_ERROR(QString("Send data to %1 failed! Port is closed").arg(mPort->portName()));
+        LOG_ERROR(QString("Send data to %1 failed! %2 port is closed").arg(mModuleName).arg(mPort->portName()));
         return false;
     }
 
     qint64 bytesWritten = mPort->QIODevice::write(request);
     if (bytesWritten == -1)
     {
-        LOG_ERROR(QString("Send data to %1 failed! Port error: %2").arg(mPort->portName()).arg(mPort->errorString()));
+        LOG_ERROR(QString("Send data to %1 failed! %2 port error: %3").arg(mModuleName).arg(mPort->portName()).arg(mPort->errorString()));
         return false;
     }
 
@@ -66,7 +67,7 @@ bool COMPortModule::sendToPort(const QByteArray& request)
     {
         //Returns true if a payload of data was written to the device;
         //otherwise returns false (i.e. if the operation timed out, or if an error occurred).
-        LOG_ERROR(QString("Send data to %1 failed! Payload not written! Port error: %2").arg(mPort->portName()).arg(mPort->errorString()));
+        LOG_ERROR(QString("Send data to %1 failed! Payload not written! %2 port error: %3").arg(mModuleName).arg(mPort->portName()).arg(mPort->errorString()));
         return false;
     }
 
@@ -102,7 +103,7 @@ void COMPortModule::initialize()
 
     if (portName.isNull())
     {
-        emit initializationFinished(QString("Configuration error. No COM port module found"));
+        emit initializationFinished(QString("Module %1 configuration error. No COM port module found").arg(mModuleName));
         return;
     }
 
@@ -133,7 +134,7 @@ QString COMPortModule::createPort(const QString& portName)
     }
     else
     {
-        error = QString("Port %1 not opened. Port error: %2").arg(mPort->portName()).arg(mPort->errorString());
+        error = QString("%1 port not created. %2 port error: %3").arg(mModuleName).arg(mPort->portName()).arg(mPort->errorString());
     }
 
     return error;
@@ -145,16 +146,16 @@ void COMPortModule::onResponseReceived()
 
     if (!mPort || !mPort->isOpen())
     {
-        LOG_ERROR(QString("INTERNAL ERROR"));
+        LOG_ERROR(QString("%1 module INTERNAL ERROR").arg(mModuleName));
         return;
     }
 
     QByteArray response = mPort->readAll();
-    LOG_INFO(QString("Recv <---- %1: %2").arg(mPort->portName()).arg(QString(response.toHex().toStdString().c_str())));
+    LOG_INFO(QString("Recv <---- %1 (%2): %3").arg(mModuleName).arg(mPort->portName()).arg(QString(response.toHex().toStdString().c_str())));
 
     if (!processResponse(mRequestQueue.front().operation, mRequestQueue.front().data, response))
     {
-        LOG_ERROR(QString("%1 response processing error. Flushing request queue...").arg(mPort->portName()));
+        LOG_ERROR(QString("%1 (%2) response processing error. Flushing request queue...").arg(mModuleName).arg(mPort->portName()));
         mRequestQueue.clear();
         return;
     }
@@ -173,9 +174,16 @@ void COMPortModule::onResponseReceived()
 
 void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
 {
+    if (!mModuleReady)
+    {
+        LOG_ERROR(QString("Can not add request. Module %1 (%2) not ready").arg(mModuleName).arg(mPort->portName()));
+        onTransmissionError(operationID);
+        return;
+    }
+
     if (request.isEmpty())
     {
-        LOG_ERROR(QString("Empty request try to send to %1 port").arg(mPort->portName()));
+        LOG_ERROR(QString("Empty request try to send to %1 (%2)").arg(mModuleName).arg(mPort->portName()));
         onTransmissionError(operationID);
         return;
     }
@@ -193,7 +201,7 @@ void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
 
 void COMPortModule::onResponseTimeout()
 {
-    LOG_ERROR(QString("%1 wait for response timeout. Flushing request queue...").arg(mPort->portName()));
+    LOG_ERROR(QString("%1 (%2) wait for response timeout. Flushing request queue...").arg(mModuleName).arg(mPort->portName()));
     uint32_t operationID = mRequestQueue.front().operation;
     mRequestQueue.clear();
     onTransmissionError(operationID);
@@ -203,19 +211,19 @@ void COMPortModule::sendRequest()
 {
     if (mRequestQueue.isEmpty())
     {
-        LOG_ERROR(QString("Can not send request to %1. Queue is empty").arg(mPort->portName()));
+        LOG_ERROR(QString("Can not send request to %1 (%2). Queue is empty").arg(mModuleName).arg(mPort->portName()));
         return;
     }
 
     if (!sendToPort(mRequestQueue.front().data))
     {
         onTransmissionError(mRequestQueue.front().operation);
-        LOG_ERROR(QString("%1 transmission error occured. Flushing request queue...").arg(mPort->portName()));
+        LOG_ERROR(QString("%1 (%2) transmission error occured. Flushing request queue...").arg(mModuleName).arg(mPort->portName()));
         mRequestQueue.clear();
         return;
     }
 
-    LOG_INFO(QString("Send ----> %1: %2").arg(mPort->portName()).arg(QString(mRequestQueue.front().data.toHex().toStdString().c_str())));
+    LOG_INFO(QString("Send ----> %1 (%2): %3").arg(mModuleName).arg(mPort->portName()).arg(QString(mRequestQueue.front().data.toHex().toStdString().c_str())));
     mResponseWaitTimer->start(mResponseWaitTime);
 }
 
@@ -243,18 +251,19 @@ void COMPortModule::setResponseWaitTime(int msec)
 
 void COMPortModule::softReset()
 {
-    if (!mPort || !mPort->isOpen())
+    if (!mPort || !mPort->isOpen() || !mModuleReady)
     {
-        LOG_WARNING("Trying to reset inactive port");
+        LOG_WARNING(QString("Trying to soft reset inactive module %1").arg(mModuleName));
         return;
     }
 
-    LOG_INFO(QString("%1 soft reset started ..."));
+    LOG_INFO(QString("%1 (%2) soft reset started ...").arg(mModuleName).arg(mPort->portName()));
 
     disconnect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
     mPort->close();
     mPort->deleteLater();
     mPort = Q_NULLPTR;
+    mModuleReady = false;
 
     mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
 }
@@ -265,7 +274,7 @@ void COMPortModule::tryCreatePort()
 
     if (portName.isNull())
     {
-        LOG_INFO(QString("Module still not active. Restarting update timer ..."));
+        LOG_INFO(QString("Module %1 still not active. Restarting update timer ...").arg(mModuleName));
         mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
         return;
     }
@@ -278,7 +287,7 @@ void COMPortModule::tryCreatePort()
         return;
     }
 
-    LOG_INFO(QString("%1 is up after soft reset").arg(mPort->portName()));
+    LOG_INFO(QString("%1 (%2) is up after soft reset").arg(mModuleName).arg(mPort->portName()));
     onSoftResetComplete();
 }
 
@@ -287,7 +296,10 @@ const COMPortModule::Identifier& COMPortModule::id() const
     return mID;
 }
 
-void COMPortModule::setId(const Identifier& id)
+void COMPortModule::setId(ModuleCommands::ModuleID moduleID, const Identifier& id)
 {
+    mModuleID = moduleID;
+    QMetaEnum e = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+    mModuleName = e.valueToKey(mModuleID);
     mID = id;
 }

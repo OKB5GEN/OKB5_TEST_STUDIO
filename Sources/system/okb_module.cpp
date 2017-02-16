@@ -114,6 +114,7 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
 void ModuleOKB::initializeCustomOKBModule()
 {
     //TODO stub here
+    mModuleReady = true;
     mCustomInitializationFinished = true;
     emit initializationFinished(QString(""));
 }

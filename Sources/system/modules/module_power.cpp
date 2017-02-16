@@ -47,7 +47,7 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
-    setSendInterval(300); //TODO
+    //setSendInterval(300); //TODO
 }
 
 ModulePower::~ModulePower()
@@ -487,9 +487,9 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
     case SET_OCP_THRESHOLD:
         {
-            if (!mInitializationFinished)
+            if (!mModuleReady)
             {
-                mInitializationFinished = true;
+                mModuleReady = true;
                 emit initializationFinished(QString(""));
             }
 
