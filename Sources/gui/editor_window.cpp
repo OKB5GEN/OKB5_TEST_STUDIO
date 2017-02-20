@@ -28,6 +28,7 @@ EditorWindow::EditorWindow():
 
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogram = new Cyclogram(this);
+    mCyclogram->setMainCyclogram(true);
 
     mCyclogram->createDefault();
     mCyclogramWidget->load(mCyclogram);
@@ -66,9 +67,16 @@ void EditorWindow::onApplicationStart()
 
 void EditorWindow::closeEvent(QCloseEvent *event)
 {
+    int TODO; // Закрытие приложения
+    /*
+     * 1. Если есть активная циклограмма, мы спрашиваем "Циклограмма запущена, стопать бум?"
+     * 2. Если нет, то тупо закрываем окно и игнорим ивент
+     * 3. Если да, то стопаем циклограмму (та в свою очередь вырубит все модули)
+     * 4. По завершении стопа циклограммы мы спрашиваем "Сохранить изменения?" (по идее это перед стартом циклограммы должно спрашиваться или делаться автоматически)
+     * 5. После чего делаем обычную магию сохранения и сами закрываем приложение.
+    */
     if (maybeSave())
     {
-        int TODO; // on application finish processing here!
         writeSettings();
         event->accept();
     }

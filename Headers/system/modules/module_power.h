@@ -45,7 +45,7 @@ public:
     void initializeCustom() override;
 
 public slots:
-    void restart();
+    void setDefaultState() override;
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
     void onApplicationFinish() override;

@@ -16,6 +16,7 @@ public:
 
 public slots:
     virtual void processCommand(const QMap<uint32_t, QVariant>& request) = 0;
+    virtual void setDefaultState() = 0;
 
 signals:
     void commandResult(const QMap<uint32_t, QVariant>& response);

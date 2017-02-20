@@ -51,7 +51,7 @@ public:
 
     void onApplicationStart();
 
-    void restart();
+    void setDefaultState();
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
@@ -62,12 +62,6 @@ private slots:
 
     //TODO refactor/remove
     int simpltst1(int x);
-
-    void OTDtemd(QString data);
-    void OTDerror(QString err);
-    void OTDtm1(QString temp);
-    void OTDtm2(QString temp);
-    void status_OTD(QString data);
 
     void MKO_data(QString data);
     void MKO_cm_data(QString data);
@@ -83,7 +77,6 @@ private slots:
     void on_tech_clear_out_4_clicked();
     void on_tech_clear_in_4_clicked();
     void on_tech_clear_buf_4_clicked();
-    void on_OTD_nd_clicked();
     void on_pow_DY_osn_clicked();
     void on_pow_DY_rez_clicked();
     void on_MKO_osn_clicked();
@@ -92,7 +85,6 @@ private slots:
     void on_pushButton_11_clicked();
     void on_pushButton_12_clicked();
     void on_MKO_avt_clicked();
-    void on_OTD_avt_2_clicked();
     //<<<
 
     // new slots

@@ -80,13 +80,7 @@ int ModuleOTD::dsCount(LineID line) const
 
 void ModuleOTD::initializeCustomOKBModule()
 {
-    // 1. Reset sensors on both lines
-    // 2. Read sensors count on both lines
-    // 3. Read sensors addresses on both lines (OPTIONAL)
-
-    // reset sensors on both lines (it doesn't work without that :))
-    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
-    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
+    setDefaultState();
 
     // read sensors count on both lines (TODO do not change call order)
     addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
@@ -110,6 +104,12 @@ void ModuleOTD::initializeCustomOKBModule()
             //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
         }
     }*/
+}
+
+void ModuleOTD::setDefaultState()
+{
+    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
+    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
 }
 
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)

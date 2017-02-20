@@ -319,3 +319,8 @@ void ModuleTech::onModuleError()
 {
     int TODO; //TODO here will be processing
 }
+
+void ModuleTech::setDefaultState()
+{
+    int TODO;
+}

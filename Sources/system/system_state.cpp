@@ -160,9 +160,9 @@ void SystemState::onApplicationStart()
     createModules();
 }
 
-void SystemState::restart()
+void SystemState::setDefaultState()
 {
-    LOG_INFO("System state restarting...");
+    LOG_INFO("Setting default system state...");
 
     /* Что собой представляет инициализация?
      *  TODO
@@ -189,7 +189,6 @@ void SystemState::restart()
      *    - Подать питание на МКО, чтобы он включился (может и не надо)
      * 3. ОТД
      *    - проверить статус
-     *    - послать эхо
      *    - вычитать по новой информацию о датчиках (количество, адреса и т.д.)
      *    - провести стартовые замеры температуры на всех датчиках
      * 4. Технологический модуль (пока забиваем наверное, но можно стандартные эхо-прошивка-статус)
@@ -201,39 +200,38 @@ void SystemState::restart()
      * 2. ОТД если перезагружается - перевыспросить по новой все потроха в зависимости от типа
      *
      * - TODO пороговые значения температуры для включения нагревателей?
-     *   Нужны для:
-     *   - вероятно, не давать возможность крутить приводом (слать команды на МКО соответствующие) если температура слишком низкая/высокая?
-     *   - нужны для подачи питания на нагреватели, если температура низкая и их отключения, если температура достигла рабочей
      *
     */
 
     if (mModulesStates[ModuleCommands::POWER_UNIT_BUP].ready)
     {
-        mPowerBUP->restart();
+        mPowerBUP->setDefaultState();
     }
 
     if (mModulesStates[ModuleCommands::POWER_UNIT_PNA].ready)
     {
-        mPowerPNA->restart();
+        mPowerPNA->setDefaultState();
     }
 
-    //TODO: enable MKO power supply
-    //mSTM->setMKOPowerChannelState(1, ModuleCommands::POWER_ON);
-    //mSTM->setMKOPowerChannelState(2, ModuleCommands::POWER_ON);
+    if (mModulesStates[ModuleCommands::STM].ready)
+    {
+        mSTM->setDefaultState();
+    }
 
-    //TODO: disable MKO power supply on command exit
+    if (mModulesStates[ModuleCommands::OTD].ready)
+    {
+        mOTD->setDefaultState();
+    }
 
-/*
-    mThreadMKO = new QThread(this);
-    mMKO->moveToThread(mThreadMKO);
-    mThreadMKO->start();
+    if (mModulesStates[ModuleCommands::TECH].ready)
+    {
+        mTech->setDefaultState();
+    }
 
-    mThreadOTD = new QThread(this);
-    mOTD->moveToThread(mThreadOTD);
-    connect(mThreadOTD, SIGNAL(started()), mOTD, SLOT(COMConnectorOTD()));
-    mThreadOTD->start();*/
-
-    LOG_INFO("System state restarted");
+    if (mModulesStates[ModuleCommands::MKO].ready)
+    {
+        mMKO->setDefaultState();
+    }
 }
 
 int SystemState::simpltst1(int z)
@@ -519,14 +517,6 @@ void SystemState::checkModulesStatus()
     //ui->error_mod->setText(res);
 }
 
-void SystemState::status_OTD(QString data)
-{
-    if(data != "")
-    {
-        //ui->error_mod->setText (data);
-    }
-}
-
 /*void SystemState::plot_point()
 {
     double a = 0; //Начало интервала, где рисуем график по оси Ox
@@ -666,34 +656,6 @@ void SystemState::on_tech_clear_buf_4_clicked()
     */
 }
 
-void SystemState::OTDtemd(QString data)
-{
-    //ui->OTDtd->setText(data);
-}
-
-void SystemState::OTDerror(QString err)
-{
-   // ui->OTDerror->setStyleSheet("font: 25 12pt GOST type A;" "color: red;");
-    //ui->OTDerror->setText(err);
-}
-
-void SystemState::OTDtm1(QString temp)
-{
-    //ui->OTDtm1->setText(temp);
-}
-
-void SystemState::OTDtm2(QString temp)
-{
-    //ui->OTDtm2->setText(temp);
-}
-
-void SystemState::on_OTD_nd_clicked()
-{
-    connect(this, SIGNAL(OTD_nd()), mOTD, SLOT(OTDtemper()));
-    //emit OTD_nd();
-    disconnect(this, SIGNAL(OTD_nd()), mOTD, SLOT(OTDtemper()));
-}
-
 void SystemState::on_pow_DY_osn_clicked()
 {
     /*
@@ -821,30 +783,6 @@ void SystemState::on_MKO_avt_clicked()
         connect(this, SIGNAL( MKO_auto(int,int,int,int)), mMKO, SLOT(MKO_avt(int,int,int,int)));
         emit MKO_auto(flag_mko_auto,u3,u1,u2);
         disconnect(this, SIGNAL( MKO_auto(int,int,int,int)), mMKO, SLOT(MKO_avt(int,int,int,int)));
-    }
-    */
-}
-
-void SystemState::on_OTD_avt_2_clicked()
-{
-    /*
-    QString S3 = ui->lineEdit_period_OTD->text();
-    int u3 = S3.toInt();
-    if(flag_otd_auto == 0)
-    {
-        flag_otd_auto = 1;
-        ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
-        connect(this, SIGNAL(OTD_auto(int,int)), mOTD, SLOT(OTD_avt(int,int)));
-        emit OTD_auto(flag_otd_auto, u3 * 1000);
-        disconnect(this, SIGNAL(OTD_auto(int,int)), mOTD, SLOT(OTD_avt(int,int)));
-    }
-    else if(flag_otd_auto == 1)
-    {
-        flag_otd_auto = 0;
-        ui->OTD_avt_2->setStyleSheet(QString::fromUtf8("background-color: rgb(230, 230, 230);"));
-        connect(this, SIGNAL(OTD_auto(int,int)), mOTD, SLOT(OTD_avt(int,int)));
-        emit OTD_auto(flag_otd_auto,u3);
-        disconnect(this, SIGNAL(OTD_auto(int,int)), mOTD, SLOT(OTD_avt(int,int)));
     }
     */
 }
@@ -1298,5 +1236,5 @@ void SystemState::onModuleInitFinished(ModuleCommands::ModuleID id, const QStrin
 
     mSystemReady = true; // all modules initialization finished
 
-    restart();
+    setDefaultState();
 }

@@ -81,7 +81,7 @@ void ModulePower::initializeCustom()
     // - device manufacturer
 }
 
-void ModulePower::restart()
+void ModulePower::setDefaultState()
 {
     sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
     sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off power output

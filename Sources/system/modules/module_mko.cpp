@@ -1052,3 +1052,8 @@ void ModuleMKO::initialize()
     emit initializationFinished(QString("MKO not implemented"));
     int TODO;
 }
+
+void ModuleMKO::setDefaultState()
+{
+    int TODO;
+}

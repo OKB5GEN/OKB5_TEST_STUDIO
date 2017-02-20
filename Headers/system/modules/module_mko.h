@@ -54,6 +54,7 @@ public slots:
     void MKO_timer();
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void setDefaultState() override;
 
 signals:
     void test_MKO(int x);

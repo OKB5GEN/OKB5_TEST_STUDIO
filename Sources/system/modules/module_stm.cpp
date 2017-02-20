@@ -226,3 +226,19 @@ void ModuleSTM::createResponse(QMap<uint32_t, QVariant>& response)
 
     response = mTmpResponse;
 }
+
+void ModuleSTM::initializeCustomOKBModule()
+{
+    //TODO stub here
+    mModuleReady = true;
+    mCustomInitializationFinished = true;
+    emit initializationFinished(QString(""));
+}
+
+void ModuleSTM::setDefaultState()
+{
+    int TODO;
+
+    setMKOPowerChannelState(1, ModuleCommands::POWER_ON); // enable MKO power supply (main?) TODO
+    setMKOPowerChannelState(2, ModuleCommands::POWER_ON); // enable MKO power supply (reserve?) TODO
+}

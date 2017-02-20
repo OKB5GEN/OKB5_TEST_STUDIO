@@ -62,6 +62,9 @@ public:
 
     void clear(); //TODO possibly temporary
 
+    bool isMainCyclogram() const;
+    void setMainCyclogram(bool isMain);
+
 private slots:
     void onCommandFinished(Command* cmd);
     void onCriticalError(Command* cmd);
@@ -84,6 +87,7 @@ private:
 
     VariableController* mVarController;
     SystemState* mSystemState;
+    bool mIsMainCyclogram;
 
     //bool mExecuteOneCmd;
     bool mModified;
