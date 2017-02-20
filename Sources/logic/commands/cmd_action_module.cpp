@@ -251,7 +251,7 @@ QString CmdActionModule::commandName() const
     QString text = tr("ЗАГЛУШКА");
     switch (mOperation)
     {
-    case ModuleCommands::POWER_CHANNEL_CTRL: // Управление подачей питания 27В на модуле питания
+    case ModuleCommands::SET_POWER_CHANNEL_STATE: // Управление подачей питания 27В на модуле питания
         {
             if (!mImplicitParams.empty())
             {

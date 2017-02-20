@@ -1,7 +1,7 @@
 #ifndef MODULE_STM_H
 #define MODULE_STM_H
 
-#include <QVector>
+#include <QMap>
 
 #include "Headers/system/okb_module.h"
 
@@ -34,12 +34,17 @@ protected:
     void initializeCustomOKBModule() override;
 
 private:
-    void setPowerChannelState(int channel, ModuleCommands::PowerState state); // Подача питания на БУП и ПНА
-    void setMKOPowerChannelState(int channel, ModuleCommands::PowerState state); // Подача питания на МКО
-    ModuleCommands::PowerState powerChannelState(int channel);
+    void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state); // Подача питания на БУП и ПНА
+    void setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state); // Подача питания на МКО
+    ModuleCommands::PowerState getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel);
+    ModuleCommands::PowerState getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel);
+    void getChannelTelemetry(int channel);
     FuseStates fuseState(int fuseIndex);
 
-    QVector<ModuleCommands::PowerState> mChannelStates;
+    QMap<ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState> mPowerSupplyRelayStates;
+    QMap<ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState> mMKOPowerSupplyRelayStates;
+
+    int mRequestedChannelTelemetry;
 };
 
 #endif // MODULE_STM_H

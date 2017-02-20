@@ -62,9 +62,9 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     case ModuleCommands::GET_MODULE_ADDRESS:
     case ModuleCommands::RESET_ERROR:
     case ModuleCommands::SOFT_RESET:
-    case ModuleCommands::GET_SOWFTWARE_VER:
-    case ModuleCommands::POWER_CHANNEL_CTRL:
-    case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:
+    case ModuleCommands::GET_SOWFTWARE_VERSION:
+    case ModuleCommands::SET_POWER_CHANNEL_STATE:
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
     case ModuleCommands::SET_PACKET_SIZE_CAN:
     case ModuleCommands::ADD_BYTES_CAN:
     case ModuleCommands::SEND_PACKET_CAN:
@@ -89,10 +89,10 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
 
     case ModuleCommands::GET_STATUS_WORD:
     case ModuleCommands::ECHO:
-    case ModuleCommands::GET_POWER_MODULE_STATE:
-    case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_FUSE_STATE:
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
-    case ModuleCommands::GET_MKO_MODULE_STATE:
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
     case ModuleCommands::CHECK_RECV_DATA_CAN:
     case ModuleCommands::RECV_DATA_CAN:
     case ModuleCommands::CHECK_RECV_DATA_RS485:
@@ -136,7 +136,7 @@ void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
     case ModuleCommands::GET_STATUS_WORD:
     case ModuleCommands::RESET_ERROR:
     case ModuleCommands::SOFT_RESET:
-    case ModuleCommands::GET_SOWFTWARE_VER:
+    case ModuleCommands::GET_SOWFTWARE_VERSION:
     case ModuleCommands::ECHO:
         {
             int TODO; // decode and process common commands here
@@ -283,7 +283,7 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
         }
         break;
 
-    case ModuleCommands::GET_SOWFTWARE_VER:
+    case ModuleCommands::GET_SOWFTWARE_VERSION:
         {
             int version = 0; //"response[2].response[3]" типа "0.3" //TODO
         }

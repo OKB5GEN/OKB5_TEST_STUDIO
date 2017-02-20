@@ -16,15 +16,15 @@ public:
         RESET_ERROR                     = 0x03,
         SOFT_RESET                      = 0x04,
         //RESERVED_0x05 = 0x05,
-        GET_SOWFTWARE_VER               = 0x06,
+        GET_SOWFTWARE_VERSION           = 0x06,
         ECHO                            = 0x07,
         //RESERVED_0x08 = 0x08,
         //RESERVED_0x09 = 0x09,
         //RESERVED_0x0A = 0x0A,
-        POWER_CHANNEL_CTRL              = 0x0B, // Can be sent to STM only
-        GET_PWR_MODULE_FUSE_STATE       = 0x0C, // Can be sent to STM only
+        SET_POWER_CHANNEL_STATE         = 0x0B, // Can be sent to STM only
+        GET_FUSE_STATE                  = 0x0C, // Can be sent to STM only
         GET_CHANNEL_TELEMETRY           = 0x0D, // Can be sent to STM only
-        SET_MKO_PWR_CHANNEL_STATE       = 0x0E, // Can be sent to STM only
+        SET_MKO_POWER_CHANNEL_STATE     = 0x0E, // Can be sent to STM only
         //MATRIX_CMD_CTRL                 = 0x0F, // Can be sent to MKU only
         SET_PACKET_SIZE_CAN             = 0x10, // Can be sent to TECH only
         ADD_BYTES_CAN                   = 0x11, // Can be sent to TECH only
@@ -43,9 +43,9 @@ public:
         GET_DS1820_COUNT_LINE_2         = 0x1E, // Can be sent to OTD only (Nu)
         GET_TEMPERATURE_DS1820_LINE_1   = 0x1F, // Can be sent to OTD only (Psi)
         GET_TEMPERATURE_DS1820_LINE_2   = 0x20, // Can be sent to OTD only (Nu)
-        GET_POWER_MODULE_STATE          = 0x21, // Can be sent to STM only
+        GET_POWER_CHANNEL_STATE         = 0x21, // Can be sent to STM only
         //GET_MKU_MODULE_STATE            = 0x22, // Can be sent to MKU only
-        GET_MKO_MODULE_STATE            = 0x23, // Can be sent to STM only
+        GET_MKO_POWER_CHANNEL_STATE     = 0x23, // Can be sent to STM only
         SET_MODE_RS485                  = 0x24, // Can be sent to TECH only
         SET_SPEED_RS485                 = 0x25, // Can be sent to TECH only
         RESET_LINE_1                    = 0x26, // Can be sent to OTD only (Psi)
@@ -89,7 +89,7 @@ public:
         POWER_OFF
     };
 
-    enum ChannelID
+    enum PowerSupplyChannelID
     {
         BUP_MAIN      = 1,
         BUP_RESERVE   = 2,
@@ -99,7 +99,17 @@ public:
         DRIVE_CONTROL = 6,
     };
 
-    Q_ENUM(ChannelID)
+    Q_ENUM(PowerSupplyChannelID)
+
+    enum MKOPowerSupplyChannelID
+    {
+        MKO_1 = 1,
+        MKO_2 = 2,
+        MKO_3 = 3,
+        MKO_4 = 4
+    };
+
+    Q_ENUM(MKOPowerSupplyChannelID)
 
     enum ModuleID
     {

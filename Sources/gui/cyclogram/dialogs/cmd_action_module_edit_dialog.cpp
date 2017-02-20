@@ -112,56 +112,56 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             QList<int> params;
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::BUP_MAIN);
             params.push_back(ModuleCommands::POWER_ON);
             addCommand(tr("Включить основной комплект БУП"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::BUP_MAIN);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить основной комплект БУП"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::BUP_RESERVE);
             params.push_back(ModuleCommands::POWER_ON);
             addCommand(tr("Включить резервный комплект БУП"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::BUP_RESERVE);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить резервный комплект БУП"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::HEATER_LINE_1);
             params.push_back(ModuleCommands::POWER_ON);
             addCommand(tr("Включить нагреватели ПНА на линии 1"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::HEATER_LINE_1);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить нагреватели ПНА на линии 1"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::HEATER_LINE_2);
             params.push_back(ModuleCommands::POWER_ON);
             addCommand(tr("Включить нагреватели ПНА на линии 2"), params);
 
             params.clear();
-            params.push_back(ModuleCommands::POWER_CHANNEL_CTRL);
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
             params.push_back(2); //params count
             params.push_back(ModuleCommands::HEATER_LINE_2);
             params.push_back(ModuleCommands::POWER_OFF);
