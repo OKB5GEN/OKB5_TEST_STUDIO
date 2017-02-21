@@ -86,16 +86,16 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             //addCommand(tr("Установить ограничение"), ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT);
 
             //TODO здесь подключение основного/резервного полукомплекта БУП и относится оно скорее всего к POWER_UNIT_BUP только
-            //TODO у ПНА кажись нагреватели и двигатели привода подключаются
-            //QList<int> params;
-            //params.push_back(ModuleCommands::SET_POWER_STATE);
-            //params.push_back(ModuleCommands::POWER_ON);
-            //addCommand(tr("Включить питание"), params);
 
-            //params.clear();
-            //params.push_back(ModuleCommands::SET_POWER_STATE);
-            //params.push_back(ModuleCommands::POWER_OFF);
-            //addCommand(tr("Выключить питание"), params);
+            QList<int> params;
+            params.push_back(ModuleCommands::SET_POWER_STATE);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить подачу питания"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::SET_POWER_STATE);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить подачу питания"), params);
         }
         break;
 

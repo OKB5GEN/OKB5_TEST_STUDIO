@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="DS1-1" value="0"/>
+        <variable name="DS1-2" value="0"/>
+        <variable name="DS1-3" value="0"/>
+        <variable name="DS2-1" value="0"/>
+        <variable name="DS2-2" value="0"/>
+        <variable name="DS2-3" value="0"/>
+        <variable name="H1Active" value="0"/>
+        <variable name="H2Active" value="0"/>
+        <variable name="PT1" value="0"/>
+        <variable name="PT2" value="0"/>
+        <variable name="TestTime" value="120"/>
+        <variable name="Toff" value="27"/>
+        <variable name="Ton" value="26"/>
+        <variable name="V" value="27"/>
+        <variable name="time" value="0"/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1486363263019" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1486363263020" name="Startup"/>
+        <command type="GO_TO_BRANCH" id="1486363263021"/>
+        <command type="BRANCH_BEGIN" id="1486363263022" name="End"/>
+        <command type="TERMINATOR" id="1486363263023" name="FINISH" cmd_type="END"/>
+        <command type="BRANCH_BEGIN" id="1486372414337" name="Heater 1 Handle"/>
+        <command type="GO_TO_BRANCH" id="1486372414338"/>
+        <command type="BRANCH_BEGIN" id="1486372431167" name="Heater 2 Handle"/>
+        <command type="GO_TO_BRANCH" id="1486372431169"/>
+        <command type="BRANCH_BEGIN" id="1486372470364" name="Wait"/>
+        <command type="GO_TO_BRANCH" id="1486372470366"/>
+        <command type="QUESTION" id="1486372622727" operation="Less" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="120" variable="time"/>
+            <operand id="Right" type="Variable" value="120" variable="TestTime"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1486372622732"/>
+        <command type="QUESTION" id="1486372758752" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="H1Active"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1486372758754"/>
+        <command type="QUESTION" id="1486372819419" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="27.0625" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="27" variable="Toff"/>
+        </command>
+        <command type="QUESTION" id="1486372823930" operation="Less" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="27.6875" variable="DS1-2"/>
+            <operand id="Right" type="Variable" value="26" variable="Ton"/>
+        </command>
+        <command type="ACTION_MATH" id="1486372834729" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="H1Active"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1486372841614" operation="Assign">
+            <operand id="Result" type="Variable" value="1" variable="H1Active"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="QUESTION" id="1486373241709" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="H2Active"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1486373241711"/>
+        <command type="QUESTION" id="1486373247587" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="27.75" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="27" variable="Toff"/>
+        </command>
+        <command type="QUESTION" id="1486373251204" operation="Less" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="28.4375" variable="DS2-2"/>
+            <operand id="Right" type="Variable" value="26" variable="Ton"/>
+        </command>
+        <command type="ACTION_MATH" id="1486373260297" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="H2Active"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1486373264100" operation="Assign">
+            <operand id="Result" type="Variable" value="1" variable="H2Active"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="QUESTION" id="1486373464211" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="H1Active"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="QUESTION" id="1486373470116" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="H2Active"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1486373483301" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="H1Active"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1486373488082" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="H2Active"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384310734" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="4,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384328176" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="4,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384339992" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="5,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384350585" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="5,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384469842" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="4,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1486384482771" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="5,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="DELAY" id="1487241697919" delay="20000"/>
+        <command type="ACTION_MATH" id="1487241711293" operation="Add">
+            <operand id="Result" type="Variable" value="120" variable="time"/>
+            <operand id="Operand1" type="Variable" value="120" variable="time"/>
+            <operand id="Operand2" type="Number" value="20" variable=""/>
+        </command>
+        <command type="BRANCH_BEGIN" id="1487678740985" name="Measure Temp"/>
+        <command type="GO_TO_BRANCH" id="1487678740988"/>
+        <command type="ACTION_MODULE" id="1487678776443" module="OTD" command="GET_TEMPERATURE_PT100" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1487678800685" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_1" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1487678812887" module="OTD" command="GET_TEMPERATURE_DS1820_LINE_2" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1487678836175" module="POWER_UNIT_PNA" command="SET_VOLTAGE_AND_CURRENT" implicit_params="">
+            <input_params>
+                <param name="Voltage, V" variable="V"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1487678862740" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="">
+            <input_params/>
+            <output_params/>
+        </command>
+    </commands>
+    <tree>
+        <item id="1486363263019" down="1486363263020" right="-1" under_arrow="-1"/>
+        <item id="1486363263020" down="1487678836175" right="-1" under_arrow="-1"/>
+        <item id="1486363263021" down="1487678740985" right="-1" under_arrow="-1"/>
+        <item id="1486363263022" down="1486373464211" right="-1" under_arrow="-1"/>
+        <item id="1486363263023" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1486372414337" down="1486372758752" right="-1" under_arrow="-1"/>
+        <item id="1486372414338" down="1486372431167" right="-1" under_arrow="-1"/>
+        <item id="1486372431167" down="1486373241709" right="-1" under_arrow="-1"/>
+        <item id="1486372431169" down="1486372470364" right="-1" under_arrow="-1"/>
+        <item id="1486372470364" down="1486372622727" right="-1" under_arrow="-1"/>
+        <item id="1486372470366" down="1487678740985" right="-1" under_arrow="-1"/>
+        <item id="1486372622727" down="1487241697919" right="1486372622732" under_arrow="-1"/>
+        <item id="1486372622732" down="1486363263022" right="-1" under_arrow="-1"/>
+        <item id="1486372758752" down="1486372819419" right="1486372823930" under_arrow="-1"/>
+        <item id="1486372758754" down="1486372431167" right="-1" under_arrow="-1"/>
+        <item id="1486372819419" down="1486384310734" right="1486372414338" under_arrow="1486372414338"/>
+        <item id="1486372823930" down="1486384328176" right="1486372758754" under_arrow="1486372758754"/>
+        <item id="1486372834729" down="1486372414338" right="-1" under_arrow="-1"/>
+        <item id="1486372841614" down="1486372758754" right="-1" under_arrow="-1"/>
+        <item id="1486373241709" down="1486373247587" right="1486373251204" under_arrow="-1"/>
+        <item id="1486373241711" down="1486372470364" right="-1" under_arrow="-1"/>
+        <item id="1486373247587" down="1486384339992" right="1486372431169" under_arrow="1486372431169"/>
+        <item id="1486373251204" down="1486384350585" right="1486373241711" under_arrow="1486373241711"/>
+        <item id="1486373260297" down="1486372431169" right="-1" under_arrow="-1"/>
+        <item id="1486373264100" down="1486373241711" right="-1" under_arrow="-1"/>
+        <item id="1486373464211" down="1486384469842" right="1486373470116" under_arrow="1486373470116"/>
+        <item id="1486373470116" down="1486384482771" right="1486363263023" under_arrow="1486363263023"/>
+        <item id="1486373483301" down="1486373470116" right="-1" under_arrow="-1"/>
+        <item id="1486373488082" down="1486363263023" right="-1" under_arrow="-1"/>
+        <item id="1486384310734" down="1486372834729" right="-1" under_arrow="-1"/>
+        <item id="1486384328176" down="1486372841614" right="-1" under_arrow="-1"/>
+        <item id="1486384339992" down="1486373260297" right="-1" under_arrow="-1"/>
+        <item id="1486384350585" down="1486373264100" right="-1" under_arrow="-1"/>
+        <item id="1486384469842" down="1486373483301" right="-1" under_arrow="-1"/>
+        <item id="1486384482771" down="1486373488082" right="-1" under_arrow="-1"/>
+        <item id="1487241697919" down="1487241711293" right="-1" under_arrow="-1"/>
+        <item id="1487241711293" down="1486372470366" right="-1" under_arrow="-1"/>
+        <item id="1487678740985" down="1487678776443" right="-1" under_arrow="-1"/>
+        <item id="1487678740988" down="1487678740985" right="-1" under_arrow="-1"/>
+        <item id="1487678776443" down="1487678800685" right="-1" under_arrow="-1"/>
+        <item id="1487678800685" down="1487678812887" right="-1" under_arrow="-1"/>
+        <item id="1487678812887" down="1487678740988" right="-1" under_arrow="-1"/>
+        <item id="1487678836175" down="1487678862740" right="-1" under_arrow="-1"/>
+        <item id="1487678862740" down="1486363263021" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>
