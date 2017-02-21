@@ -29,7 +29,6 @@ protected:
 
     void onTransmissionError(uint32_t operationID) override;
     void onTransmissionComplete() override;
-    void onSoftResetComplete() override;
 
     virtual void initializeCustomOKBModule();
     virtual void createResponse(QMap<uint32_t, QVariant>& response);
@@ -41,7 +40,6 @@ protected:
 
     void addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
 
-    bool mCustomInitializationFinished;
     QMap<uint32_t, QVariant> mTmpResponse;//TODO simplify internal protocol (remove copy-paste)
 
 private:
@@ -49,7 +47,6 @@ private:
 
     uint8_t mCurrentAddress;
     uint8_t mDefaultAddress;
-    bool mCommonInitializationFinished;
 };
 
 #endif // OKB_MODULE_H

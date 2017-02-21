@@ -1047,13 +1047,18 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
     int TODO;
 }
 
-void ModuleMKO::initialize()
+void ModuleMKO::onApplicationStart()
 {
-    emit initializationFinished(QString("MKO not implemented"));
+    setModuleState(AbstractModule::INITIALIZING);
+    setModuleState(AbstractModule::INITIALIZED_FAILED, tr("MKO not implemeted"));
+
     int TODO;
 }
 
 void ModuleMKO::setDefaultState()
 {
+    //TODO check state
+    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SAFE_STATE);
     int TODO;
 }

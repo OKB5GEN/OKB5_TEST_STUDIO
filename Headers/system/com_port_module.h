@@ -4,9 +4,7 @@
 #include <QtSerialPort>
 
 #include "Headers/system/abstract_module.h"
-#include "Headers/module_commands.h"
 
-//class QSerialPort;
 class QTimer;
 
 class COMPortModule: public AbstractModule
@@ -28,10 +26,10 @@ public:
     void setSendInterval(int msec);
     void setResponseWaitTime(int msec);
 
-    void setId(ModuleCommands::ModuleID moduleID, const Identifier& id);
+    void setId(const Identifier& id);
     const Identifier& id() const;
 
-    void initialize();
+    void onApplicationStart() override;
 
     // callback for some actions that must be performed on application finish
     virtual void onApplicationFinish() = 0;
@@ -47,18 +45,11 @@ protected:
     // call when all requests in queue are succesfully sent and all responses to them are successfully processed
     virtual void onTransmissionComplete() = 0;
 
-    // inherited class custom initialization. The signal 'initializationFinished' must be sent after initialization finished
+    // inherited class custom initialization. Module state must be set to INITIALIZED_OK/INITIALIZED_FAILED after initialization success/fail
     virtual void initializeCustom() = 0;
-
-    virtual void onSoftResetComplete() = 0;
 
     void addRequest(uint32_t operationID, const QByteArray& request);
     void softReset();
-
-    ModuleCommands::ModuleID moduleID() const;
-    const QString& moduleName() const;
-
-    bool mModuleReady;
 
 private slots:
     void onResponseReceived();
@@ -80,8 +71,6 @@ private:
 
     QSerialPort* mPort;
     Identifier mID;
-    ModuleCommands::ModuleID mModuleID;
-    QString mModuleName;
 
     QTimer* mResponseWaitTimer;
     int mResponseWaitTime;

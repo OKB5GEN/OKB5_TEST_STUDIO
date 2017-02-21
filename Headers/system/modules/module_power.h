@@ -55,7 +55,6 @@ protected:
 
     void onTransmissionError(uint32_t operationID) override;
     void onTransmissionComplete() override;
-    void onSoftResetComplete() override;
 
 private:
     enum ObjectID

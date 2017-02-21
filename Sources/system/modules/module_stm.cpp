@@ -149,19 +149,19 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             uu2 = response[3];
             qreal voltage = qreal((uu1 << 8) | uu2) / 10000;
 
-            LOG_INFO(QString("Channel %1 voltage=%2").arg(mRequestedChannelTelemetry).arg(voltage));
+            LOG_INFO(QString("Telemetry channel %1 voltage=%2").arg(mRequestedChannelTelemetry).arg(voltage));
 
             if (voltage >= CHANNEL_CONNECTED_BORDER)
             {
 
             }
 
-            LOG_WARNING("Get channel telemetry command not implemented");
+            LOG_WARNING("Get channel telemetry processing not implemented");
             int TODO; //form response
         }
         break;
 
-    case ModuleCommands::SET_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
         {
             QMetaEnum e = QMetaEnum::fromType<ModuleCommands::PowerSupplyChannelID>();
             uint8_t channel = response[2];
@@ -185,7 +185,7 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             int TODO; // form response
         }
         break;
-    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         {
             QMetaEnum e = QMetaEnum::fromType<ModuleCommands::MKOPowerSupplyChannelID>();
             uint8_t channel = response[2];
@@ -207,6 +207,11 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             }
 
             int TODO; // form response
+
+            if (moduleState() == AbstractModule::INITIALIZING && channel == ModuleCommands::MKO_4)
+            {
+                setModuleState(AbstractModule::INITIALIZED_OK);
+            }
         }
         break;
 
@@ -216,12 +221,12 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
         }
         break;
 
-    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+    case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
             int TODO;
         }
         break;
-    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
             int TODO;
         }
@@ -272,16 +277,46 @@ void ModuleSTM::createResponse(QMap<uint32_t, QVariant>& response)
 
 void ModuleSTM::initializeCustomOKBModule()
 {
-    //TODO stub here
-    mModuleReady = true;
-    mCustomInitializationFinished = true;
-    emit initializationFinished(QString(""));
+    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
+    {
+        addModuleCmd(ModuleCommands::GET_POWER_CHANNEL_STATE, i, 0);
+    }
+
+    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
+    {
+        addModuleCmd(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, i, 0);
+    }
 }
 
 void ModuleSTM::setDefaultState()
 {
-    int TODO;
+    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
 
-    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_ON); // enable MKO power supply (main?) TODO
-    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_ON); // enable MKO power supply (reserve?) TODO
+    int TODO; // for more reliability ask for channel state from module?
+
+    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
+    {
+        ModuleCommands::PowerState state = mPowerSupplyRelayStates.value(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+        if (state == ModuleCommands::POWER_ON)
+        {
+            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+        }
+    }
+
+    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
+    {
+        ModuleCommands::PowerState state = mMKOPowerSupplyRelayStates.value(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+        if (state == ModuleCommands::POWER_ON)
+        {
+            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+        }
+    }
+
+    TODO;
+    //setModuleState(AbstractModule::SAFE_STATE);
+
+
+    // TODO: possibly give powe supply to MKO?
+    //setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_ON); // enable MKO power supply (main?) TODO
+    //setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_ON); // enable MKO power supply (reserve?) TODO
 }

@@ -41,7 +41,8 @@ Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
     mState(STOPPED),
     mModified(false),
-    mIsMainCyclogram(false)
+    mIsMainCyclogram(false),
+    mSystemState(Q_NULLPTR)
 //  , mExecuteOneCmd(false)
 {
     mVarController = new VariableController(this);
@@ -187,7 +188,7 @@ void Cyclogram::stop()
     mCurrent = mFirst;
     setState(STOPPED);
 
-    if (mIsMainCyclogram)
+    if (mIsMainCyclogram && mSystemState)
     {
         mSystemState->setDefaultState();
     }

@@ -34,8 +34,8 @@ protected:
     void initializeCustomOKBModule() override;
 
 private:
-    void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state); // Подача питания на БУП и ПНА
-    void setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state); // Подача питания на МКО
+    void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на БУП и ПНА
+    void setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на МКО
     ModuleCommands::PowerState getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel);
     ModuleCommands::PowerState getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel);
     void getChannelTelemetry(int channel);

@@ -13,9 +13,7 @@ namespace
 ModuleOKB::ModuleOKB(QObject* parent):
     COMPortModule(parent),
     mCurrentAddress(0xff),
-    mDefaultAddress(0xff),
-    mCommonInitializationFinished(false),
-    mCustomInitializationFinished(false)
+    mDefaultAddress(0xff)
 {
     int TODO; // вообще надо проверять ОКБ модули только по типу и идентифицировать модуль запросом адреса модуля
 }
@@ -85,14 +83,14 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     case ModuleCommands::START_MEASUREMENT_LINE_2:
     case ModuleCommands::GET_DS1820_ADDR_LINE_1:
     case ModuleCommands::GET_DS1820_ADDR_LINE_2:
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_FUSE_STATE:
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         return true; // can return ModuleCommands::ERROR in case of hardware failure/errors
 
     case ModuleCommands::GET_STATUS_WORD:
     case ModuleCommands::ECHO:
-    case ModuleCommands::GET_POWER_CHANNEL_STATE:
-    case ModuleCommands::GET_FUSE_STATE:
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
-    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
     case ModuleCommands::CHECK_RECV_DATA_CAN:
     case ModuleCommands::RECV_DATA_CAN:
     case ModuleCommands::CHECK_RECV_DATA_RS485:
@@ -113,10 +111,7 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
 
 void ModuleOKB::initializeCustomOKBModule()
 {
-    //TODO stub here
-    mModuleReady = true;
-    mCustomInitializationFinished = true;
-    emit initializationFinished(QString(""));
+    setModuleState(AbstractModule::INITIALIZED_OK);
 }
 
 void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
@@ -165,9 +160,9 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
 
     if (!error.isEmpty())
     {
-        if (!mCommonInitializationFinished)
+        if (moduleState() == AbstractModule::INITIALIZING)
         {
-            emit initializationFinished(error);
+            setModuleState(AbstractModule::INITIALIZED_FAILED, error);
         }
         else
         {
@@ -197,12 +192,12 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
             }
 
             // Initialization step 1 finish >>>
-            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && !mCommonInitializationFinished)
+            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && moduleState() == AbstractModule::INITIALIZING)
             {
                 if (mCurrentAddress != mDefaultAddress)
                 {
                     QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
-                    emit initializationFinished(error);
+                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
                 }
                 else
                 {
@@ -248,15 +243,14 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
             }
 
             // Initialization step 2 finish >>>
-            if (!mCommonInitializationFinished)
+            if (moduleState() == AbstractModule::INITIALIZING)
             {
                 if (!error.isEmpty())
                 {
-                    emit initializationFinished(error);
+                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
                 }
                 else
                 {
-                    mCommonInitializationFinished = true;
                     initializeCustomOKBModule();
                 }
             }
@@ -318,11 +312,6 @@ void ModuleOKB::onTransmissionComplete()
         LOG_INFO("Send response to cyclogram");
         emit commandResult(response);
     }
-}
-
-void ModuleOKB::onSoftResetComplete()
-{
-    int TODO; // QSerialPort is up, need some module re-initialization will be here such as initializeCustom() call
 }
 
 void ModuleOKB::createResponse(QMap<uint32_t, QVariant>& response)

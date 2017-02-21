@@ -67,7 +67,8 @@ SOURCES += main.cpp\
     Sources/logger/FileAppender.cpp \
     Sources/logger/Logger.cpp \
     Sources/logger/OutputDebugAppender.cpp \
-    Sources/logger/RollingFileAppender.cpp
+    Sources/logger/RollingFileAppender.cpp \
+    Sources/system/abstract_module.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \

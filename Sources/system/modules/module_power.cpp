@@ -83,12 +83,13 @@ void ModulePower::initializeCustom()
 
 void ModulePower::setDefaultState()
 {
-    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
-    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off power output
-    setCurVoltage(MIN_VOLTAGE);
+    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
 
-    // switch "give power supply" on
-    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
+    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
+    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off external power output
+
+    //setCurVoltage(MIN_VOLTAGE);
+    //sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
 }
 
 void ModulePower::setCurVoltage(qreal voltage)
@@ -490,10 +491,9 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
     case SET_OCP_THRESHOLD:
         {
-            if (!mModuleReady)
+            if (moduleState() == AbstractModule::INITIALIZING)
             {
-                mModuleReady = true;
-                emit initializationFinished(QString(""));
+                setModuleState(AbstractModule::INITIALIZED_OK);
             }
 
             int TODO; // parse response that is all OK
@@ -588,6 +588,11 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
         {
             int TODO; // parse response, to not have errors
             mState = ModuleCommands::POWER_ON;
+
+            if (moduleState() == AbstractModule::SETTING_TO_INACTIVE)
+            {
+                setModuleState(AbstractModule::SAFE_STATE);
+            }
         }
         break;
 
@@ -615,10 +620,5 @@ void ModulePower::onTransmissionComplete()
         emit commandResult(mCurrentResponse);
     }
 
-    int TODO;
-}
-
-void ModulePower::onSoftResetComplete()
-{
     int TODO;
 }

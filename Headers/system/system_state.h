@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QStringList>
 
+#include "Headers/system/abstract_module.h"
 #include "Headers/logic/variable_controller.h" //TODO what for?
 #include "Headers/module_commands.h"
 
@@ -89,13 +90,7 @@ private slots:
 
     // new slots
     void processResponse(const QMap<uint32_t, QVariant>& response);
-
-    void onMKOInitFinished(const QString& error);
-    void onOTDInitFinished(const QString& error);
-    void onSTMInitFinished(const QString& error);
-    void onTechInitFinished(const QString& error);
-    void onPowerBUPInitFinished(const QString& error);
-    void onPowerPNAInitFinished(const QString& error);
+    void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 signals:
     void commandFinished(bool success);
@@ -118,21 +113,7 @@ signals:
     void sendToPowerUnitPNA(const QMap<uint32_t, QVariant>& request);
 
 private:
-    struct ModuleState
-    {
-        ModuleState():
-            initialized(false),
-            ready(false)
-        {
-        }
-
-        bool initialized;
-        bool ready;
-    };
-
-    void createModules();
     void setupCommandsParams();
-    void onModuleInitFinished(ModuleCommands::ModuleID id, const QString& error);
 
     void onExecutionFinished(uint32_t error);
 
@@ -155,10 +136,7 @@ private:
     ModulePower* mPowerBUP;
     ModulePower* mPowerPNA;
 
-    int m_mko_kits; //TODO remove/move to MKO
-
-    //QThread* mThreadMKO;
-    //QThread* mThreadOTD;
+    int mEnablesMKOKits; //TODO remove/move to MKO
 
     QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
@@ -166,8 +144,6 @@ private:
     CmdActionModule* mCurCommand;
     QMap<ParamID, QString> mParamNames;
 
-    ModuleState mModulesStates[ModuleCommands::MODULES_COUNT];
-
-    bool mSystemReady;
+    QMap<ModuleCommands::ModuleID, AbstractModule*> mModules;
 };
 #endif // SYSTEM_STATE_H

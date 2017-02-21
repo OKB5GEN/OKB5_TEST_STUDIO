@@ -22,9 +22,9 @@ public:
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
 
-    void initialize();
-
 public slots:
+    void onApplicationStart() override;
+
 /*    void startMKO();
     void startMKO1();
     void stopMKO();

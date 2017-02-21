@@ -1,5 +1,4 @@
 #include "Headers/system/modules/module_otd.h"
-#include "Headers/module_commands.h"
 #include "Headers/logger/Logger.h"
 #include "Headers/system/system_state.h"
 
@@ -108,6 +107,8 @@ void ModuleOTD::initializeCustomOKBModule()
 
 void ModuleOTD::setDefaultState()
 {
+    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+
     addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
     addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
 }
@@ -193,11 +194,9 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
             mSensorsCntNu = response[2];
             LOG_INFO("DS1820 sensors count at line 2 is %i", mSensorsCntNu);
 
-            if (!mCustomInitializationFinished)
+            if (moduleState() == AbstractModule::INITIALIZING)
             {
-                mCustomInitializationFinished = true;
-                mModuleReady = true;
-                emit initializationFinished(QString(""));
+                setModuleState(AbstractModule::INITIALIZED_OK);
             }
         }
         break;
@@ -247,7 +246,10 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::RESET_LINE_2:
         {
-            int TODO; // check error
+            if (moduleState() == AbstractModule::SETTING_TO_INACTIVE)
+            {
+                setModuleState(AbstractModule::SAFE_STATE);
+            }
         }
         break;
 
