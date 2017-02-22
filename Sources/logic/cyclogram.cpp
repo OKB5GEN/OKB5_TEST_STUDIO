@@ -11,6 +11,7 @@
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/logic/commands/cmd_question.h"
+#include "Headers/logic/commands/cmd_sub_program.h"
 
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
@@ -350,6 +351,11 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
             cmd = new CmdDelay(this);
         }
         break;
+    case DRAKON::SUBPROGRAM:
+        {
+            cmd = new CmdSubProgram(this);
+        }
+        break;
     case DRAKON::ACTION_MATH:
         {
             CmdActionMath* tmp = new CmdActionMath(this);
@@ -376,19 +382,8 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         }
         break;
 
-        //TODO not implemented
-    case DRAKON::SWITCH:{} break;
-    case DRAKON::CASE:{} break;
-    case DRAKON::SUBPROGRAM:{} break;
-    case DRAKON::SHELF:{} break;
-    case DRAKON::FOR_BEGIN:{} break;
-    case DRAKON::FOR_END:{} break;
-    case DRAKON::OUTPUT:{} break;
-    case DRAKON::INPUT:{} break;
-    case DRAKON::START_TIMER:{} break;
-    case DRAKON::SYNCHRONIZER:{} break;
-    case DRAKON::PARALLEL_PROCESS:{} break;
     default:
+        LOG_ERROR(QString("Command not implemented").arg(int(type)));
         break;
     }
 

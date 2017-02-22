@@ -15,26 +15,21 @@ public:
         GO_TO_BRANCH,
         ACTION_MATH,
         DELAY,
-
-        // PARTIALLY IMPLEMENTED >>>
         QUESTION,
         ACTION_MODULE,
-
-        // NOT IMPLEMENTED (PLANNED)
         SUBPROGRAM,
 
         // NOT IMPLEMENTED (NOT PLANNED YET)
-        SWITCH,
-        CASE,
-        FOR_BEGIN,
-        FOR_END,
-        OUTPUT,
-        INPUT,
-        START_TIMER,
-        SYNCHRONIZER,
-        PARALLEL_PROCESS,
-
-        SHELF, // subprogram input (top), subprogram output (bottom)
+//        SWITCH,
+//        CASE,
+//        FOR_BEGIN,
+//        FOR_END,
+//        OUTPUT,
+//        INPUT,
+//        START_TIMER,
+//        SYNCHRONIZER,
+//        PARALLEL_PROCESS,
+//        SHELF,
 
         SHAPES_COUNT // always must be last
     };

@@ -457,6 +457,15 @@ void ShapeItem::createPath()
             path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
         }
         break;
+    case DRAKON::SUBPROGRAM:
+        {
+            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+            path.moveTo(w * 3 / 2, h);
+            path.lineTo(w * 3 / 2, H - h);
+            path.moveTo(W - (w * 3 / 2), h);
+            path.lineTo(W - (w * 3 / 2), H - h);
+        }
+        break;
     case DRAKON::DELAY:
         {
             path.moveTo(w, h);
@@ -1361,6 +1370,7 @@ void ShapeItem::createValencyPoints(Command* cmd)
     case DRAKON::ACTION_MATH:
     case DRAKON::ACTION_MODULE:
     case DRAKON::DELAY:
+    case DRAKON::SUBPROGRAM:
         {
             ValencyPoint point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
             mValencyPoints.push_back(point);

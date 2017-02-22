@@ -68,7 +68,8 @@ SOURCES += main.cpp\
     Sources/logger/Logger.cpp \
     Sources/logger/OutputDebugAppender.cpp \
     Sources/logger/RollingFileAppender.cpp \
-    Sources/system/abstract_module.cpp
+    Sources/system/abstract_module.cpp \
+    Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -124,7 +125,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/logger/Logger.h \
     Headers/logger/OutputDebugAppender.h \
     Headers/logger/RollingFileAppender.h \
-    Headers/system/abstract_module.h
+    Headers/system/abstract_module.h \
+    Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h
 
 
 FORMS    +=
