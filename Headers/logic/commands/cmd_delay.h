@@ -16,8 +16,10 @@ public:
 
     void run() override;
     void stop() override;
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     void pause() override;
     void resume() override;
+#endif
 
     void setDelay(int hours, int minutes, int seconds, int msec);
     int delay() const; // milliseconds

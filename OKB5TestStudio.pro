@@ -16,6 +16,8 @@ TEMPLATE = app
 QT += serialport
 CONFIG +=c++11
 
+#DEFINES += ENABLE_CYCLOGRAM_PAUSE
+
 SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp \

@@ -520,7 +520,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
             return false;
         }
     }
-
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     if (mCurrentCyclogram->state() == Cyclogram::PAUSED)
     {
         // current running command can not be deleted
@@ -542,6 +542,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
             }
         }
     }
+#endif
 
     return true;
 }

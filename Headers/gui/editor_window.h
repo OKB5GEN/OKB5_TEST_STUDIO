@@ -37,7 +37,6 @@ private slots:
     void documentWasModified();
 
     void runCyclogram();
-    void runOneCommand();
     void stopCyclogram();
 
     void addVariablesMonitor();
@@ -72,10 +71,11 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
-    //QAction* mRunOneCmdAct;
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     QIcon mPlayIcon;
     QIcon mPauseIcon;
+#endif
 
     QScrollArea * mScrollArea;
     qreal mScaleFactor;

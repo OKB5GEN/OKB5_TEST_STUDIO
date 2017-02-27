@@ -32,8 +32,11 @@ public:
 
     virtual void run();
     virtual void stop();
+
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     virtual void pause();
     virtual void resume();
+#endif
 
     qint64 id() const;
 

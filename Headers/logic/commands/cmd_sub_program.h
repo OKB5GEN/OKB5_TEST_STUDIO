@@ -19,8 +19,10 @@ public:
     const QString& filePath() const;
 
     void stop() override;
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     void pause() override;
     void resume() override;
+#endif
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;

@@ -13,6 +13,8 @@
 #include "Headers/file_reader.h"
 #include "Headers/file_writer.h"
 
+#include "Headers/logger/Logger.h"
+
 namespace
 {
     static const int TOOLBAR_ICON_SIZE = 64;
@@ -240,24 +242,21 @@ void EditorWindow::createActions()
     QToolBar *runToolBar = addToolBar(tr("Run"));
     runToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     mPlayIcon = QIcon(":/images/play.png");
     mPauseIcon = QIcon(":/images/pause.png");
 
+
     mRunAct = new QAction(mPlayIcon, tr("Run"), this);
+#else
+    mRunAct = new QAction(QIcon(":/images/play.png"), tr("Run"), this);
+#endif
+
     //mRunAct->setShortcuts(QKeySequence::New);
     mRunAct->setStatusTip(tr("Execute cyclogram"));
     connect(mRunAct, &QAction::triggered, this, &EditorWindow::runCyclogram);
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
-
-    /*
-    QIcon runOneCmdIcon = QIcon(":/images/step_forward.png");
-    mRunOneCmdAct = new QAction(runOneCmdIcon, tr("Run"), this);
-    //mRunOneCmdAct->setShortcuts(QKeySequence::New);
-    mRunOneCmdAct->setStatusTip(tr("Run one command"));
-    connect(mRunOneCmdAct, &QAction::triggered, this, &EditorWindow::runOneCommand);
-    runMenu->addAction(mRunOneCmdAct);
-    runToolBar->addAction(mRunOneCmdAct);*/
 
     QIcon stopIcon = QIcon(":/images/stop.png");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
@@ -432,66 +431,35 @@ void EditorWindow::runCyclogram()
     if (errorCmd)
     {
         mCyclogramWidget->showValidationError(errorCmd);
-        qDebug("Cyclogram validation failed");
+        LOG_ERROR(QString("Cyclogram validation failed"));
         return;
     }
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     if (mCyclogram->state() == Cyclogram::STOPPED)
     {
-        //mCyclogram->setExecuteOneCmd(false);
-        //mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->run();
     }
     else if (mCyclogram->state() == Cyclogram::RUNNING)
     {
-        //mRunOneCmdAct->setEnabled(true);
         mRunAct->setIcon(mPlayIcon);
         mRunAct->setStatusTip(tr("Execute cyclogram"));
         mCyclogram->pause();
     }
     else if (mCyclogram->state() == Cyclogram::PAUSED)
     {
-        //mRunOneCmdAct->setEnabled(false);
         mRunAct->setIcon(mPauseIcon);
         mRunAct->setStatusTip(tr("Pause cyclogram execution"));
         mCyclogram->resume();
     }
+#else
+    mRunAct->setEnabled(false);
+    mCyclogram->run();
+#endif
 
     mStopAct->setEnabled(true);
-}
-
-void EditorWindow::runOneCommand()
-{
-    /*
-    Command* errorCmd = mCyclogram->validate();
-    if (errorCmd)
-    {
-        mCyclogramWidget->showValidationError(errorCmd);
-        qDebug("Cyclogram validation failed");
-        return;
-    }
-
-    if (mCyclogram->state() == Cyclogram::STOPPED)
-    {
-        mCyclogram->setExecuteOneCmd(true);
-        mRunOneCmdAct->setEnabled(false);
-        mRunAct->setIcon(mPauseIcon);
-        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
-        mCyclogram->run();
-    }
-    else if (mCyclogram->state() == Cyclogram::PAUSED)
-    {
-        mCyclogram->setExecuteOneCmd(true);
-        mRunOneCmdAct->setEnabled(false);
-        mRunAct->setIcon(mPauseIcon);
-        mRunAct->setStatusTip(tr("Pause cyclogram execution"));
-        mCyclogram->resume();
-    }
-
-    mStopAct->setEnabled(true);
-    */
 }
 
 void EditorWindow::stopCyclogram()
@@ -500,7 +468,9 @@ void EditorWindow::stopCyclogram()
 
     mCyclogram->stop();
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     mRunAct->setIcon(mPlayIcon);
+#endif
     mRunAct->setStatusTip(tr("Execute cyclogram"));
     mStopAct->setEnabled(false);
 
@@ -553,12 +523,13 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
 
 void EditorWindow::onCyclogramStateChanged(int state)
 {
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     if (state == Cyclogram::PAUSED)
     {
         mRunAct->setIcon(mPlayIcon);
         mRunAct->setStatusTip(tr("Execute cyclogram"));
-        //mRunOneCmdAct->setEnabled(true);
     }
+#endif
 }
 
 void EditorWindow::commitData(QSessionManager &manager)

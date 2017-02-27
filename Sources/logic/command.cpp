@@ -65,6 +65,7 @@ void Command::stop()
 
 }
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
 void Command::pause()
 {
 
@@ -74,6 +75,7 @@ void Command::resume()
 {
 
 }
+#endif
 
 DRAKON::IconType Command::type() const
 {

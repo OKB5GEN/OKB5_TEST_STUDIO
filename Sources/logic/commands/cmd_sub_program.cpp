@@ -363,6 +363,7 @@ void CmdSubProgram::stop()
     mCyclogram->stop();
 }
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
 void CmdSubProgram::pause()
 {
     mCyclogram->pause();
@@ -372,6 +373,7 @@ void CmdSubProgram::resume()
 {
     mCyclogram->resume();
 }
+#endif
 
 void CmdSubProgram::onCyclogramFinished(const QString& error)
 {

@@ -163,22 +163,19 @@ void Cyclogram::runCurrentCommand()
         connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
 
-//        if (mExecuteOneCmd && QObject::sender())
-//        {
-//            setState(PAUSED);
-//        }
-//        else
-//        {
-            LogCmd(mCurrent, "started");
-            mCurrent->setActive(true);
-            mCurrent->run();
-//        }
+        LogCmd(mCurrent, "started");
+        mCurrent->setActive(true);
+        mCurrent->run();
     }
 }
 
 void Cyclogram::stop()
 {
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     if (mState == RUNNING || mState == PAUSED)
+#else
+    if (mState == RUNNING)
+#endif
     {
         mCurrent->setActive(false);
         disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
@@ -195,6 +192,7 @@ void Cyclogram::stop()
     }
 }
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
 void Cyclogram::pause()
 {
     if (mState == RUNNING)
@@ -212,12 +210,7 @@ void Cyclogram::resume()
         setState(RUNNING);
     }
 }
-/*
-void Cyclogram::setExecuteOneCmd(bool enable)
-{
-    mExecuteOneCmd = enable;
-}
-*/
+#endif
 
 Command* Cyclogram::first() const
 {
@@ -383,7 +376,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         break;
 
     default:
-        LOG_ERROR(QString("Command not implemented").arg(int(type)));
+        LOG_ERROR(QString("Command %1 not implemented").arg(int(type)));
         break;
     }
 

@@ -19,7 +19,9 @@ public:
     {
         STOPPED,
         RUNNING,
+#ifdef ENABLE_CYCLOGRAM_PAUSE
         PAUSED
+#endif
     };
 
     Q_ENUM(State)
@@ -30,13 +32,13 @@ public:
 
     void run();
     void stop();
+#ifdef ENABLE_CYCLOGRAM_PAUSE
     void pause();
     void resume();
+#endif
 
     bool isModified() const;
     void setModified(bool isModified, bool sendSignal);
-
-    //void setExecuteOneCmd(bool enable);
 
     Command* first() const;
     Command* last() const;

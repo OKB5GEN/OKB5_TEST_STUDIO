@@ -33,7 +33,7 @@ VariablesWindow::VariablesWindow(QWidget * parent):
 
     layout->addWidget(mTableWidget, 0, 0, 5, 5);
 
-    // play button
+    // add button
     QToolButton* addBtn = new QToolButton(this);
     addBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
     addBtn->setIcon(QIcon(":/images/edit_add.png"));
@@ -41,7 +41,7 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
     layout->addWidget(addBtn, 0, 5, 1, 1);
 
-    // pause button
+    // remove button
     mRemoveBtn = new QToolButton(this);
     mRemoveBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
     mRemoveBtn->setIcon(QIcon(":/images/edit_remove.png"));

@@ -45,6 +45,7 @@ void CmdDelay::stop()
     mTimer->stop();
 }
 
+#ifdef ENABLE_CYCLOGRAM_PAUSE
 void CmdDelay::pause()
 {
     int timeLeft = mTimer->remainingTime();
@@ -56,6 +57,7 @@ void CmdDelay::resume()
 {
     run();
 }
+#endif
 
 void CmdDelay::finish()
 {
