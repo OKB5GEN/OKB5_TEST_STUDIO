@@ -148,9 +148,14 @@ void Cyclogram::onCriticalError(Command* cmd)
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
 
-    LOG_INFO("==================================");
-    LOG_INFO("Cyclogram stopped due to critical runtime error");
-    LOG_INFO("==================================");
+    LOG_ERROR("==================================");
+    LOG_ERROR("Cyclogram stopped due to critical runtime error");
+    LOG_ERROR("==================================");
+
+    for (auto it = mVarController->variables().begin(); it != mVarController->variables().end(); ++it)
+    {
+        LOG_ERROR(QString("Variable '%1' current value is %2").arg(it.key()).arg(it.value()));
+    }
 
     stop();
     emit finished(tr("Critical error occured: ") + cmd->errorDesc());

@@ -1,4 +1,5 @@
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
 
 VariableController::VariableController(QObject* parent):
     QObject(parent)
@@ -40,6 +41,7 @@ void VariableController::setVariable(const QString& name, qreal value, Container
 
     if (cont.contains(name))
     {
+        LOG_INFO(QString("Variable '%1' %2 value changed to %3").arg(name).arg((container == Current) ? "current" : "initial").arg(value));
         cont[name] = value;
         emit valueChanged(name, value, container);
     }
@@ -94,5 +96,4 @@ void VariableController::clear()
 {
     mCurrent.clear();
     mInitial.clear();
-
 }
