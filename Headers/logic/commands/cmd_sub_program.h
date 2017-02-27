@@ -12,6 +12,10 @@ public:
 
     void run() override;
 
+public:
+    void setFilePath(const QString& filePath);
+    const QString& filePath() const;
+
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;
@@ -22,6 +26,8 @@ private:
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
+
+    QString mFilePath;
 };
 
 #endif // CMD_SUB_PROGRAM_H

@@ -3,6 +3,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
 
 CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
     QDialog(parent),
@@ -24,7 +25,26 @@ void CmdSubProgramEditDialog::setupUI()
 {
     QGridLayout * layout = new QGridLayout(this);
 
+    // Cyclogram file
+    QGroupBox* filePathBox = new QGroupBox(this);
+    filePathBox->setTitle(tr("Cyclogram file"));
+    QHBoxLayout* fileNameLayout = new QHBoxLayout(filePathBox);
+    mFileNameStr = new QLineEdit(filePathBox);
+    //mFileNameStr->setReadOnly(true);
+    mFileNameStr->setBackgroundRole(QPalette::Dark);
+    //mFileNameStr->setText(tr("Browse to set file name"));
+    QPushButton* browseButton = new QPushButton(filePathBox);
+    connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(openFile()));
+
+    browseButton->setText(tr("Browse"));
+    fileNameLayout->addWidget(mFileNameStr);
+    fileNameLayout->addWidget(browseButton);
+    filePathBox->setLayout(fileNameLayout);
+
+    layout->addWidget(filePathBox, 0, 0, 1, 9);
+
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    /*
     QGroupBox* resultBox = new QGroupBox(this);
     resultBox->setTitle(tr("Result"));
     QVBoxLayout* box4layout = new QVBoxLayout(resultBox);
@@ -34,11 +54,11 @@ void CmdSubProgramEditDialog::setupUI()
     box4layout->addStretch();
 
     resultBox->setLayout(box4layout);
-    layout->addWidget(resultBox, 0, 0, 2, 2);
+    layout->addWidget(resultBox, 1, 0, 2, 2);
 
     QLabel* equalSign = new QLabel(this);
     equalSign->setText("=");
-    layout->addWidget(equalSign, 0, 2, 2, 1);
+    layout->addWidget(equalSign, 1, 2, 2, 1);
 
     mValidator = new QDoubleValidator(this);
 
@@ -59,7 +79,7 @@ void CmdSubProgramEditDialog::setupUI()
     box1layout->addWidget(mOper1Num, 1, 1, 1, 1);
 
     mOperand1Box->setLayout(box1layout);
-    layout->addWidget(mOperand1Box, 0, 3, 2, 2);
+    layout->addWidget(mOperand1Box, 1, 3, 2, 2);
 
     // Operation box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* operationBox = new QGroupBox(this);
@@ -78,7 +98,7 @@ void CmdSubProgramEditDialog::setupUI()
     box3layout->addWidget(mTwoOperandsCheckBox);
 
     operationBox->setLayout(box3layout);
-    layout->addWidget(operationBox, 0, 5, 2, 2);
+    layout->addWidget(operationBox, 1, 5, 2, 2);
 
     // Operand 2 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand2Box = new QGroupBox(this);
@@ -98,22 +118,23 @@ void CmdSubProgramEditDialog::setupUI()
 
     mOperand2Box->setLayout(box2layout);
 
-    layout->addWidget(mOperand2Box, 0, 7, 2, 2);
-
+    layout->addWidget(mOperand2Box, 1, 7, 2, 2);
+*/
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 3, 7, 1, 2);
+    //layout->addWidget(buttonBox, 4, 7, 1, 2);
+    layout->addWidget(buttonBox, 1, 7, 1, 2);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     setLayout(layout);
-
+/*
     connect(mTwoOperandsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
     connect(mOper1VarBtn, SIGNAL(toggled(bool)), this, SLOT(onOper1VarBtnStateChanged(bool)));
     connect(mOper1NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper1NumBtnStateChanged(bool)));
     connect(mOper2VarBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2VarBtnStateChanged(bool)));
-    connect(mOper2NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2NumBtnStateChanged(bool)));
+    connect(mOper2NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2NumBtnStateChanged(bool)));*/
 }
 
 void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command)
@@ -122,6 +143,7 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command)
 
     if (mCommand)
     {
+        mFileNameStr->setText(mCommand->filePath());
         // set default state
 //        mTwoOperandsCheckBox->setChecked(true);
 //        mOper1VarBtn->setChecked(true);
@@ -195,6 +217,8 @@ void CmdSubProgramEditDialog::onAccept()
 {
     if (mCommand)
     {
+        QString text = mFileNameStr->text();
+        mCommand->setFilePath(text);
 //        if (mTwoOperandsCheckBox->isChecked())
 //        {
 //            CmdSubProgram::Operation operation = CmdSubProgram::Operation(mOperationBox->currentData().toInt());
@@ -289,4 +313,36 @@ void CmdSubProgramEditDialog::onOper2NumBtnStateChanged(bool toggled)
     mOper2VarBtn->blockSignals(false);
 }
 
+void CmdSubProgramEditDialog::openFile()
+{
+    QString path;
+    QString currentFileName = mFileNameStr->text();
+    if (!currentFileName.isEmpty())
+    {
+        if (QFileInfo(currentFileName).exists())
+        {
+            path = QFileInfo(currentFileName).absoluteDir().path();
+        }
+        else
+        {
+            LOG_WARNING(QString("Corrupted file reference '%1' detected. Set path to current application directory path").arg(currentFileName));
+        }
+    }
 
+    if (path.isEmpty())
+    {
+        path = QDir::currentPath();
+    }
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    if (!fileName.isEmpty())
+    {
+        //TODO пока не очень понятно какие пути юзать абсолютные или относительные. Пока сделаны абсолютные
+        //абсолютный понятнее и копипастить его проще, но при переносе на другой комп ссылки на подпрограммы могут поехать (надо как-то решить)
+        // относительный безопаснее при переносе между машинами, но нечитабельный (от какой директории идет отсчет? по идее от директории приложения)
+        // по идее все циклограммы должны храниться в папке/подпапках приложения (или при выборе файла, он копируется в папку приложения и читается уже оттуда)
+
+        //QString relativePath = QDir::current().relativeFilePath(fileName);
+        mFileNameStr->setText(fileName);
+    }
+}

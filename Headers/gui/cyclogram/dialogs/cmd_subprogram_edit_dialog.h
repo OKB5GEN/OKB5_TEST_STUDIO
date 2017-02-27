@@ -34,11 +34,15 @@ private slots:
     void onOper2VarBtnStateChanged(bool toggled);
     void onOper2NumBtnStateChanged(bool toggled);
 
+    void openFile();
+
 private:
     void setupUI();
     void updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn);
 
     CmdSubProgram* mCommand;
+
+    QLineEdit* mFileNameStr;
 
     QComboBox* mResultBox;
     QComboBox* mOper1Box;
