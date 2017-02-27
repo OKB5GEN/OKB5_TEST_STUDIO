@@ -363,19 +363,19 @@ void EditorWindow::loadFile(const QString &fileName)
     FileReader reader(mCyclogram);
     if (!reader.read(&file))
     {
+        mCyclogram->createDefault();
+        mCyclogramWidget->load(mCyclogram);
+
         QMessageBox::warning(this, tr("OKB5 Test Studio"),
                                    tr("Parse error in file %1:\n%2.").
                                    arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-
-        mCyclogram->createDefault();
     }
     else
     {
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
+        mCyclogramWidget->load(mCyclogram);
     }
-
-    mCyclogramWidget->load(mCyclogram);
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
