@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables/>
+    <commands>
+        <command type="TERMINATOR" id="1488189935636" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1488189935637" name="Wait 1"/>
+        <command type="GO_TO_BRANCH" id="1488189935638"/>
+        <command type="BRANCH_BEGIN" id="1488189935639" name="End"/>
+        <command type="TERMINATOR" id="1488189935640" name="FINISH" cmd_type="END"/>
+        <command type="DELAY" id="1488189943342" delay="10000"/>
+        <command type="BRANCH_BEGIN" id="1488189950958" name="Wait 2"/>
+        <command type="GO_TO_BRANCH" id="1488189950961"/>
+        <command type="BRANCH_BEGIN" id="1488189952601" name="Wait 3"/>
+        <command type="GO_TO_BRANCH" id="1488189952603"/>
+        <command type="DELAY" id="1488189994738" delay="5000"/>
+        <command type="DELAY" id="1488190009860" delay="8000"/>
+    </commands>
+    <tree>
+        <item id="1488189935636" down="1488189935637" right="-1" under_arrow="-1"/>
+        <item id="1488189935637" down="1488189943342" right="-1" under_arrow="-1"/>
+        <item id="1488189935638" down="1488189950958" right="-1" under_arrow="-1"/>
+        <item id="1488189935639" down="1488189935640" right="-1" under_arrow="-1"/>
+        <item id="1488189935640" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1488189943342" down="1488189935638" right="-1" under_arrow="-1"/>
+        <item id="1488189950958" down="1488189994738" right="-1" under_arrow="-1"/>
+        <item id="1488189950961" down="1488189952601" right="-1" under_arrow="-1"/>
+        <item id="1488189952601" down="1488190009860" right="-1" under_arrow="-1"/>
+        <item id="1488189952603" down="1488189935639" right="-1" under_arrow="-1"/>
+        <item id="1488189994738" down="1488189950961" right="-1" under_arrow="-1"/>
+        <item id="1488190009860" down="1488189952603" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

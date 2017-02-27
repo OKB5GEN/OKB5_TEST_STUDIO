@@ -3,6 +3,8 @@
 
 #include "Headers/logic/commands/cmd_action.h"
 
+class Cyclogram;
+
 class CmdSubProgram: public CmdAction
 {
     Q_OBJECT
@@ -16,10 +18,15 @@ public:
     void setFilePath(const QString& filePath);
     const QString& filePath() const;
 
+    void stop() override;
+    void pause() override;
+    void resume() override;
+
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;
     void execute();
+    void onCyclogramFinished(const QString& error);
 
 private:
     void updateText();
@@ -28,6 +35,7 @@ private:
     void readCustomAttributes(QXmlStreamReader* reader) override;
 
     QString mFilePath;
+    Cyclogram* mCyclogram;
 };
 
 #endif // CMD_SUB_PROGRAM_H

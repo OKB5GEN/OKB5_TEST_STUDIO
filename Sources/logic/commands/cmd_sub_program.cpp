@@ -1,13 +1,16 @@
 #include "Headers/logic/commands/cmd_sub_program.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/file_reader.h"
+#include "Headers/logic/cyclogram.h"
 
-//#include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QMetaEnum>
 #include <QFileInfo>
+#include <QMessageBox>
+#include <QDir>
 
 
 /* Команда-подпрограмма. Мысли вслух о реализации.
@@ -33,8 +36,12 @@
 */
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
-    CmdAction(DRAKON::SUBPROGRAM, parent)
+    CmdAction(DRAKON::SUBPROGRAM, parent),
+    mCyclogram(Q_NULLPTR)
 {
+    mCyclogram = new Cyclogram(this);
+    mCyclogram->setMainCyclogram(false);
+    connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     updateText();
 }
 
@@ -52,6 +59,30 @@ void CmdSubProgram::run()
 
 void CmdSubProgram::execute()
 {
+    // Load cyclogram
+    mCyclogram->clear();
+
+    QFile file(mFilePath);
+    FileReader reader(mCyclogram);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(mFilePath), file.errorString()));
+        emit criticalError(this);
+        return;
+    }
+
+    if (!reader.read(&file))
+    {
+        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(mFilePath), reader.errorString()));
+        emit criticalError(this);
+        return;
+    }
+
+    mCyclogram->run();
+
+
+
 //    // read current values from variable controller
 //    for (int i = 0; i < OperandsCount; ++i)
 //    {
@@ -96,7 +127,7 @@ void CmdSubProgram::execute()
 //    // set new variable value to variable controller
 //    mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
 
-    finish();
+//    finish();
 }
 
 void CmdSubProgram::setFilePath(const QString& filePath)
@@ -325,4 +356,31 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
 const QString& CmdSubProgram::filePath() const
 {
     return mFilePath;
+}
+
+void CmdSubProgram::stop()
+{
+    mCyclogram->stop();
+}
+
+void CmdSubProgram::pause()
+{
+    mCyclogram->pause();
+}
+
+void CmdSubProgram::resume()
+{
+    mCyclogram->resume();
+}
+
+void CmdSubProgram::onCyclogramFinished(const QString& error)
+{
+    if (!error.isEmpty())
+    {
+        mErrorText = QString("Subprogram finished with error: %1").arg(error);
+        emit criticalError(this);
+        return;
+    }
+
+    finish();
 }

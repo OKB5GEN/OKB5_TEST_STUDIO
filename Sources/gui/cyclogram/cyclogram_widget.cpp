@@ -60,6 +60,8 @@ CyclogramWidget::~CyclogramWidget()
 
 void CyclogramWidget::clear(bool onDestroy)
 {
+    clearSelection();
+
     qDeleteAll(mCommands);
     mCommands.clear();
 
