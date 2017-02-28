@@ -25,14 +25,20 @@ void CmdSubProgramEditDialog::setupUI()
 {
     QGridLayout * layout = new QGridLayout(this);
 
+    QLabel* caption = new QLabel(this);
+    caption->setText(tr("Name:"));
+    layout->addWidget(caption, 0, 0, 1, 1);
+
+    mSubprogramNameStr = new QLineEdit(this);
+    mSubprogramNameStr->setText(tr("Subprogram"));
+    layout->addWidget(mSubprogramNameStr, 0, 1, 1, 8);
+
     // Cyclogram file
     QGroupBox* filePathBox = new QGroupBox(this);
     filePathBox->setTitle(tr("Cyclogram file"));
     QHBoxLayout* fileNameLayout = new QHBoxLayout(filePathBox);
     mFileNameStr = new QLineEdit(filePathBox);
-    //mFileNameStr->setReadOnly(true);
     mFileNameStr->setBackgroundRole(QPalette::Dark);
-    //mFileNameStr->setText(tr("Browse to set file name"));
     QPushButton* browseButton = new QPushButton(filePathBox);
     connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(openFile()));
 
@@ -41,7 +47,7 @@ void CmdSubProgramEditDialog::setupUI()
     fileNameLayout->addWidget(browseButton);
     filePathBox->setLayout(fileNameLayout);
 
-    layout->addWidget(filePathBox, 0, 0, 1, 9);
+    layout->addWidget(filePathBox, 1, 0, 1, 9);
 
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     /*
@@ -123,7 +129,7 @@ void CmdSubProgramEditDialog::setupUI()
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     //layout->addWidget(buttonBox, 4, 7, 1, 2);
-    layout->addWidget(buttonBox, 1, 7, 1, 2);
+    layout->addWidget(buttonBox, 2, 7, 1, 2);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -143,7 +149,9 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command)
 
     if (mCommand)
     {
+        mSubprogramNameStr->setText(mCommand->name());
         mFileNameStr->setText(mCommand->filePath());
+
         // set default state
 //        mTwoOperandsCheckBox->setChecked(true);
 //        mOper1VarBtn->setChecked(true);
@@ -217,8 +225,9 @@ void CmdSubProgramEditDialog::onAccept()
 {
     if (mCommand)
     {
-        QString text = mFileNameStr->text();
-        mCommand->setFilePath(text);
+        mCommand->setFilePath(mFileNameStr->text());
+        mCommand->setName(mSubprogramNameStr->text());
+
 //        if (mTwoOperandsCheckBox->isChecked())
 //        {
 //            CmdSubProgram::Operation operation = CmdSubProgram::Operation(mOperationBox->currentData().toInt());

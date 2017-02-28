@@ -8,8 +8,8 @@
         <command type="GO_TO_BRANCH" id="1488190487940"/>
         <command type="BRANCH_BEGIN" id="1488190487941" name="End"/>
         <command type="TERMINATOR" id="1488190487942" name="FINISH" cmd_type="END"/>
-        <command type="SUBPROGRAM" id="1488190494348" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/test_subprogram.cgr"/>
-        <command type="SUBPROGRAM" id="1488190497774" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/test_subprogram.cgr"/>
+        <command type="SUBPROGRAM" id="1488190494348" name="Delay 1" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/test_subprogram.cgr"/>
+        <command type="SUBPROGRAM" id="1488190497774" name="Delay 2" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/test_subprogram.cgr"/>
     </commands>
     <tree>
         <item id="1488190487938" down="1488190487939" right="-1" under_arrow="-1"/>

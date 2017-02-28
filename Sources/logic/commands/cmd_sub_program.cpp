@@ -39,6 +39,8 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
     mCyclogram(Q_NULLPTR)
 {
+    mText = "ERROR";
+
     mCyclogram = new Cyclogram(this);
     mCyclogram->setMainCyclogram(false);
     connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
@@ -80,8 +82,6 @@ void CmdSubProgram::execute()
     }
 
     mCyclogram->run();
-
-
 
 //    // read current values from variable controller
 //    for (int i = 0; i < OperandsCount; ++i)
@@ -142,9 +142,19 @@ void CmdSubProgram::setFilePath(const QString& filePath)
     updateText();
 }
 
+void CmdSubProgram::setName(const QString& name)
+{
+    mText = name;
+    updateText();
+}
+
+const QString& CmdSubProgram::name() const
+{
+    return mText;
+}
+
 void CmdSubProgram::updateText()
 {
-    mText = "ERROR";
     QFileInfo fileInfo(mFilePath);
 
     bool isOK = (!mFilePath.isEmpty() && fileInfo.exists());
@@ -156,11 +166,6 @@ void CmdSubProgram::updateText()
     else if (!isOK)
     {
         setErrorStatus(true);
-    }
-
-    if (isOK)
-    {
-        mText = fileInfo.fileName();
     }
 
 //    if (mOperands[Result].variable.isEmpty())
@@ -272,6 +277,7 @@ void CmdSubProgram::onVariableRemoved(const QString& name)
 
 void CmdSubProgram::writeCustomAttributes(QXmlStreamWriter* writer)
 {
+    writer->writeAttribute("name", mText);
     writer->writeAttribute("file", mFilePath);
 
 //    QMetaEnum operation = QMetaEnum::fromType<CmdSubProgram::Operation>();
@@ -297,6 +303,11 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
     if (attributes.hasAttribute("file"))
     {
         mFilePath = attributes.value("file").toString();
+    }
+
+    if (attributes.hasAttribute("name"))
+    {
+        mText = attributes.value("name").toString();
     }
 
 //    QMetaEnum operation = QMetaEnum::fromType<CmdSubProgram::Operation>();

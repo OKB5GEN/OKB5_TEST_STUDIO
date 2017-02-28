@@ -16,7 +16,9 @@ public:
 
 public:
     void setFilePath(const QString& filePath);
+    void setName(const QString& name);
     const QString& filePath() const;
+    const QString& name() const;
 
     void stop() override;
 #ifdef ENABLE_CYCLOGRAM_PAUSE

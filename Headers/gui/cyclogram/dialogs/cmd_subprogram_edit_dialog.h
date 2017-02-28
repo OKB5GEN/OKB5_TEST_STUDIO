@@ -43,6 +43,7 @@ private:
     CmdSubProgram* mCommand;
 
     QLineEdit* mFileNameStr;
+    QLineEdit* mSubprogramNameStr;
 
     QComboBox* mResultBox;
     QComboBox* mOper1Box;
