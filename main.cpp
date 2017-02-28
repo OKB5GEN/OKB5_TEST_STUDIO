@@ -11,6 +11,8 @@
 #include "Headers/logger/FileAppender.h"
 #include "Headers/logger/ConsoleAppender.h"
 
+//#include "xlsxdocument.h"
+
 void initializeLogger()
 {
     // create console output
@@ -47,6 +49,12 @@ int main(int argc, char *argv[])
     QLocale::setDefault(QLocale::c());
 
     initializeLogger();
+
+    ////////////
+//    QXlsx::Document xlsx;
+//    xlsx.write("A1", "Hello Qt!");
+//    xlsx.saveAs("Test.xlsx");
+    ////////////////
 
     LOG_INFO("========== APPLICATION STARTED ==========");
 

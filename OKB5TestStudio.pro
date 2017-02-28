@@ -11,6 +11,8 @@ INCLUDEPATH +=C:\Qt\Tools\mingw482_32\i686-w64-mingw32\include
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
+include(external/qtxlsx/src/xlsx/qtxlsx.pri)
+
 TARGET = OKB5TestStudio
 TEMPLATE = app
 QT += serialport
