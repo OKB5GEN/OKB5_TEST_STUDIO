@@ -99,11 +99,21 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         }
         break;
 
-    case ModuleCommands::MKO: //TODO
+    case ModuleCommands::MKO: //TODO в ответ получаем ответное слово
         {
-            //mCommands->addItem(tr("МКО1"));
-            //mCommands->addItem(tr("МКО2"));
-            //mCommands->addItem(tr("МКО3"));
+            int i = 0;
+            addCommand(tr("Принять тестовый массив"), ++i);
+            addCommand(tr("Выдать тестовый массив"), ++i);
+            addCommand(tr("Принять командный массив"), ++i);
+            addCommand(tr("Выдать контрольный массив"), ++i);
+            addCommand(tr("Принять тестовый массив по линии 1 (Psy)"), ++i);
+            addCommand(tr("Принять тестовый массив по линии 2 (Nu)"), ++i);
+            addCommand(tr("Выдать тестовый массив по линии 1 (Psy)"), ++i);
+            addCommand(tr("Выдать тестовый массив по линии 2 (Nu)"), ++i);
+            addCommand(tr("Принять командный массив по ψ"), ++i);
+            addCommand(tr("Принять командный массив по ψ"), ++i);
+            addCommand(tr("Принять командный массив по υ"), ++i);
+            addCommand(tr("Подать питание на ДУ"), ++i);
         }
         break;
 
@@ -166,6 +176,20 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             params.push_back(ModuleCommands::HEATER_LINE_2);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить нагреватели ПНА на линии 2"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::DRIVE_CONTROL);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить подачу силового питания"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::DRIVE_CONTROL);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить подачу силового питания"), params);
 
             int TODO;
             // 1. проверка предохранителей

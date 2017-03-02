@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="U" value="27"/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1488278216223" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1488278216224" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1488278216225"/>
+        <command type="BRANCH_BEGIN" id="1488278216226" name="End"/>
+        <command type="TERMINATOR" id="1488278216227" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1488278257045" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488278277558" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1488278702109" name="УстНачСост" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/set_initial_state.cgr"/>
+        <command type="ACTION_MODULE" id="1488279439730" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="2,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1488280002673" name="ТестМКО" file="D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/mko_test.cgr"/>
+        <command type="BRANCH_BEGIN" id="1488280207050" name="Тест УстТекПол"/>
+        <command type="GO_TO_BRANCH" id="1488280207053"/>
+        <command type="BRANCH_BEGIN" id="1488280252860" name="Тест СтБезТока"/>
+        <command type="GO_TO_BRANCH" id="1488280252863"/>
+        <command type="BRANCH_BEGIN" id="1488280294215" name="Тест СтПодТоком"/>
+        <command type="GO_TO_BRANCH" id="1488280294217"/>
+        <command type="BRANCH_BEGIN" id="1488280347265" name="Тест НизкСкор"/>
+        <command type="GO_TO_BRANCH" id="1488280347267"/>
+        <command type="BRANCH_BEGIN" id="1488280399242" name="Тест ВысокСкор"/>
+        <command type="GO_TO_BRANCH" id="1488280399244"/>
+        <command type="BRANCH_BEGIN" id="1488280471916" name="Тест БезДУ"/>
+        <command type="GO_TO_BRANCH" id="1488280471918"/>
+        <command type="BRANCH_BEGIN" id="1488280509230" name="Тест СДУ"/>
+        <command type="GO_TO_BRANCH" id="1488280509233"/>
+        <command type="ACTION_MODULE" id="1488356604388" module="MKO" command="GET_FUSE_STATE" implicit_params="">
+            <input_params/>
+            <output_params/>
+        </command>
+    </commands>
+    <tree>
+        <item id="1488278216223" down="1488278216224" right="-1" under_arrow="-1"/>
+        <item id="1488278216224" down="1488278702109" right="-1" under_arrow="-1"/>
+        <item id="1488278216225" down="1488280207050" right="-1" under_arrow="-1"/>
+        <item id="1488278216226" down="1488278216227" right="-1" under_arrow="-1"/>
+        <item id="1488278216227" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1488278257045" down="1488278277558" right="-1" under_arrow="-1"/>
+        <item id="1488278277558" down="1488279439730" right="-1" under_arrow="-1"/>
+        <item id="1488278702109" down="1488278257045" right="-1" under_arrow="-1"/>
+        <item id="1488279439730" down="1488280002673" right="-1" under_arrow="-1"/>
+        <item id="1488280002673" down="1488356604388" right="-1" under_arrow="-1"/>
+        <item id="1488280207050" down="1488280207053" right="-1" under_arrow="-1"/>
+        <item id="1488280207053" down="1488280252860" right="-1" under_arrow="-1"/>
+        <item id="1488280252860" down="1488280252863" right="-1" under_arrow="-1"/>
+        <item id="1488280252863" down="1488280294215" right="-1" under_arrow="-1"/>
+        <item id="1488280294215" down="1488280294217" right="-1" under_arrow="-1"/>
+        <item id="1488280294217" down="1488280347265" right="-1" under_arrow="-1"/>
+        <item id="1488280347265" down="1488280347267" right="-1" under_arrow="-1"/>
+        <item id="1488280347267" down="1488280399242" right="-1" under_arrow="-1"/>
+        <item id="1488280399242" down="1488280399244" right="-1" under_arrow="-1"/>
+        <item id="1488280399244" down="1488280399242" right="-1" under_arrow="-1"/>
+        <item id="1488280471916" down="1488280471918" right="-1" under_arrow="-1"/>
+        <item id="1488280471918" down="1488280509230" right="-1" under_arrow="-1"/>
+        <item id="1488280509230" down="1488280509233" right="-1" under_arrow="-1"/>
+        <item id="1488280509233" down="1488278216226" right="-1" under_arrow="-1"/>
+        <item id="1488356604388" down="1488278216225" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>
