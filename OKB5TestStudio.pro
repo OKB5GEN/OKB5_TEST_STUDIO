@@ -76,7 +76,8 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp \
     Sources/system/codecs/mko_codec.cpp \
     Sources/system/codecs/okb_codec.cpp \
-    Sources/system/codecs/power_unit_codec.cpp
+    Sources/system/codecs/power_unit_codec.cpp \
+    Sources/gui/application_finish_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -136,7 +137,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h \
     Headers/system/codecs/mko_codec.h \
     Headers/system/codecs/okb_codec.h \
-    Headers/system/codecs/power_unit_codec.h
+    Headers/system/codecs/power_unit_codec.h \
+    Headers/gui/application_finish_dialog.h
 
 
 FORMS    +=

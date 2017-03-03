@@ -4,6 +4,7 @@
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
 #include "Headers/gui/tools/monitor_manual.h"
 #include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/gui/application_finish_dialog.h"
 #include "Headers/logic/cyclogram.h"
 
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
@@ -69,14 +70,32 @@ void EditorWindow::onApplicationStart()
 
 void EditorWindow::closeEvent(QCloseEvent *event)
 {
-    int TODO; // Закрытие приложения
-    /*
-     * 1. Если есть активная циклограмма, мы спрашиваем "Циклограмма запущена, стопать бум?"
-     * 2. Если нет, то тупо закрываем окно и игнорим ивент
-     * 3. Если да, то стопаем циклограмму (та в свою очередь вырубит все модули)
-     * 4. По завершении стопа циклограммы мы спрашиваем "Сохранить изменения?" (по идее это перед стартом циклограммы должно спрашиваться или делаться автоматически)
-     * 5. После чего делаем обычную магию сохранения и сами закрываем приложение.
-    */
+    if (mCyclogram->state() == Cyclogram::RUNNING)
+    {
+        int button =  QMessageBox::question(this,
+                                            tr("Application exit"),
+                                            tr("Cyclogram is running. Would you like to stop it?"),
+                                            QMessageBox::Ok,
+                                            QMessageBox::Cancel);
+
+        if (button == QMessageBox::Ok)
+        {
+            mCyclogram->disconnect();
+            mCyclogram->stop();
+
+            ApplicationFinishDialog appFinishDialog(this);
+            if (appFinishDialog.init())
+            {
+                appFinishDialog.exec();
+            }
+        }
+        else
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     if (maybeSave())
     {
         writeSettings();
