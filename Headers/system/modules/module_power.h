@@ -3,7 +3,6 @@
 
 #include "Headers/system/com_port_module.h"
 
-#include <QMap>
 #include <QVariant>
 
 class QTimer;

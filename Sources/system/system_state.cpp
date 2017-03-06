@@ -216,6 +216,7 @@ void SystemState::setDefaultState()
 
 int SystemState::simpltst1(int z)
 {
+    /*
     if(z == 0)
     {
         //ui->label_MKO->setText("Тест пройден успешно!\n");
@@ -226,7 +227,7 @@ int SystemState::simpltst1(int z)
         TestOutStr += QString::number(z);
         TestOutStr += " ошибками. Перезагрузите программу!\n";
         //ui->label_MKO->setText(TestOutStr);
-    }
+    }*/
 
     return z ;
 }
@@ -238,6 +239,7 @@ void SystemState::MKO_data(QString data)
 
 void SystemState::MKO_cm_data(QString data)
 {
+    /*
     QString ncd, zcd, cdh, cdd;
 
     QStringList list1 = data.split(" ");
@@ -435,6 +437,7 @@ void SystemState::MKO_cm_data(QString data)
             }
         }
     }
+    */
 }
 
 //void SystemState::paintvalue()
@@ -660,7 +663,7 @@ void SystemState::on_pow_DY_rez_clicked()
 
 void SystemState::on_MKO_osn_clicked()
 {
-    mEnablesMKOKits ^= ModuleMKO::MAIN_KIT;
+    /*mEnablesMKOKits ^= ModuleMKO::MAIN_KIT;
 
     if(mEnablesMKOKits & ModuleMKO::MAIN_KIT)
     {
@@ -673,12 +676,12 @@ void SystemState::on_MKO_osn_clicked()
 
     connect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));
     emit MKO_ch(mEnablesMKOKits);
-    disconnect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));
+    disconnect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));*/
 }
 
 void SystemState::on_MKO_rez_clicked()
 {
-    mEnablesMKOKits ^= ModuleMKO::RESERVE_KIT;
+    /*mEnablesMKOKits ^= ModuleMKO::RESERVE_KIT;
     if(mEnablesMKOKits & ModuleMKO::RESERVE_KIT)
     {
         //ui->MKO_rez->setStyleSheet(QString::fromUtf8("background-color: rgb(0, 255, 0);"));
@@ -690,7 +693,7 @@ void SystemState::on_MKO_rez_clicked()
 
     connect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));
     emit MKO_ch(mEnablesMKOKits);
-    disconnect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));
+    disconnect(this, SIGNAL(MKO_ch(int)), mMKO, SLOT(MKO_chan(int)));*/
 }
 
 void SystemState::on_MKO_test_clicked()

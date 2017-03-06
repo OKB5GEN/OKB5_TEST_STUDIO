@@ -1,25 +1,39 @@
 #include "Headers/system/modules/module_mko.h"
-#include <windows.h>
-#include <QTimer>
-#include <QTime>
-
-#include "Sources/system/WDMTMKv2.cpp"
+#include "Headers/system/system_state.h"
 #include "Headers/logger/Logger.h"
 
-HANDLE hEvent, hEvent1;
-int flag_ch = 0;
-//int ch_cur = 0;
-//int addr1;
-//int addr2;
-//QTimer *MyTimerMKO;
+#include <QTimer>
+
+#include <windows.h>
+#include "Sources/system/WDMTMKv2.cpp"
+
+
+HANDLE hEvent, hEvent1; //TODO some internal MKO shit here
+
+namespace
+{
+    static const uint16_t MAIN_KIT_ADDRESS = 0x1E;
+    static const uint16_t RESERVE_KIT_ADDRESS = 0x1D;
+    static const uint16_t ANGLE_SENSOR_SUBADDRESS = 0x06;
+    static const uint16_t PSY_CHANNEL_SUBADDRESS = 0x01;
+    static const uint16_t NU_CHANNEL_SUBADDRESS = 0x02;
+    static const uint16_t RECEIVE_SUBADDRESS = 0x0D;
+    static const uint16_t SEND_SUBADDRESS = 0x0C;
+
+    static const int RECEIVE_DELAY = 100; // msec
+    static const int RECEIVE_BUFFER_SIZE = 100; // words
+}
 
 ModuleMKO::ModuleMKO(QObject* parent):
     AbstractModule(parent),
+    mMainKitEnabled(false),
+    mReserveKitEnabled(false),
+    mWordsToReceive(0),
     mActiveKits(NO_KIT)
 {
-//    m_timer = new QTimer(this);
-//    m_timer->setSingleShot(true);
-//    connect(m_timer, SIGNAL(timeout()), this, SLOT(MKO_timer()));
+    mReceiveTimer = new QTimer(this);
+    mReceiveTimer->setSingleShot(true);
+    connect(mReceiveTimer, SIGNAL(timeout()), this, SLOT(readResponse()));
 }
 
 ModuleMKO::~ModuleMKO()
@@ -27,38 +41,76 @@ ModuleMKO::~ModuleMKO()
 
 }
 
-void ModuleMKO::MKO_chan(int x)
+void ModuleMKO::readResponse()
 {
-    flag_ch = x;
-    if (flag_ch == 10 || flag_ch == 20) //TODO: какая-то Сашина залипуха для выключения активных МКО комплектов
+    int TODO; // стопнули циклограмму, не дождавшись респонса
+
+    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentResponse.value(SystemState::COMMAND_ID).toUInt());
+
+    uint16_t buffer[RECEIVE_BUFFER_SIZE];
+
+    switch (command)
     {
-        stopMKO();
-        flag_ch = 0;
-        mActiveKits = NO_KIT;
+    case SEND_TEST_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_TEST_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_COMMAND_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_COMMAND_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_TEST_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_TO_ANGLE_SENSOR:
+        {
+            int TODO;
+        }
+        break;
+    default:
+        LOG_ERROR(QString("MKO messages internal error"));
+        break;
     }
 
-    if (flag_ch == 30)
-    {
-        stopMKO1();
-        flag_ch = 0;
-        mActiveKits = NO_KIT;
-    }
-}
+    bcgetblk(0, &buffer, mWordsToReceive);
 
-void ModuleMKO::MKO_avt(int x, int y, int adr1, int adr2)
-{
-    /*if (x == 1)
+    if (false)
     {
-        MyTimerMKO = new QTimer;
-        MyTimerMKO->start(y);
-        addr1 = adr1;
-        addr2 = adr2;
-        QObject::connect(MyTimerMKO,SIGNAL(timeout()), this, SLOT(MKO_timer()));
+        //TODO check response word
+        //TODO read and parse response data
     }
-    else
-    {
-        QObject::disconnect(MyTimerMKO,SIGNAL(timeout()), this, SLOT(MKO_timer()));
-    }*/
+
+    //TODO можно ли больше прочитать? а меньше? и что будет?
+
 }
 
 void ModuleMKO::MKO_timer()
@@ -174,20 +226,36 @@ void ModuleMKO::stopMKO1()
     CloseHandle(hEvent1);
 }
 
-QString ModuleMKO::OCcontrol(uint16_t oc)
+QString ModuleMKO::processResponseWord(uint16_t oc)
 {
-    QString data1;
+    //ADDRESS_MASK
+    QString error;
     uint16_t x;
-    if (oc >> 11 != mAddr)
+
+    uint16_t address;
+    if (mMainKitEnabled)
     {
-        data1+= " - Неверный адрес в ОС! \n";
+        address == MAIN_KIT_ADDRESS;
+    }
+    else if (mReserveKitEnabled)
+    {
+        address = RESERVE_KIT_ADDRESS;
+    }
+    else
+    {
+        LOG_ERROR(QString("Response received but no enabled BUP kit found"));
+    }
+
+    if (oc >> 11 != address)
+    {
+        error += " - Неверный адрес в ОС! \n";
     }
 
     x = oc << 5;
     x = x >> 15;
     if (x == 1)
     {
-        data1 += " - Принята недостоверная информация! \n";
+        error += " - Принята недостоверная информация! \n";
     }
 
     x = oc << 12;
@@ -195,7 +263,7 @@ QString ModuleMKO::OCcontrol(uint16_t oc)
 
     if (x == 1)
     {
-        data1 += " - Нет возможности обмена! \n";
+        error += " - Нет возможности обмена! \n";
     }
 
     x = oc << 13;
@@ -203,7 +271,7 @@ QString ModuleMKO::OCcontrol(uint16_t oc)
 
     if (x == 1)
     {
-        data1 += " - Абонент неисправен! \n";
+        error += " - Абонент неисправен! \n";
     }
 
     x = oc << 15;
@@ -211,20 +279,20 @@ QString ModuleMKO::OCcontrol(uint16_t oc)
 
     if (x == 1)
     {
-        data1+= " - ОУ функционирует неправильно! \n";
+        error += " - ОУ функционирует неправильно! \n";
     }
 
-    if (data1 == "")
+    if (error == "")
     {
-        data1 += "";
+        error += "";
     }
 
-    return data1;
+    return error;
 }
 
 void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 {
-    WORD buf[11];
+    /*WORD buf[11];
     WORD buff[13];
 
     QString err = "";
@@ -304,7 +372,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
     if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
-        tx_mes(buf, 11, buff, 1);
+        sendDataToBUP(buf, 11, buff, 1);
         err += OCcontrol(buff[0]);
     }
 
@@ -322,7 +390,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
     if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
-        rx_mes(buff, 12);
+        requestDataFromBUP(buff, 12);
         for(int i = 1; i < 12; i++)
         {
             if (buff[i] != 0)
@@ -389,7 +457,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         mAddr = adr1;
         mSubAddr = 1;
 
-        tx_mes(buf, 6, buff, 1);
+        sendDataToBUP(buf, 6, buff, 1);
         if (OCcontrol(buff[0]) != "")
         {
             err += "МКО: Основной полукомплект передача массива ось ψ: \n";
@@ -397,7 +465,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         }
 
         mSubAddr = 2;
-        tx_mes(buf, 6, buff, 1);
+        sendDataToBUP(buf, 6, buff, 1);
         if (OCcontrol(buff[0]) != "")
         {
             err += "МКО: Основной полукомплект передача массива ось υ: \n";
@@ -405,7 +473,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         }
 
         mSubAddr = 1;
-        rx_mes(buff, 7);
+        requestDataFromBUP(buff, 7);
         for(int i = 1; i < 7; i++)
         {
             if (buff[i] != 0)
@@ -428,7 +496,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 
         err_count = 0;
         mSubAddr = 2;
-        rx_mes(buff, 7);
+        requestDataFromBUP(buff, 7);
         for(int i = 1; i < 7; i++)
         {
             if (buff[i] != 0)
@@ -460,7 +528,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         //ch_cur = 2;
         mAddr = adr2;
         mSubAddr = 1;
-        tx_mes(buf, 6, buff, 1);
+        sendDataToBUP(buf, 6, buff, 1);
         if (OCcontrol(buff[0]) != "")
         {
             err += "МКО: Резервный полукомплект передача массива ось ψ: \n";
@@ -468,7 +536,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         }
 
         mSubAddr = 2;
-        tx_mes(buf, 6, buff, 1);
+        sendDataToBUP(buf, 6, buff, 1);
 
         if (OCcontrol(buff[0]) != "")
         {
@@ -478,7 +546,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 
         mAddr = adr2;
         mSubAddr = 1;
-        rx_mes(buff, 7);
+        requestDataFromBUP(buff, 7);
         for(int i = 1; i < 7; i++)
         {
             if (buff[i] != 0)
@@ -501,7 +569,7 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 
         err_count= 0;
         mSubAddr = 2;
-        rx_mes(buff, 7);
+        requestDataFromBUP(buff, 7);
 
         for(int i = 1; i < 7; i++)
         {
@@ -526,34 +594,33 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
         err_count= 0;
     }
 
-    emit start_MKO(err);
+    emit start_MKO(err);*/
 }
 
-void ModuleMKO::tx_mes(uint16_t* sendBuffer, uint16_t sendCount, uint16_t* receiveBuffer, uint16_t receiveCount)
+void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount)
 {
-    WORD msgCmd = (mAddr << 11) + RT_RECEIVE + (mSubAddr << 5) + (sendCount & NWORDS_MASK);
+    uint16_t commandWord = (address << 11) + RT_RECEIVE + (subaddress << 5) + (wordsCount & NWORDS_MASK);
     bcdefbase(0);
-    bcputw(0, msgCmd);
-    bcputblk(1, sendBuffer, sendCount);
+    bcputw(0, commandWord);
+    bcputblk(1, data, wordsCount);
     bcstartx(0, DATA_BC_RT | CX_BUS_0 | CX_STOP | CX_NOSIG);
-    Sleep(100);
 
-    bcgetblk(0, receiveBuffer, receiveCount);
+    mReceiveTimer->start(RECEIVE_DELAY);
 }
 
-void ModuleMKO::rx_mes(uint16_t* receiveBuffer, uint16_t receiveCount)
+void ModuleMKO::requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse)
 {
-    WORD msgCmd = (mAddr << 11) + RT_TRANSMIT + (mSubAddr << 5) + ((receiveCount - 1) & NWORDS_MASK);
+    uint16_t commandWord = (address << 11) + RT_TRANSMIT + (subaddress << 5) + ((expectedWordsInResponse - 1) & NWORDS_MASK); //TODO '-1' - "response word" or "checksum"
     bcdefbase(0);
-    bcputw(0, msgCmd);
+    bcputw(0, commandWord);
     bcstartx(0, DATA_RT_BC | CX_BUS_0 | CX_STOP | CX_NOSIG);
-    Sleep(100);
-    bcgetblk(0, receiveBuffer, receiveCount);
+
+    mReceiveTimer->start(RECEIVE_DELAY);
 }
 
 void ModuleMKO::pow_DY(int kit, int adr)
 {
-    QString err1 = "";
+    /*QString err1 = "";
     WORD buf[3];
     WORD buff[5];
     mSubAddr = 6;
@@ -623,19 +690,19 @@ void ModuleMKO::pow_DY(int kit, int adr)
         buf[2] = 64;
     }
 
-    tx_mes(buf, 3, buff, 1);
+    sendDataToBUP(buf, 3, buff, 1);
     if (OCcontrol(buff[0]) != "")
     {
         err1 += "МКО: Питание ДУ:\n";
         err1 += OCcontrol(buff[0]);
     }
 
-    emit start_MKO(err1);
+    emit start_MKO(err1);*/
 }
 
 void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
 {
-    WORD buf1[11];
+    /*WORD buf1[11];
     WORD buff[13];
 
     QStringList list1 = cm.split(" ");
@@ -746,7 +813,7 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
     if (kit == MAIN_KIT || kit == RESERVE_KIT)
     {
         mSubAddr = 12;
-        tx_mes(buf1, 11, buff, 1);
+        sendDataToBUP(buf1, 11, buff, 1);
 
         if (OCcontrol(buff[0]) != "")
         {
@@ -822,7 +889,7 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
 
         mAddr = adr1;
         mSubAddr = 1;
-        tx_mes(buf2, 6, buff, 1);
+        sendDataToBUP(buf2, 6, buff, 1);
 
         if (OCcontrol(buff[0]) != "")
         {
@@ -832,7 +899,7 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
 
         mSubAddr = 2;
 
-        tx_mes(buf3, 6, buff, 1);
+        sendDataToBUP(buf3, 6, buff, 1);
         if (OCcontrol(buff[0]) != "")
         {
             err2 += "МКО: Основной полукомплект передача массива ось υ: \n";
@@ -849,7 +916,7 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
         mAddr = adr2;
         mSubAddr = 1;
 
-        tx_mes(buf2, 6, buff, 1);
+        sendDataToBUP(buf2, 6, buff, 1);
         if (OCcontrol(buff[0]) != "")
         {
             err2 += "МКО: Резервный полукомплект передача массива ось ψ: \n";
@@ -857,7 +924,7 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
         }
 
         mSubAddr = 2;
-        tx_mes(buf3, 6, buff, 1);
+        sendDataToBUP(buf3, 6, buff, 1);
 
         if (OCcontrol(buff[0]) != "")
         {
@@ -866,12 +933,12 @@ void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
         }
     }
 
-    emit start_MKO(err2);
+    emit start_MKO(err2);*/
 }
 
 void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
 {
-    QString data = "";
+    /*QString data = "";
     QString err3 = "";
     if (kit == NO_KIT)
     {
@@ -944,7 +1011,7 @@ void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
     {
         mSubAddr = 13;
         WORD buff1[23];
-        rx_mes(buff1, 22);
+        requestDataFromBUP(buff1, 22);
 
         if (OCcontrol(buff1[0]) != "")
         {
@@ -1002,7 +1069,7 @@ void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
 
         WORD buff2[23];
 
-        rx_mes(buff2, 22);
+        requestDataFromBUP(buff2, 22);
         if (OCcontrol(buff2[0]) != "")
         {
             err3 += "МКО: Основной полукомплект прием массива: \n";
@@ -1024,7 +1091,7 @@ void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
         mAddr = adr2;
         mSubAddr = 13;
 
-        rx_mes(buff2, 22);
+        requestDataFromBUP(buff2, 22);
 
         if (OCcontrol(buff2[0]) != "")
         {
@@ -1039,12 +1106,86 @@ void ModuleMKO::MKO_rc_cm(int kit, int adr1, int adr2)
     }
 
     emit data_MKO(data);
-    emit start_MKO(err3);
+    emit start_MKO(err3);*/
 }
 
 void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 {
-    int TODO;
+    mCurrentResponse.clear();
+
+    ModuleMKO::CommandID command = ModuleMKO::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+
+    switch (command)
+    {
+    case SEND_TEST_ARRAY:
+        {
+            //sendDataToBUP();
+            int TODO;
+        }
+        break;
+    case RECEIVE_TEST_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_COMMAND_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_COMMAND_ARRAY:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_TEST_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+        {
+            int TODO;
+        }
+        break;
+    case SEND_TO_ANGLE_SENSOR:
+        {
+            int TODO;
+        }
+        break;
+
+    default:
+        {
+            LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
+            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
+            emit commandResult(mCurrentResponse);
+            return;
+        }
+        break;
+    }
+
+    if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
+    {
+        LOG_ERROR(QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE));
+        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
+        emit commandResult(mCurrentResponse);
+        return;
+    }
+
+    mCurrentResponse[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
+    mCurrentResponse[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
+    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
+    mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 }
 
 void ModuleMKO::onApplicationStart()

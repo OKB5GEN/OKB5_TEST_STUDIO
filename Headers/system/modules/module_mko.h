@@ -2,6 +2,7 @@
 #define MODULE_MKO_H
 
 #include "Headers/system/abstract_module.h"
+#include <QVariant>
 
 class QTimer;
 
@@ -19,38 +20,81 @@ public:
         ALL_KITS = MAIN_KIT | RESERVE_KIT
     };
 
+    enum CommandID
+    {
+        SEND_TEST_ARRAY,
+        RECEIVE_TEST_ARRAY,
+        SEND_COMMAND_ARRAY,
+        RECEIVE_COMMAND_ARRAY,
+        SEND_TEST_ARRAY_FOR_CHANNEL,
+        RECEIVE_TEST_ARRAY_FOR_CHANNEL,
+        SEND_COMMAND_ARRAY_FOR_CHANNEL,
+        RECEIVE_COMMAND_ARRAY_FOR_CHANNEL,
+        SEND_TO_ANGLE_SENSOR
+    };
+
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
+
+public:
+    // КС - "командное слово" - двухбайтовая "шапка" операции, мы отправляем на БУП
+    // ОС - "ответное слово" - двухбайтова шапка операции, мы ее получаем с БУПа; получая его мы парсим на предмет ошибок операции
+
+    // 2.1.1 Операция обмена при выдаче из БКУ в БУП НА тестового массива с использованием формата 1
+    // (используется для тестирования БУП НА при включении только основного или только резервного полукомплекта БУП НА). Используется подадрес 12 (запись)
+    //void sendTestArray(); // мы отправляем на БУП КС "Прими тестовый массив" + 11 слов данных, в ответ получаем ОС
+
+    // 2.1.2 Операция обмена при чтении из ОУ БУП НА по запросу БКУ тестового массива по формату 2
+    // (тестирование БУП НА при включении только основного или только резервного полукомплекта БУП НА). Используется подадрес 12 (чтение)
+    //void receiveTestArray(); // мы отправляем на БУП КС "Дай тестовый массив", нам в ответ прилетает ОС + 11 слов данных
+
+    // 2.1.3 Операция обмена при выдаче из БКУ в ОУ БУП НА командного массива на управление обоими модулями (ψ и υ) с использованием формата 1
+    // (при включенном только основном или только резервном полукомплекте БУП НА). Используется подадрес 12
+    //void sendCommandArray(); // мы отправляем КС "Прими командный массив" + 11 слов данных (5 на каждую ось + контрольная сумма)
+
+    // 2.1.4 Операция обмена при чтении из ОУ БУП НА по запросу БКУ контрольного массива по обоим модулям (ψ и υ) по формату 2
+    // (при включенном только основном или только резервном полукомплекте БУП НА). Используется подадрес 13
+    //void receiveCommandArray(); // мы отправляем КА "Дай командный массив", нам в ответ прилетает ОС + 21 слово данных
+
+    //2.1.5 Операци я обмена при выдаче из БКУ в ОУ БУП НА тестового массива с использованием формата 1
+    //(тестирование БУП НА при включении обоих полукомплектов БУП НА).
+    //Используется подадрес 01 (запись) – тестирование канала ψ и подадрес 02 (запись) – тестирование канала υ.
+    //void sendTestArrayForChannel(); // Почти то же самое, что sendTestArray(), только для одной оси (ψ или υ): туда КС + 5 слов + контрольная сумма, оттуда ОС
+
+    //2.1.6 Операция обмена при чтении из ОУ БУП НА по запросу БКУ тестового массива по формату 2 (тестирование БУП НА при включении обоих полукомплектов БУП НА).
+    // Используется подадрес 01 (чтение) – тестирование канала ψ и подадрес 02 (чтение) – тестирование канала υ.
+    //void receiveTestArrayForChannel(); // Почти то же самое, что receiveTestArray(), только для одной оси (ψ или υ): туда КС, оттуда ОС + 5 слов + контрольная сумма
+
+    //2.1.7 Операция обмена при выдаче из БКУ в ОУ БУП НА командного массива на управление модулем ψ (модулем υ) с использованием формата 1
+    //(управление при включении обоих полукомплектов БУП НА). Используется подадрес 01 (02)
+    //void sendCommandArrayForChannel(); // Почти то же самое, что sendCommandArray(), только для одной оси (ψ или υ): туда КС + 5 слов + контрольная сумма, оттуда ОС
+
+    //2.1.8 Операция обмена при чтении из ОУ БУП НА по запросу БКУ контрольного массива по ψ и υ по формату 2
+    //(управление при включении обоих полукомплектов БУП НА).  Используется подадрес 13.
+    //void receiveCommandArrayForChannel(); // Почти то же самое, что receiveCommandArray(), только для одной оси (ψ или υ): туда КС, оттуда ОС + 21 слово
+
+    //2.1.9 Операция обмена при выдаче из БКУ в ОУ БУП НА массива для подачи питания на ДУ с использованием формата 1. Используется подадрес 06
+    //void sendAngleSensorData();
 
 public slots:
     void onApplicationStart() override;
 
-/*    void startMKO();
-    void startMKO1();
-    void stopMKO();
-    void stopMKO1();
-    QString OCcontrol(uint16_t oc);
-    void pow_DY(int kit, int adr);
-    void MKO_start_test(int kits, int adr1, int adr2);
-    void MKO_tr_cm(int kits, QString cm, int adr1, int adr2);
-    void MKO_rc_cm(int kits, int adr1, int adr2);
-    void MKO_chan(int kits);
-    void MKO_avt(int x, int y, int adr1, int adr2);
-    void MKO_timer();*/
+    void sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount);
+    void requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse);
 
+    QString processResponseWord(uint16_t responseWord);
+
+    // TODO refactor
     void startMKO();
     void startMKO1();
     void stopMKO();
     void stopMKO1();
-    QString OCcontrol(uint16_t oc);
+
     void pow_DY(int kit, int y);
     void MKO_start_test(int kit, int adr1, int adr2);
-    void tx_mes(uint16_t* sendBuffer, uint16_t sendCount, uint16_t* receiveBuffer, uint16_t receiveCount);
-    void rx_mes(uint16_t* receiveBuffer, uint16_t receiveCount);
     void MKO_tr_cm(int kit, QString cm, int adr1, int adr2);
     void MKO_rc_cm(int kit, int adr1, int adr2);
-    void MKO_chan(int x);
-    void MKO_avt(int x,int y,int adr1, int adr2);
+    //void MKO_chan(int x);
     void MKO_timer();
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
@@ -62,18 +106,20 @@ signals:
     void data_MKO(QString x);
     void MKO_CTM(int x, int y);
 
+private slots:
+    void readResponse();
+
 private:
-    uint8_t mAddr; // variable module address
-    uint8_t mSubAddr; // constant module subaddress
+    QTimer * mReceiveTimer;
 
+    bool mMainKitEnabled;
+    bool mReserveKitEnabled;
+
+    QMap<uint32_t, QVariant> mCurrentResponse;
+
+    //TODO remove
+    uint16_t mWordsToReceive;
     KitID mActiveKits = NO_KIT;
-
-    /*
-    void send(uint16_t* buf, uint16_t len, QString& dat, QString& error);
-    void send(uint16_t* buf, uint16_t len);
-    QString receive(uint16_t* buf, uint16_t len);
-    QTimer * m_timer;
-    */
 };
 
 #endif // MODULE_MKO_H
