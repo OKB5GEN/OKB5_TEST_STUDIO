@@ -14,9 +14,11 @@ int cErrors, fEventResult, strt, count_1=0,count_2=0, flag_mko_test=0;
 int flag_rem1 = 0, flag_rem2 = 0, flag_con1 = 0, flag_con2 = 0, k, flag_con3 = 0, flag_con4 = 0, flag_con5 = 0, flag_tech_log=0,flag_rm=0;
 int flag_mko_auto = 0, flag_mko_osn = 0, flag_mko_rez = 0, flag_otd_auto = 0, flag_bp_auto = 0, flag_tech_auto = 0, flag_tech_ssi=0,flag_rm_4=0;
 int flag_rlm=0, flag_rlm2=0;
+int buf_spd1[10]={0},buf_spd2[10]={0},buf_spd3[10]={0},buf_spd4[10]={0};
 double dat [1000] = { 0 }, dat1 [1000] = { 0 };
 unsigned dwMRT;
-int er;
+int er,MKO_addr_o=0x1E,MKO_addr_r=0x1D;
+int spd1, spd2;
 double d_h[3],d_v[3];
 uint16_t sum;
 WORD tx_data [4];
@@ -88,20 +90,20 @@ void MainWindow::startcondition ()
     ui->baudRateBox_tech->addItem (QStringLiteral ("921600"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("1250000"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("3000000"));
-    ui->lineEdit_Addr_2->setText (QString::number (0));
-    ui->lineEdit_Addr_3->setText (QString::number (0));
-    ui->lineEdit_period->setText (QString::number (1000));
+    //ui->lineEdit_Addr_2->setText (QString::number (0));
+    //ui->lineEdit_Addr_3->setText (QString::number (0));
+    ui->lineEdit_period->setText (QString::number (100));
     ui->tech_period->setText (QString::number (1000));
     ui->lineEdit_period_OTD->setText (QString::number (1));
     ui->MKO_cd_0->setText (QString::number (0));
     ui->MKO_cd_1->setText (QString::number (0));
-    ui->MKO_cd_3->setText (QString::number (0));
-    ui->MKO_cd_4->setText (QString::number (0));
+    ui->MKO_cd_3->setText (QString::number (5000));
+    ui->MKO_cd_4->setText (QString::number (500));
     ui->MKO_cd_5->setText (QString::number (0));
     ui->MKO_cd_6->setText (QString::number (0));
-    ui->MKO_cd_8->setText (QString::number (0));
-    ui->MKO_cd_9->setText (QString::number (0));
-    ui->lineEdit_bp_max->setText (QString::number (0.2));
+    ui->MKO_cd_8->setText (QString::number (5000));
+    ui->MKO_cd_9->setText (QString::number (500));
+    ui->lineEdit_bp_max->setText (QString::number (0.5));
     ui->lineEdit_bp_min->setText (QString::number (-0.01));
     ui->lineEdit_bp_l1->setText (QString::number (1000));
     ui->lineEdit_bp_l2->setText (QString::number (0));
@@ -138,15 +140,21 @@ void MainWindow::startcondition ()
     ui->tableWidget_2->setSelectionBehavior (QAbstractItemView::SelectRows);
     stm_on_mko (1, 0);
     stm_on_mko (2, 0);
-
     myBP->moveToThread (threadBP);
     connect (myBP, SIGNAL (paint ()), this, SLOT (paintvaluebp ()));
     threadBP->start ();
+    stm_on_com6 (1, 0);
+    stm_on_com6 (2, 0);
+    stm_on_com6 (3, 0);
+    stm_on_com5 (4, 0);
+    stm_on_com5 (5, 0);
+    stm_on_com5 (6, 0);
 
     myMKO->moveToThread (threadMKO);
     connect (myMKO, SIGNAL (test_MKO (int)), this, SLOT (simpltst1 (int)));
     connect (myMKO, SIGNAL (MKO_CTM (int,int)), this, SLOT (MKO_change_ch (int,int)));
     connect (myMKO, SIGNAL (start_MKO (QString)), this, SLOT (MKO_data (QString)));
+    connect (myMKO, SIGNAL (start_test_MKO (QString)), this, SLOT (MKO_data_test (QString)));
     connect (myMKO, SIGNAL (data_MKO (QString)), this, SLOT (MKO_cm_data (QString)));
     threadMKO->start ();
 
@@ -265,15 +273,22 @@ void MainWindow::MKO_data (QString data)
 {
     error_mes_1=data;
     write_message();
-    if(error_mes_1==""&& flag_mko_test==1){
-        flag_mko_test=0;
+}
+void MainWindow::MKO_data_test (QString data)
+{
+    error_mes_1=data;
+    write_message();
+    if(error_mes_1==" МКО: Тест пройден успешно! "){
         ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
     }
-    else if (flag_mko_test==1){
-        flag_mko_test=0;
-        ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
+    else   ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
+    for(int i=0; i<150; i++) {
+        Sleep(10);
+        QApplication::processEvents();
     }
+    ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
 }
+
 void MainWindow::MKO_cm_data (QString data)
 {
     QStringList list1 = data.split (" ");
@@ -305,20 +320,51 @@ void MainWindow::MKO_cm_data (QString data)
     zcd = "";
     cdh = "";
     cdd = "";
+
+
     int ct = 0;
     signed short a;
-    if (list1 [0] != "") {
+    if (list1 [0] != "" ) {
         for (int i = 0; i < 21; i++) {
             int z = list1 [i].toInt ();
             ncd += "CД ";
             ncd += QString::number (i);
             zcd = list2 [i];
             cdh += "0x";
+            if(i==3){
+                int sum1=0;
+                for(int k=9;k>0;k--)
+                {
+                    buf_spd1[k] = buf_spd1[k-1];
+                }
+                if( z >= spd1*1.2 ) buf_spd1[0]=spd1*1.2;
+                else buf_spd1[0]=z;
+                for(int k1=0;k1<10; k1++)
+                {
+                    sum1=sum1+buf_spd1[k1];
+                }
+                z=sum1/10;
+            }
+            if(i==8){
+                int sum2=0;
+                for(int k3=9;k3>0;k3--)
+                {
+                    buf_spd2[k3] = buf_spd2[k3-1];
+                }
+                if( z >= (spd2*1.2) ) buf_spd2[0]= spd2*1.2;
+                else buf_spd2[0]=z;
+                for(int k2=0;k2<10; k2++)
+                {
+                    sum2=sum2+buf_spd2[k2];
+                }
+                z=sum2/10;
+            }
             if (i < 10 && i != 1 && i != 6) {
                 a = z;
                 cdh += QString::number (z, 16);
                 cdd += QString::number (a);
             }
+
             if (i == 10 || i == 11) {
                 int d1 = z * 180.0 / 65536.0;
                 double z4=(z * 180.0 / 65536.0-d1)*60.0;
@@ -376,7 +422,7 @@ void MainWindow::MKO_cm_data (QString data)
             cdd = "";
         }
     }
-    if (flag_mko_osn + flag_mko_rez == 3) {
+    /*if (flag_mko_osn + flag_mko_rez == 3) {
         if (list1 [0] != "") {
             add_string_table_MKO (ct, "----------- ", "'РЕЗЕРВНЫЙ ПОЛУКОМПЛЕКТ'", "---------- ", "----------- ");
             ct++;
@@ -386,15 +432,53 @@ void MainWindow::MKO_cm_data (QString data)
                 ncd += QString::number (i);
                 zcd = list2 [i];
                 cdh += "0x";
+                if(i==3){
+                    int sum3=0;
+                    for(int k4=9;k4>0;k4--)
+                    {
+                        buf_spd3[k4] = buf_spd3[k4-1];
+                    }
+                    if( z >= spd1*1.2 ) buf_spd3[0]=spd1*1.2;
+                    else buf_spd3[0]=z;
+                    for(int k5=0;k5<10; k5++)
+                    {
+                        sum3=sum3+buf_spd3[k5];
+                    }
+                    z=sum3/10;
+                }
+                if(i==8){
+                    int sum4=0;
+                    for(int k6=9;k6>0;k6--)
+                    {
+                        buf_spd4[k6] = buf_spd4[k6-1];
+                    }
+                    if( z >= (spd2*1.2) ) buf_spd4[0]= spd2*1.2;
+                    else buf_spd4[0]=z;
+                    for(int k7=0;k7<10; k7++)
+                    {
+                        sum4=sum4+buf_spd2[k7];
+                    }
+                    z=sum4/10;
+                }
                 if (i < 10 && i != 1 && i != 6) {
                     a = z;
                     cdh += QString::number (z, 16);
                     cdd += QString::number (a);
                 }
                 if (i == 10 || i == 11) {
-                    z = z * 180 / 65536;
+                    int d2 = z * 180.0 / 65536.0;
+                    double z5=(z * 180.0 / 65536.0-d2)*60.0;
+                    int m3 =z5;
+                    int s3 = (z5-m3)*60.0;
+                    QString V;
+                    V += QString::number (d2);
+                    V += "° ";
+                    V += QString::number (m3);
+                    V += "' ";
+                    V += QString::number (s3);
+                    V += "''";
                     cdh += QString::number (z, 16);
-                    cdd += QString::number (z);
+                    cdd += V;
                 }
                 if (i == 12) {
                     i = i + 5;
@@ -437,7 +521,7 @@ void MainWindow::MKO_cm_data (QString data)
                 cdd = "";
             }
         }
-    }
+    }*/
 }
 
 void MainWindow::on_pushButton_start_com6_clicked ()
@@ -488,10 +572,10 @@ void MainWindow::paintvalue ()
         ui->pushButton_start_com5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
     error_mes_2="";
-    if (er1 == 1) error_mes_2="БП БУН НА: Превышение выходного порога по напряжению!\n";
-    if (er1 == 2) error_mes_2="БП БУН НА: Превышение выходного порога по току!\n";
-    if (er1 == 4) error_mes_2="БП БУН НА: Превышение выходного порога по мощности!\n";
-    if (er1 == 8) error_mes_2="БП БУН НА: Превышение рабочей температуры!\n";
+    if (er1 == 1) error_mes_2="БП БУП НА: Превышение выходного порога по напряжению!\n";
+    if (er1 == 2) error_mes_2="БП БУП НА: Превышение выходного порога по току!\n";
+    if (er1 == 4) error_mes_2="БП БУП НА: Превышение выходного порога по мощности!\n";
+    if (er1 == 8) error_mes_2="БП БУП НА: Превышение рабочей температуры!\n";
     if (er2 == 1) error_mes_2="БП ПНА: Превышение выходного порога по напряжению!\n";
     if (er2 == 2) error_mes_2="БП ПНА: Превышение выходного порога по току!\n";
     if (er2 == 4) error_mes_2="БП ПНА: Превышение выходного порога по мощности!\n";
@@ -533,7 +617,7 @@ void MainWindow::statusRS (QString data)
 }
 void MainWindow::statusCAN (QString data)
 {
-    QString buf;
+    /*QString buf;
     QStringList list3 = data.split (" ");
     int s = list3.size ();
     for (int i = 0; i < s - 1; i++) {
@@ -542,13 +626,13 @@ void MainWindow::statusCAN (QString data)
         buf += QString::number (hex, 16);
         buf += "\n";
         ui->tech_buf_2->setText (buf);
-    }
+    }*/
 }
 void MainWindow::on_pushButton_22_clicked()
 {
-    connect (this, SIGNAL (Tech_read(int )), myTech, SLOT (tech_read ( int )));
+    /*connect (this, SIGNAL (Tech_read(int )), myTech, SLOT (tech_read ( int )));
     emit Tech_read(2);
-    disconnect (this, SIGNAL (Tech_read(int)), myTech, SLOT (tech_read ( int )));
+    disconnect (this, SIGNAL (Tech_read(int)), myTech, SLOT (tech_read ( int )));*/
 }
 
 void MainWindow::on_pushButton_23_clicked()
@@ -568,7 +652,7 @@ void MainWindow::statusM ()
     disconnect (this, SIGNAL (OTD_req ()), myOTD, SLOT (OTD_req ()));
     //if (res!="") ui->error_mod->setText (res);
     error_mes_3=res;
-    write_message();
+    //write_message();
 }
 void MainWindow::status_OTD (QString data)
 {
@@ -582,6 +666,7 @@ void MainWindow::write_message ()
 {
     QString data;
     ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: red;");
+    if (error_mes_1== " МКО: Тест пройден успешно! ") ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: black;");
     data+=error_m;
     data+=TestOutStr;
     data+= TestOutStr1;
@@ -622,7 +707,7 @@ void MainWindow::plot_point ()
     ui->widget->addGraph ();
     ui->widget->graph (1)->setPen (QPen (Qt::red));
     ui->widget->graph (1)->setData (x, z);
-    ui->widget->graph (0)->setName ("I(БУН НА),A ");
+    ui->widget->graph (0)->setName ("I(БУП НА),A ");
     ui->widget->graph (1)->setName ("I(ПНА),A ");
     ui->widget->xAxis->setTickLabelFont (QFont (QFont ().family (), 10));
     ui->widget->yAxis->setTickLabelFont (QFont (QFont ().family (), 10));
@@ -1023,28 +1108,28 @@ void MainWindow::on_tech_clear_buf_3_clicked ()
 
 void MainWindow::on_tech_clear_out_4_clicked ()
 {
-    connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    /*connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
     emit Tech_send(21, 1, 0);
-    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));*/
 }
 
 void MainWindow::on_tech_clear_in_4_clicked ()
 {
-    connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    /*connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
     emit Tech_send(21, 2, 0);
-    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));*/
 }
 
 void MainWindow::on_tech_clear_buf_4_clicked ()
 {
-    connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    /* connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
     emit Tech_send(21, 3, 0);
-    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));*/
 }
 
 void MainWindow::on_pushButton_send_tech_2_clicked ()
 {
-    QString S1;
+    /*QString S1;
 
     S1 = ui->str_tech_2->text ();
     QStringList list1 = S1.split (" ");
@@ -1080,7 +1165,7 @@ void MainWindow::on_pushButton_send_tech_2_clicked ()
     }
     connect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
     emit Tech_send(18, 0, 0);
-    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));
+    disconnect (this, SIGNAL (Tech_send(int , int , int)), myTech, SLOT (tech_send (int , int , int )));*/
 }
 
 void MainWindow::on_res_err_stm_clicked ()
@@ -1218,7 +1303,7 @@ void MainWindow::Tech_error (double x)
 
     if (x==300) {
         error_mes_9 = ("ТЕХ: Ошибка при исполнении команды 'Эхо'!");
-        ui->pushButton_20->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
+        ui->pushButton_21->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
     }
     if (x==333) {
         ui->pushButton_21->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
@@ -1372,21 +1457,21 @@ void MainWindow::on_OTD_nd_clicked ()
 
 void MainWindow::on_pow_DY_osn_clicked ()
 {
-    QString S1 = ui->lineEdit_Addr_2->text ();
-    int u1 = S1.toInt ();
+    //QString S1 = ui->lineEdit_Addr_2->text ();
+    //int u1 = S1.toInt ();
 
     connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
-    emit MKO_DY (0, u1);
+    emit MKO_DY (0, flag_mko_osn+flag_mko_rez);
     disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
 }
 
 void MainWindow::on_pow_DY_rez_clicked ()
 {
-    QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();
+    //QString S2 = ui->lineEdit_Addr_3->text ();
+    //int u2 = S2.toInt ();
 
     connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
-    emit MKO_DY (1, u2);
+    emit MKO_DY (1, flag_mko_osn+flag_mko_rez);
     disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
 }
 
@@ -1422,19 +1507,30 @@ void MainWindow::on_MKO_rez_clicked ()
 
 void MainWindow::on_MKO_test_clicked ()
 {
-    QString S1 = ui->lineEdit_Addr_2->text ();
-    int u1 = S1.toInt ();
-    QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();
+    //QString S1 = ui->lineEdit_Addr_2->text ();
+    //int u1 = S1.toInt ();
+    //QString S2 = ui->lineEdit_Addr_3->text ();
+    //int u2 = S2.toInt ();
     flag_mko_test=1;
     connect (this, SIGNAL (MKO_ts (int,int,int)), myMKO, SLOT (MKO_start_test (int,int,int)));
-    emit MKO_ts (flag_mko_osn + flag_mko_rez, u1, u2);
+    emit MKO_ts (flag_mko_osn + flag_mko_rez, MKO_addr_o, MKO_addr_r);
     disconnect (this, SIGNAL (MKO_ts (int,int,int)), myMKO, SLOT (MKO_start_test (int,int,int)));
 }
 
 void MainWindow::on_pushButton_11_clicked ()
 {
+    for(int k2=0;k2<10; k2++)
+    {
+        buf_spd1[k2]=0;
+        buf_spd2[k2]=0;
+        buf_spd3[k2]=0;
+        buf_spd4[k2]=0;
+    }
     QString S1;
+    QString S2 = ui->MKO_cd_3->text ();
+    spd1 = S2.toInt ();
+    S2 = ui->MKO_cd_8->text ();
+    spd2 = S2.toInt ();
     S1 += ui->MKO_cd_0->text () + " ";
     S1 += ui->MKO_cd_1->text () + " ";
     S1 += ui->MKO_cd_3->text () + " ";
@@ -1446,12 +1542,12 @@ void MainWindow::on_pushButton_11_clicked ()
     if (ui->radioButton_2->isChecked()==1){
         flag_mko_osn=flag_mko_osn+10;
     }
-    QString S3 = ui->lineEdit_Addr_2->text ();
+    /*QString S3 = ui->lineEdit_Addr_2->text ();
     int u1 = S3.toInt ();
     QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();
+    int u2 = S2.toInt ();*/
     connect (this, SIGNAL (MKO_cm (int,QString,int,int)), myMKO, SLOT (MKO_tr_cm (int,QString,int,int)));
-    emit MKO_cm (flag_mko_osn + flag_mko_rez, S1, u1, u2);
+    emit MKO_cm (flag_mko_osn + flag_mko_rez, S1, MKO_addr_o, MKO_addr_r);
     disconnect (this, SIGNAL (MKO_cm (int,QString,int,int)), myMKO, SLOT (MKO_tr_cm (int,QString,int,int)));
     if (ui->radioButton_2->isChecked()==1){
         flag_mko_osn=flag_mko_osn-10;
@@ -1460,13 +1556,13 @@ void MainWindow::on_pushButton_11_clicked ()
 
 void MainWindow::on_pushButton_12_clicked ()
 {
-    QString S1 = ui->lineEdit_Addr_2->text ();
+    /*QString S1 = ui->lineEdit_Addr_2->text ();
     int u1 = S1.toInt ();
     QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();
+    int u2 = S2.toInt ();*/
 
     connect (this, SIGNAL (MKO_cm_r (int,int,int)), myMKO, SLOT (MKO_rc_cm (int,int,int)));
-    emit MKO_cm_r (flag_mko_osn + flag_mko_rez, u1, u2);
+    emit MKO_cm_r (flag_mko_osn + flag_mko_rez, MKO_addr_o, MKO_addr_r);
     disconnect (this, SIGNAL (MKO_cm_r (int,int,int)), myMKO, SLOT (MKO_rc_cm (int,int,int)));
 }
 
@@ -1478,10 +1574,10 @@ void MainWindow::MKO_change_ch (int x, int y)
 
 void MainWindow::on_MKO_avt_clicked ()
 {
-    QString S1 = ui->lineEdit_Addr_2->text ();
+    /*QString S1 = ui->lineEdit_Addr_2->text ();
     int u1 = S1.toInt ();
     QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();
+    int u2 = S2.toInt ();*/
     QString S3 = ui->lineEdit_period->text ();
     int u3 = S3.toInt ();
 
@@ -1489,14 +1585,14 @@ void MainWindow::on_MKO_avt_clicked ()
         flag_mko_auto = 1;
         ui->MKO_avt->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
         connect (this, SIGNAL (MKO_auto (int,int,int,int)), myMKO, SLOT (MKO_avt (int,int,int,int)));
-        emit MKO_auto (flag_mko_auto, u3, u1, u2);
+        emit MKO_auto (flag_mko_auto, u3, MKO_addr_o, MKO_addr_r);
         disconnect (this, SIGNAL (MKO_auto (int,int,int,int)), myMKO, SLOT (MKO_avt (int,int,int,int)));
     }
     else if (flag_mko_auto == 1) {
         flag_mko_auto = 0;
         ui->MKO_avt->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         connect (this, SIGNAL (MKO_auto (int,int,int,int)), myMKO, SLOT (MKO_avt (int,int,int,int)));
-        emit MKO_auto (flag_mko_auto, u3, u1, u2);
+        emit MKO_auto (flag_mko_auto, u3, MKO_addr_o, MKO_addr_r);
         disconnect (this, SIGNAL (MKO_auto (int,int,int,int)), myMKO, SLOT (MKO_avt (int,int,int,int)));
     }
 }
@@ -1566,6 +1662,9 @@ void MainWindow::on_tech_avto_clicked()
 
 void MainWindow::on_tech_single_shot_clicked()
 {
+    connect (this, SIGNAL (Tech_ssi (int)), myTech, SLOT (Tech_ssi (int)));
+    emit Tech_ssi (2);
+    disconnect (this, SIGNAL (Tech_ssi (int)), myTech, SLOT (Tech_ssi (int)));
     connect (this, SIGNAL (Tech_auto (int,int)), myTech, SLOT (Tech_avt (int,int)));
     emit Tech_auto (2, 1000);
     disconnect (this, SIGNAL (Tech_auto (int,int)), myTech, SLOT (Tech_avt (int,int)));
@@ -1577,10 +1676,10 @@ void MainWindow::Tech_SSI_value (double x, double y, double skvt_V, double skvt_
     ui->tech_SSI_dec->setText (QString::number (x));
     ui->tech_dec_v->setText (QString::number (skvt_V));
     ui->tech_dec_h->setText (QString::number (skvt_H));
-    int a1=1,a2=1;
+    int a1=2,a2=2;
     if(flag_tech_ssi==1||flag_rm==1){
-        a2=1;
-        a1=1;
+        a2=2;
+        a1=2;
     }
     if(flag_rm_4==1||flag_rlm2==1){
         a2=192;
@@ -1588,7 +1687,7 @@ void MainWindow::Tech_SSI_value (double x, double y, double skvt_V, double skvt_
     }
     if(flag_rlm==4){
         a2=192;
-        a1=1;
+        a1=2;
     }
     double degr = 180*x/8192*a1;
     int degree = degr;
@@ -1665,7 +1764,7 @@ void MainWindow::Tech_SSI_value (double x, double y, double skvt_V, double skvt_
     buf_H[0] += "' ";
     buf_H[0] += QString::number (sech);
     buf_H[0] += "''";
-    double check1 = degr-zv-d_v[0];
+    /*double check1 = degr-zv-d_v[0];
     check1=-180.99;
     if(check1 >100){
         check1=(check1-180);
@@ -1716,7 +1815,7 @@ void MainWindow::Tech_SSI_value (double x, double y, double skvt_V, double skvt_
     delta_RM_2[0] += QString::number (m3);
     delta_RM_2[0] += "' ";
     delta_RM_2[0] += QString::number (s3);
-    delta_RM_2[0] += "''";
+    delta_RM_2[0] += "''";*/
 
     delete_table_tech();
     for(int c=0;c<20;c++)
@@ -1850,6 +1949,11 @@ void MainWindow::on_pushButton_24_clicked()
 
 void MainWindow::on_reset_clicked()
 {
+    ui->reset->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    if (flag_mko_auto == 1) on_MKO_avt_clicked ();
+    if (flag_otd_auto == 1) on_OTD_avt_2_clicked ();
+    if (flag_tech_auto == 1) on_tech_avto_clicked();
+    QApplication::processEvents();
     connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
     emit MKO_ch (flag_mko_osn*10 + flag_mko_rez*10);
     disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
@@ -1896,4 +2000,22 @@ void MainWindow::on_reset_clicked()
     on_pushButton_19_clicked();
     on_pushButton_20_clicked();
     on_pushButton_21_clicked();
+    for(int i=0; i<100; i++) {
+        Sleep(10);
+        QApplication::processEvents();
+    }
+    error_m = "";
+    TestOutStr = "";
+    TestOutStr1 = "";
+    error_mes_1 = "";
+    error_mes_2 = "";
+    error_mes_3 = "";
+    error_mes_4 = "";
+    error_mes_5 = "";
+    error_mes_6 = "";
+    error_mes_7 = "";
+    error_mes_8 = "";
+    error_mes_9 = "";
+    ui->error_mod->setText ("");
+    ui->reset->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
 }

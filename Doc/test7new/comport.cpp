@@ -44,16 +44,19 @@ void startpower()
     setUIcom5(27);
     setUIcom6(27);
 
+
 }
 void COMConnector5_6()
 {
     com5 = new QSerialPort("com5");
-    com5->open(QIODevice::ReadWrite);
-    com5->setBaudRate(QSerialPort::Baud115200);
-    com5->setDataBits(QSerialPort::Data8);
-    com5->setParity(QSerialPort::OddParity);
-    com5->setStopBits(QSerialPort::OneStop);
-    com5->setFlowControl(QSerialPort::NoFlowControl);
+    if (com5->open(QIODevice::ReadWrite))
+    {
+        com5->setBaudRate(QSerialPort::Baud115200);
+        com5->setDataBits(QSerialPort::Data8);
+        com5->setParity(QSerialPort::OddParity);
+        com5->setStopBits(QSerialPort::OneStop);
+        com5->setFlowControl(QSerialPort::NoFlowControl);
+    }
 
     com6 = new QSerialPort("com6");
     com6->open(QIODevice::ReadWrite);

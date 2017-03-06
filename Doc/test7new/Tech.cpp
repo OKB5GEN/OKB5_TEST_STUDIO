@@ -14,7 +14,7 @@
 
 QSerialPort *com8, *com9, *com2;
 QTimer *MyTimerTech;
-QTime time;
+//QTime time;
 time_t rawtime;
 QString name;
 struct tm * timeinfo;
@@ -49,7 +49,7 @@ void Tech::COMConnectorRM_2()
 }
 void Tech::COMConnectorTech()
 {
-    com8 = new QSerialPort("com8");
+    com8 = new QSerialPort("com3");
     com8->open(QIODevice::ReadWrite);
     com8->setBaudRate(QSerialPort::Baud115200);
     com8->setDataBits(QSerialPort::Data8);
@@ -319,20 +319,20 @@ double tech_read_RM_2()
     bb[1] = 0x3d;
     bb[2] = 0x00;
     bb[3] = 0x00;
-    com2->QIODevice::write(ba);
+    //com2->QIODevice::write(ba);
     com8->QIODevice::write(bb);
-    com2->waitForBytesWritten(-1);
+    //com2->waitForBytesWritten(-1);
     com8->waitForBytesWritten(-1);
-    QByteArray readData2 = com2->readAll();
+    //QByteArray readData2 = com2->readAll();
     QByteArray readData3 = com8->readAll();
-    while (com2->waitForReadyRead(10))
-        readData2.append(com2->readAll());
+    //while (com2->waitForReadyRead(10))
+        //readData2.append(com2->readAll());
 
     while (com8->waitForReadyRead(10))
         readData3.append(com8->readAll());
     uint8_t uu3,uu4;
-    uu3=readData2[2];
-    uu4=readData2[3];
+    //uu3=readData2[2];
+    //uu4=readData2[3];
     rm2=(uu3<<8) | uu4;
     uint8_t uu1,uu2;
     uu1=readData3[2];
@@ -423,7 +423,8 @@ void Tech::Tech_ssi (int x)
         else flag_SSI=0;
     }
     else if (x==2){
-        if(tech_on_SSI(1)==1&&tech_check_SSI()==1&&tech_on_RM_2(1)==1&&tech_check_RM_2()==1)
+        //if(tech_on_SSI(1)==1&&tech_check_SSI()==1&&tech_on_RM_2(1)==1&&tech_check_RM_2()==1)
+        if(tech_on_SSI(1)==1&&tech_check_SSI()==1)
         {
             flag_SSI=2;
         }
@@ -448,11 +449,12 @@ void Tech::Tech_ssi (int x)
 }
 void Tech::Tech_log (int x, QString S3)
 {
-    if(S3==""&&x!=0){
+    if(S3 == "" && x != 0){
         QString str;
         QDate date;
         QString str1;
-        time.start () ;
+        QTime time;
+        time.start();
         str1 = time.toString("_hh_mm_ss");
         date=QDate::currentDate ();
         str = date.toString("dd_MM_yyyy");
@@ -592,6 +594,14 @@ void Tech::RLM_RLM()
     uint32_t pole1,pole2;
     pole1=uu1;
     pole2=uv1;
+    if(uu2>127) {
+        uu2=uu2-128;
+        pole1=pole1-62;
+    }
+    if(uv2>127) {
+        uv2=uv2-128;
+        pole2=pole2-62;
+    }
     if(uu2==4||uv2==4)emit tech_err(800);
     if(uu2==2||uv2==2)emit tech_err(820);
     if(uu2==0||uv2==0)emit tech_err(840);
@@ -668,6 +678,10 @@ void Tech::RM_RLM()
     uu2=readData3[3];
     uint32_t pole;
     pole=uu1;
+    if(uu2>127) {
+        uu2=uu2-128;
+        pole=pole-62;
+    }
     if(uu2==4)emit tech_err(800);
     if(uu2==2)emit tech_err(820);
     if(uu2==0)emit tech_err(840);
@@ -728,6 +742,10 @@ void Tech::SKVT_RLM()
     uu2=readData3[3];
     uint32_t pole;
     pole=uu1;
+    if(uu2>127) {
+        uu2=uu2-128;
+        pole=pole-62;
+    }
     if(uu2==4)emit tech_err(800);
     if(uu2==2)emit tech_err(820);
     if(uu2==0)emit tech_err(840);
@@ -796,7 +814,8 @@ void Tech::Tech_timer()
 {
     double x=0,y=0;
     QString str;
-    time.start () ;
+    QTime time;
+    time.start();
     if(flag_SSI==1) {
         SKVT_angle();
         x=rm1;
@@ -837,18 +856,18 @@ void Tech::Tech_timer()
         x=1581055-rm1;
         y=rm2;
     }
-    int a1=1,a2=1;
-    if(x==1||x==2){
-        a2=1;
-        a1=1;
+    int a1=2,a2=2;
+    if(flag_SSI==1||flag_SSI==2){
+        a2=2;
+        a1=2;
     }
-    if(x==3||x==5){
+    if(flag_SSI==3||flag_SSI==5){
         a2=192;
         a1=192;
     }
-    if(x==4){
+    if(flag_SSI==4){
         a2=192;
-        a1=1;
+        a1=2;
     }
     str = time.toString("hh:mm:ss.zzz");
     int degree = 180*x/(8192*a1);

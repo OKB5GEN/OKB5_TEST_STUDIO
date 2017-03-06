@@ -6,8 +6,8 @@
 
 QT       += core gui
 
-INCLUDEPATH += C:\Qt\5.3\mingw482_32\include
-INCLUDEPATH +=C:\Qt\Tools\mingw482_32\i686-w64-mingw32\include
+INCLUDEPATH += C:\Qt\5.8\mingw53_32\include
+INCLUDEPATH +=C:\Qt\Tools\mingw530_32\i686-w64-mingw32\include
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 

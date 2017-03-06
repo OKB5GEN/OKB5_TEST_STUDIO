@@ -33,6 +33,7 @@ public slots:
 signals:
     void test_MKO(int x);
     void start_MKO(QString x);
+    void start_test_MKO(QString x);
     void data_MKO(QString x);
     void MKO_CTM(int x, int y);
 

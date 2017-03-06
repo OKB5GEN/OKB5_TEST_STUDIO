@@ -38,6 +38,7 @@ private slots:
     void OTD_ind_echo(int x);
     void status_OTD(QString data);
     void MKO_data(QString data);
+    void MKO_data_test(QString data);
     void MKO_cm_data(QString data);
     void MKO_change_ch(int x,int y);
     void statusM();
