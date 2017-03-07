@@ -135,7 +135,7 @@ private:
     void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
     void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
     void setCurVoltage(qreal voltage);
-    void setPowerState(const QMap<uint32_t, QVariant>& request);
+    bool setPowerState(const QMap<uint32_t, QVariant>& request);
 
     // power units command
     void sendPowerSupplyControlCommand(PowerSupplyCommandID command);

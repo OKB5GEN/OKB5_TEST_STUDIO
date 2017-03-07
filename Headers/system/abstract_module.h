@@ -11,14 +11,14 @@ class AbstractModule: public QObject
 public:
     enum ModuleState
     {
-        NOT_INITIALIZED,    // module state on application start
-        INITIALIZING,       // module object created, its initialization started
-        INITIALIZED_FAILED, // module initialization finished with error, module is not ready to process commands (possibly soft reset will help)
-        INITIALIZED_OK,     // module initialization succesfully finished, module is raedy to process commands
-        SETTING_TO_INACTIVE,// module resetting to "cyclogram-applicable" state started
-        SAFE_STATE,         // module is ready to process cyclogram commands
-        UNSAFE_STATE,       // cyclogram started, some module commands could be executed
-        SOFT_RESETTING      // module is in soft reset state
+        NOT_INITIALIZED,      // module state on application start
+        INITIALIZING,         // module object created, its initialization started
+        INITIALIZED_FAILED,   // module initialization finished with error, module is not ready to process commands (possibly soft reset will help)
+        INITIALIZED_OK,       // module initialization succesfully finished, module is raedy to process commands
+        SETTING_TO_SAFE_STATE,// module resetting to "cyclogram-applicable" state started
+        SAFE_STATE,           // module is ready to process cyclogram commands
+        UNSAFE_STATE,         // cyclogram started, some module commands could be executed
+        SOFT_RESETTING        // module is in soft reset state
     };
 
     Q_ENUM(ModuleState)

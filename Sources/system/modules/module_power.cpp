@@ -83,13 +83,13 @@ void ModulePower::initializeCustom()
 
 void ModulePower::setDefaultState()
 {
-    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
     sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
     sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off external power output
 
-    //setCurVoltage(MIN_VOLTAGE);
-    //sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
+    //setCurVoltage(MIN_VOLTAGE); // Hardcode
+    //sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON); // Hardcode
 }
 
 void ModulePower::setCurVoltage(qreal voltage)
@@ -199,7 +199,14 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
         break;
 
     case ModuleCommands::SET_POWER_STATE:
-        setPowerState(params);
+        if (!setPowerState(params))
+        {
+            LOG_ERROR(QString("Malformed request for Power UNIT command"));
+            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(300)); //TODO define error codes internal or hardware
+            emit commandResult(mCurrentResponse);
+            return;
+        }
+
         break;
 
     default:
@@ -311,9 +318,25 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
 //    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 //}
 
-void ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request)
+bool ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request)
 {
-    int TODO;
+    int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+    if (paramsCount != 1)
+    {
+        return false;
+    }
+
+    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+    if (state == ModuleCommands::POWER_ON)
+    {
+        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
+    }
+    else
+    {
+        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF);
+    }
+
+    return true;
 }
 
 void ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
@@ -589,7 +612,7 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
             int TODO; // parse response, to not have errors
             mState = ModuleCommands::POWER_ON;
 
-            if (moduleState() == AbstractModule::SETTING_TO_INACTIVE)
+            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
             {
                 setModuleState(AbstractModule::SAFE_STATE);
             }

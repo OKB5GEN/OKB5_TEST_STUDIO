@@ -38,16 +38,26 @@ ModuleMKO::ModuleMKO(QObject* parent):
 
 ModuleMKO::~ModuleMKO()
 {
-
+    stopMKO(); // TODO remove
 }
 
 void ModuleMKO::readResponse()
 {
     int TODO; // стопнули циклограмму, не дождавшись респонса
 
-    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentResponse.value(SystemState::COMMAND_ID).toUInt());
-
+    // parsing response word for errors
     uint16_t buffer[RECEIVE_BUFFER_SIZE];
+    bcgetblk(4, &buffer, mWordsToReceive); // TODO хитрожопая логика вычитывания: надо вычиывать столько, сколько послал и после этого будет лежать ответное слово + данные (если есть)
+    // в данном примере стоит 4, потому что тестилась только подача питания на датчик угла, а она состояит из командного слова + 3 слова данных, поэтому в буфере на
+    // девайсе лежит наше командное слово + 3 слова, и после этого записано ответное слово.
+    QString error = processResponseWord(buffer[0]);
+    if (!error.isEmpty())
+    {
+        LOG_ERROR(QString("MKO response error: %1").arg(error));
+        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+    }
+
+    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentResponse.value(SystemState::COMMAND_ID).toUInt());
 
     switch (command)
     {
@@ -101,16 +111,9 @@ void ModuleMKO::readResponse()
         break;
     }
 
-    bcgetblk(0, &buffer, mWordsToReceive);
-
-    if (false)
-    {
-        //TODO check response word
-        //TODO read and parse response data
-    }
-
+    //TODO read and parse response data and put output params to response
     //TODO можно ли больше прочитать? а меньше? и что будет?
-
+    emit commandResult(mCurrentResponse);
 }
 
 void ModuleMKO::MKO_timer()
@@ -210,17 +213,21 @@ void ModuleMKO::startMKO()
         LOG_ERROR("MKO reset failed");
     }
 
-    emit start_MKO(data);
+    mMainKitEnabled = true;
+    //emit start_MKO(data);
 }
 
 void ModuleMKO::stopMKO()
 {
+    LOG_INFO("Stopping MKO");
+    mMainKitEnabled = false;
     TmkClose();
     CloseHandle(hEvent);
 }
 
 void ModuleMKO::stopMKO1()
 {
+    LOG_INFO("Stopping MKO 1");
     TmkClose();
     CloseHandle(hEvent);
     CloseHandle(hEvent1);
@@ -228,6 +235,8 @@ void ModuleMKO::stopMKO1()
 
 QString ModuleMKO::processResponseWord(uint16_t oc)
 {
+    LOG_INFO(QString("Response word is %1").arg(QString::number(oc, 16)));
+
     //ADDRESS_MASK
     QString error;
     uint16_t x;
@@ -235,7 +244,7 @@ QString ModuleMKO::processResponseWord(uint16_t oc)
     uint16_t address;
     if (mMainKitEnabled)
     {
-        address == MAIN_KIT_ADDRESS;
+        address = MAIN_KIT_ADDRESS;
     }
     else if (mReserveKitEnabled)
     {
@@ -248,6 +257,7 @@ QString ModuleMKO::processResponseWord(uint16_t oc)
 
     if (oc >> 11 != address)
     {
+        LOG_ERROR(QString("Addr from OS: %1, Addr cur: %2").arg(oc >> 11).arg(address));
         error += " - Неверный адрес в ОС! \n";
     }
 
@@ -599,6 +609,21 @@ void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
 
 void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount)
 {
+    LOG_INFO(QString("MKO: Send data to BUP: Address: %1, Subaddress: %2").arg(address).arg(subaddress));
+
+    QString dataStr;
+
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        dataStr += QString::number(data[i], 16);
+        dataStr += QString(" ");
+    }
+
+    if (!dataStr.isEmpty())
+    {
+        LOG_INFO(QString("Data: %1").arg(dataStr));
+    }
+
     uint16_t commandWord = (address << 11) + RT_RECEIVE + (subaddress << 5) + (wordsCount & NWORDS_MASK);
     bcdefbase(0);
     bcputw(0, commandWord);
@@ -610,12 +635,50 @@ void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* d
 
 void ModuleMKO::requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse)
 {
+    LOG_INFO(QString("MKO: Request data from BUP: Address: %1, Subaddress: %2").arg(address).arg(subaddress));
+
     uint16_t commandWord = (address << 11) + RT_TRANSMIT + (subaddress << 5) + ((expectedWordsInResponse - 1) & NWORDS_MASK); //TODO '-1' - "response word" or "checksum"
     bcdefbase(0);
     bcputw(0, commandWord);
     bcstartx(0, DATA_RT_BC | CX_BUS_0 | CX_STOP | CX_NOSIG);
 
     mReceiveTimer->start(RECEIVE_DELAY);
+}
+
+bool ModuleMKO::sendAngleSensorData()
+{
+    uint16_t data[3];
+    data[0] = 0;
+    uint16_t wordsCount = 2;
+    uint16_t address = 0;
+
+    if (mMainKitEnabled)
+    {
+        data[1] = PS_FROM_MAIN_KIT;
+        address = MAIN_KIT_ADDRESS;
+    }
+    else if (mReserveKitEnabled)
+    {
+        data[1] = PS_FROM_RESERVE_KIT;
+        address = RESERVE_KIT_ADDRESS;
+    }
+    else
+    {
+        LOG_ERROR("No MKO kit enabled");
+        return false;
+    }
+
+    // add checksum
+    data[wordsCount] = 0;
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        data[wordsCount] += data[i];
+    }
+
+    ++wordsCount;
+    sendDataToBUP(address, ANGLE_SENSOR_SUBADDRESS, data, wordsCount);
+    mWordsToReceive = 1;
+    return true;
 }
 
 void ModuleMKO::pow_DY(int kit, int adr)
@@ -1115,6 +1178,8 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 
     ModuleMKO::CommandID command = ModuleMKO::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
 
+    int errorCode = 0;
+
     switch (command)
     {
     case SEND_TEST_ARRAY:
@@ -1160,18 +1225,26 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
         break;
     case SEND_TO_ANGLE_SENSOR:
         {
-            int TODO;
+            if (!sendAngleSensorData())
+            {
+                errorCode = 105;
+            }
         }
         break;
 
     default:
         {
-            LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
-            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
-            emit commandResult(mCurrentResponse);
-            return;
+            errorCode = 100;
         }
         break;
+    }
+
+    if (errorCode)
+    {
+        LOG_ERROR(QString("Error in MKO command id=%1").arg(int(command)));
+        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
+        emit commandResult(mCurrentResponse);
+        return;
     }
 
     if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
@@ -1191,15 +1264,14 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 void ModuleMKO::onApplicationStart()
 {
     setModuleState(AbstractModule::INITIALIZING);
-    setModuleState(AbstractModule::INITIALIZED_FAILED, tr("MKO not implemeted"));
-
-    int TODO;
+    startMKO(); //TODO when to stop MKO? and we are using main kit only for now
+    setModuleState(AbstractModule::INITIALIZED_OK);
 }
 
 void ModuleMKO::setDefaultState()
 {
     //TODO check state
-    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
     setModuleState(AbstractModule::SAFE_STATE);
     int TODO;
 }

@@ -322,7 +322,7 @@ void ModuleTech::onModuleError()
 
 void ModuleTech::setDefaultState()
 {
-    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
     setModuleState(AbstractModule::SAFE_STATE);
     int TODO;
 }

@@ -4,6 +4,7 @@
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/system/system_state.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/system/modules/module_mko.h"
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     QDialog(parent),
@@ -89,31 +90,33 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
             QList<int> params;
             params.push_back(ModuleCommands::SET_POWER_STATE);
+            params.push_back(1); //params count
             params.push_back(ModuleCommands::POWER_ON);
             addCommand(tr("Включить подачу питания"), params);
 
             params.clear();
             params.push_back(ModuleCommands::SET_POWER_STATE);
+            params.push_back(1); //params count
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить подачу питания"), params);
         }
         break;
 
-    case ModuleCommands::MKO: //TODO в ответ получаем ответное слово
+    case ModuleCommands::MKO:
         {
-            int i = 0;
-            addCommand(tr("Принять тестовый массив"), ++i);
-            addCommand(tr("Выдать тестовый массив"), ++i);
-            addCommand(tr("Принять командный массив"), ++i);
-            addCommand(tr("Выдать контрольный массив"), ++i);
-            addCommand(tr("Принять тестовый массив по линии 1 (Psy)"), ++i);
-            addCommand(tr("Принять тестовый массив по линии 2 (Nu)"), ++i);
-            addCommand(tr("Выдать тестовый массив по линии 1 (Psy)"), ++i);
-            addCommand(tr("Выдать тестовый массив по линии 2 (Nu)"), ++i);
-            addCommand(tr("Принять командный массив по ψ"), ++i);
-            addCommand(tr("Принять командный массив по ψ"), ++i);
-            addCommand(tr("Принять командный массив по υ"), ++i);
-            addCommand(tr("Подать питание на ДУ"), ++i);
+            //addCommand(tr("Принять тестовый массив"), ModuleMKO::SEND_TEST_ARRAY);
+            //addCommand(tr("Выдать тестовый массив"), ModuleMKO::RECEIVE_TEST_ARRAY);
+            //addCommand(tr("Принять командный массив"), ModuleMKO::SEND_COMMAND_ARRAY);
+            //addCommand(tr("Выдать командный массив"), ModuleMKO::RECEIVE_COMMAND_ARRAY);
+            //addCommand(tr("Принять тестовый массив по линии ψ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Принять тестовый массив по линии υ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Выдать тестовый массив по линии υ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Принять командный массив по линии ψ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Принять командный массив по линии υ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Выдать командный массив по линии ψ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
+            //addCommand(tr("Выдать командный массив по линии υ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
+            addCommand(tr("Подать питание на ДУ"), ModuleMKO::SEND_TO_ANGLE_SENSOR);
         }
         break;
 

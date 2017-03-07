@@ -207,6 +207,8 @@ void SystemState::setDefaultState()
 
     foreach (AbstractModule* module, mModules.values())
     {
+        LOG_INFO(QString("Module %1 state is %2").arg(module->moduleName()).arg(module->moduleState()));
+
         if (module->moduleState() == AbstractModule::INITIALIZED_OK)
         {
             module->setDefaultState();

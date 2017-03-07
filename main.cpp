@@ -18,7 +18,7 @@ void initializeLogger()
     // create console output
     ConsoleAppender* consoleAppender = new ConsoleAppender();
     //consoleAppender->setFormat("[%{type}] <%{function}> %{message}\n");
-    consoleAppender->setFormat("[%{type}] %{message}\n");
+    consoleAppender->setFormat("%{time} [%{type}] %{message}\n");
     Logger::globalInstance()->registerAppender(consoleAppender);
 
     // create file output

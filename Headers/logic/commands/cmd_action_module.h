@@ -16,9 +16,9 @@ public:
 
     void run() override;
 
-    void setParams(ModuleCommands::ModuleID module, ModuleCommands::CommandID operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out, const QList<int>& implicitParams);
+    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out, const QList<int>& implicitParams);
 
-    ModuleCommands::CommandID operation() const;
+    uint32_t operation() const;
     ModuleCommands::ModuleID module() const;
     const QMap<QString, QString>& inputParams() const;
     const QMap<QString, QString>& outputParams() const;
@@ -40,7 +40,7 @@ private:
     QString commandName() const;
 
     ModuleCommands::ModuleID mModule;
-    ModuleCommands::CommandID mOperation;
+    uint32_t mOperation;
 
     QMap<QString, QString> mInputParams;
     QMap<QString, QString> mOutputParams;

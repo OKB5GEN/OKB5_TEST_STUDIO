@@ -107,7 +107,7 @@ void ModuleOTD::initializeCustomOKBModule()
 
 void ModuleOTD::setDefaultState()
 {
-    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
     addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
     addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
@@ -246,7 +246,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::RESET_LINE_2:
         {
-            if (moduleState() == AbstractModule::SETTING_TO_INACTIVE)
+            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
             {
                 setModuleState(AbstractModule::SAFE_STATE);
             }

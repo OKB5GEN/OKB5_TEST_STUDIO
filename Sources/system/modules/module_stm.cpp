@@ -115,8 +115,6 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         }
         break;
 
-
-
     default:
         LOG_ERROR("Unexpected command %i received by STM module", command);
         break;
@@ -290,7 +288,7 @@ void ModuleSTM::initializeCustomOKBModule()
 
 void ModuleSTM::setDefaultState()
 {
-    setModuleState(AbstractModule::SETTING_TO_INACTIVE);
+    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
     int TODO; // for more reliability ask for channel state from module?
 
@@ -312,11 +310,9 @@ void ModuleSTM::setDefaultState()
         }
     }
 
-    TODO;
     //setModuleState(AbstractModule::SAFE_STATE);
 
-
     // TODO: possibly give powe supply to MKO?
-    //setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_ON); // enable MKO power supply (main?) TODO
+    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_ON); // Hardcode enable MKO power supply (main?) TODO to cyclogram
     //setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_ON); // enable MKO power supply (reserve?) TODO
 }

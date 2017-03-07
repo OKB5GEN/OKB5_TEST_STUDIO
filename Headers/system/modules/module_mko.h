@@ -33,6 +33,14 @@ public:
         SEND_TO_ANGLE_SENSOR
     };
 
+    Q_ENUM(CommandID)
+
+    enum AngleSensorPowerSupplySource
+    {
+        PS_FROM_MAIN_KIT    = 0x20,
+        PS_FROM_RESERVE_KIT = 0x40
+    };
+
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
 
@@ -74,7 +82,7 @@ public:
     //void receiveCommandArrayForChannel(); // Почти то же самое, что receiveCommandArray(), только для одной оси (ψ или υ): туда КС, оттуда ОС + 21 слово
 
     //2.1.9 Операция обмена при выдаче из БКУ в ОУ БУП НА массива для подачи питания на ДУ с использованием формата 1. Используется подадрес 06
-    //void sendAngleSensorData();
+    bool sendAngleSensorData();
 
 public slots:
     void onApplicationStart() override;
