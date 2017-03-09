@@ -114,7 +114,8 @@ namespace
 
 ///////////////////////////////////////////////////////////////
 SystemState::SystemState(QObject* parent):
-    VariableController(parent),
+    //VariableController(parent),
+    QObject(parent),
     mEnablesMKOKits(ModuleMKO::NO_KIT),
     mCurCommand(Q_NULLPTR),
     mMKO(Q_NULLPTR),
@@ -127,6 +128,21 @@ SystemState::SystemState(QObject* parent):
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
     mParamNames[TEMPERATURE] = tr("Temperature, °C");
+
+    mParamNames[MODE] = tr("Mode");
+    mParamNames[STEPS] = tr("Steps");
+    mParamNames[VELOCITY] = tr("Velocity");
+    mParamNames[MODE_PSY] = tr("Mode (Psy)");
+    mParamNames[STEPS_PSY] = tr("Steps (Psy)");
+    mParamNames[VELOCITY_PSY] = tr("Velocity (Psy)");
+    mParamNames[CURRENT_PSY] = tr("Max current (Psy)");
+    mParamNames[MODE_NU] = tr("Mode (Nu)");
+    mParamNames[STEPS_PSY] = tr("Steps (Nu)");
+    mParamNames[VELOCITY_PSY] = tr("Velocity (Nu)");
+    mParamNames[CURRENT_NU] = tr("Max current (Nu)");
+    mParamNames[ANGLE_PSY] = tr("Angle (Psy)");
+    mParamNames[ANGLE_NU] = tr("Angle (Nu)");
+    mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
 }
 
 SystemState::~SystemState()
@@ -641,28 +657,6 @@ void SystemState::on_tech_clear_buf_4_clicked()
     */
 }
 
-void SystemState::on_pow_DY_osn_clicked()
-{
-    /*
-    QString S1 = ui->lineEdit_Addr_2->text();
-    int u1 = S1.toInt();
-    connect(this, SIGNAL(MKO_DY(int, int)), mMKO, SLOT(pow_DY(int, int)));
-    emit MKO_DY(MKO::MAIN_KIT, u1);
-    disconnect(this, SIGNAL(MKO_DY(int, int)), mMKO, SLOT(pow_DY(int, int)));
-    */
-}
-
-void SystemState::on_pow_DY_rez_clicked()
-{
-    /*
-    QString S2 = ui->lineEdit_Addr_3->text();
-    int u2 = S2.toInt();
-    connect(this, SIGNAL(MKO_DY(int, int)), mMKO, SLOT(pow_DY(int, int)));
-    emit MKO_DY(MKO::RESERVE_KIT, u2);
-    disconnect(this, SIGNAL(MKO_DY(int, int)), mMKO, SLOT(pow_DY(int, int)));
-    */
-}
-
 void SystemState::on_MKO_osn_clicked()
 {
     /*mEnablesMKOKits ^= ModuleMKO::MAIN_KIT;
@@ -812,13 +806,70 @@ void SystemState::setupCommandsParams()
     int TODO; // replace by constant usage
 
     {
-        QMap<int, QStringList> params;
-        mInParams[ModuleCommands::MKO] = params;
+        QMap<int, QStringList> inParams;
+        QMap<int, QStringList> outParams;
+
+        // commands input params
+        QStringList sendTestArrayParams; // hardcoded with 0
+        QStringList receiveTestArrayParams; // hardcoded with 0 checks on receive
+        QStringList sendTestArrayForChannelParams; // hardcoded with 0
+        QStringList receiveTestArrayForChannelParams; // hardcoded with 0 checks on receive
+        QStringList enablePowerSupplyForAngleSensorParams; // auto set params (main of reserve kit)
+
+        QStringList sendCommandArrayParams;
+        sendCommandArrayParams.push_back(paramName(MODE_PSY));
+        sendCommandArrayParams.push_back(paramName(STEPS_PSY));
+        sendCommandArrayParams.push_back(paramName(VELOCITY_PSY));
+        sendCommandArrayParams.push_back(paramName(CURRENT_PSY));
+        sendCommandArrayParams.push_back(paramName(MODE_NU));
+        sendCommandArrayParams.push_back(paramName(STEPS_NU));
+        sendCommandArrayParams.push_back(paramName(VELOCITY_NU));
+        sendCommandArrayParams.push_back(paramName(CURRENT_NU));
+
+        QStringList sendCommandArrayForChannelParams;
+        sendCommandArrayForChannelParams.push_back(paramName(MODE));
+        sendCommandArrayForChannelParams.push_back(paramName(STEPS));
+        sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
+        sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
+
+        QStringList receiveCommandArrayParams;
+        receiveCommandArrayParams.push_back(paramName(MODE_PSY));
+        receiveCommandArrayParams.push_back(paramName(STEPS_PSY));
+        receiveCommandArrayParams.push_back(paramName(VELOCITY_PSY));
+        receiveCommandArrayParams.push_back(paramName(CURRENT_PSY));
+        receiveCommandArrayParams.push_back(paramName(MODE_NU));
+        receiveCommandArrayParams.push_back(paramName(STEPS_NU));
+        receiveCommandArrayParams.push_back(paramName(VELOCITY_NU));
+        receiveCommandArrayParams.push_back(paramName(CURRENT_NU));
+        receiveCommandArrayParams.push_back(paramName(ANGLE_PSY));
+        receiveCommandArrayParams.push_back(paramName(ANGLE_NU));
+        receiveCommandArrayParams.push_back(paramName(SENSOR_FLAG));
+        receiveCommandArrayParams.push_back(paramName(TEMPERATURE));
+
+        QStringList receiveCommandArrayForChannelParams;
+        sendCommandArrayForChannelParams.push_back(paramName(MODE));
+        sendCommandArrayForChannelParams.push_back(paramName(STEPS));
+        sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
+        sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
+
+        inParams[ModuleMKO::SEND_TEST_ARRAY] = sendTestArrayParams;
+        inParams[ModuleMKO::SEND_COMMAND_ARRAY] = sendCommandArrayParams;
+        inParams[ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL] = sendTestArrayForChannelParams;
+        inParams[ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL] = sendCommandArrayForChannelParams;
+        inParams[ModuleMKO::SEND_TO_ANGLE_SENSOR] = enablePowerSupplyForAngleSensorParams;
+
+        outParams[ModuleMKO::RECEIVE_TEST_ARRAY] = receiveTestArrayParams;
+        outParams[ModuleMKO::RECEIVE_COMMAND_ARRAY] = receiveCommandArrayParams;
+        outParams[ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL] = receiveTestArrayForChannelParams;
+        outParams[ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL] = receiveCommandArrayForChannelParams;
+
+        mInParams[ModuleCommands::MKO] = inParams;
+        mOutParams[ModuleCommands::MKO] = outParams;
     }
 
     // STM
     {
-        QMap<int, QStringList> params;
+        //QMap<int, QStringList> params;
         //mInParams[ModuleCommands::STM] = params;
 
         // STM

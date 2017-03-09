@@ -14,12 +14,6 @@ namespace
 {
     static const uint16_t MAIN_KIT_ADDRESS = 0x1E;
     static const uint16_t RESERVE_KIT_ADDRESS = 0x1D;
-    static const uint16_t ANGLE_SENSOR_SUBADDRESS = 0x06;
-    static const uint16_t PSY_CHANNEL_SUBADDRESS = 0x01;
-    static const uint16_t NU_CHANNEL_SUBADDRESS = 0x02;
-    static const uint16_t RECEIVE_SUBADDRESS = 0x0D;
-    static const uint16_t SEND_SUBADDRESS = 0x0C;
-
     static const int RECEIVE_DELAY = 100; // msec
     static const int RECEIVE_BUFFER_SIZE = 100; // words
 }
@@ -29,6 +23,7 @@ ModuleMKO::ModuleMKO(QObject* parent):
     mMainKitEnabled(false),
     mReserveKitEnabled(false),
     mWordsToReceive(0),
+    mWordsSent(0),
     mActiveKits(NO_KIT)
 {
     mReceiveTimer = new QTimer(this);
@@ -45,11 +40,20 @@ void ModuleMKO::readResponse()
 {
     int TODO; // стопнули циклограмму, не дождавшись респонса
 
+    // хитрожопая логика вычитывания: надо вычиывать столько, сколько послал и после этого будут лежать ответное слово + данные (если есть)
     // parsing response word for errors
     uint16_t buffer[RECEIVE_BUFFER_SIZE];
-    bcgetblk(4, &buffer, mWordsToReceive); // TODO хитрожопая логика вычитывания: надо вычиывать столько, сколько послал и после этого будет лежать ответное слово + данные (если есть)
-    // в данном примере стоит 4, потому что тестилась только подача питания на датчик угла, а она состояит из командного слова + 3 слова данных, поэтому в буфере на
-    // девайсе лежит наше командное слово + 3 слова, и после этого записано ответное слово.
+    bcgetblk(mWordsSent, &buffer, mWordsToReceive);
+
+    QString dataStr;
+    for (uint16_t i = 0; i < mWordsToReceive; ++i)
+    {
+        dataStr += QString::number(buffer[i], 16);
+        dataStr += QString(" ");
+    }
+
+    LOG_INFO(QString("Receive data from MKO: %1").arg(dataStr));
+
     QString error = processResponseWord(buffer[0]);
     if (!error.isEmpty())
     {
@@ -62,57 +66,197 @@ void ModuleMKO::readResponse()
     switch (command)
     {
     case SEND_TEST_ARRAY:
+    case SEND_COMMAND_ARRAY:
+    case SEND_TEST_ARRAY_FOR_CHANNEL:
+    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+    case SEND_TO_ANGLE_SENSOR:
         {
-            int TODO;
+            // no special processing needed, just response word on OK/FAIL is enough
         }
         break;
     case RECEIVE_TEST_ARRAY:
-        {
-            int TODO;
-        }
-        break;
-    case SEND_COMMAND_ARRAY:
-        {
-            int TODO;
-        }
-        break;
-    case RECEIVE_COMMAND_ARRAY:
-        {
-            int TODO;
-        }
-        break;
-    case SEND_TEST_ARRAY_FOR_CHANNEL:
-        {
-            int TODO;
-        }
-        break;
     case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            for (uint16_t i = 0; i < mWordsToReceive; ++i)
+            {
+                if (buffer[i] != 0)
+                {
+                    LOG_ERROR(QString("Incorrect test array received"));
+                    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(405)); //TODO define error codes internal or hardware
+                    break;
+                }
+            }
         }
         break;
-    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+
+    case RECEIVE_COMMAND_ARRAY:
         {
-            int TODO;
+            int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                if (i % 2 == 0)
+                {
+                    int type = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i).toInt();
+                    QString variable = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i + 1).toString();
+                    qreal value = 0;
+
+                    switch (type)
+                    {
+                    case SystemState::MODE_PSY:
+                        {
+                            int16_t v = buffer[0];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::STEPS_PSY:
+                        {
+                            int16_t v1 = buffer[1];
+                            int32_t v = buffer[2] + (v1 << 16);
+                            value = v;
+                        }
+                        break;
+                    case SystemState::VELOCITY_PSY:
+                        {
+                            int16_t v = buffer[3];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::CURRENT_PSY:
+                        {
+                            int16_t v = buffer[4];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::ANGLE_PSY:
+                        {
+                            qreal rawData = buffer[10];
+                            value = rawData * 180 / 65536;
+                        }
+                        break;
+                    case SystemState::MODE_NU:
+                        {
+                            int16_t v = buffer[5];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::STEPS_NU:
+                        {
+                            int16_t v1 = buffer[6];
+                            int32_t v = buffer[7] + (v1 << 16);
+                            value = v;
+                        }
+                        break;
+                    case SystemState::VELOCITY_NU:
+                        {
+                            int16_t v = buffer[8];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::CURRENT_NU:
+                        {
+                            int16_t v = buffer[9];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::ANGLE_NU:
+                        {
+                            qreal rawData = buffer[11];
+                            value = rawData * 180 / 65536;
+                        }
+                        break;
+                    case SystemState::SENSOR_FLAG:
+                        {
+                            uint16_t tmp = buffer[19];
+                            tmp = tmp << 3;
+                            tmp = tmp >> 15;
+                            value = tmp;
+                        }
+                        break;
+                    case SystemState::TEMPERATURE:
+                        {
+                            uint16_t tmp = buffer[19];
+                            tmp = tmp << 3;
+                            tmp = tmp >> 15;
+                            if (tmp == 1) // has temperature sensor
+                            {
+                                int16_t temper = buffer[19] & 0x0fff; //TODO скорее всего какая-то хуйня, если это интерпретировать как int, а не float
+                                value = temper;
+                            }
+                            else
+                            {
+                                value = 0xffff;
+                            }
+                        }
+                        break;
+
+                    default:
+                        LOG_ERROR(QString("Internal error occured in MKO response parsing"));
+                        break;
+                    }
+
+                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = QVariant(variable);
+                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i + 1] = QVariant(value);
+                }
+            }
         }
         break;
+
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                if (i % 2 == 0)
+                {
+                    int type = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i).toInt();
+                    QString variable = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i + 1).toString();
+                    qreal value = 0;
+
+                    switch (type)
+                    {
+                    case SystemState::MODE:
+                        {
+                            int16_t v = buffer[0];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::STEPS:
+                        {
+                            int16_t v1 = buffer[1];
+                            int32_t v = buffer[2] + (v1 << 16);
+                            value = v;
+                        }
+                        break;
+                    case SystemState::VELOCITY:
+                        {
+                            int16_t v = buffer[3];
+                            value = v;
+                        }
+                        break;
+                    case SystemState::CURRENT:
+                        {
+                            int16_t v = buffer[4];
+                            value = v;
+                        }
+                        break;
+
+                    default:
+                        LOG_ERROR(QString("Internal error occured in MKO response parsing"));
+                        break;
+                    }
+
+                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = QVariant(variable);
+                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i + 1] = QVariant(value);
+                }
+            }
         }
         break;
-    case SEND_TO_ANGLE_SENSOR:
-        {
-            int TODO;
-        }
-        break;
+
     default:
         LOG_ERROR(QString("MKO messages internal error"));
         break;
     }
 
-    //TODO read and parse response data and put output params to response
-    //TODO можно ли больше прочитать? а меньше? и что будет?
     emit commandResult(mCurrentResponse);
 }
 
@@ -237,7 +381,7 @@ QString ModuleMKO::processResponseWord(uint16_t oc)
 {
     LOG_INFO(QString("Response word is %1").arg(QString::number(oc, 16)));
 
-    //ADDRESS_MASK
+    //TODO use ADDRESS_MASK etc instead of bit shifts
     QString error;
     uint16_t x;
 
@@ -645,122 +789,158 @@ void ModuleMKO::requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16
     mReceiveTimer->start(RECEIVE_DELAY);
 }
 
-bool ModuleMKO::sendAngleSensorData()
+void ModuleMKO::sendTestArray(uint16_t address)
+{
+    uint16_t data[11];
+    uint16_t wordsCount = 10;
+    uint16_t checkSum = 0;
+
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        data[i] = 0;
+        checkSum += data[i];
+    }
+
+    data[wordsCount] = checkSum;
+    ++wordsCount;
+
+    mWordsToReceive = 1;
+    mWordsSent = 1 + wordsCount; // control message + data
+    sendDataToBUP(address, SEND_SUBADDRESS, data, wordsCount);
+}
+
+void ModuleMKO::receiveTestArray(uint16_t address)
+{
+    mWordsToReceive = 12;
+    mWordsSent = 1; // control message
+    requestDataFromBUP(address, SEND_SUBADDRESS, mWordsToReceive);
+}
+
+void ModuleMKO::sendCommandArray(uint16_t address, const AxisData& psy, const AxisData& nu)
+{
+    uint16_t data[11];
+    uint16_t wordsCount = 10;
+    uint16_t checkSum = 0;
+
+    data[0] = psy.mode;
+    data[1] = psy.steps >> 16;
+    data[2] = psy.steps;
+    data[3] = psy.velocity;
+    data[4] = psy.current;
+    data[5] = nu.mode;
+    data[6] = psy.steps >> 16;
+    data[7] = psy.steps;
+    data[8] = psy.velocity;
+    data[9] = psy.current;
+
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        checkSum += data[i];
+    }
+
+    data[wordsCount] = checkSum;
+    ++wordsCount;
+
+    mWordsToReceive = 1;
+    mWordsSent = 1 + wordsCount; // control message + data
+    sendDataToBUP(address, SEND_SUBADDRESS, data, wordsCount);
+}
+
+void ModuleMKO::receiveCommandArray(uint16_t address)
+{
+    mWordsToReceive = 22;
+    mWordsSent = 1; // control message
+    requestDataFromBUP(address, RECEIVE_SUBADDRESS, mWordsToReceive);
+}
+
+void ModuleMKO::sendTestArrayForChannel(uint16_t address, Subaddress channel)
+{
+    uint16_t data[6];
+    uint16_t wordsCount = 5;
+    uint16_t checkSum = 0;
+
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        data[i] = 0;
+        checkSum += data[i];
+    }
+
+    data[wordsCount] = checkSum;
+    ++wordsCount;
+
+    mWordsToReceive = 1;
+    mWordsSent = 1 + wordsCount; // control message + data
+    sendDataToBUP(address, channel, data, wordsCount);
+}
+
+void ModuleMKO::receiveTestArrayForChannel(uint16_t address, Subaddress channel)
+{
+    mWordsToReceive = 6;
+    mWordsSent = 1; // control message
+    requestDataFromBUP(address, channel, mWordsToReceive);
+}
+
+void ModuleMKO::sendCommandArrayForChannel(uint16_t address, Subaddress channel, const AxisData& axisData)
+{
+    uint16_t data[6];
+    uint16_t wordsCount = 5;
+    uint16_t checkSum = 0;
+
+    data[0] = axisData.mode;
+    data[1] = axisData.steps >> 16;
+    data[2] = axisData.steps;
+    data[3] = axisData.velocity;
+    data[4] = axisData.current;
+
+    for (uint16_t i = 0; i < wordsCount; ++i)
+    {
+        checkSum += data[i];
+    }
+
+    data[wordsCount] = checkSum;
+    ++wordsCount;
+
+    mWordsToReceive = 1;
+    mWordsSent = 1 + wordsCount; // control message + data
+    sendDataToBUP(address, channel, data, wordsCount);
+}
+
+void ModuleMKO::receiveCommandArrayForChannel(uint16_t address, Subaddress channel)
+{
+    //TODO channel param not used
+    mWordsToReceive = 6;
+    mWordsSent = 1; // control message
+    requestDataFromBUP(address, RECEIVE_SUBADDRESS, mWordsToReceive);
+}
+
+void ModuleMKO::sendAngleSensorData(uint16_t address)
 {
     uint16_t data[3];
     data[0] = 0;
     uint16_t wordsCount = 2;
-    uint16_t address = 0;
 
-    if (mMainKitEnabled)
+    if (address == MAIN_KIT_ADDRESS)
     {
         data[1] = PS_FROM_MAIN_KIT;
-        address = MAIN_KIT_ADDRESS;
-    }
-    else if (mReserveKitEnabled)
-    {
-        data[1] = PS_FROM_RESERVE_KIT;
-        address = RESERVE_KIT_ADDRESS;
     }
     else
     {
-        LOG_ERROR("No MKO kit enabled");
-        return false;
+        data[1] = PS_FROM_RESERVE_KIT;
     }
 
     // add checksum
-    data[wordsCount] = 0;
+    uint16_t checkSum = 0;
     for (uint16_t i = 0; i < wordsCount; ++i)
     {
-        data[wordsCount] += data[i];
+        checkSum += data[i];
     }
 
+    data[wordsCount] = checkSum;
     ++wordsCount;
-    sendDataToBUP(address, ANGLE_SENSOR_SUBADDRESS, data, wordsCount);
+
     mWordsToReceive = 1;
-    return true;
-}
-
-void ModuleMKO::pow_DY(int kit, int adr)
-{
-    /*QString err1 = "";
-    WORD buf[3];
-    WORD buff[5];
-    mSubAddr = 6;
-    mAddr = adr;
-    buf[0] = 0;
-
-    if (kit == NO_KIT)
-    {
-        if (mActiveKits == RESERVE_KIT)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2, 0);
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if (mActiveKits == NO_KIT)
-        {
-            emit MKO_CTM(1, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if (mActiveKits == ALL_KITS)
-        {
-            if (tmkselect(0) != 0)
-            {
-                err1 += "МКО: Ошибка tmk0!\n";
-            }//
-
-            bcreset();
-        }
-
-        mActiveKits = MAIN_KIT;
-        buf[1] = 32;
-        buf[2] = 32;
-    }
-    else
-    {
-        if (mActiveKits == MAIN_KIT)
-        {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1, 0);
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if (mActiveKits == NO_KIT)
-        {
-            emit MKO_CTM(2, 1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if (mActiveKits == ALL_KITS)
-        {
-            if (tmkselect(1) != 0)
-            {
-                err1 += "МКО: Ошибка tmk1!\n";
-            }//
-
-            bcreset();
-        }
-
-        mActiveKits = RESERVE_KIT;
-        buf[1] = 64;
-        buf[2] = 64;
-    }
-
-    sendDataToBUP(buf, 3, buff, 1);
-    if (OCcontrol(buff[0]) != "")
-    {
-        err1 += "МКО: Питание ДУ:\n";
-        err1 += OCcontrol(buff[0]);
-    }
-
-    emit start_MKO(err1);*/
+    mWordsSent = 1 + wordsCount; // control message + data
+    sendDataToBUP(address, ANGLE_SENSOR_SUBADDRESS, data, wordsCount);
 }
 
 void ModuleMKO::MKO_tr_cm(int kit, QString cm, int adr1, int adr2)
@@ -1176,7 +1356,51 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
 {
     mCurrentResponse.clear();
 
+    uint16_t address = 0;
+    if (mMainKitEnabled)
+    {
+        address = MAIN_KIT_ADDRESS;
+    }
+    else if (mReserveKitEnabled)
+    {
+        address = RESERVE_KIT_ADDRESS;
+    }
+    else
+    {
+        LOG_ERROR(QString("No MKO Kit enabled"));
+        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(500)); //TODO define error codes internal or hardware
+        emit commandResult(mCurrentResponse);
+        return;
+    }
+
     ModuleMKO::CommandID command = ModuleMKO::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+
+    // implicit params check
+    switch (command)
+    {
+    case SEND_TEST_ARRAY_FOR_CHANNEL:
+    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+        {
+            int paramsCount = params.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+            if (paramsCount != 1)
+            {
+                LOG_ERROR(QString("Malformed request for MKO command %1").arg(int(command)));
+                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(50)); //TODO define error codes internal or hardware
+                emit commandResult(mCurrentResponse);
+                return;
+            }
+
+            //case SEND_COMMAND_ARRAY:
+            //case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+            int TODO; // check input params?
+        }
+        break;
+
+    default:
+        break;
+    }
 
     int errorCode = 0;
 
@@ -1184,65 +1408,156 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
     {
     case SEND_TEST_ARRAY:
         {
-            //sendDataToBUP();
-            int TODO;
+            sendTestArray(address);
         }
         break;
     case RECEIVE_TEST_ARRAY:
         {
-            int TODO;
+            receiveTestArray(address);
         }
         break;
     case SEND_COMMAND_ARRAY:
         {
-            int TODO;
+            AxisData psy;
+            AxisData nu;
+
+            int paramsCount = params.value(SystemState::INPUT_PARAMS_COUNT).toInt();
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                if (i % 2 == 0)
+                {
+                    int type = params.value(SystemState::INPUT_PARAM_BASE + i).toInt();
+                    int32_t value = int32_t(params.value(SystemState::INPUT_PARAM_BASE + i + 1).toDouble());
+
+                    switch (type)
+                    {
+                    case SystemState::MODE_PSY:
+                        psy.mode = value;
+                        break;
+                    case SystemState::STEPS_PSY:
+                        psy.steps = value;
+                        break;
+                    case SystemState::VELOCITY_PSY:
+                        psy.velocity = value;
+                        break;
+                    case SystemState::CURRENT_PSY:
+                        psy.current = value;
+                        break;
+                    case SystemState::MODE_NU:
+                        nu.mode = value;
+                        break;
+                    case SystemState::STEPS_NU:
+                        nu.steps = value;
+                        break;
+                    case SystemState::VELOCITY_NU:
+                        nu.velocity = value;
+                        break;
+                    case SystemState::CURRENT_NU:
+                        nu.current = value;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+
+            sendCommandArray(address, psy, nu);
         }
         break;
     case RECEIVE_COMMAND_ARRAY:
         {
-            int TODO;
+            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+            mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAMS_COUNT + i);
+            }
+
+            receiveCommandArray(address);
         }
         break;
     case SEND_TEST_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            sendTestArrayForChannel(address, subaddress);
         }
         break;
     case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+            mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAMS_COUNT + i);
+            }
+
+            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            receiveTestArrayForChannel(address, subaddress);
         }
         break;
     case SEND_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            AxisData data;
+            int paramsCount = params.value(SystemState::INPUT_PARAMS_COUNT).toInt();
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                if (i % 2 == 0)
+                {
+                    int type = params.value(SystemState::INPUT_PARAM_BASE + i).toInt();
+                    int32_t value = int32_t(params.value(SystemState::INPUT_PARAM_BASE + i + 1).toDouble());
+
+                    switch (type)
+                    {
+                    case SystemState::MODE:
+                        data.mode = value;
+                        break;
+                    case SystemState::STEPS:
+                        data.steps = value;
+                        break;
+                    case SystemState::VELOCITY:
+                        data.velocity = value;
+                        break;
+                    case SystemState::CURRENT:
+                        data.current = value;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            sendCommandArrayForChannel(address, subaddress, data);
         }
         break;
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            int TODO;
+            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
+            for (int i = 0; i < paramsCount; ++i)
+            {
+                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAMS_COUNT + i);
+            }
+
+            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            receiveCommandArrayForChannel(address, subaddress);
         }
         break;
     case SEND_TO_ANGLE_SENSOR:
         {
-            if (!sendAngleSensorData())
-            {
-                errorCode = 105;
-            }
+            sendAngleSensorData(address);
         }
         break;
 
     default:
-        {
-            errorCode = 100;
-        }
+        errorCode = 100; //TODO define error code
         break;
     }
 
-    if (errorCode)
+    if (errorCode != 0)
     {
         LOG_ERROR(QString("Error in MKO command id=%1").arg(int(command)));
-        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
+        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(errorCode)); //TODO define error codes internal or hardware
         emit commandResult(mCurrentResponse);
         return;
     }

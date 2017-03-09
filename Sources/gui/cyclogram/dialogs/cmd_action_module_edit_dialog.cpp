@@ -72,6 +72,7 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 
 void CmdActionModuleEditDialog::onModuleChanged(int index)
 {
+    //TODO: причесать прокидывание параметров в функции (к теме переделки внутреннего протокола)
     mModuleID = index;
     mCommands->clear();
 
@@ -104,18 +105,59 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::MKO:
         {
-            //addCommand(tr("Принять тестовый массив"), ModuleMKO::SEND_TEST_ARRAY);
-            //addCommand(tr("Выдать тестовый массив"), ModuleMKO::RECEIVE_TEST_ARRAY);
-            //addCommand(tr("Принять командный массив"), ModuleMKO::SEND_COMMAND_ARRAY);
-            //addCommand(tr("Выдать командный массив"), ModuleMKO::RECEIVE_COMMAND_ARRAY);
-            //addCommand(tr("Принять тестовый массив по линии ψ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Принять тестовый массив по линии υ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Выдать тестовый массив по линии υ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Принять командный массив по линии ψ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Принять командный массив по линии υ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Выдать командный массив по линии ψ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
-            //addCommand(tr("Выдать командный массив по линии υ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
+            addCommand(tr("Принять тестовый массив"), ModuleMKO::SEND_TEST_ARRAY);
+            addCommand(tr("Выдать тестовый массив"), ModuleMKO::RECEIVE_TEST_ARRAY);
+            addCommand(tr("Принять командный массив"), ModuleMKO::SEND_COMMAND_ARRAY);
+            addCommand(tr("Выдать командный массив"), ModuleMKO::RECEIVE_COMMAND_ARRAY);
+
+            QList<int> params;
+            params.push_back(ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
+            addCommand(tr("Принять тестовый массив по линии ψ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
+            addCommand(tr("Принять тестовый массив по линии υ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
+            addCommand(tr("Выдать тестовый массив по линии ψ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
+            addCommand(tr("Выдать тестовый массив по линии υ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
+            addCommand(tr("Принять командный массив по линии ψ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
+            addCommand(tr("Принять командный массив по линии υ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
+            addCommand(tr("Выдать командный массив по линии ψ"), params);
+
+            params.clear();
+            params.push_back(ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
+            params.push_back(1); //params count
+            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
+            addCommand(tr("Выдать командный массив по линии υ"), params);
+
             addCommand(tr("Подать питание на ДУ"), ModuleMKO::SEND_TO_ANGLE_SENSOR);
         }
         break;

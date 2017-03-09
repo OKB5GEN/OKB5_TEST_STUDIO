@@ -17,7 +17,7 @@ class ModuleTech;
 class ModulePower;
 class CmdActionModule;
 
-class SystemState: public VariableController //TODO possibly it's better to inherit from QObject
+class SystemState: public QObject//: public VariableController //TODO possibly it's better to inherit from QObject
 {
     Q_OBJECT
 
@@ -36,6 +36,22 @@ public:
         VOLTAGE               = 0x00000006,
         CURRENT               = 0x00000007,
         TEMPERATURE           = 0x00000008,
+
+        //MKO param types
+        MODE_PSY              = 0x00000009,
+        STEPS_PSY             = 0x0000000A,
+        VELOCITY_PSY          = 0x0000000B,
+        CURRENT_PSY           = 0x0000000C,
+        ANGLE_PSY             = 0x0000000D,
+        MODE_NU               = 0x0000000E,
+        STEPS_NU              = 0x0000000F,
+        VELOCITY_NU           = 0x00000010,
+        CURRENT_NU            = 0x00000011,
+        ANGLE_NU              = 0x00000012,
+        SENSOR_FLAG           = 0x00000013,
+        MODE                  = 0x00000014,
+        STEPS                 = 0x00000015,
+        VELOCITY              = 0x00000016,
 
         // custom command params
         INPUT_PARAM_BASE      = 0x00001000, // all input params will have code "in base + i"
@@ -78,8 +94,6 @@ private slots:
     void on_tech_clear_out_4_clicked();
     void on_tech_clear_in_4_clicked();
     void on_tech_clear_buf_4_clicked();
-    void on_pow_DY_osn_clicked();
-    void on_pow_DY_rez_clicked();
     void on_MKO_osn_clicked();
     void on_MKO_rez_clicked();
     void on_MKO_test_clicked();
