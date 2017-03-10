@@ -77,7 +77,7 @@ void ModuleMKO::readResponse()
     case RECEIVE_TEST_ARRAY:
     case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            for (uint16_t i = 0; i < mWordsToReceive; ++i)
+            for (uint16_t i = 1; i < mWordsToReceive; ++i) // 1 - skip response word
             {
                 if (buffer[i] != 0)
                 {
