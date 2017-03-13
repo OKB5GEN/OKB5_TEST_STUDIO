@@ -58,6 +58,19 @@ public:
 public slots:
     void onApplicationStart() override;
 
+    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void setDefaultState() override;
+
+signals:
+    void test_MKO(int x);
+    void start_MKO(QString x);
+    void data_MKO(QString x);
+    void MKO_CTM(int x, int y);
+
+private slots:
+    void readResponse();
+    void sendResponse();
+
     void sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount);
     void requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse);
 
@@ -72,20 +85,6 @@ public slots:
     void MKO_start_test(int kit, int adr1, int adr2);
     void MKO_tr_cm(int kit, QString cm, int adr1, int adr2);
     void MKO_rc_cm(int kit, int adr1, int adr2);
-    //void MKO_chan(int x);
-    void MKO_timer();
-
-    void processCommand(const QMap<uint32_t, QVariant>& params) override;
-    void setDefaultState() override;
-
-signals:
-    void test_MKO(int x);
-    void start_MKO(QString x);
-    void data_MKO(QString x);
-    void MKO_CTM(int x, int y);
-
-private slots:
-    void readResponse();
 
 private:
     struct AxisData
@@ -134,8 +133,6 @@ private:
 
     //2.1.9 Операция обмена при выдаче из БКУ в ОУ БУП НА массива для подачи питания на ДУ с использованием формата 1. Используется подадрес 06
     void sendAngleSensorData(uint16_t address);
-
-    QTimer * mReceiveTimer;
 
     bool mMainKitEnabled;
     bool mReserveKitEnabled;

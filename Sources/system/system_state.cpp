@@ -136,11 +136,11 @@ SystemState::SystemState(QObject* parent):
     mParamNames[STEPS_PSY] = tr("Steps (Psy)");
     mParamNames[VELOCITY_PSY] = tr("Velocity (Psy)");
     mParamNames[CURRENT_PSY] = tr("Max current (Psy)");
-    mParamNames[MODE_NU] = tr("Mode (Nu)");
-    mParamNames[STEPS_PSY] = tr("Steps (Nu)");
-    mParamNames[VELOCITY_PSY] = tr("Velocity (Nu)");
-    mParamNames[CURRENT_NU] = tr("Max current (Nu)");
     mParamNames[ANGLE_PSY] = tr("Angle (Psy)");
+    mParamNames[MODE_NU] = tr("Mode (Nu)");
+    mParamNames[STEPS_NU] = tr("Steps (Nu)");
+    mParamNames[VELOCITY_NU] = tr("Velocity (Nu)");
+    mParamNames[CURRENT_NU] = tr("Max current (Nu)");
     mParamNames[ANGLE_NU] = tr("Angle (Nu)");
     mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
 }

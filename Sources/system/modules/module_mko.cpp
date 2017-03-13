@@ -15,6 +15,7 @@ namespace
     static const uint16_t MAIN_KIT_ADDRESS = 0x1E;
     static const uint16_t RESERVE_KIT_ADDRESS = 0x1D;
     static const int RECEIVE_DELAY = 100; // msec
+    static const int PROTECTION_DELAY = 100; // msec
     static const int RECEIVE_BUFFER_SIZE = 100; // words
 }
 
@@ -26,9 +27,6 @@ ModuleMKO::ModuleMKO(QObject* parent):
     mWordsSent(0),
     mActiveKits(NO_KIT)
 {
-    mReceiveTimer = new QTimer(this);
-    mReceiveTimer->setSingleShot(true);
-    connect(mReceiveTimer, SIGNAL(timeout()), this, SLOT(readResponse()));
 }
 
 ModuleMKO::~ModuleMKO()
@@ -257,12 +255,12 @@ void ModuleMKO::readResponse()
         break;
     }
 
-    emit commandResult(mCurrentResponse);
+    QTimer::singleShot(PROTECTION_DELAY, this, SLOT(sendResponse()));
 }
 
-void ModuleMKO::MKO_timer()
+void ModuleMKO::sendResponse()
 {
-    //MKO_rc_cm(flag_ch, addr1,  addr2);
+    emit commandResult(mCurrentResponse);
 }
 
 void ModuleMKO::startMKO1()
@@ -364,7 +362,7 @@ void ModuleMKO::startMKO()
 void ModuleMKO::stopMKO()
 {
     LOG_INFO("Stopping MKO");
-    mMainKitEnabled = false;
+    mMainKitEnabled = false; //TODO
     TmkClose();
     CloseHandle(hEvent);
 }
@@ -774,7 +772,7 @@ void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* d
     bcputblk(1, data, wordsCount);
     bcstartx(0, DATA_BC_RT | CX_BUS_0 | CX_STOP | CX_NOSIG);
 
-    mReceiveTimer->start(RECEIVE_DELAY);
+    QTimer::singleShot(RECEIVE_DELAY, this, SLOT(readResponse()));
 }
 
 void ModuleMKO::requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse)
@@ -786,7 +784,7 @@ void ModuleMKO::requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16
     bcputw(0, commandWord);
     bcstartx(0, DATA_RT_BC | CX_BUS_0 | CX_STOP | CX_NOSIG);
 
-    mReceiveTimer->start(RECEIVE_DELAY);
+    QTimer::singleShot(RECEIVE_DELAY, this, SLOT(readResponse()));
 }
 
 void ModuleMKO::sendTestArray(uint16_t address)

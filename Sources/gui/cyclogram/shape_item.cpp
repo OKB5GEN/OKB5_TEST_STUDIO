@@ -993,11 +993,9 @@ void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
 
             mRect.setBottom(mRect.bottom() + yOffset);
         }
-        else
-        {
-            adjust();
-        }
     }
+
+    adjust();
 
     if (before != mRect)
     {
