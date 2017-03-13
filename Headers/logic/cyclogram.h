@@ -73,7 +73,8 @@ private slots:
     void runCurrentCommand();
     void onCommandTextChanged(const QString& text);
     void variablesChanged();
-    void variableValueChanged(const QString& name, qreal value, int container);
+    void variableCurrentValueChanged(const QString& name, qreal value);
+    void variableInitialValueChanged(const QString& name, qreal value);
 
 private:
     void deleteCommandTree(Command* cmd, bool silent);

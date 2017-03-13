@@ -78,6 +78,7 @@ void FileReader::readVariables()
             QXmlStreamAttributes attributes = mXML.attributes();
             QString name;
             QString value;
+            QString desc;
 
             if (attributes.hasAttribute("name"))
             {
@@ -89,8 +90,14 @@ void FileReader::readVariables()
                 value = attributes.value("value").toString();
             }
 
+            if (attributes.hasAttribute("desc"))
+            {
+                desc = attributes.value("desc").toString();
+            }
+
             VariableController* varCtrl = mCyclogram->variableController();
             varCtrl->addVariable(name, value.toDouble());
+            varCtrl->setDescription(name, desc);
         }
 
         mXML.readNext();

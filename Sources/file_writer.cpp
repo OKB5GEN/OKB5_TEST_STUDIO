@@ -29,15 +29,15 @@ bool FileWriter::writeFile(QIODevice *device)
 void FileWriter::writeVariables()
 {
     VariableController* varCtrl = mCyclogram->variableController();
-    const QMap<QString, qreal>& values = varCtrl->variables(VariableController::Initial);
 
     mXML.writeStartElement("variables");
 
-    for (QMap<QString, qreal>::const_iterator it = values.begin(); it != values.end(); ++it)
+    for (auto it = varCtrl->variablesData().begin(); it != varCtrl->variablesData().end(); ++it)
     {
         mXML.writeStartElement("variable");
         mXML.writeAttribute("name", it.key());
-        mXML.writeAttribute("value", QString::number(it.value()));
+        mXML.writeAttribute("value", QString::number(it.value().initialValue));
+        mXML.writeAttribute("desc", it.value().description);
         mXML.writeEndElement();
     }
 

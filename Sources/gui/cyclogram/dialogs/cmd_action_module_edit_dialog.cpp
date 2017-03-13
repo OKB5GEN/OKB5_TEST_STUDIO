@@ -356,7 +356,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         QComboBox* comboBox = new QComboBox(mParams);
         VariableController* vc = mCommand->variableController();
-        comboBox->addItems(vc->variables().keys());
+        comboBox->addItems(vc->variablesData().keys());
         mParams->setCellWidget(i, 1, comboBox);
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
@@ -383,7 +383,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         QComboBox* comboBox = new QComboBox(mParams);
         VariableController* vc = mCommand->variableController();
-        comboBox->addItems(vc->variables().keys());
+        comboBox->addItems(vc->variablesData().keys());
         mParams->setCellWidget(i + inCount, 1, comboBox);
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())

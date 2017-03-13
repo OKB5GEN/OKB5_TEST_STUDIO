@@ -9,19 +9,31 @@ class VariableController: public QObject
     Q_OBJECT
 
 public:
-    enum Container
+    struct VariableData
     {
-        Current,
-        Initial
+        VariableData():
+            currentValue(0),
+            initialValue(0)
+        {
+        }
+
+        qreal currentValue;
+        qreal initialValue;
+        QString description;
     };
 
     VariableController(QObject* parent);
     virtual ~VariableController();
 
-    // set/get actions are usually performed on current variable values
-    const QMap<QString, qreal>& variables(Container container = Current) const;
-    qreal variable(const QString& name, qreal defaultValue = -1, Container container = Current) const;
-    void setVariable(const QString& name, qreal value, Container container = Current);
+    const QMap<QString, VariableData>& variablesData() const;
+    VariableData variableData(const QString& name) const;
+    void setCurrentValue(const QString& name, qreal value);
+    void setInitialValue(const QString& name, qreal value);
+    void setDescription(const QString& name, const QString& description);
+
+    QString description(const QString& name) const;
+    qreal currentValue(const QString& name, qreal defaultValue = -1) const;
+    qreal initialValue(const QString& name, qreal defaultValue = -1) const;
 
     // add/remove actions are performed for all variable containers
     void addVariable(const QString& name, qreal value);
@@ -36,11 +48,12 @@ public slots:
 signals:
     void variableAdded(const QString& name, qreal value);
     void variableRemoved(const QString& name);
-    void valueChanged(const QString& name, qreal value, int container);
+    void initialValueChanged(const QString& name, qreal value);
+    void currentValueChanged(const QString& name, qreal value);
     void nameChanged(const QString& newName, const QString& oldName);
+    void descriptionChanged(const QString& name, const QString& description);
 
 private:
-    QMap<QString, qreal> mCurrent; //TODO create structure Variable and remove copypaste
-    QMap<QString, qreal> mInitial;
+    QMap<QString, VariableData> mData;
 };
 #endif // VARIABLE_CONTROLLER_H

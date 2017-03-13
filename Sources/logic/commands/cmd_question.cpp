@@ -51,7 +51,7 @@ void CmdQuestion::execute()
     {
         if (mOperands[i].type == Variable)
         {
-            qreal v = mVarCtrl->variable(mOperands[i].variable);
+            qreal v = mVarCtrl->currentValue(mOperands[i].variable);
             mOperands[i].value = v;
         }
     }
@@ -145,7 +145,7 @@ void CmdQuestion::setOperand(OperandID operand, const QString& variable)
         return;
     }
 
-    mOperands[operand].value = mVarCtrl->variable(variable);
+    mOperands[operand].value = mVarCtrl->currentValue(variable);
     mOperands[operand].type = Variable;
     mOperands[operand].variable = variable;
     updateText();

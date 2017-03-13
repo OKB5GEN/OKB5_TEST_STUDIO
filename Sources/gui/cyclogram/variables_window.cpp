@@ -16,11 +16,12 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     QGridLayout* layout = new QGridLayout(this);
 
     mTableWidget = new QTableWidget(this);
-    mTableWidget->setColumnCount(3);
     QStringList list;
     list.append(tr("Name"));
     list.append(tr("Initial"));
     list.append(tr("Current"));
+    list.append(tr("Description"));
+    mTableWidget->setColumnCount(list.size());
     mTableWidget->setHorizontalHeaderLabels(list);
 
     mTableWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
@@ -70,14 +71,15 @@ void VariablesWindow::setCyclogram(Cyclogram * cyclogram)
 
     VariableController* controller = mCyclogram->variableController();
 
-    connect(controller, SIGNAL(valueChanged(const QString&,qreal,int)), this, SLOT(onValueChanged(const QString&,qreal,int)));
+    connect(controller, SIGNAL(currentValueChanged(const QString&,qreal)), this, SLOT(onCurrentValueChanged(const QString&,qreal)));
 
-    foreach (QString key, controller->variables().keys())
+    foreach (QString key, controller->variablesData().keys())
     {
         int index = mTableWidget->rowCount();
-        qreal initial = controller->variable(key, -1, VariableController::Initial);
-        qreal current = controller->variable(key, -1, VariableController::Current);
-        addRow(index, key, initial, current);
+        qreal initial = controller->initialValue(key, -1);
+        qreal current = controller->currentValue(key, -1);
+        QString desc = controller->description(key);
+        addRow(index, key, initial, current, desc);
     }
 
     updateTableSize();
@@ -96,7 +98,7 @@ void VariablesWindow::onAddClicked()
         name = prefix + QString::number(index);
     }
 
-    addRow(mTableWidget->rowCount(), name, 0, 0);
+    addRow(mTableWidget->rowCount(), name, 0, 0, "");
     controller->addVariable(name, 0);
     updateTableSize();
 }
@@ -201,27 +203,56 @@ void VariablesWindow::onInitialValueChanged()
         }
     }
 
-    controller->setVariable(name, value, VariableController::Initial);
+    controller->setInitialValue(name, value);
 }
 
-void VariablesWindow::onValueChanged(const QString& name, qreal value, int container)
+void VariablesWindow::onDescriptionChanged()
 {
-    if (container == VariableController::Current)
+    VariableController* controller = mCyclogram->variableController();
+    QLineEdit* descriptionLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
+    if (!descriptionLineEdit)
     {
-        for(int row = 0; row < mTableWidget->rowCount(); row++)
+        qDebug("WTF 3?");
+        return;
+    }
+
+    QString description = descriptionLineEdit->text();
+
+    // find out variable name
+    QString name;
+
+    for(int row = 0; row < mTableWidget->rowCount(); row++)
+    {
+        QLineEdit* tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 3));
+        if(tmp == descriptionLineEdit)
         {
-            // find line edit with name text in first column
-            QLineEdit* tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 0));
-            if(tmp && tmp->text() == name)
+            tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 0));
+            if (tmp)
             {
-                // get corresponding current value
-                tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 2));
-                if (tmp)
-                {
-                    tmp->setText(QString::number(value));
-                }
-                break;
+                name = tmp->text();
             }
+            break;
+        }
+    }
+
+    controller->setDescription(name, description);
+}
+
+void VariablesWindow::onCurrentValueChanged(const QString& name, qreal value)
+{
+    for(int row = 0; row < mTableWidget->rowCount(); row++)
+    {
+        // find line edit with name text in first column
+        QLineEdit* tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 0));
+        if(tmp && tmp->text() == name)
+        {
+            // get corresponding current value
+            tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 2));
+            if (tmp)
+            {
+                tmp->setText(QString::number(value));
+            }
+            break;
         }
     }
 }
@@ -233,7 +264,7 @@ void VariablesWindow::onTableSelectionChanged()
     mRemoveBtn->setEnabled(count > 0 && (mCyclogram->state() != Cyclogram::RUNNING));
 }
 
-void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, qreal currentValue)
+void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, qreal currentValue, const QString& description)
 {
     mTableWidget->insertRow(row);
 
@@ -257,4 +288,9 @@ void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, q
     lineEditCurrent->setReadOnly(true);
     mTableWidget->setCellWidget(row, 2, lineEditCurrent);
     //connect(lineEditCurrent, SIGNAL(editingFinished()), this, SLOT(onCurrentValueChanged()));
+
+    QLineEdit* lineEditDescription = new QLineEdit();
+    lineEditDescription->setText(description);
+    mTableWidget->setCellWidget(row, 3, lineEditDescription);
+    connect(lineEditDescription, SIGNAL(editingFinished()), this, SLOT(onDescriptionChanged()));
 }

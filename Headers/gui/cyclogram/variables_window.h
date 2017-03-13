@@ -29,12 +29,13 @@ private slots:
 
     void onNameChanged();
     void onInitialValueChanged();
+    void onDescriptionChanged();
     void onTableSelectionChanged();
 
-    void onValueChanged(const QString& name, qreal value, int container);
+    void onCurrentValueChanged(const QString& name, qreal value);
 
 private:
-    void addRow(int row, const QString& name, qreal initialValue, qreal currentValue);
+    void addRow(int row, const QString& name, qreal initialValue, qreal currentValue, const QString& description);
     void updateTableSize();
 
     QTableWidget* mTableWidget;

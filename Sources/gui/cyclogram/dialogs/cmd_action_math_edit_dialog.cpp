@@ -134,9 +134,9 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
         mResultBox->clear();
 
         VariableController* vc = mCommand->variableController();
-        mOper1Box->addItems(vc->variables().keys());
-        mOper2Box->addItems(vc->variables().keys());
-        mResultBox->addItems(vc->variables().keys());
+        mOper1Box->addItems(vc->variablesData().keys());
+        mOper2Box->addItems(vc->variablesData().keys());
+        mResultBox->addItems(vc->variablesData().keys());
 
         int index = mOperationBox->findData(QVariant(int(mCommand->operation())));
         if (index != -1)

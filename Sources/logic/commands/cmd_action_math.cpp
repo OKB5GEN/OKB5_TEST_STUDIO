@@ -39,7 +39,7 @@ void CmdActionMath::execute()
     {
         if (mOperands[i].type == Variable)
         {
-            qreal v = mVarCtrl->variable(mOperands[i].variable);
+            qreal v = mVarCtrl->currentValue(mOperands[i].variable);
             mOperands[i].value = v;
         }
     }
@@ -76,7 +76,7 @@ void CmdActionMath::execute()
     }
 
     // set new variable value to variable controller
-    mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
+    mVarCtrl->setCurrentValue(mOperands[Result].variable, mOperands[Result].value);
 
     finish();
 }
@@ -121,7 +121,7 @@ void CmdActionMath::setOperand(OperandID operand, const QString& variable)
         return;
     }
 
-    mOperands[operand].value = mVarCtrl->variable(variable);
+    mOperands[operand].value = mVarCtrl->currentValue(variable);
     mOperands[operand].type = Variable;
     mOperands[operand].variable = variable;
     updateText();

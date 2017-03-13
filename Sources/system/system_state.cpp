@@ -1036,7 +1036,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         params[INPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
         ++i;
 
-        qreal value = vc->variable(it.value());
+        qreal value = vc->currentValue(it.value());
         params[INPUT_PARAM_BASE + i] = QVariant(value);
         ++i;
     }
@@ -1128,7 +1128,7 @@ void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
         else
         {
             value = response.value(OUTPUT_PARAM_BASE + i).toDouble();
-            vc->setVariable(varName, value);
+            vc->setCurrentValue(varName, value);
         }
     }
 

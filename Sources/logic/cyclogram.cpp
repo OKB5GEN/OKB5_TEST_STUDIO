@@ -50,8 +50,10 @@ Cyclogram::Cyclogram(QObject * parent):
 
     connect(mVarController, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(variablesChanged()));
     connect(mVarController, SIGNAL(variableRemoved(const QString&)), this, SLOT(variablesChanged()));
-    connect(mVarController, SIGNAL(valueChanged(const QString&, qreal, int)), this, SLOT(variableValueChanged(const QString&, qreal, int)));
+    connect(mVarController, SIGNAL(initialValueChanged(const QString&, qreal)), this, SLOT(variableInitialValueChanged(const QString&, qreal)));
+    connect(mVarController, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(variableCurrentValueChanged(const QString&, qreal)));
     connect(mVarController, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
+    connect(mVarController, SIGNAL(descriptionChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
 }
 
 void Cyclogram::createDefault()
@@ -152,9 +154,9 @@ void Cyclogram::onCriticalError(Command* cmd)
     LOG_ERROR("Cyclogram stopped due to critical runtime error");
     LOG_ERROR("==================================");
 
-    for (auto it = mVarController->variables().begin(); it != mVarController->variables().end(); ++it)
+    for (auto it = mVarController->variablesData().begin(); it != mVarController->variablesData().end(); ++it)
     {
-        LOG_ERROR(QString("Variable '%1' current value is %2").arg(it.key()).arg(it.value()));
+        LOG_ERROR(QString("Variable '%1' current value is %2").arg(it.key()).arg(it.value().currentValue));
     }
 
     stop();
@@ -523,12 +525,13 @@ void Cyclogram::variablesChanged()
     setModified(true, true);
 }
 
-void Cyclogram::variableValueChanged(const QString& name, qreal value, int container)
+void Cyclogram::variableCurrentValueChanged(const QString& name, qreal value)
 {
-    if (container != VariableController::Current)
-    {
-        variablesChanged();
-    }
+}
+
+void Cyclogram::variableInitialValueChanged(const QString& name, qreal value)
+{
+    variablesChanged();
 }
 
 void Cyclogram::setFirst(Command* first)

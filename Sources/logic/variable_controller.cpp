@@ -11,53 +11,82 @@ VariableController::~VariableController()
 
 }
 
-const QMap<QString, qreal>& VariableController::variables(Container container) const
+const QMap<QString, VariableController::VariableData>& VariableController::variablesData() const
 {
-    if (container == Current)
-    {
-        return mCurrent;
-    }
-
-    return mInitial;
+    return mData;
 }
 
-qreal VariableController::variable(const QString& name, qreal defaultValue/* = -1*/, Container container) const
+VariableController::VariableData VariableController::variableData(const QString& name) const
 {
-    if (container == Current)
+    auto it = mData.find(name);
+    if (it != mData.end())
     {
-        return mCurrent.value(name, defaultValue);
+        return it.value();
     }
-    else if (container == Initial)
+
+    return VariableData();
+}
+
+qreal VariableController::currentValue(const QString& name, qreal defaultValue) const
+{
+    auto it = mData.find(name);
+    if (it != mData.end())
     {
-        return mInitial.value(name, defaultValue);
+        return it.value().currentValue;
     }
 
     return defaultValue;
 }
 
-void VariableController::setVariable(const QString& name, qreal value, Container container)
+qreal VariableController::initialValue(const QString& name, qreal defaultValue) const
 {
-    QMap<QString, qreal>& cont = (container == Current) ? mCurrent : mInitial;
-
-    if (cont.contains(name))
+    auto it = mData.find(name);
+    if (it != mData.end())
     {
-        LOG_INFO(QString("Variable '%1' %2 value changed to %3").arg(name).arg((container == Current) ? "current" : "initial").arg(value));
-        cont[name] = value;
-        emit valueChanged(name, value, container);
+        return it.value().initialValue;
+    }
+
+    return defaultValue;
+}
+
+void VariableController::setCurrentValue(const QString& name, qreal value)
+{
+    auto it = mData.find(name);
+    if (it != mData.end())
+    {
+        LOG_INFO(QString("Variable '%1' current value changed to %2").arg(name).arg(value));
+        VariableData data = it.value();
+        data.currentValue = value;
+        mData[name] = data;
+        emit currentValueChanged(name, value);
+    }
+}
+
+void VariableController::setInitialValue(const QString& name, qreal value)
+{
+    auto it = mData.find(name);
+    if (it != mData.end())
+    {
+        LOG_INFO(QString("Variable '%1' initial value changed to %2").arg(name).arg(value));
+        VariableData data = it.value();
+        data.initialValue = value;
+        mData[name] = data;
+        emit initialValueChanged(name, value);
     }
 }
 
 void VariableController::addVariable(const QString& name, qreal value)
 {
-    mInitial[name] = value;
-    mCurrent[name] = value;
+    VariableData data;
+    data.currentValue = value;
+    data.initialValue = value;
+    mData[name] = data;
     emit variableAdded(name, value);
 }
 
 void VariableController::removeVariable(const QString& name)
 {
-    mInitial.remove(name);
-    mCurrent.remove(name);
+    mData.remove(name);
     emit variableRemoved(name);
 }
 
@@ -65,14 +94,8 @@ void VariableController::renameVariable(const QString& newName, const QString& o
 {
     if (isVariableExist(oldName) && !isVariableExist(newName))
     {
-        qreal initialValue = mInitial.value(oldName, -1);
-        qreal currentValue = mCurrent.value(oldName, -1);
-
-        blockSignals(true);
-        removeVariable(oldName);
-        addVariable(newName, initialValue);
-        setVariable(newName, currentValue, Current);
-        blockSignals(false);
+        VariableData data = variableData(oldName);
+        mData[newName] = data;
 
         emit nameChanged(newName, oldName);
     }
@@ -81,19 +104,51 @@ void VariableController::renameVariable(const QString& newName, const QString& o
 bool VariableController::isVariableExist(const QString& name) const
 {
     // it is enough to check initial values container, cause all containers are synchronized
-    return mInitial.contains(name);
+    return mData.contains(name);
 }
 
 void VariableController::restart()
 {
-    foreach (QString key, mInitial.keys())
+    for (auto it = mData.begin(); it != mData.end(); ++it)
     {
-        setVariable(key, variable(key, -1, Initial), Current);
+        setCurrentValue(it.key(), it.value().initialValue);
     }
 }
 
 void VariableController::clear()
 {
-    mCurrent.clear();
-    mInitial.clear();
+    mData.clear();
+}
+
+void VariableController::setDescription(const QString& name, const QString& description)
+{
+    VariableData data;
+    data.currentValue = 0;
+    data.initialValue = 0;
+
+    auto it = mData.find(name);
+    if (it != mData.end())
+    {
+        data = it.value();
+    }
+
+    bool sendSignal = (data.description != description);
+
+    if (sendSignal)
+    {
+        data.description = description;
+        mData[name] = data;
+        emit descriptionChanged(name, description);
+    }
+}
+
+QString VariableController::description(const QString& name) const
+{
+    auto it = mData.find(name);
+    if (it != mData.end())
+    {
+        return it.value().description;
+    }
+
+    return "";
 }
