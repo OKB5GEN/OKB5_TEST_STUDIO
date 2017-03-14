@@ -5,6 +5,7 @@
 #include "Headers/system/system_state.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/system/modules/module_mko.h"
+#include "Headers/logger/Logger.h"
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     QDialog(parent),
@@ -14,7 +15,7 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     setWindowTitle(tr("Module operation"));
 
     adjustSize();
-    setFixedSize(sizeHint());
+    //setFixedSize(sizeHint());
 }
 
 CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
@@ -35,21 +36,41 @@ void CmdActionModuleEditDialog::setupUI()
     mModules->addItem(tr("ОТД"));
     mModules->addItem(tr("Технологический"));
 
-    layout->addWidget(mModules, 0, 0, 5, 4);
+    //layout->addWidget(mModules, 0, 0, 10, 4);
+    layout->addWidget(mModules, 0, 0);
+    mModules->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mCommands = new QListWidget(this);
-    layout->addWidget(mCommands, 0, 4, 5, 4);
+    //layout->addWidget(mCommands, 0, 4, 10, 4);
+    layout->addWidget(mCommands, 0, 1);
+    mCommands->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
-    mParams = new QTableWidget(this);
-    mParams->setColumnCount(2);
+    mInParams = new QTableWidget(this);
     QStringList headers;
-    headers.append(tr("Параметр"));
+    headers.append(tr("Вх.Параметр"));
+    headers.append(tr(""));
+    headers.append(tr("Переменная"));
+    headers.append(tr(""));
     headers.append(tr("Значение"));
-    mParams->setHorizontalHeaderLabels(headers);
-    layout->addWidget(mParams, 0, 8, 5, 4);
+    mInParams->setColumnCount(headers.size());
+    mInParams->setHorizontalHeaderLabels(headers);
+    //layout->addWidget(mInParams, 0, 8, 5, 4);
+    layout->addWidget(mInParams, 0, 2);
+    mInParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
+    mOutParams = new QTableWidget(this);
+    QStringList outHeaders;
+    outHeaders.append(tr("Вых.Параметр"));
+    outHeaders.append(tr("Переменная"));
+    mOutParams->setColumnCount(outHeaders.size());
+    mOutParams->setHorizontalHeaderLabels(outHeaders);
+    //layout->addWidget(mOutParams, 5, 8, 5, 4);
+    layout->addWidget(mOutParams, 0, 3);
+    mOutParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 5, 5, 1, 2);
+    //layout->addWidget(buttonBox, 11, 5, 1, 2);
+    layout->addWidget(buttonBox, 1, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -329,11 +350,13 @@ void CmdActionModuleEditDialog::addCommand(const QString& text, const QList<int>
 
 void CmdActionModuleEditDialog::onCommandChanged(int index)
 {
-    mParams->clearContents();
+    mInParams->clearContents(); //TODO possibly remove all children?
+    mOutParams->clearContents(); //TODO possibly remove all children?
 
     if (index == -1)
     {
-        mParams->setRowCount(0);
+        mInParams->setRowCount(0);
+        mOutParams->setRowCount(0);
         return;
     }
 
@@ -344,23 +367,44 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     SystemState* system = mCommand->systemState();
     int inCount = system->paramsCount(mModuleID, mCommandID, true);
     int outCount = system->paramsCount(mModuleID, mCommandID, false);
-    mParams->setRowCount(inCount + outCount);
+    mInParams->setRowCount(inCount);
+    mOutParams->setRowCount(outCount);
+
+    mInParams->setVisible(inCount > 0);
+    mOutParams->setVisible(outCount > 0);
 
     for (int i = 0; i < inCount; ++i)
     {
+        // param name
         QString name = system->paramName(mModuleID, mCommandID, i, true);
-        QLabel* text = new QLabel(mParams);
+        QLabel* text = new QLabel(mInParams);
         text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
-        mParams->setCellWidget(i, 0, text);
+        mInParams->setCellWidget(i, 0, text);
 
-        QComboBox* comboBox = new QComboBox(mParams);
+        // "use variable input" button
+        QCheckBox* varSelectBtn = new QCheckBox(mInParams);
+        mInParams->setCellWidget(i, 1, varSelectBtn);
+
+        // variable selector
+        QComboBox* comboBox = new QComboBox(mInParams);
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variablesData().keys());
-        mParams->setCellWidget(i, 1, comboBox);
+        mInParams->setCellWidget(i, 2, comboBox);
+
+        // "use direct value input" button
+        QCheckBox* valueSelectBtn = new QCheckBox(mInParams);
+        mInParams->setCellWidget(i, 3, valueSelectBtn);
+
+        // variable selector
+        QLineEdit* valueEdit = new QLineEdit(mInParams);
+        valueEdit->setValidator(new QDoubleValidator(mInParams));
+        valueEdit->setText("0");
+        mInParams->setCellWidget(i, 4, valueEdit);
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
         {
+            int TODO; // initialize widget with variable/value from command
             QMap<QString, QString>::const_iterator it = inputParams.find(name);
             if (it != inputParams.end())
             {
@@ -376,15 +420,15 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     for (int i = 0; i < outCount; ++i)
     {
         QString name = system->paramName(mModuleID, mCommandID, i, false);
-        QLabel* text = new QLabel(mParams);
+        QLabel* text = new QLabel(mOutParams);
         text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
-        mParams->setCellWidget(i + inCount, 0, text);
+        mOutParams->setCellWidget(i, 0, text);
 
-        QComboBox* comboBox = new QComboBox(mParams);
+        QComboBox* comboBox = new QComboBox(mOutParams);
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variablesData().keys());
-        mParams->setCellWidget(i + inCount, 1, comboBox);
+        mOutParams->setCellWidget(i, 1, comboBox);
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
         {
@@ -399,6 +443,12 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
             }
         }
     }
+
+    mInParams->resizeColumnToContents(1);
+    mInParams->resizeColumnToContents(3);
+
+    adjustSize();
+    //mOutParams->adjustSize();
 }
 
 void CmdActionModuleEditDialog::onAccept()
@@ -414,30 +464,42 @@ void CmdActionModuleEditDialog::onAccept()
 
         for (int i = 0; i < inCount; ++i)
         {
-            QLabel* label = qobject_cast<QLabel*>(mParams->cellWidget(i, 0));
+            QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
             QString name;
             if (label)
             {
                 name = label->text();
             }
 
-            QComboBox* comboBox = qobject_cast<QComboBox*>(mParams->cellWidget(i, 1));
+            QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
+            bool variableChecked = varSelectBtn->isChecked();
+            variableChecked;
+
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
             if (comboBox)
             {
                 input[name] = comboBox->currentText();
             }
+
+            QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
+            bool valueChecked = valueSelectBtn->isChecked();
+            valueChecked;
+
+            QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
+            qreal value = valueText->text().toDouble();
+            value;
         }
 
-        for (int i = inCount; i < (inCount + outCount); ++i)
+        for (int i = 0; i < outCount; ++i)
         {
             QString name;
-            QLabel* label = qobject_cast<QLabel*>(mParams->cellWidget(i, 0));
+            QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
             if (label)
             {
                 name = label->text();
             }
 
-            QComboBox* comboBox = qobject_cast<QComboBox*>(mParams->cellWidget(i, 1));
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 1));
             if (comboBox)
             {
                 output[name] = comboBox->currentText();

@@ -33,7 +33,8 @@ private:
 
     QListWidget * mModules;
     QListWidget * mCommands;
-    QTableWidget* mParams;
+    QTableWidget* mInParams;
+    QTableWidget* mOutParams;
 
     int mModuleID;
     int mCommandID;
