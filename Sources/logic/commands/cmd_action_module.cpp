@@ -54,7 +54,7 @@ void CmdActionModule::onCommandFinished(bool success)
     }
 }
 
-void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out, const QList<int>& implicitParams)
+void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out, const QList<int>& implicitParams)
 {
     mModule = module;
     mOperation = operation;
@@ -74,12 +74,12 @@ ModuleCommands::ModuleID CmdActionModule::module() const
     return mModule;
 }
 
-const QMap<QString, QString>& CmdActionModule::inputParams() const
+const QMap<QString, QVariant>& CmdActionModule::inputParams() const
 {
     return mInputParams;
 }
 
-const QMap<QString, QString>& CmdActionModule::outputParams() const
+const QMap<QString, QVariant>& CmdActionModule::outputParams() const
 {
     return mOutputParams;
 }
@@ -97,9 +97,9 @@ void CmdActionModule::updateText()
     bool isValid = true;
 
 
-    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
-        if (it.value().isEmpty())
+        if (!it.value().isValid())
         {
             isValid = false;
             break;
@@ -135,25 +135,26 @@ void CmdActionModule::updateText()
     mText += commandName();
 //    mText += "(";
 
-    bool isFirstParam = true;
+//    bool isFirstParam = true;
 
-    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
-        if (it.value().isEmpty())
+        if (!it.value().isValid())
         {
             isValid = false;
+            break;
         }
         else
         {
-            if (!isFirstParam)
-            {
+//            if (!isFirstParam)
+//            {
 //                mText += ",";
-            }
+//            }
 
 //            mText += it.value();
         }
 
-        isFirstParam = false;
+//        isFirstParam = false;
     }
 
 //    mText += ")";
@@ -173,21 +174,19 @@ void CmdActionModule::updateText()
 
 void CmdActionModule::onNameChanged(const QString& newName, const QString& oldName)
 {
-    QList<QString> values = mInputParams.values();
-
-    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
-        if (it.value() == oldName)
+        if (it.value().type() == QMetaType::QString && it.value().toString() == oldName)
         {
-            mInputParams[it.key()] = newName;
+            mInputParams[it.key()] = QVariant(newName);
         }
     }
 
-    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
-        if (it.value() == oldName)
+        if (it.value().type() == QMetaType::QString && it.value().toString() == oldName)
         {
-            mOutputParams[it.key()] = newName;
+            mOutputParams[it.key()] = QVariant(newName);
         }
     }
 
@@ -196,21 +195,19 @@ void CmdActionModule::onNameChanged(const QString& newName, const QString& oldNa
 
 void CmdActionModule::onVariableRemoved(const QString& name)
 {
-    QList<QString> values = mInputParams.values();
-
-    for (QMap<QString, QString>::iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
-        if (it.value() == name)
+        if (it.value().type() == QMetaType::QString && it.value().toString() == name)
         {
-            mInputParams[it.key()] = "";
+            it.value().clear();
         }
     }
 
-    for (QMap<QString, QString>::iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
-        if (it.value() == name)
+        if (it.value().type() == QMetaType::QString && it.value().toString() == name)
         {
-            mOutputParams[it.key()] = "";
+            it.value().clear();
         }
     }
 
@@ -436,11 +433,12 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
 
     // input params
     writer->writeStartElement("input_params");
-    for (QMap<QString, QString>::const_iterator it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
         writer->writeStartElement("param");
         writer->writeAttribute("name", it.key());
-        writer->writeAttribute("variable", it.value());
+        writer->writeAttribute("type", QString::number(int(it.value().type())));
+        writer->writeAttribute("value", it.value().toString());
         writer->writeEndElement();
     }
 
@@ -448,11 +446,12 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
 
     // output params
     writer->writeStartElement("output_params");
-    for (QMap<QString, QString>::const_iterator it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
         writer->writeStartElement("param");
         writer->writeAttribute("name", it.key());
-        writer->writeAttribute("variable", it.value());
+        writer->writeAttribute("type", QString::number(int(it.value().type())));
+        writer->writeAttribute("value", it.value().toString());
         writer->writeEndElement();
     }
 
@@ -508,18 +507,44 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                     {
                         attributes = reader->attributes();
                         QString name;
-                        QString variable;
+
                         if (attributes.hasAttribute("name"))
                         {
                             name = attributes.value("name").toString();
                         }
 
-                        if (attributes.hasAttribute("variable"))
+                        if (attributes.hasAttribute("variable")) // for backward compatibility TODO remove
                         {
+                            QString variable;
                             variable = attributes.value("variable").toString();
+                            mInputParams[name] = variable;
                         }
+                        else
+                        {
+                            int metaType = QMetaType::UnknownType;
 
-                        mInputParams[name] = variable;
+                            if (attributes.hasAttribute("type"))
+                            {
+                                metaType = attributes.value("type").toInt();
+                            }
+
+                            if (attributes.hasAttribute("value"))
+                            {
+                                if (metaType == QMetaType::QString)
+                                {
+                                    mInputParams[name] = attributes.value("value").toString();
+                                }
+                                else if (metaType == QMetaType::Double)
+                                {
+                                    mInputParams[name] = attributes.value("value").toDouble();
+                                }
+                                else
+                                {
+                                    LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
+                                    mInputParams[name] = QVariant();
+                                }
+                            }
+                        }
                     }
 
                     reader->readNext();
@@ -533,18 +558,44 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                     {
                         attributes = reader->attributes();
                         QString name;
-                        QString variable;
+
                         if (attributes.hasAttribute("name"))
                         {
                             name = attributes.value("name").toString();
                         }
 
-                        if (attributes.hasAttribute("variable"))
+                        if (attributes.hasAttribute("variable")) // for backward compatibility TODO remove
                         {
+                            QString variable;
                             variable = attributes.value("variable").toString();
+                            mOutputParams[name] = variable;
                         }
+                        else
+                        {
+                            int metaType = QMetaType::UnknownType;
 
-                        mOutputParams[name] = variable;
+                            if (attributes.hasAttribute("type"))
+                            {
+                                metaType = attributes.value("type").toInt();
+                            }
+
+                            if (attributes.hasAttribute("value"))
+                            {
+                                if (metaType == QMetaType::QString)
+                                {
+                                    mOutputParams[name] = attributes.value("value").toString();
+                                }
+                                else if (metaType == QMetaType::Double)
+                                {
+                                    mOutputParams[name] = attributes.value("value").toDouble();
+                                }
+                                else
+                                {
+                                    LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
+                                    mOutputParams[name] = QVariant();
+                                }
+                            }
+                        }
                     }
 
                     reader->readNext();

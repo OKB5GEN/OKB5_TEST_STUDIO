@@ -23,6 +23,7 @@ private slots:
     void onAccept();
     void onModuleChanged(int index);
     void onCommandChanged(int index);
+    void onCheckBoxStateChanged(int state);
 
 private:
     void setupUI();

@@ -1,8 +1,7 @@
 #ifndef CMD_ACTION_MODULE_H
 #define CMD_ACTION_MODULE_H
 
-#include <QMap>
-#include <QList>
+#include <QVariant>
 
 #include "Headers/logic/commands/cmd_action.h"
 #include "Headers/module_commands.h"
@@ -16,12 +15,12 @@ public:
 
     void run() override;
 
-    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QString>& in, const QMap<QString, QString>& out, const QList<int>& implicitParams);
+    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out, const QList<int>& implicitParams);
 
     uint32_t operation() const;
     ModuleCommands::ModuleID module() const;
-    const QMap<QString, QString>& inputParams() const;
-    const QMap<QString, QString>& outputParams() const;
+    const QMap<QString, QVariant>& inputParams() const;
+    const QMap<QString, QVariant>& outputParams() const;
     const QList<int>& implicitParams() const;
 
 private slots:
@@ -42,8 +41,8 @@ private:
     ModuleCommands::ModuleID mModule;
     uint32_t mOperation;
 
-    QMap<QString, QString> mInputParams;
-    QMap<QString, QString> mOutputParams;
+    QMap<QString, QVariant> mInputParams;
+    QMap<QString, QVariant> mOutputParams;
     QList<int> mImplicitParams; //TODO possibly use QVariant instead of int
 
 };

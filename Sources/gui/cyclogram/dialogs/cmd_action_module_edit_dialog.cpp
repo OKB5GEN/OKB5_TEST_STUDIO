@@ -16,6 +16,34 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
 
     adjustSize();
     //setFixedSize(sizeHint());
+
+    /*
+    QVariant v;
+    bool f = v.isValid();
+
+    v = "Var";
+
+    f = v.isValid();
+
+    v.clear();
+
+    f = v.isValid();
+
+    v = "String";
+    int type1 = v.type();
+    QString name1 = v.typeName();
+
+    qreal val = 10;
+    QVariant v2 = val;
+
+    int type2 = v2.type();
+    QString name2 = v2.typeName();
+
+    int type1T = QMetaType::QString;
+    int type2T = QMetaType::Double;
+
+
+    int i = 0;*/
 }
 
 CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
@@ -360,8 +388,8 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         return;
     }
 
-    const QMap<QString, QString>& inputParams = mCommand->inputParams();
-    const QMap<QString, QString>& outputParams = mCommand->outputParams();
+    const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
+    const QMap<QString, QVariant>& outputParams = mCommand->outputParams();
 
     mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
@@ -404,16 +432,33 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
         {
-            int TODO; // initialize widget with variable/value from command
-            QMap<QString, QString>::const_iterator it = inputParams.find(name);
+            bool isVariable = false;
+
+            auto it = inputParams.find(name);
             if (it != inputParams.end())
             {
-                int index = comboBox->findText(it.value());
-                if (index != -1)
+                if (it.value().type() == QMetaType::QString)
                 {
-                    comboBox->setCurrentIndex(index);
+                    int index = comboBox->findText(it.value().toString());
+                    if (index != -1)
+                    {
+                        comboBox->setCurrentIndex(index);
+                        isVariable = true;
+                    }
+                }
+                else if (it.value().type() == QMetaType::Double)
+                {
+                    valueEdit->setText(it.value().toString());
                 }
             }
+
+            connect(valueSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
+            connect(varSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
+
+            valueEdit->setEnabled(!isVariable);
+            valueSelectBtn->setChecked(!isVariable);
+            comboBox->setEnabled(isVariable);
+            varSelectBtn->setChecked(isVariable);
         }
     }
 
@@ -432,10 +477,10 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
         {
-            QMap<QString, QString>::const_iterator it = outputParams.find(name);
+            auto it = outputParams.find(name);
             if (it != outputParams.end())
             {
-                int index = comboBox->findText(it.value());
+                int index = comboBox->findText(it.value().toString()); // output params are always variables
                 if (index != -1)
                 {
                     comboBox->setCurrentIndex(index);
@@ -448,15 +493,14 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     mInParams->resizeColumnToContents(3);
 
     adjustSize();
-    //mOutParams->adjustSize();
 }
 
 void CmdActionModuleEditDialog::onAccept()
 {
     if (mCommand)
     {
-        QMap<QString, QString> input;
-        QMap<QString, QString> output;
+        QMap<QString, QVariant> input;
+        QMap<QString, QVariant> output;
 
         SystemState* system = mCommand->systemState();
         int inCount = system->paramsCount(mModuleID, mCommandID, true);
@@ -472,22 +516,27 @@ void CmdActionModuleEditDialog::onAccept()
             }
 
             QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
+            //QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
+
             bool variableChecked = varSelectBtn->isChecked();
-            variableChecked;
+            //bool valueChecked = valueSelectBtn->isChecked();
 
-            QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
-            if (comboBox)
+            if (variableChecked)
             {
-                input[name] = comboBox->currentText();
+                QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
+                if (comboBox)
+                {
+                    input[name] = comboBox->currentText();
+                }
             }
-
-            QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
-            bool valueChecked = valueSelectBtn->isChecked();
-            valueChecked;
-
-            QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
-            qreal value = valueText->text().toDouble();
-            value;
+            else
+            {
+                QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
+                if (valueText)
+                {
+                    input[name] = valueText->text().toDouble();
+                }
+            }
         }
 
         for (int i = 0; i < outCount; ++i)
@@ -520,4 +569,50 @@ void CmdActionModuleEditDialog::onAccept()
     }
 
     accept();
+}
+
+void CmdActionModuleEditDialog::onCheckBoxStateChanged(int state)
+{
+    QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
+    if (!changedBox)
+    {
+        LOG_ERROR(QString("Widget not found"));
+        return;
+    }
+
+    for (int row = 0; row < mInParams->rowCount(); row++)
+    {
+        QCheckBox* varSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 1));
+        QComboBox* varBox = qobject_cast<QComboBox*>(mInParams->cellWidget(row, 2));
+        QCheckBox* valueSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 3));
+        QLineEdit* valueEdit = qobject_cast<QLineEdit*>(mInParams->cellWidget(row, 4));
+
+        if (varSelectBox == changedBox || valueSelectBox == changedBox)
+        {
+            varSelectBox->blockSignals(true);
+            valueSelectBox->blockSignals(true);
+
+            bool varBoxSelected = (varSelectBox == changedBox) && (state == Qt::Checked);
+            bool valueEditSelected = (valueSelectBox == changedBox) && (state == Qt::Checked);
+            bool varBoxUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool valueEditUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+
+            if (varSelectBox == changedBox)
+            {
+                valueSelectBox->setCheckState((state == Qt::Checked) ? Qt::Unchecked : Qt::Checked);
+            }
+            else if (valueSelectBox == changedBox)
+            {
+                varSelectBox->setCheckState((state == Qt::Checked) ? Qt::Unchecked : Qt::Checked);
+            }
+
+            varBox->setEnabled(varBoxSelected || valueEditUnselected);
+            valueEdit->setEnabled(valueEditSelected || varBoxUnselected);
+
+
+            varSelectBox->blockSignals(false);
+            valueSelectBox->blockSignals(false);
+            break;
+        }
+    }
 }

@@ -59,7 +59,7 @@ private slots:
     void execute();
 
 private:
-    struct OperandData
+    struct OperandData //TODO replace by QVariant usage, similar to CmdActionModule
     {
         OperandData();
 

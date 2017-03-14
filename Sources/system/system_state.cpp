@@ -1013,8 +1013,8 @@ void SystemState::sendCommand(CmdActionModule* command)
 {
     mCurCommand = command;
 
-    const QMap<QString, QString>& inputParams = command->inputParams();
-    const QMap<QString, QString>& outputParams = command->outputParams();
+    const QMap<QString, QVariant>& inputParams = command->inputParams();
+    const QMap<QString, QVariant>& outputParams = command->outputParams();
     const QList<int>& implicitInputParams = command->implicitParams();
 
     VariableController* vc = command->variableController();
@@ -1036,8 +1036,16 @@ void SystemState::sendCommand(CmdActionModule* command)
         params[INPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
         ++i;
 
-        qreal value = vc->currentValue(it.value());
-        params[INPUT_PARAM_BASE + i] = QVariant(value);
+        if (it.value().type() == QMetaType::QString)
+        {
+            qreal value = vc->currentValue(it.value().toString());
+            params[INPUT_PARAM_BASE + i] = QVariant(value);
+        }
+        else
+        {
+            params[INPUT_PARAM_BASE + i] = it.value().toDouble();
+        }
+
         ++i;
     }
 
