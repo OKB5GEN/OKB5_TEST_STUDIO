@@ -475,6 +475,8 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
     mRootShape = title;
     drawCyclogram(title);
 
+    mRootShape->adjust();
+
     onNeedUpdate();
 }
 
