@@ -115,6 +115,24 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         }
         break;
 
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+        {
+            int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+            if (paramsCount != 2)
+            {
+                LOG_ERROR("Malformed request for STM command");
+                response[SystemState::ERROR_CODE] = QVariant(1);
+                return;
+            }
+
+            int channel = request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt();
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 1).toInt());
+
+            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), state);
+            response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+        }
+        break;
+
     default:
         LOG_ERROR("Unexpected command %i received by STM module", command);
         break;
@@ -313,6 +331,6 @@ void ModuleSTM::setDefaultState()
     //setModuleState(AbstractModule::SAFE_STATE);
 
     // TODO: possibly give powe supply to MKO?
-    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_ON); // Hardcode enable MKO power supply (main?) TODO to cyclogram
-    //setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_ON); // enable MKO power supply (reserve?) TODO
+    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_OFF); // Hardcode enable MKO power supply (main?) TODO to cyclogram
+    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_OFF); // enable MKO power supply (reserve?) TODO
 }

@@ -289,6 +289,37 @@ QString CmdActionModule::commandName() const
         }
         break;
 
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE: // Управление подачей питания на МКО
+        {
+            if (!mImplicitParams.empty())
+            {
+                int channel = mImplicitParams.front();
+                int state = mImplicitParams.back();
+
+                if (state == ModuleCommands::POWER_ON)
+                {
+                    text = tr("СТМ.Вкл");
+                }
+                else
+                {
+                    text = tr("СТМ.Выкл");
+                }
+
+                switch (channel)
+                {
+                case ModuleCommands::MKO_1:
+                    text += tr("MKOОсн");
+                    break;
+                case ModuleCommands::MKO_2:
+                    text += tr("MKOРез");
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        break;
+
     // own modules commands
     //case ModuleCommands::RESET_ERROR:                   text = tr("СбросОшб"); break;  // Команда сброса ошибок
     //case ModuleCommands::SOFT_RESET:                    text = tr("Перезагр"); break;  // Soft reset
@@ -386,6 +417,13 @@ QString CmdActionModule::commandName() const
                 case ModuleMKO::SEND_TO_ANGLE_SENSOR:
                     text += tr("ВклПитДУ");
                     break;
+                case ModuleMKO::START_MKO:
+                    text += tr("Старт");
+                    break;
+                case ModuleMKO::STOP_MKO:
+                    text += tr("Стоп");
+                    break;
+
                 default: //TODO
                     break;
                 }

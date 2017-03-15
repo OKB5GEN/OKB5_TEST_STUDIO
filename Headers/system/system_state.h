@@ -69,6 +69,7 @@ public:
     void onApplicationStart();
 
     void setDefaultState();
+    void onCyclogramStart(); //TODO remove
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;

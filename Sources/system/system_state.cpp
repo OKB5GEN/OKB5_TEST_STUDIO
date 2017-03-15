@@ -1078,7 +1078,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         }
         else
         {
-            params[INPUT_PARAM_BASE + i] = it.value().toDouble();
+            params[INPUT_PARAM_BASE + i] = it.value();
         }
 
         ++i;
@@ -1249,4 +1249,9 @@ void SystemState::onModuleStateChanged(ModuleCommands::ModuleID id, AbstractModu
             setDefaultState();
         }
     }
+}
+
+void SystemState::onCyclogramStart()
+{
+    mMKO->onCyclogramStart();
 }

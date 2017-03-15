@@ -208,6 +208,9 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(tr("Выдать командный массив по линии υ"), params);
 
             addCommand(tr("Подать питание на ДУ"), ModuleMKO::SEND_TO_ANGLE_SENSOR);
+
+            addCommand(tr("Старт Осн."), ModuleMKO::START_MKO);
+            addCommand(tr("Стоп Осн."), ModuleMKO::STOP_MKO);
         }
         break;
 
@@ -284,6 +287,23 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             params.push_back(ModuleCommands::DRIVE_CONTROL);
             params.push_back(ModuleCommands::POWER_OFF);
             addCommand(tr("Выключить подачу силового питания"), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::MKO_1);
+            params.push_back(ModuleCommands::POWER_ON);
+            addCommand(tr("Включить подачу питания на МКО Осн."), params);
+
+            params.clear();
+            params.push_back(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE);
+            params.push_back(2); //params count
+            params.push_back(ModuleCommands::MKO_1);
+            params.push_back(ModuleCommands::POWER_OFF);
+            addCommand(tr("Выключить подачу питания на МКО Осн."), params);
+
+            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
+            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
 
             int TODO;
             // 1. проверка предохранителей

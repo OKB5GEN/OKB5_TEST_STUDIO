@@ -30,7 +30,11 @@ public:
         RECEIVE_TEST_ARRAY_FOR_CHANNEL,
         SEND_COMMAND_ARRAY_FOR_CHANNEL,
         RECEIVE_COMMAND_ARRAY_FOR_CHANNEL,
-        SEND_TO_ANGLE_SENSOR
+        SEND_TO_ANGLE_SENSOR,
+
+        // custom
+        START_MKO,
+        STOP_MKO
     };
 
     Q_ENUM(CommandID)
@@ -53,13 +57,13 @@ public:
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
 
-public:
-
 public slots:
     void onApplicationStart() override;
 
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
     void setDefaultState() override;
+    void onCyclogramStart(); //TODO remove
+
 
 signals:
     void test_MKO(int x);
