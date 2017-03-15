@@ -73,6 +73,11 @@ public:
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
 
+    ParamID paramID(const QString& name) const;
+    QString paramName(ParamID param) const;
+    QString paramDefaultVarName(ParamID param) const;
+    QString paramDefaultDesc(ParamID param) const;
+
     void sendCommand(CmdActionModule* command);
 
 private slots:
@@ -137,9 +142,6 @@ private:
     bool sendMKOCommand(CmdActionModule* command);
     bool sendTechCommand(CmdActionModule* command);
 
-    QString paramName(ParamID param) const;
-    ParamID paramID(const QString& name) const;
-
     void createPowerUnitCommandsParams();
     void createOTDCommandsParams();
 
@@ -157,6 +159,8 @@ private:
 
     CmdActionModule* mCurCommand;
     QMap<ParamID, QString> mParamNames;
+    QMap<ParamID, QString> mDefaultVariables;
+    QMap<ParamID, QString> mDefaultDescriptions;
 
     QMap<ModuleCommands::ModuleID, AbstractModule*> mModules;
 };

@@ -430,10 +430,10 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         valueEdit->setText("0");
         mInParams->setCellWidget(i, 4, valueEdit);
 
-        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
-        {
-            bool isVariable = false;
+        bool isVariable = false; // by default command input params are directly set values
 
+        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
+        {
             auto it = inputParams.find(name);
             if (it != inputParams.end())
             {
@@ -454,13 +454,15 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
             connect(valueSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
             connect(varSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
-
-            valueEdit->setEnabled(!isVariable);
-            valueSelectBtn->setChecked(!isVariable);
-            comboBox->setEnabled(isVariable);
-            varSelectBtn->setChecked(isVariable);
         }
+
+        valueEdit->setEnabled(!isVariable);
+        valueSelectBtn->setChecked(!isVariable);
+        comboBox->setEnabled(isVariable);
+        varSelectBtn->setChecked(isVariable);
     }
+
+    QSet<QString> generatedVariableNames;
 
     for (int i = 0; i < outCount; ++i)
     {
@@ -475,17 +477,33 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         comboBox->addItems(vc->variablesData().keys());
         mOutParams->setCellWidget(i, 1, comboBox);
 
-        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation())
+        if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
             auto it = outputParams.find(name);
             if (it != outputParams.end())
             {
                 int index = comboBox->findText(it.value().toString()); // output params are always variables
-                if (index != -1)
+                if (index != -1) // add default variable name, corresponding to this paramID
                 {
                     comboBox->setCurrentIndex(index);
                 }
             }
+        }
+        else
+        {
+            QString defaultParamName = system->paramDefaultVarName(system->paramID(name));
+            QString tmp = defaultParamName;
+
+            int index = 1;
+            while (generatedVariableNames.contains(tmp))
+            {
+                tmp = defaultParamName + QString::number(index);
+                ++index;
+            }
+
+            generatedVariableNames.insert(tmp);
+            comboBox->addItem(tmp);
+            comboBox->setCurrentIndex(comboBox->count() - 1);
         }
     }
 
@@ -551,7 +569,17 @@ void CmdActionModuleEditDialog::onAccept()
             QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 1));
             if (comboBox)
             {
-                output[name] = comboBox->currentText();
+                QString variableName = comboBox->currentText();
+                VariableController* vc = mCommand->variableController();
+                auto it = vc->variablesData().find(variableName);
+                if (it == vc->variablesData().end())
+                {
+                    vc->addVariable(variableName, 0);
+                    QString desc = system->paramDefaultDesc(system->paramID(name));
+                    vc->setDescription(variableName, desc);
+                }
+
+                output[name] = variableName;
             }
         }
 

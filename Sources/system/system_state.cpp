@@ -128,7 +128,6 @@ SystemState::SystemState(QObject* parent):
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
     mParamNames[TEMPERATURE] = tr("Temperature, °C");
-
     mParamNames[MODE] = tr("Mode");
     mParamNames[STEPS] = tr("Steps");
     mParamNames[VELOCITY] = tr("Velocity");
@@ -143,6 +142,42 @@ SystemState::SystemState(QObject* parent):
     mParamNames[CURRENT_NU] = tr("Max current (Nu)");
     mParamNames[ANGLE_NU] = tr("Angle (Nu)");
     mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
+
+    mDefaultVariables[VOLTAGE] = "U";
+    mDefaultVariables[CURRENT] = "I";
+    mDefaultVariables[TEMPERATURE] = "T";
+    mDefaultVariables[MODE] = "M";
+    mDefaultVariables[STEPS] = "St";
+    mDefaultVariables[VELOCITY] = "V";
+    mDefaultVariables[MODE_PSY] = "PsyM";
+    mDefaultVariables[STEPS_PSY] = "PsyS";
+    mDefaultVariables[VELOCITY_PSY] = "PsyV";
+    mDefaultVariables[CURRENT_PSY] = "PsyI";
+    mDefaultVariables[ANGLE_PSY] = "PsyA";
+    mDefaultVariables[MODE_NU] = "NuM";
+    mDefaultVariables[STEPS_NU] = "NuS";
+    mDefaultVariables[VELOCITY_NU] = "NuV";
+    mDefaultVariables[CURRENT_NU] = "NuI";
+    mDefaultVariables[ANGLE_NU] = "NuA";
+    mDefaultVariables[SENSOR_FLAG] = "TSF";
+
+    mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
+    mDefaultDescriptions[CURRENT] = tr("Current, A");
+    mDefaultDescriptions[TEMPERATURE] = tr("Temperature, °C");
+    mDefaultDescriptions[MODE] = tr("Mode");
+    mDefaultDescriptions[STEPS] = tr("Steps");
+    mDefaultDescriptions[VELOCITY] = tr("Velocity");
+    mDefaultDescriptions[MODE_PSY] = tr("Mode (Psy)");
+    mDefaultDescriptions[STEPS_PSY] = tr("Steps (Psy)");
+    mDefaultDescriptions[VELOCITY_PSY] = tr("Velocity (Psy)");
+    mDefaultDescriptions[CURRENT_PSY] = tr("Max current (Psy)");
+    mDefaultDescriptions[ANGLE_PSY] = tr("Angle (Psy)");
+    mDefaultDescriptions[MODE_NU] = tr("Mode (Nu)");
+    mDefaultDescriptions[STEPS_NU] = tr("Steps (Nu)");
+    mDefaultDescriptions[VELOCITY_NU] = tr("Velocity (Nu)");
+    mDefaultDescriptions[CURRENT_NU] = tr("Max current (Nu)");
+    mDefaultDescriptions[ANGLE_NU] = tr("Angle (Nu)");
+    mDefaultDescriptions[SENSOR_FLAG] = tr("Temperature sensor presense flag");
 }
 
 SystemState::~SystemState()
@@ -981,7 +1016,7 @@ void SystemState::createOTDCommandsParams()
     int ptCount = mOTD->ptCount();
     for (int i = 0; i < ptCount; ++i)
     {
-        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") + */paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
@@ -991,7 +1026,7 @@ void SystemState::createOTDCommandsParams()
     int dsCount1 = mOTD->dsCount(ModuleOTD::PSY);
     for (int i = 0; i < dsCount1; ++i)
     {
-        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") +*/ paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
@@ -1001,7 +1036,7 @@ void SystemState::createOTDCommandsParams()
     int dsCount2 = mOTD->dsCount(ModuleOTD::NU);
     for (int i = 0; i < dsCount2; ++i)
     {
-        temperatureParams.push_back(QString::number(i + 1) + QString(". ") + paramName(TEMPERATURE));
+        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") +*/ paramName(TEMPERATURE));
     }
 
     params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
@@ -1154,6 +1189,16 @@ void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
 QString SystemState::paramName(ParamID param) const
 {
     return mParamNames.value(param, "");
+}
+
+QString SystemState::paramDefaultVarName(ParamID param) const
+{
+    return mDefaultVariables.value(param, "");
+}
+
+QString SystemState::paramDefaultDesc(ParamID param) const
+{
+    return mDefaultDescriptions.value(param, "");
 }
 
 SystemState::ParamID SystemState::paramID(const QString& name) const
