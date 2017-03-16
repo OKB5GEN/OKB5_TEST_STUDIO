@@ -24,8 +24,13 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     mTableWidget->setColumnCount(list.size());
     mTableWidget->setHorizontalHeaderLabels(list);
 
-    mTableWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    mTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    mTableWidget->setColumnWidth(0, 100);
+    mTableWidget->setColumnWidth(1, 100);
+    mTableWidget->setColumnWidth(2, 100);
+    mTableWidget->setColumnWidth(3, 200);
+
+    mTableWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    //mTableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     //mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -105,9 +110,7 @@ void VariablesWindow::onAddClicked()
 
 void VariablesWindow::updateTableSize()
 {
-    mTableWidget->resizeColumnsToContents();
-    mTableWidget->setFixedWidth(mTableWidget->horizontalHeader()->length() + mTableWidget->verticalHeader()->width());
-    mTableWidget->update();
+    mTableWidget->setFixedWidth(mTableWidget->horizontalHeader()->length() + mTableWidget->verticalHeader()->width() + mTableWidget->frameWidth()*2);
 }
 
 void VariablesWindow::onRemoveClicked()
@@ -236,6 +239,8 @@ void VariablesWindow::onDescriptionChanged()
     }
 
     controller->setDescription(name, description);
+
+    updateTableSize();
 }
 
 void VariablesWindow::onCurrentValueChanged(const QString& name, qreal value)
@@ -268,28 +273,28 @@ void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, q
 {
     mTableWidget->insertRow(row);
 
-    QLineEdit* lineEditName = new QLineEdit();
+    QLineEdit* lineEditName = new QLineEdit(mTableWidget);
     lineEditName->setText(name);
     lineEditName->setProperty(PREV_NAME_PROPERTY, QVariant(name));
     mTableWidget->setCellWidget(row, 0, lineEditName);
     connect(lineEditName, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
 
     QString initial = QString::number(initialValue);
-    QLineEdit* lineEditInitial = new QLineEdit();
+    QLineEdit* lineEditInitial = new QLineEdit(mTableWidget);
     lineEditInitial->setText(initial);
     lineEditInitial->setValidator(mValidator);
     mTableWidget->setCellWidget(row, 1, lineEditInitial);
     connect(lineEditInitial, SIGNAL(editingFinished()), this, SLOT(onInitialValueChanged()));
 
     QString current = QString::number(currentValue);
-    QLineEdit* lineEditCurrent = new QLineEdit();
+    QLineEdit* lineEditCurrent = new QLineEdit(mTableWidget);
     lineEditCurrent->setText(current);
     lineEditCurrent->setValidator(mValidator);
     lineEditCurrent->setReadOnly(true);
     mTableWidget->setCellWidget(row, 2, lineEditCurrent);
     //connect(lineEditCurrent, SIGNAL(editingFinished()), this, SLOT(onCurrentValueChanged()));
 
-    QLineEdit* lineEditDescription = new QLineEdit();
+    QLineEdit* lineEditDescription = new QLineEdit(mTableWidget);
     lineEditDescription->setText(description);
     mTableWidget->setCellWidget(row, 3, lineEditDescription);
     connect(lineEditDescription, SIGNAL(editingFinished()), this, SLOT(onDescriptionChanged()));
