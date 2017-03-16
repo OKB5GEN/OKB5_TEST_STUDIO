@@ -98,6 +98,7 @@ void VariableController::renameVariable(const QString& newName, const QString& o
         mData[newName] = data;
 
         emit nameChanged(newName, oldName);
+        removeVariable(oldName);
     }
 }
 
