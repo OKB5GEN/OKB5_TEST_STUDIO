@@ -14,36 +14,10 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     setupUI();
     setWindowTitle(tr("Module operation"));
 
-    adjustSize();
+    //adjustSize();
     //setFixedSize(sizeHint());
 
-    /*
-    QVariant v;
-    bool f = v.isValid();
-
-    v = "Var";
-
-    f = v.isValid();
-
-    v.clear();
-
-    f = v.isValid();
-
-    v = "String";
-    int type1 = v.type();
-    QString name1 = v.typeName();
-
-    qreal val = 10;
-    QVariant v2 = val;
-
-    int type2 = v2.type();
-    QString name2 = v2.typeName();
-
-    int type1T = QMetaType::QString;
-    int type2T = QMetaType::Double;
-
-
-    int i = 0;*/
+    setFixedSize(QSize(800, 400));
 }
 
 CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
@@ -66,12 +40,12 @@ void CmdActionModuleEditDialog::setupUI()
 
     //layout->addWidget(mModules, 0, 0, 10, 4);
     layout->addWidget(mModules, 0, 0);
-    mModules->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    //mModules->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mCommands = new QListWidget(this);
     //layout->addWidget(mCommands, 0, 4, 10, 4);
     layout->addWidget(mCommands, 0, 1);
-    mCommands->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    //mCommands->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mInParams = new QTableWidget(this);
     QStringList headers;
@@ -84,7 +58,7 @@ void CmdActionModuleEditDialog::setupUI()
     mInParams->setHorizontalHeaderLabels(headers);
     //layout->addWidget(mInParams, 0, 8, 5, 4);
     layout->addWidget(mInParams, 0, 2);
-    mInParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    //mInParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mOutParams = new QTableWidget(this);
     QStringList outHeaders;
@@ -94,7 +68,7 @@ void CmdActionModuleEditDialog::setupUI()
     mOutParams->setHorizontalHeaderLabels(outHeaders);
     //layout->addWidget(mOutParams, 5, 8, 5, 4);
     layout->addWidget(mOutParams, 0, 3);
-    mOutParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    //mOutParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     //layout->addWidget(buttonBox, 11, 5, 1, 2);
@@ -530,7 +504,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     mInParams->resizeColumnToContents(1);
     mInParams->resizeColumnToContents(3);
 
-    adjustSize();
+    //adjustSize();
 }
 
 void CmdActionModuleEditDialog::onAccept()
