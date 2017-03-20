@@ -78,6 +78,8 @@ void CmdActionMath::execute()
     // set new variable value to variable controller
     mVarCtrl->setCurrentValue(mOperands[Result].variable, mOperands[Result].value);
 
+    mVarCtrl->makeDataSnapshot(); //TODO
+
     finish();
 }
 

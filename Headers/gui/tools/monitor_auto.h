@@ -2,12 +2,11 @@
 #define MONITOR_AUTO_H
 
 #include <QDialog>
+#include "Headers/logic/variable_controller.h"
 
-QT_BEGIN_NAMESPACE
 class QCheckBox;
-QT_END_NAMESPACE
-
 class QCustomPlot;
+class Cyclogram;
 
 class MonitorAuto : public QDialog
 {
@@ -17,16 +16,21 @@ public:
     MonitorAuto(QWidget * parent);
     ~MonitorAuto();
 
+    void setCyclogram(Cyclogram * cyclogram);
+
 protected:
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+//    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+//    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+//    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+//    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
     void onPlayClicked();
     void onPauseClicked();
     void onStopClicked();
+
+    void updateGraphs(const VariableController::DataSnapshot& data);
+    void onCyclogramStateChanged(int state);
 
     void setUpdatePeriod(QString period);
 
@@ -40,6 +44,13 @@ private:
     QCheckBox* mPlotCheckBox;
 
     int mUpdatePeriod;
+
+    Cyclogram* mCyclogram;
+    qreal mMinY;
+    qreal mMaxY;
+    qreal mMinX;
+    qreal mMaxX;
+    qint64 mStartTime;
 };
 
 #endif // MONITOR_AUTO_H

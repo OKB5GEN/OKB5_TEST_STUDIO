@@ -1175,6 +1175,11 @@ void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
         }
     }
 
+    if (paramsCount > 0)
+    {
+        vc->makeDataSnapshot();
+    }
+
     uint32_t error = response.value(ERROR_CODE, QVariant(uint32_t(0))).toUInt();
 
     // in case of power unit

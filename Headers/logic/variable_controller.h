@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QVector>
 
 class VariableController: public QObject
 {
@@ -20,6 +21,14 @@ public:
         qreal currentValue;
         qreal initialValue;
         QString description;
+        QString legend; //TODO
+    };
+
+    struct DataSnapshot
+    {
+        qint64 timestamp;
+        QMap<QString, qreal> variables;
+        QString label;
     };
 
     VariableController(QObject* parent);
@@ -41,6 +50,13 @@ public:
     void renameVariable(const QString& newName, const QString& oldName);
     bool isVariableExist(const QString& name) const;
 
+    // Data handling
+    void makeDataSnapshot(const QString& label = "");
+    void clearDataTimeline();
+    const QVector<DataSnapshot>& dataTimeline() const;
+    void createDependence(const QString& xVar, const QString& yVar, QList<qreal>& x, QList<qreal>& y) const;
+    void timeline(const QString& var, QList<qreal>& time, QList<qreal>& value) const;
+
 public slots:
     void restart();
     void clear();
@@ -52,8 +68,10 @@ signals:
     void currentValueChanged(const QString& name, qreal value);
     void nameChanged(const QString& newName, const QString& oldName);
     void descriptionChanged(const QString& name, const QString& description);
+    void dataSnapshotAdded(const VariableController::DataSnapshot& data);
 
 private:
     QMap<QString, VariableData> mData;
+    QVector<DataSnapshot> mDataTimeline;
 };
 #endif // VARIABLE_CONTROLLER_H

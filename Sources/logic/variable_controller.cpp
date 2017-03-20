@@ -1,6 +1,8 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
 
+#include <QDateTime>
+
 VariableController::VariableController(QObject* parent):
     QObject(parent)
 {
@@ -114,11 +116,14 @@ void VariableController::restart()
     {
         setCurrentValue(it.key(), it.value().initialValue);
     }
+
+    clearDataTimeline();
 }
 
 void VariableController::clear()
 {
     mData.clear();
+    clearDataTimeline();
 }
 
 void VariableController::setDescription(const QString& name, const QString& description)
@@ -152,4 +157,80 @@ QString VariableController::description(const QString& name) const
     }
 
     return "";
+}
+
+void VariableController::makeDataSnapshot(const QString& label)
+{
+    bool isFirstPoint = mDataTimeline.isEmpty();
+
+    mDataTimeline.push_back(DataSnapshot());
+
+    mDataTimeline.back().label = label;
+    mDataTimeline.back().timestamp = QDateTime::currentMSecsSinceEpoch();
+
+    for (auto it = mData.begin(); it != mData.end(); ++it)
+    {
+        mDataTimeline.back().variables[it.key()] = it.value().currentValue;
+    }
+
+    emit dataSnapshotAdded(mDataTimeline.back());
+    int TODO; // optimize memory usage
+}
+
+void VariableController::clearDataTimeline()
+{
+    mDataTimeline.clear();
+}
+
+const QVector<VariableController::DataSnapshot>& VariableController::dataTimeline() const
+{
+    return mDataTimeline;
+}
+
+void VariableController::createDependence(const QString& xVar, const QString& yVar, QList<qreal>& x, QList<qreal>& y) const
+{
+    if (!mData.contains(xVar))
+    {
+        LOG_ERROR(QString("Can not create dependence. Variable '%1' not found").arg(xVar));
+        return;
+    }
+
+    if (!mData.contains(yVar))
+    {
+        LOG_ERROR(QString("Can not create dependence. Variable '%1' not found").arg(yVar));
+        return;
+    }
+
+    if (mDataTimeline.isEmpty())
+    {
+        LOG_ERROR(QString("Can not create dependence. Data timeline is empty"));
+        return;
+    }
+
+    for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
+    {
+        x.append(mDataTimeline[i].variables.value(xVar, 0));
+        y.append(mDataTimeline[i].variables.value(yVar, 0));
+    }
+}
+
+void VariableController::timeline(const QString& var, QList<qreal>& time, QList<qreal>& value) const
+{
+    if (!mData.contains(var))
+    {
+        LOG_ERROR(QString("Can not create timeline. Variable '%1' not found").arg(var));
+        return;
+    }
+
+    if (mDataTimeline.isEmpty())
+    {
+        LOG_ERROR(QString("Can not create timeline. Data timeline is empty"));
+        return;
+    }
+
+    for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
+    {
+        time.append(qreal(mDataTimeline[i].timestamp - mDataTimeline.front().timestamp));
+        value.append(mDataTimeline[i].variables.value(var, 0));
+    }
 }

@@ -297,7 +297,7 @@ void EditorWindow::createActions()
     connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
     monitorMenu->addAction(addVariablesAct);
     monitorToolBar->addAction(addVariablesAct);
-/* // TODO manual and automatic monitor creation commented
+ // TODO manual and automatic monitor creation commented
     const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
     addManualMonitorAct->setStatusTip(tr("Add manual parameter monitor"));
@@ -310,7 +310,7 @@ void EditorWindow::createActions()
     addAutoMonitorAct->setStatusTip(tr("Add auto parameter monitor"));
     connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addAutoMonitor);
     monitorMenu->addAction(addAutoMonitorAct);
-    monitorToolBar->addAction(addAutoMonitorAct);*/
+    monitorToolBar->addAction(addAutoMonitorAct);
 }
 
 void EditorWindow::createStatusBar()
@@ -517,7 +517,9 @@ void EditorWindow::addManualMonitor()
 
 void EditorWindow::addAutoMonitor()
 {
+    int TODO; // reset cyclogram when new cyclogram opened
     MonitorAuto* dialog = new MonitorAuto(this);
+    dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
