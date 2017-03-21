@@ -3,9 +3,8 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QLabel;
-QT_END_NAMESPACE
+class Cyclogram;
 
 class CyclogramEndDialog: public QDialog
 {
@@ -15,9 +14,14 @@ public:
     CyclogramEndDialog(QWidget * parent);
     ~CyclogramEndDialog();
 
+    void setCyclogram(Cyclogram* cyclogram);
     void setText(const QString& text);
+
+private slots:
+    void saveReportAs();
 
 private:
      QLabel* mLabel;
+     Cyclogram* mCyclogram;
 };
 #endif // CYCLOGRAM_END_DIALOG_H

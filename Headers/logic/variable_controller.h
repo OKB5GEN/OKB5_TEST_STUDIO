@@ -57,6 +57,8 @@ public:
     void createDependence(const QString& xVar, const QString& yVar, QList<qreal>& x, QList<qreal>& y) const;
     void timeline(const QString& var, QList<qreal>& time, QList<qreal>& value) const;
 
+    void saveReport(const QString& fileName);
+
 public slots:
     void restart();
     void clear();

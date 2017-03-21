@@ -1,6 +1,8 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
 
+#include "xlsxdocument.h"
+
 #include <QDateTime>
 
 VariableController::VariableController(QObject* parent):
@@ -233,4 +235,49 @@ void VariableController::timeline(const QString& var, QList<qreal>& time, QList<
         time.append(qreal(mDataTimeline[i].timestamp - mDataTimeline.front().timestamp));
         value.append(mDataTimeline[i].variables.value(var, 0));
     }
+}
+
+void VariableController::saveReport(const QString& fileName)
+{
+    QXlsx::Document xlsx;
+    int row = 1;
+    int column = 1;
+
+    // create data header
+    xlsx.write(row, column, "Time");
+    column++;
+
+    for (auto it = mData.begin(); it != mData.end(); ++it)
+    {
+        xlsx.write(row, column, it.key());
+        ++column;
+    }
+
+    ++row;
+
+    // get test start time
+    qint64 startTime = 0;
+    if (!mDataTimeline.isEmpty())
+    {
+        startTime = mDataTimeline.front().timestamp;
+    }
+
+    // write data
+    for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
+    {
+        column = 1;
+        qint64 time = mDataTimeline[i].timestamp - startTime;
+        xlsx.write(row, column, time);
+        ++column;
+
+        for (auto it = mDataTimeline[i].variables.begin(); it != mDataTimeline[i].variables.end(); ++it)
+        {
+            xlsx.write(row, column, it.value());
+            ++column;
+        }
+
+        ++row;
+    }
+
+    xlsx.saveAs(fileName);
 }

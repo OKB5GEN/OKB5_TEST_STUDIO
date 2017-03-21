@@ -140,6 +140,7 @@ void Cyclogram::onCommandFinished(Command* cmd)
         LOG_INFO("==================================");
         LOG_INFO("Cyclogram finished");
         LOG_INFO("==================================");
+
         stop();
         emit finished("");
     }

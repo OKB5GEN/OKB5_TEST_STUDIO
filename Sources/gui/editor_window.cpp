@@ -557,6 +557,8 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     stopCyclogram();
 
+    dialog->setCyclogram(mCyclogram);
+
     if (!errorText.isEmpty())
     {
         dialog->setText(errorText);
