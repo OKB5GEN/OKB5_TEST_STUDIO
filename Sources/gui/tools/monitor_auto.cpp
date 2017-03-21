@@ -214,6 +214,9 @@ void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
 
     mCheckboxes.clear();
     mVariables->clear();
+    mPlot->clearGraphs();
+    mPlot->legend->setVisible(false);
+    mPlot->replot();
 
     const QMap<QString, VariableController::VariableData>& data = mCyclogram->variableController()->variablesData();
 

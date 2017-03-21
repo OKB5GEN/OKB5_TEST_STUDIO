@@ -184,7 +184,7 @@ void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
 {
     if (!mPort || !mPort->isOpen())
     {
-        LOG_ERROR(QString("Can not add request. Module %1 (%2) not ready").arg(moduleName()).arg(mPort->portName()));
+        LOG_ERROR(QString("Can not add request. Module %1 not ready").arg(moduleName()));
         onTransmissionError(operationID);
         return;
     }

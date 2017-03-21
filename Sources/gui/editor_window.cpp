@@ -115,6 +115,12 @@ void EditorWindow::newFile()
         mCyclogram->createDefault();
         mCyclogramWidget->setUpdateOnRemove(true);
         mCyclogramWidget->load(mCyclogram);
+
+        for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
+        {
+            (*it)->setCyclogram(mCyclogram);
+        }
+
         setCurrentFile(QString());
 
         mCyclogram->setModified(true, true);
@@ -210,29 +216,29 @@ void EditorWindow::createActions()
     fileToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
     QIcon newIcon = QIcon(":/images/new.png");
-    QAction *newAct = new QAction(newIcon, tr("&New"), this);
-    newAct->setShortcuts(QKeySequence::New);
-    newAct->setStatusTip(tr("Create a new cyclogram"));
-    connect(newAct, &QAction::triggered, this, &EditorWindow::newFile);
-    fileMenu->addAction(newAct);
-    fileToolBar->addAction(newAct);
+    mNewAct = new QAction(newIcon, tr("&New"), this);
+    mNewAct->setShortcuts(QKeySequence::New);
+    mNewAct->setStatusTip(tr("Create a new cyclogram"));
+    connect(mNewAct, &QAction::triggered, this, &EditorWindow::newFile);
+    fileMenu->addAction(mNewAct);
+    fileToolBar->addAction(mNewAct);
 
     QIcon openIcon = QIcon(":/images/open.png");
-    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
-    openAct->setShortcuts(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an existing file"));
-    connect(openAct, &QAction::triggered, this, &EditorWindow::open);
-    fileMenu->addAction(openAct);
-    fileToolBar->addAction(openAct);
+    mOpenAct = new QAction(openIcon, tr("&Open..."), this);
+    mOpenAct->setShortcuts(QKeySequence::Open);
+    mOpenAct->setStatusTip(tr("Open an existing file"));
+    connect(mOpenAct, &QAction::triggered, this, &EditorWindow::open);
+    fileMenu->addAction(mOpenAct);
+    fileToolBar->addAction(mOpenAct);
 
     QIcon saveIcon = QIcon(":/images/save.png");
-    QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
-    saveAct->setShortcuts(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the document to disk"));
-    connect(saveAct, &QAction::triggered, this, &EditorWindow::save);
-    connect(this, SIGNAL(documentSaved(bool)), saveAct, SLOT(setDisabled(bool)));
-    fileMenu->addAction(saveAct);
-    fileToolBar->addAction(saveAct);
+    mSaveAct = new QAction(saveIcon, tr("&Save"), this);
+    mSaveAct->setShortcuts(QKeySequence::Save);
+    mSaveAct->setStatusTip(tr("Save the document to disk"));
+    connect(mSaveAct, &QAction::triggered, this, &EditorWindow::save);
+    connect(this, SIGNAL(documentSaved(bool)), mSaveAct, SLOT(setDisabled(bool)));
+    fileMenu->addAction(mSaveAct);
+    fileToolBar->addAction(mSaveAct);
 
     QIcon saveAsIcon = QIcon::fromTheme("document-save-as");
     QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &EditorWindow::saveAs);
@@ -297,10 +303,10 @@ void EditorWindow::createActions()
     connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
     monitorMenu->addAction(addVariablesAct);
     monitorToolBar->addAction(addVariablesAct);
- // TODO manual and automatic monitor creation commented
+
     const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
-    addManualMonitorAct->setStatusTip(tr("Add manual parameter monitor"));
+    addManualMonitorAct->setStatusTip(tr("Make data snapshot"));
     connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::addManualMonitor);
     monitorMenu->addAction(addManualMonitorAct);
     monitorToolBar->addAction(addManualMonitorAct);
@@ -393,6 +399,11 @@ void EditorWindow::loadFile(const QString &fileName)
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
         mCyclogramWidget->load(mCyclogram);
+    }
+
+    for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
+    {
+        (*it)->setCyclogram(mCyclogram);
     }
 }
 
@@ -510,18 +521,34 @@ void EditorWindow::addVariablesMonitor()
 
 void EditorWindow::addManualMonitor()
 {
-    MonitorManual* dialog = new MonitorManual(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
+    int TODO; // create data snapshot with label if cyclogram is running, or make it inactive
+
+    //MonitorManual* dialog = new MonitorManual(this);
+    //dialog->setAttribute(Qt::WA_DeleteOnClose);
+    //dialog->show();
 }
 
 void EditorWindow::addAutoMonitor()
 {
     int TODO; // reset cyclogram when new cyclogram opened
     MonitorAuto* dialog = new MonitorAuto(this);
+
+    mActiveMonitors.insert(dialog);
+
+    connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed(int)));
+
     dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+void EditorWindow::onAutoMonitorClosed(int result)
+{
+    QObject* sender = QObject::sender();
+    if (sender)
+    {
+        mActiveMonitors.remove(qobject_cast<MonitorAuto*>(sender));
+    }
 }
 
 void EditorWindow::onCyclogramFinish(const QString& errorText)
@@ -544,6 +571,10 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
 
 void EditorWindow::onCyclogramStateChanged(int state)
 {
+    mOpenAct->setEnabled(state == Cyclogram::STOPPED);
+    mNewAct->setEnabled(state == Cyclogram::STOPPED);
+    mSaveAct->setEnabled(state == Cyclogram::STOPPED);
+
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     if (state == Cyclogram::PAUSED)
     {

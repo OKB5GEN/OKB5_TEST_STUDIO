@@ -1,19 +1,19 @@
-#ifndef EDITORWINDOW_H
-#define EDITORWINDOW_H
+#ifndef EDITOR_WINDOW_H
+#define EDITOR_WINDOW_H
 
 #include <QMainWindow>
+#include <QSet>
 
-QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
 class QSessionManager;
 class QScrollArea;
-QT_END_NAMESPACE
 
 class CyclogramWidget;
 class Cyclogram;
 class VariablesWindow;
 class SystemState;
+class MonitorAuto;
 
 class EditorWindow : public QMainWindow
 {
@@ -46,6 +46,8 @@ private slots:
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
 
+    void onAutoMonitorClosed(int result);
+
     void commitData(QSessionManager &);
 
 signals:
@@ -72,6 +74,10 @@ private:
     QAction* mRunAct;
     QAction* mStopAct;
 
+    QAction* mOpenAct;
+    QAction* mNewAct;
+    QAction* mSaveAct;
+
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     QIcon mPlayIcon;
     QIcon mPauseIcon;
@@ -79,5 +85,7 @@ private:
 
     QScrollArea * mScrollArea;
     qreal mScaleFactor;
+
+    QSet<MonitorAuto*> mActiveMonitors;
 };
-#endif // EDITORWINDOW_H
+#endif // EDITOR_WINDOW_H
