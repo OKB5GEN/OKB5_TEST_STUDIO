@@ -3,6 +3,8 @@
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logger/Logger.h"
 
+#include "Headers/logic/variable_controller.h"
+
 #include <QtWidgets>
 #include <QDateTime>
 
@@ -31,6 +33,21 @@ MonitorAuto::MonitorAuto(QWidget * parent):
     mTimer = new QTimer(this);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(getCurrentValue()));
 
+    QHBoxLayout* hLayout = new QHBoxLayout(this);
+
+    mVariables = new QListWidget(this);
+    mVariables->setMaximumWidth(100);
+
+    hLayout->addWidget(mVariables);
+
+    QCustomPlot* plot = new QCustomPlot(this);
+    plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
+    hLayout->addWidget(plot);
+    mPlot = plot;
+
+    setLayout(hLayout);
+
+            /*
     QVBoxLayout * vLayout = new QVBoxLayout(this);
 
     {// value to monitor select
@@ -170,35 +187,15 @@ MonitorAuto::MonitorAuto(QWidget * parent):
     vLayout->addStretch();
 
     setLayout(vLayout);
-    setWindowTitle(tr("Monitor"));
+            */
 
-    updateUI();
+    setWindowTitle(tr("Monitor"));
 }
 
 MonitorAuto::~MonitorAuto()
 {
 
 }
-
-//void MonitorAuto::paintEvent(QPaintEvent *event)
-//{
-
-//}
-
-//void MonitorAuto::mousePressEvent(QMouseEvent *event)
-//{
-
-//}
-
-//void MonitorAuto::mouseReleaseEvent(QMouseEvent *event)
-//{
-
-//}
-
-//void MonitorAuto::mouseMoveEvent(QMouseEvent *event)
-//{
-
-//}
 
 void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
 {
@@ -214,12 +211,52 @@ void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
     }
 
     mCyclogram = cyclogram;
+
+    mCheckboxes.clear();
+    mVariables->clear();
+
+    const QMap<QString, VariableController::VariableData>& data = mCyclogram->variableController()->variablesData();
+
+    for (auto it = data.begin(); it != data.end(); ++it)
+    {
+        QCheckBox* checkBox = new QCheckBox(this);
+        checkBox->setText(it.key());
+        mCheckboxes[it.key()] = checkBox;
+
+        connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(onVariableSelectionChanged(bool)));
+
+        QListWidgetItem* item = new QListWidgetItem();
+        mVariables->addItem(item);
+        mVariables->setItemWidget(item, checkBox);
+    }
+
     //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
     connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO
     {
         onCyclogramStateChanged(Cyclogram::RUNNING);
+    }
+}
+
+void  MonitorAuto::onVariableSelectionChanged(bool toggled)
+{
+    QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
+    if (changedBox && !toggled)
+    {
+        QString name = changedBox->text();
+        int count = mPlot->graphCount();
+        QCPGraph* graph = Q_NULLPTR;
+
+        for (int i = 0; i < count; ++i)
+        {
+            QCPGraph* tmp = mPlot->graph(i);
+            if (tmp->name() == name)
+            {
+                tmp->setVisible(false);
+                break;
+            }
+        }
     }
 }
 
@@ -247,6 +284,15 @@ void MonitorAuto::onVariableValueChanged(const QString& name, qreal value)
     qreal time = qreal(QDateTime::currentMSecsSinceEpoch() - mStartTime) / 1000;
     graph->addData(time, value);
 
+    QCheckBox* checkBox = mCheckboxes.value(name);
+    graph->setVisible(checkBox->isChecked());
+
+    if (!checkBox->isChecked())
+    {
+        mPlot->replot();
+        return; // variable not selected
+    }
+
     // if graphs reached right plot point, expand it
     if (time > mMaxX)
     {
@@ -269,7 +315,7 @@ void MonitorAuto::onVariableValueChanged(const QString& name, qreal value)
     mPlot->replot();
 }
 
-void MonitorAuto::updateGraphs(const VariableController::DataSnapshot& data)
+/*void MonitorAuto::updateGraphs(const VariableController::DataSnapshot& data)
 {
     qreal minValue;
     qreal maxValue;
@@ -321,7 +367,7 @@ void MonitorAuto::updateGraphs(const VariableController::DataSnapshot& data)
     mPlot->yAxis->setRange(mMinY, mMaxY); //TODO all negative values?
 
     mPlot->replot();
-}
+}*/
 
 void MonitorAuto::onCyclogramStateChanged(int state)
 {
@@ -384,6 +430,9 @@ void MonitorAuto::onCyclogramStateChanged(int state)
             {
                 color = Qt::red; //TODO temporary
             }
+
+            bool isChecked = mCheckboxes.value(it.key())->isChecked();
+            graph->setVisible(isChecked);
         }
 
         mPlot->legend->setVisible(true);
@@ -391,83 +440,4 @@ void MonitorAuto::onCyclogramStateChanged(int state)
 
         connect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
     }
-}
-
-void MonitorAuto::onPlayClicked()
-{
-    return;
-
-    double a = 0; //Начало интервала, где рисуем график по оси Ox
-    double b = 100; //Конец интервала, где рисуем график по оси Ox
-    int N = 100 + 1; //Вычисляем количество точек, которые будем отрисовывать
-
-    //Массивы координат точек
-    QVector<double> x(N);
-    QVector<double> y1(N);
-    QVector<double> y2(N);
-    int i = 0;
-
-    for (double X = 0; X < b; X++)//Пробегаем по всем точкам
-    {
-        x[i] = X * 2;
-        y1[i] = fRand(1.0, 10.0);
-        y2[i] = fRand(1.0, 10.0);
-        i++;
-    }
-
-    mPlot->clearGraphs();//Если нужно, то очищаем все графики
-
-    mPlot->addGraph();
-    mPlot->graph(0)->setData(x, y1);
-    mPlot->graph(0)->setPen(QPen(Qt::blue));
-    mPlot->graph(0)->setName("I(БУП НА),A ");
-
-    mPlot->addGraph();
-    mPlot->graph(1)->setPen(QPen(Qt::red));
-    mPlot->graph(1)->setData(x, y2);
-    mPlot->graph(1)->setName("I(ПНА),A ");
-
-    mPlot->xAxis->setTickLabelFont(QFont(QFont().family(), 10));
-    mPlot->xAxis->setLabelFont(QFont(QFont().family(), 10));
-    mPlot->xAxis->setLabel("Время, с");
-    mPlot->xAxis->setRange(a, 150);//Для оси Ox
-
-    mPlot->yAxis->setTickLabelFont(QFont(QFont().family(), 10));
-    mPlot->yAxis->setLabelFont(QFont(QFont().family(), 10));
-    mPlot->yAxis->setLabel(" I изм, А");
-    mPlot->yAxis->setRange(-0.5, 10.5);//Для оси Oy
-
-    mPlot->legend->setVisible(true);
-    mPlot->replot();
-}
-
-void MonitorAuto::onPauseClicked()
-{
-    //TODO
-}
-
-void MonitorAuto::onStopClicked()
-{
-    mPlot->clearGraphs();
-    mPlot->replot();
-    //TODO
-}
-
-void MonitorAuto::setUpdatePeriod(QString period)
-{
-    mUpdatePeriod = period.toInt();
-    //TODO timer
-}
-
-void MonitorAuto::updateUI()
-{
-    mPlot->setVisible(mPlotCheckBox->isChecked());
-
-    adjustSize();
-    update();
-}
-
-void MonitorAuto::getCurrentValue()
-{
-    //TODO
 }
