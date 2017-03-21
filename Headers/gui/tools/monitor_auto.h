@@ -30,6 +30,7 @@ private slots:
     void onStopClicked();
 
     void updateGraphs(const VariableController::DataSnapshot& data);
+    void onVariableValueChanged(const QString& name, qreal value);
     void onCyclogramStateChanged(int state);
 
     void setUpdatePeriod(QString period);

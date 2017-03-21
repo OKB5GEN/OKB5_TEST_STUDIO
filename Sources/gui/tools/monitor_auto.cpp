@@ -1,6 +1,7 @@
 #include "Headers/gui/tools/monitor_auto.h"
 #include "Headers/gui/qcustomplot.h"
 #include "Headers/logic/cyclogram.h"
+#include "Headers/logger/Logger.h"
 
 #include <QtWidgets>
 #include <QDateTime>
@@ -206,9 +207,66 @@ void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
         return;
     }
 
+    if (mCyclogram)
+    {
+        disconnect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+    }
+
     mCyclogram = cyclogram;
-    connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
-    connect(cyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
+    connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+
+    if (cyclogram->state() == Cyclogram::RUNNING) //TODO
+    {
+        onCyclogramStateChanged(Cyclogram::RUNNING);
+    }
+}
+
+void MonitorAuto::onVariableValueChanged(const QString& name, qreal value)
+{
+    int count = mPlot->graphCount();
+    QCPGraph* graph = Q_NULLPTR;
+
+    for (int i = 0; i < count; ++i)
+    {
+        QCPGraph* tmp = mPlot->graph(i);
+        if (tmp->name() == name)
+        {
+            graph = tmp;
+            break;
+        }
+    }
+
+    if (!graph)
+    {
+        LOG_DEBUG(QString("Graph for variable '%1' not found").arg(name)); //TODO variable not included in display list?
+        return;
+    }
+
+    qreal time = qreal(QDateTime::currentMSecsSinceEpoch() - mStartTime) / 1000;
+    graph->addData(time, value);
+
+    // if graphs reached right plot point, expand it
+    if (time > mMaxX)
+    {
+        mMaxX += X_AXIS_ADD;
+        mPlot->xAxis->setRangeUpper(mMaxX);
+    }
+
+    // update Y axis ranges to new values
+    if (value < mMinY)
+    {
+        mMinY = value;
+    }
+    else if (value > mMaxY)
+    {
+        mMaxY = value;
+    }
+
+    mPlot->yAxis->setRange(mMinY, mMaxY); //TODO all negative values?
+
+    mPlot->replot();
 }
 
 void MonitorAuto::updateGraphs(const VariableController::DataSnapshot& data)
@@ -280,6 +338,8 @@ void MonitorAuto::onCyclogramStateChanged(int state)
     darkMagenta,
     darkYellow,*/
 
+    disconnect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+
     if (state == Cyclogram::RUNNING)
     {
         mPlot->clearGraphs();
@@ -317,6 +377,7 @@ void MonitorAuto::onCyclogramStateChanged(int state)
             QCPGraph* graph = mPlot->addGraph();
             graph->setName(tr("%1").arg(it.key()));
             graph->setPen(QPen(Qt::GlobalColor(color)));
+            graph->addData(mMinX, it.value().currentValue);
             ++color;
 
             if (color > Qt::darkYellow)
@@ -327,6 +388,8 @@ void MonitorAuto::onCyclogramStateChanged(int state)
 
         mPlot->legend->setVisible(true);
         mPlot->replot();
+
+        connect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
     }
 }
 
