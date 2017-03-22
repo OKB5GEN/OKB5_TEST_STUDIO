@@ -87,5 +87,7 @@ private:
     qreal mScaleFactor;
 
     QSet<MonitorAuto*> mActiveMonitors;
+
+    int mSnapshotsCouner; // hack for force data snapshot save
 };
 #endif // EDITOR_WINDOW_H

@@ -276,6 +276,12 @@ void VariableController::saveReport(const QString& fileName)
             ++column;
         }
 
+        if (!mDataTimeline[i].label.isEmpty())
+        {
+            xlsx.write(row, column, mDataTimeline[i].label);
+            ++column;
+        }
+
         ++row;
     }
 

@@ -457,6 +457,8 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 
 void EditorWindow::runCyclogram()
 {
+    mSnapshotsCouner = 0;
+
     Command* errorCmd = mCyclogram->validate();
     if (errorCmd)
     {
@@ -521,6 +523,8 @@ void EditorWindow::addVariablesMonitor()
 
 void EditorWindow::addManualMonitor()
 {
+    ++mSnapshotsCouner;
+    mCyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
     int TODO; // create data snapshot with label if cyclogram is running, or make it inactive
 
     //MonitorManual* dialog = new MonitorManual(this);
