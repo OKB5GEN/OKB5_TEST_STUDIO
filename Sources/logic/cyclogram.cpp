@@ -113,7 +113,12 @@ void Cyclogram::run()
     {
         mVarController->restart();
         mCurrent = mFirst;
-        mSystemState->onCyclogramStart();
+
+        if (mIsMainCyclogram)
+        {
+            mSystemState->onCyclogramStart();
+        }
+
         setState(RUNNING);
         runCurrentCommand();
     }
