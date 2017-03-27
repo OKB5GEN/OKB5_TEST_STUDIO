@@ -19,5 +19,6 @@
     <file>images/edit_remove.png</file>
     <file>images/contents-256.png</file>
     <file>images/variable.png</file>
+    <file>images/delete_all.png</file>
 </qresource>
 </RCC>

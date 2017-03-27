@@ -7,18 +7,24 @@
 AppConsole::AppConsole(QWidget * parent):
     QWidget(parent)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this);
+    QGridLayout* layout = new QGridLayout(this);
+
+    QPushButton* clearConsoleBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Clear console"), this);
+
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    layout->addLayout(hLayout, 0, 0);
+    hLayout->addWidget(clearConsoleBtn);
+    hLayout->addStretch();
 
     QTextEdit* textEdit = new QTextEdit(this);
-    //textEdit->setMinimumWidth(600);
-    layout->addWidget(textEdit);
+    layout->addWidget(textEdit, 1, 0);
 
     mTextEditAppender = new TextEditAppender();
     mTextEditAppender->setTextEdit(textEdit);
     mTextEditAppender->setFormat("%{time}: %{message}");
     Logger::globalInstance()->registerAppender(mTextEditAppender);
 
-    //setWindowTitle(tr("Application console"));
+    connect(clearConsoleBtn, SIGNAL(clicked()), textEdit, SLOT(clear()));
 }
 
 AppConsole::~AppConsole()
