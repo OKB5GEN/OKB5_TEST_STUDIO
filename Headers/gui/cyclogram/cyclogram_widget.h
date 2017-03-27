@@ -48,6 +48,7 @@ private slots:
     void removeShape(Command* command);
     void onNeedUpdate();
     void onNeedToDelete(ShapeItem* shape);
+    void showSubprogramWidget();
 
 private:
     void drawSilhouette();

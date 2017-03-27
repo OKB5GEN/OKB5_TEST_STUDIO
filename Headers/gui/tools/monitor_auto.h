@@ -27,7 +27,6 @@ private slots:
     void onVariableSelectionChanged(bool toggled);
 
 private:
-    QTimer* mTimer;
     QCustomPlot* mPlot;
     QListWidget* mVariables;
 

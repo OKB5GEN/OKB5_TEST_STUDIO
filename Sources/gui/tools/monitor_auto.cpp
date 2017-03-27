@@ -30,9 +30,6 @@ MonitorAuto::MonitorAuto(QWidget * parent):
     QDialog(parent),
     mCyclogram(Q_NULLPTR)
 {
-    mTimer = new QTimer(this);
-    connect(mTimer, SIGNAL(timeout()), this, SLOT(getCurrentValue()));
-
     QHBoxLayout* hLayout = new QHBoxLayout(this);
 
     mVariables = new QListWidget(this);

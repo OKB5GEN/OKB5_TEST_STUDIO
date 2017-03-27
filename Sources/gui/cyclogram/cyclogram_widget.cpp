@@ -1,5 +1,6 @@
 #include <QtWidgets>
 #include <QDebug>
+#include <QFile>
 
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
 #include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
@@ -29,6 +30,13 @@
 #include "Headers/gui/cyclogram/shape_item.h"
 
 #include "Headers/logger/Logger.h"
+
+#include "Headers/file_reader.h"
+
+namespace
+{
+    static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir"; //TODO
+}
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
@@ -283,6 +291,84 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             }
         }
     }
+/*    else if (event->button() == Qt::RightButton)
+    {
+        int index = commandAt(event->pos());
+        if (index >= 0)
+        {
+            ShapeItem* clickedItem = mCommands[index];
+
+            
+            //int TODO1; // split shapes on movable and selectable
+            //if (clickedItem->isMovable())
+            //{
+            //    int TODO2; // create command shape copy and drag it under cursor
+            //    mMovingItem = clickedItem;
+            //    mPreviousPosition = event->pos();
+            //    mCommands.move(index, mCommands.size() - 1);
+            //}
+            
+
+            if (!mSelectedItem || mSelectedItem != clickedItem)
+            {
+                clearSelection(false);
+                mSelectedItem = clickedItem;
+                mSelectedItem->setSelected(true);
+                update();
+
+                QMenu *menu = new QMenu(this);
+                menu->addAction(tr("Show subprogram widget"), this, SLOT(showSubprogramWidget()));
+                menu->exec(mapToGlobal(event->pos()));
+            }
+        }
+        else
+        {
+            clearSelection();
+        }
+    }*/
+}
+
+void CyclogramWidget::showSubprogramWidget()
+{
+    // try read last file open path
+//    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+//    QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
+//    if (path.isEmpty())
+//    {
+//        path = QDir::currentPath();
+//    }
+
+//    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+//    if (fileName.isEmpty())
+//    {
+//        return;
+//    }
+
+//    QFile file(fileName);
+//    if (!file.open(QFile::ReadOnly | QFile::Text))
+//    {
+//        QMessageBox::warning(this, tr("OKB5 Test Studio"),
+//                                   tr("Cannot read file %1:\n%2.").
+//                                   arg(QDir::toNativeSeparators(fileName), file.errorString()));
+//        return;
+//    }
+
+//    Cyclogram* c = new Cyclogram(parentWidget());
+
+//    FileReader reader(c);
+//    if (!reader.read(&file))
+//    {
+//        c->createDefault();
+//        QMessageBox::warning(this, tr("OKB5 Test Studio"),
+//                                   tr("Parse error in file %1:\n%2.").
+//                                   arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+
+//        return;
+//    }
+
+//    CyclogramWidget* w = new CyclogramWidget(parentWidget());
+//    w->load(c);
+//    w->show();
 }
 
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)

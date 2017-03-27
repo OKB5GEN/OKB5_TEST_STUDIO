@@ -5,6 +5,7 @@
 #include "Headers/gui/tools/monitor_manual.h"
 #include "Headers/gui/tools/monitor_auto.h"
 #include "Headers/gui/application_finish_dialog.h"
+#include "Headers/gui/tools/app_console.h"
 #include "Headers/logic/cyclogram.h"
 
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
@@ -317,6 +318,15 @@ void EditorWindow::createActions()
     connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addAutoMonitor);
     monitorMenu->addAction(addAutoMonitorAct);
     monitorToolBar->addAction(addAutoMonitorAct);
+
+    // add application console
+    QDockWidget *dock = new QDockWidget(tr("Application console"), this);
+    dock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
+
+    AppConsole* console = new AppConsole(this);
+    dock->setWidget(console);
+    addDockWidget(Qt::BottomDockWidgetArea, dock);
+    monitorMenu->addAction(dock->toggleViewAction());
 }
 
 void EditorWindow::createStatusBar()
@@ -525,7 +535,6 @@ void EditorWindow::addManualMonitor()
 {
     ++mSnapshotsCouner;
     mCyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
-    int TODO; // create data snapshot with label if cyclogram is running, or make it inactive
 
     //MonitorManual* dialog = new MonitorManual(this);
     //dialog->setAttribute(Qt::WA_DeleteOnClose);
