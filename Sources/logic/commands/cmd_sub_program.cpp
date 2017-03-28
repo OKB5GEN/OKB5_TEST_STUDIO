@@ -37,14 +37,46 @@
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
-    mCyclogram(Q_NULLPTR)
+    mCyclogram(Q_NULLPTR),
+    mLoaded(false)
 {
-    mText = "ERROR";
+    mText = "Subprogram";
 
     mCyclogram = new Cyclogram(this);
     mCyclogram->setMainCyclogram(false);
     connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     updateText();
+}
+
+bool CmdSubProgram::load()
+{
+    mLoaded = false;
+    mCyclogram->clear();
+
+    QFile file(mFilePath);
+    FileReader reader(mCyclogram);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(mFilePath), file.errorString()));
+        //emit criticalError(this);
+        return false;
+    }
+
+    if (!reader.read(&file))
+    {
+        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(mFilePath), reader.errorString()));
+        //emit criticalError(this);
+        return false;
+    }
+
+    mLoaded = true;
+    return true;
+}
+
+Cyclogram* CmdSubProgram::cyclogram() const
+{
+    return mCyclogram;
 }
 
 void CmdSubProgram::run()
@@ -61,26 +93,13 @@ void CmdSubProgram::run()
 
 void CmdSubProgram::execute()
 {
+    if (!mLoaded)
+    {
+        emit criticalError(this);
+        return;
+    }
+
     // Load cyclogram
-    mCyclogram->clear();
-
-    QFile file(mFilePath);
-    FileReader reader(mCyclogram);
-
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(mFilePath), file.errorString()));
-        emit criticalError(this);
-        return;
-    }
-
-    if (!reader.read(&file))
-    {
-        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(mFilePath), reader.errorString()));
-        emit criticalError(this);
-        return;
-    }
-
     mCyclogram->run();
 
 //    // read current values from variable controller
@@ -132,14 +151,26 @@ void CmdSubProgram::execute()
 
 void CmdSubProgram::setFilePath(const QString& filePath)
 {
-    mFilePath = filePath;
-
-    if (!QFileInfo(mFilePath).exists())
+    if (mFilePath == filePath)
     {
-        LOG_ERROR(QString("Subprogram command error. File '%1' does not exist").arg(mFilePath));
+        return;
     }
 
+    mFilePath = filePath;
+    load();
     updateText();
+
+//    if (!QFileInfo(mFilePath).exists())
+//    {
+//        LOG_ERROR(QString("Subprogram command error. File '%1' does not exist").arg(mFilePath));
+//        updateText();
+//        return;
+//    }
+}
+
+bool CmdSubProgram::loaded() const
+{
+    return mLoaded;
 }
 
 void CmdSubProgram::setName(const QString& name)
@@ -309,6 +340,8 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
     {
         mText = attributes.value("name").toString();
     }
+
+    load();
 
 //    QMetaEnum operation = QMetaEnum::fromType<CmdSubProgram::Operation>();
 //    QMetaEnum operandType = QMetaEnum::fromType<CmdSubProgram::OperandType>();

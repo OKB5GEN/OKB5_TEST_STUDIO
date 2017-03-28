@@ -33,16 +33,12 @@
 
 #include "Headers/file_reader.h"
 
-namespace
-{
-    static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir"; //TODO
-}
-
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mCurrentCyclogram(Q_NULLPTR),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
+    mCurSubprogram(Q_NULLPTR),
     mUpdateOnShapeRemove(true)
 {
     setMouseTracking(true);
@@ -291,84 +287,60 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             }
         }
     }
-/*    else if (event->button() == Qt::RightButton)
+    else if (event->button() == Qt::RightButton)
     {
         int index = commandAt(event->pos());
         if (index >= 0)
         {
             ShapeItem* clickedItem = mCommands[index];
 
-            
-            //int TODO1; // split shapes on movable and selectable
-            //if (clickedItem->isMovable())
-            //{
-            //    int TODO2; // create command shape copy and drag it under cursor
-            //    mMovingItem = clickedItem;
-            //    mPreviousPosition = event->pos();
-            //    mCommands.move(index, mCommands.size() - 1);
-            //}
-            
+            clearSelection(false);
+            mSelectedItem = clickedItem;
+            mSelectedItem->setSelected(true);
+            update();
 
-            if (!mSelectedItem || mSelectedItem != clickedItem)
+            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
             {
-                clearSelection(false);
-                mSelectedItem = clickedItem;
-                mSelectedItem->setSelected(true);
-                update();
-
+                mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
                 QMenu *menu = new QMenu(this);
-                menu->addAction(tr("Show subprogram widget"), this, SLOT(showSubprogramWidget()));
+                menu->addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
                 menu->exec(mapToGlobal(event->pos()));
+                menu->deleteLater();
             }
         }
         else
         {
             clearSelection();
         }
-    }*/
+    }
 }
 
 void CyclogramWidget::showSubprogramWidget()
 {
-    // try read last file open path
-//    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-//    QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
-//    if (path.isEmpty())
-//    {
-//        path = QDir::currentPath();
-//    }
+    if (!mCurSubprogram)
+    {
+        LOG_WARNING(QString("Subprogram not set"));
+        return;
+    }
 
-//    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
-//    if (fileName.isEmpty())
-//    {
-//        return;
-//    }
+    if (!mCurSubprogram->loaded())
+    {
+        LOG_ERROR(QString("Subprogram configuration error"));
+        return;
+    }
 
-//    QFile file(fileName);
-//    if (!file.open(QFile::ReadOnly | QFile::Text))
-//    {
-//        QMessageBox::warning(this, tr("OKB5 Test Studio"),
-//                                   tr("Cannot read file %1:\n%2.").
-//                                   arg(QDir::toNativeSeparators(fileName), file.errorString()));
-//        return;
-//    }
+    QDialog* dialog = new QDialog(parentWidget());
+    dialog->setWindowTitle(mCurSubprogram->filePath());
 
-//    Cyclogram* c = new Cyclogram(parentWidget());
+    CyclogramWidget* w = new CyclogramWidget(dialog);
+    w->load(mCurSubprogram->cyclogram());
 
-//    FileReader reader(c);
-//    if (!reader.read(&file))
-//    {
-//        c->createDefault();
-//        QMessageBox::warning(this, tr("OKB5 Test Studio"),
-//                                   tr("Parse error in file %1:\n%2.").
-//                                   arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-
-//        return;
-//    }
-
-//    CyclogramWidget* w = new CyclogramWidget(parentWidget());
-//    w->load(c);
-//    w->show();
+    QVBoxLayout* layout = new QVBoxLayout(dialog);
+    layout->addWidget(w);
+    dialog->setLayout(layout);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->resize(w->size()); //TODO too big size case
+    dialog->show();
 }
 
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -661,6 +633,8 @@ const ShapeItem* CyclogramWidget::findBranch(const Command* command) const
 
 void CyclogramWidget::clearSelection(bool needUpdate)
 {
+    mCurSubprogram = Q_NULLPTR;
+
     if (mSelectedItem)
     {
         mSelectedItem->setSelected(false);

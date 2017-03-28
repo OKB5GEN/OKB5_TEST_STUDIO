@@ -7,16 +7,17 @@
 #include "Headers/shape_types.h"
 #include "Headers/gui/cyclogram/valency_point.h"
 
-QT_BEGIN_NAMESPACE
+
 class QAction;
 class QPoint;
 class QToolButton;
 class QDialog;
-QT_END_NAMESPACE
+
 
 class Cyclogram;
 class Command;
 class ShapeItem;
+class CmdSubProgram;
 
 class CyclogramWidget : public QWidget
 {
@@ -93,6 +94,8 @@ private:
     Cyclogram* mCurrentCyclogram = Q_NULLPTR;
 
     bool mUpdateOnShapeRemove;
+
+    CmdSubProgram* mCurSubprogram;
 };
 
 #endif //CYCLOGRAM_WIDGET_H

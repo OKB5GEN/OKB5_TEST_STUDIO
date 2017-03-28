@@ -631,7 +631,6 @@ void CmdActionModuleEditDialog::onCheckBoxStateChanged(int state)
             varBox->setEnabled(varBoxSelected || valueEditUnselected);
             valueEdit->setEnabled(valueEditSelected || varBoxUnselected);
 
-
             varSelectBox->blockSignals(false);
             valueSelectBox->blockSignals(false);
             break;

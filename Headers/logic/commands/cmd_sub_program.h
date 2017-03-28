@@ -20,6 +20,9 @@ public:
     const QString& filePath() const;
     const QString& name() const;
 
+    Cyclogram* cyclogram() const;
+    bool loaded() const;
+
     void stop() override;
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     void pause() override;
@@ -33,6 +36,8 @@ private slots:
     void onCyclogramFinished(const QString& error);
 
 private:
+    bool load();
+
     void updateText();
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
@@ -40,6 +45,7 @@ private:
 
     QString mFilePath;
     Cyclogram* mCyclogram;
+    bool mLoaded;
 };
 
 #endif // CMD_SUB_PROGRAM_H
