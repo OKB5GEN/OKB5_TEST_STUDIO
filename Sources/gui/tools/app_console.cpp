@@ -17,6 +17,7 @@ AppConsole::AppConsole(QWidget * parent):
     hLayout->addStretch();
 
     QTextEdit* textEdit = new QTextEdit(this);
+    textEdit->setReadOnly(true);
     layout->addWidget(textEdit, 1, 0);
 
     mTextEditAppender = new TextEditAppender();

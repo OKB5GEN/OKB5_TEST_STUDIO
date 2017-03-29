@@ -2,18 +2,21 @@
 
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
+#include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/file_reader.h"
 
 CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
     QDialog(parent),
-    mCommand(Q_NULLPTR)
+    mCommand(Q_NULLPTR),
+    mCallingCyclogram(Q_NULLPTR)
 {
     setupUI();
-    setWindowTitle(tr("Sub program"));
+    setWindowTitle(tr("Edit sub program"));
 
     adjustSize();
-    setFixedSize(sizeHint());
+    //setFixedSize(sizeHint());
 }
 
 CmdSubProgramEditDialog::~CmdSubProgramEditDialog()
@@ -25,17 +28,11 @@ void CmdSubProgramEditDialog::setupUI()
 {
     QGridLayout * layout = new QGridLayout(this);
 
-    QLabel* caption = new QLabel(this);
-    caption->setText(tr("Name:"));
-    layout->addWidget(caption, 0, 0, 1, 1);
-
-    mSubprogramNameStr = new QLineEdit(this);
-    mSubprogramNameStr->setText(tr("Subprogram"));
-    layout->addWidget(mSubprogramNameStr, 0, 1, 1, 8);
+    mSubprogramNameStr = new QLineEdit(tr("Sub"), this);
+    mSubprogramNameStr->setMaximumWidth(100);
 
     // Cyclogram file
-    QGroupBox* filePathBox = new QGroupBox(this);
-    filePathBox->setTitle(tr("Cyclogram file"));
+    QGroupBox* filePathBox = new QGroupBox(tr("Settings"), this);
     QHBoxLayout* fileNameLayout = new QHBoxLayout(filePathBox);
     mFileNameStr = new QLineEdit(filePathBox);
     mFileNameStr->setBackgroundRole(QPalette::Dark);
@@ -43,104 +40,55 @@ void CmdSubProgramEditDialog::setupUI()
     connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(openFile()));
 
     browseButton->setText(tr("Browse"));
+    fileNameLayout->addWidget(new QLabel(tr("Name:"), this));
+    fileNameLayout->addWidget(mSubprogramNameStr);
+    fileNameLayout->addWidget(new QLabel(tr("File:"), this));
     fileNameLayout->addWidget(mFileNameStr);
     fileNameLayout->addWidget(browseButton);
     filePathBox->setLayout(fileNameLayout);
 
-    layout->addWidget(filePathBox, 1, 0, 1, 9);
+    layout->addWidget(filePathBox, 0, 0, 1, 2);
 
-    // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    /*
-    QGroupBox* resultBox = new QGroupBox(this);
-    resultBox->setTitle(tr("Result"));
-    QVBoxLayout* box4layout = new QVBoxLayout(resultBox);
-    mResultBox = new QComboBox(this);
+    // input and output params
+    QGroupBox* inputGroupBox = new QGroupBox(tr("Input"), this);
+    QGroupBox* outputGroupBox = new QGroupBox(tr("Output"), this);
+    QVBoxLayout* inputLayout = new QVBoxLayout();
+    QVBoxLayout* outputLayout = new QVBoxLayout();
 
-    box4layout->addWidget(mResultBox);
-    box4layout->addStretch();
+    mInParams = new QTableWidget(this);
+    QStringList inHeaders;
+    inHeaders.append(tr("Вх.Параметр"));
+    inHeaders.append(tr(""));
+    inHeaders.append(tr("Переменная"));
+    inHeaders.append(tr(""));
+    inHeaders.append(tr("Значение"));
+    mInParams->setColumnCount(inHeaders.size());
+    mInParams->setHorizontalHeaderLabels(inHeaders);
+    inputLayout->addWidget(mInParams);
 
-    resultBox->setLayout(box4layout);
-    layout->addWidget(resultBox, 1, 0, 2, 2);
+    mOutParams = new QTableWidget(this);
+    QStringList outHeaders;
+    outHeaders.append(tr("Вых.Переменная"));
+    outHeaders.append(tr(""));
+    outHeaders.append(tr("Переменная"));
+    mOutParams->setColumnCount(outHeaders.size());
+    mOutParams->setHorizontalHeaderLabels(outHeaders);
+    outputLayout->addWidget(mOutParams);
 
-    QLabel* equalSign = new QLabel(this);
-    equalSign->setText("=");
-    layout->addWidget(equalSign, 1, 2, 2, 1);
+    inputGroupBox->setLayout(inputLayout);
+    outputGroupBox->setLayout(outputLayout);
 
-    mValidator = new QDoubleValidator(this);
+    layout->addWidget(inputGroupBox, 1, 0);
+    layout->addWidget(outputGroupBox, 1, 1);
 
-    // Operand 1 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    mOperand1Box = new QGroupBox(this);
-    mOperand1Box->setTitle(tr("Operand 1"));
-    QGridLayout* box1layout = new QGridLayout(mOperand1Box);
-
-    mOper1VarBtn = new QRadioButton(this);
-    mOper1NumBtn = new QRadioButton(this);
-    mOper1Box = new QComboBox(this);
-    mOper1Num = new QLineEdit(this);
-    mOper1Num->setValidator(mValidator);
-
-    box1layout->addWidget(mOper1VarBtn, 0, 0, 1, 1);
-    box1layout->addWidget(mOper1NumBtn, 1, 0, 1, 1);
-    box1layout->addWidget(mOper1Box, 0, 1, 1, 1);
-    box1layout->addWidget(mOper1Num, 1, 1, 1, 1);
-
-    mOperand1Box->setLayout(box1layout);
-    layout->addWidget(mOperand1Box, 1, 3, 2, 2);
-
-    // Operation box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    QGroupBox* operationBox = new QGroupBox(this);
-    operationBox->setTitle(tr("Operation"));
-    QVBoxLayout* box3layout = new QVBoxLayout(operationBox);
-    mOperationBox = new QComboBox(this);
-//    mOperationBox->addItem("+", QVariant(int(CmdSubProgram::Add)));
-//    mOperationBox->addItem("-", QVariant(int(CmdSubProgram::Subtract)));
-//    mOperationBox->addItem("*", QVariant(int(CmdSubProgram::Multiply)));
-//    mOperationBox->addItem(":", QVariant(int(CmdSubProgram::Divide)));
-
-    mTwoOperandsCheckBox = new QCheckBox(this);
-    mTwoOperandsCheckBox->setText(tr("Two operands"));
-
-    box3layout->addWidget(mOperationBox);
-    box3layout->addWidget(mTwoOperandsCheckBox);
-
-    operationBox->setLayout(box3layout);
-    layout->addWidget(operationBox, 1, 5, 2, 2);
-
-    // Operand 2 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    mOperand2Box = new QGroupBox(this);
-    mOperand2Box->setTitle(tr("Operand 2"));
-    QGridLayout* box2layout = new QGridLayout(mOperand2Box);
-
-    mOper2VarBtn = new QRadioButton(this);
-    mOper2NumBtn = new QRadioButton(this);
-    mOper2Box = new QComboBox(this);
-    mOper2Num = new QLineEdit(this);
-    mOper2Num->setValidator(mValidator);
-
-    box2layout->addWidget(mOper2VarBtn, 0, 0, 1, 1);
-    box2layout->addWidget(mOper2NumBtn, 1, 0, 1, 1);
-    box2layout->addWidget(mOper2Box, 0, 1, 1, 1);
-    box2layout->addWidget(mOper2Num, 1, 1, 1, 1);
-
-    mOperand2Box->setLayout(box2layout);
-
-    layout->addWidget(mOperand2Box, 1, 7, 2, 2);
-*/
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    //layout->addWidget(buttonBox, 4, 7, 1, 2);
-    layout->addWidget(buttonBox, 2, 7, 1, 2);
+    layout->addWidget(buttonBox, 2, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     setLayout(layout);
-/*
-    connect(mTwoOperandsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
-    connect(mOper1VarBtn, SIGNAL(toggled(bool)), this, SLOT(onOper1VarBtnStateChanged(bool)));
-    connect(mOper1NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper1NumBtnStateChanged(bool)));
-    connect(mOper2VarBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2VarBtnStateChanged(bool)));
-    connect(mOper2NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2NumBtnStateChanged(bool)));*/
 }
 
 void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command)
@@ -151,75 +99,13 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command)
     {
         mSubprogramNameStr->setText(mCommand->name());
         mFileNameStr->setText(mCommand->filePath());
-
-        // set default state
-//        mTwoOperandsCheckBox->setChecked(true);
-//        mOper1VarBtn->setChecked(true);
-//        mOper2VarBtn->setChecked(true);
-//        mOper1Num->setText("0");
-//        mOper2Num->setText("0");
-
-//        mOper1Box->clear();
-//        mOper2Box->clear();
-//        mResultBox->clear();
-
-//        VariableController* vc = mCommand->variableController();
-//        mOper1Box->addItems(vc->variables().keys());
-//        mOper2Box->addItems(vc->variables().keys());
-//        mResultBox->addItems(vc->variables().keys());
-
-//        int index = mOperationBox->findData(QVariant(int(mCommand->operation())));
-//        if (index != -1)
-//        {
-//            mOperationBox->setCurrentIndex(index);
-//        }
-
-//        updateComponent(CmdSubProgram::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
-//        updateComponent(CmdSubProgram::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
-//        updateComponent(CmdSubProgram::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
     }
 }
 
-void CmdSubProgramEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)
-{
-//    VariableController* vc = mCommand->variableController();
-//    CmdSubProgram::OperandID op = CmdSubProgram::OperandID(operand);
+//void CmdSubProgramEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)
+//{
 
-//    if (mCommand->operandType(op) == CmdSubProgram::Variable)
-//    {
-//        if (boxBtn)
-//        {
-//            boxBtn->setChecked(true);
-//        }
-
-//        QString name = mCommand->variableName(op);
-//        if (vc->isVariableExist(name))
-//        {
-//            int index = box->findText(name);
-//            if (index != -1)
-//            {
-//                box->setCurrentIndex(index);
-//            }
-//        }
-//    }
-//    else if (mCommand->operandType(op) == CmdSubProgram::Number)
-//    {
-//        if (lineEditBtn)
-//        {
-//            lineEditBtn->setChecked(true);
-//        }
-
-//        if (lineEdit)
-//        {
-//            lineEdit->setText(QString::number(mCommand->value(op)));
-//        }
-//    }
-
-//    if (op == CmdSubProgram::Operand2)
-//    {
-//        mTwoOperandsCheckBox->setChecked(mCommand->operation() != CmdSubProgram::Assign);
-//    }
-}
+//}
 
 void CmdSubProgramEditDialog::onAccept()
 {
@@ -227,100 +113,56 @@ void CmdSubProgramEditDialog::onAccept()
     {
         mCommand->setFilePath(mFileNameStr->text());
         mCommand->setName(mSubprogramNameStr->text());
-
-//        if (mTwoOperandsCheckBox->isChecked())
-//        {
-//            CmdSubProgram::Operation operation = CmdSubProgram::Operation(mOperationBox->currentData().toInt());
-
-//            if (mOper2VarBtn->isChecked())
-//            {
-//                QString oper2Var = mOper2Box->currentText();
-//                mCommand->setOperand(CmdSubProgram::Operand2, oper2Var);
-//            }
-//            else
-//            {
-//                qreal oper2Val = mOper2Num->text().replace(",", ".").toDouble();
-
-//                // division by zero protection
-//                if (operation == CmdSubProgram::Divide && oper2Val == 0)
-//                {
-//                    QMessageBox::warning(this, tr("Error"), tr("Division by zero detected!"));
-//                    return;
-//                }
-
-//                mCommand->setOperand(CmdSubProgram::Operand2, oper2Val);
-//            }
-
-//            mCommand->setOperation(operation);
-//        }
-//        else
-//        {
-//            mCommand->setOperation(CmdSubProgram::Assign);
-//        }
-
-//        QString resultVar = mResultBox->currentText();
-//        mCommand->setOperand(CmdSubProgram::Result, resultVar);
-
-//        if (mOper1VarBtn->isChecked())
-//        {
-//            QString oper1Var = mOper1Box->currentText();
-//            mCommand->setOperand(CmdSubProgram::Operand1, oper1Var);
-//        }
-//        else
-//        {
-//            qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
-//            mCommand->setOperand(CmdSubProgram::Operand1, oper1Val);
-//        }
     }
 
     accept();
 }
 
-void CmdSubProgramEditDialog::onCheckBoxStateChanged(int state)
-{
-    mOperationBox->setEnabled(state == Qt::Checked);
-    mOperand2Box->setEnabled(state == Qt::Checked);
-}
+//void CmdSubProgramEditDialog::onCheckBoxStateChanged(int state)
+//{
+//    mOperationBox->setEnabled(state == Qt::Checked);
+//    mOperand2Box->setEnabled(state == Qt::Checked);
+//}
 
-void CmdSubProgramEditDialog::onOper1VarBtnStateChanged(bool toggled)
-{
-    mOper1Box->setEnabled(toggled);
-    mOper1Num->setEnabled(!toggled);
+//void CmdSubProgramEditDialog::onOper1VarBtnStateChanged(bool toggled)
+//{
+//    mOper1Box->setEnabled(toggled);
+//    mOper1Num->setEnabled(!toggled);
 
-    mOper1NumBtn->blockSignals(true);
-    mOper1NumBtn->setChecked(false);
-    mOper1NumBtn->blockSignals(false);
-}
+//    mOper1NumBtn->blockSignals(true);
+//    mOper1NumBtn->setChecked(false);
+//    mOper1NumBtn->blockSignals(false);
+//}
 
-void CmdSubProgramEditDialog::onOper1NumBtnStateChanged(bool toggled)
-{
-    mOper1Box->setEnabled(!toggled);
-    mOper1Num->setEnabled(toggled);
+//void CmdSubProgramEditDialog::onOper1NumBtnStateChanged(bool toggled)
+//{
+//    mOper1Box->setEnabled(!toggled);
+//    mOper1Num->setEnabled(toggled);
 
-    mOper1VarBtn->blockSignals(true);
-    mOper1VarBtn->setChecked(false);
-    mOper1VarBtn->blockSignals(false);
-}
+//    mOper1VarBtn->blockSignals(true);
+//    mOper1VarBtn->setChecked(false);
+//    mOper1VarBtn->blockSignals(false);
+//}
 
-void CmdSubProgramEditDialog::onOper2VarBtnStateChanged(bool toggled)
-{
-    mOper2Box->setEnabled(toggled);
-    mOper2Num->setEnabled(!toggled);
+//void CmdSubProgramEditDialog::onOper2VarBtnStateChanged(bool toggled)
+//{
+//    mOper2Box->setEnabled(toggled);
+//    mOper2Num->setEnabled(!toggled);
 
-    mOper2NumBtn->blockSignals(true);
-    mOper2NumBtn->setChecked(false);
-    mOper2NumBtn->blockSignals(false);
-}
+//    mOper2NumBtn->blockSignals(true);
+//    mOper2NumBtn->setChecked(false);
+//    mOper2NumBtn->blockSignals(false);
+//}
 
-void CmdSubProgramEditDialog::onOper2NumBtnStateChanged(bool toggled)
-{
-    mOper2Box->setEnabled(!toggled);
-    mOper2Num->setEnabled(toggled);
+//void CmdSubProgramEditDialog::onOper2NumBtnStateChanged(bool toggled)
+//{
+//    mOper2Box->setEnabled(!toggled);
+//    mOper2Num->setEnabled(toggled);
 
-    mOper2VarBtn->blockSignals(true);
-    mOper2VarBtn->setChecked(false);
-    mOper2VarBtn->blockSignals(false);
-}
+//    mOper2VarBtn->blockSignals(true);
+//    mOper2VarBtn->setChecked(false);
+//    mOper2VarBtn->blockSignals(false);
+//}
 
 void CmdSubProgramEditDialog::openFile()
 {
@@ -353,5 +195,216 @@ void CmdSubProgramEditDialog::openFile()
 
         //QString relativePath = QDir::current().relativeFilePath(fileName);
         mFileNameStr->setText(fileName);
+        updateUI();
+    }
+}
+
+void CmdSubProgramEditDialog::updateUI()
+{
+    if (!mCallingCyclogram)
+    {
+        LOG_ERROR(QString("No calling cyclogram set to subprogram '%1'").arg(mSubprogramNameStr->text()));
+        return;
+    }
+
+    QString fileName = mFileNameStr->text();
+
+    QSharedPointer<Cyclogram> cyclogram;
+    cyclogram.reset(new Cyclogram(Q_NULLPTR));
+
+    QFile file(fileName);
+    FileReader reader(cyclogram.data());
+
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        return;
+    }
+
+    if (!reader.read(&file))
+    {
+        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+        return;
+    }
+
+    mInParams->clearContents(); //TODO possibly remove all children?
+    mOutParams->clearContents(); //TODO possibly remove all children?
+
+    const QMap<QString, VariableController::VariableData>& subprogramVariables = cyclogram->variableController()->variablesData();
+    const QMap<QString, VariableController::VariableData>& callingCyclogramVariables = mCallingCyclogram->variableController()->variablesData();
+
+    int inCount = subprogramVariables.size();
+    int outCount = callingCyclogramVariables.size();
+    mInParams->setRowCount(inCount);
+    mOutParams->setRowCount(outCount);
+
+    //mInParams->setVisible(inCount > 0); // TODO no variables in subprogram?
+    //mOutParams->setVisible(outCount > 0); // TODO no variables in calling cyclogram?
+
+    int i = 0;
+    for (auto it = subprogramVariables.begin(); it != subprogramVariables.end(); ++it)
+    {
+        // param name
+        QString name = mSubprogramNameStr->text() + "." + it.key();
+        QLabel* text = new QLabel(mInParams);
+        text->setTextInteractionFlags(Qt::NoTextInteraction);
+        text->setText(name);
+        mInParams->setCellWidget(i, 0, text);
+
+        // "use variable input" button
+        QCheckBox* varSelectBtn = new QCheckBox(mInParams);
+        mInParams->setCellWidget(i, 1, varSelectBtn);
+
+        // variable selector
+        QComboBox* comboBox = new QComboBox(mInParams);
+        comboBox->addItems(callingCyclogramVariables.keys());
+        mInParams->setCellWidget(i, 2, comboBox);
+
+        // "use direct value input" button
+        QCheckBox* valueSelectBtn = new QCheckBox(mInParams);
+        mInParams->setCellWidget(i, 3, valueSelectBtn);
+
+        // variable selector
+        QLineEdit* valueEdit = new QLineEdit(mInParams);
+        valueEdit->setValidator(new QDoubleValidator(mInParams));
+        valueEdit->setText(QString::number(it.value().initialValue));
+        mInParams->setCellWidget(i, 4, valueEdit);
+
+        bool isVariable = false; // by default command input params are directly set values
+
+        if (mCommand->loaded()) // already set command (load variables mapping from command) TODO
+        {
+//            auto it = inputParams.find(name);
+//            if (it != inputParams.end())
+//            {
+//                if (it.value().type() == QMetaType::QString)
+//                {
+//                    int index = comboBox->findText(it.value().toString());
+//                    if (index != -1)
+//                    {
+//                        comboBox->setCurrentIndex(index);
+//                        isVariable = true;
+//                    }
+//                }
+//                else if (it.value().type() == QMetaType::Double)
+//                {
+//                    valueEdit->setText(it.value().toString());
+//                }
+//            }
+        }
+
+        connect(valueSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
+        connect(varSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
+
+        valueEdit->setEnabled(!isVariable);
+        valueSelectBtn->setChecked(!isVariable);
+        comboBox->setEnabled(isVariable);
+        varSelectBtn->setChecked(isVariable);
+
+        ++i;
+    }
+
+    i = 0;
+    for (auto it = callingCyclogramVariables.begin(); it != callingCyclogramVariables.end(); ++it)
+    {
+        QString name = it.key();
+        QLabel* text = new QLabel(mOutParams);
+        text->setTextInteractionFlags(Qt::NoTextInteraction);
+        text->setText(name);
+        mOutParams->setCellWidget(i, 0, text);
+
+        QLabel* equalSign = new QLabel(mOutParams);
+        equalSign->setTextInteractionFlags(Qt::NoTextInteraction);
+        equalSign->setText("=");
+        mOutParams->setCellWidget(i, 1, equalSign);
+
+        QComboBox* comboBox = new QComboBox(mOutParams);
+        for (auto iter = subprogramVariables.begin(); iter != subprogramVariables.end(); ++iter)
+        {
+            QString subName = mSubprogramNameStr->text() + "." + iter.key();
+            comboBox->addItem(subName);
+        }
+
+        comboBox->addItems(callingCyclogramVariables.keys());
+
+        mOutParams->setCellWidget(i, 2, comboBox);
+
+        if (mCommand->loaded()) // already set command TODO
+        {
+//            auto it = outputParams.find(name);
+//            if (it != outputParams.end())
+//            {
+//                int index = comboBox->findText(it.value().toString()); // output params are always variables
+//                if (index != -1) // add default variable name, corresponding to this paramID
+//                {
+//                    comboBox->setCurrentIndex(index);
+//                }
+//            }
+        }
+        else // set output variable value to itself
+        {
+            int index = comboBox->findText(name); // output params are always variables
+            if (index != -1) // add default variable name, corresponding to this paramID
+            {
+                comboBox->setCurrentIndex(index);
+            }
+        }
+
+        ++i;
+    }
+
+    mInParams->resizeColumnToContents(1);
+    mInParams->resizeColumnToContents(3);
+
+    mOutParams->resizeColumnToContents(1);
+}
+
+void CmdSubProgramEditDialog::setCallingCyclogram(Cyclogram* cyclogram)
+{
+    mCallingCyclogram = cyclogram;
+}
+
+void CmdSubProgramEditDialog::onCheckBoxStateChanged(int state)
+{
+    QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
+    if (!changedBox)
+    {
+        LOG_ERROR(QString("Widget not found"));
+        return;
+    }
+
+    for (int row = 0; row < mInParams->rowCount(); row++)
+    {
+        QCheckBox* varSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 1));
+        QComboBox* varBox = qobject_cast<QComboBox*>(mInParams->cellWidget(row, 2));
+        QCheckBox* valueSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 3));
+        QLineEdit* valueEdit = qobject_cast<QLineEdit*>(mInParams->cellWidget(row, 4));
+
+        if (varSelectBox == changedBox || valueSelectBox == changedBox)
+        {
+            varSelectBox->blockSignals(true);
+            valueSelectBox->blockSignals(true);
+
+            bool varBoxSelected = (varSelectBox == changedBox) && (state == Qt::Checked);
+            bool valueEditSelected = (valueSelectBox == changedBox) && (state == Qt::Checked);
+            bool varBoxUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool valueEditUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+
+            if (varSelectBox == changedBox)
+            {
+                valueSelectBox->setCheckState((state == Qt::Checked) ? Qt::Unchecked : Qt::Checked);
+            }
+            else if (valueSelectBox == changedBox)
+            {
+                varSelectBox->setCheckState((state == Qt::Checked) ? Qt::Unchecked : Qt::Checked);
+            }
+
+            varBox->setEnabled(varBoxSelected || valueEditUnselected);
+            valueEdit->setEnabled(valueEditSelected || varBoxUnselected);
+
+            varSelectBox->blockSignals(false);
+            valueSelectBox->blockSignals(false);
+            break;
+        }
     }
 }

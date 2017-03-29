@@ -857,6 +857,7 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
             d->setCommand(qobject_cast<CmdSubProgram*>(command));
+            d->setCallingCyclogram(mCurrentCyclogram);
             dialog = d;
         }
         break;
