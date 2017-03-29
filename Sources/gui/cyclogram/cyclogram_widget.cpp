@@ -856,8 +856,7 @@ void CyclogramWidget::showEditDialog(Command *command)
     case DRAKON::SUBPROGRAM:
         {
             CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
-            d->setCommand(qobject_cast<CmdSubProgram*>(command));
-            d->setCallingCyclogram(mCurrentCyclogram);
+            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram);
             dialog = d;
         }
         break;

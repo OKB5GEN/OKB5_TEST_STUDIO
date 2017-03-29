@@ -372,8 +372,8 @@ void CmdActionModuleEditDialog::addCommand(const QString& text, const QList<int>
 
 void CmdActionModuleEditDialog::onCommandChanged(int index)
 {
-    mInParams->clearContents(); //TODO possibly remove all children?
-    mOutParams->clearContents(); //TODO possibly remove all children?
+    mInParams->clearContents();
+    mOutParams->clearContents();
 
     if (index == -1)
     {

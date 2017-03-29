@@ -99,54 +99,10 @@ void CmdSubProgram::execute()
         return;
     }
 
+    int TODO; // set input params
+
     // Load cyclogram
     mCyclogram->run();
-
-//    // read current values from variable controller
-//    for (int i = 0; i < OperandsCount; ++i)
-//    {
-//        if (mOperands[i].type == Variable)
-//        {
-//            qreal v = mVarCtrl->variable(mOperands[i].variable);
-//            mOperands[i].value = v;
-//        }
-//    }
-
-//    // perform operation
-//    switch (mOperation)
-//    {
-//    case Add:
-//        mOperands[Result].value = mOperands[Operand1].value + mOperands[Operand2].value;
-//        break;
-//    case Subtract:
-//        mOperands[Result].value = mOperands[Operand1].value - mOperands[Operand2].value;
-//        break;
-//    case Multiply:
-//        mOperands[Result].value = mOperands[Operand1].value * mOperands[Operand2].value;
-//        break;
-//    case Divide:
-//        if (mOperands[Operand2].value != 0)
-//        {
-//            mOperands[Result].value = mOperands[Operand1].value / mOperands[Operand2].value;
-//        }
-//        else
-//        {
-//            mErrorText = tr("Division by zero in runtime");
-//            emit criticalError(this);
-//        }
-
-//        break;
-//    case Assign:
-//        mOperands[Result].value = mOperands[Operand1].value;
-//        break;
-//    default:
-//        break;
-//    }
-
-//    // set new variable value to variable controller
-//    mVarCtrl->setVariable(mOperands[Result].variable, mOperands[Result].value);
-
-//    finish();
 }
 
 void CmdSubProgram::setFilePath(const QString& filePath)
@@ -190,6 +146,8 @@ void CmdSubProgram::updateText()
 
     bool isOK = (!mFilePath.isEmpty() && fileInfo.exists());
 
+    //TODO no file name is OK (implement this case)
+
     if (hasError())
     {
         setErrorStatus(!isOK);
@@ -199,81 +157,12 @@ void CmdSubProgram::updateText()
         setErrorStatus(true);
     }
 
-//    if (mOperands[Result].variable.isEmpty())
-//    {
-//        mText = "N/A";
-//        if (!hasError())
-//        {
-//            setErrorStatus(true);
-//        }
-
-//        return;
-//    }
-
-//    bool isValid = true;
-
-//    mText += mOperands[Result].variable;
-//    mText += "=";
-
-//    switch (mOperands[Operand1].type)
-//    {
-//    case Variable:
-//        mText += mOperands[Operand1].variable;
-//        break;
-//    case Number:
-//        mText += QString::number(mOperands[Operand1].value);
-//        break;
-//    default:
-//        mText += "N/A";
-//        isValid = false;
-//        break;
-//    }
-
-//    if (mOperation != Assign)
-//    {
-//        switch (mOperation)
-//        {
-//        case Add:
-//            mText += "+";
-//            break;
-//        case Subtract:
-//            mText += "-";
-//            break;
-//        case Multiply:
-//            mText += "*";
-//            break;
-//        case Divide:
-//            mText += ":";
-//            break;
-//        default:
-//            break;
-//        }
-
-//        switch (mOperands[Operand2].type)
-//        {
-//        case Variable:
-//            mText += mOperands[Operand2].variable;
-//            break;
-//        case Number:
-//            mText += QString::number(mOperands[Operand2].value);
-//            break;
-//        default:
-//            mText += "N/A";
-//            isValid = false;
-//            break;
-//        }
-//    }
-
-//    if ((hasError() && isValid) || (!hasError() && !isValid))
-//    {
-//        setErrorStatus(!isValid);
-//    }
-
     emit textChanged(mText);
 }
 
 void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName)
 {
+    int TODO;
 //    for (int i = 0; i < OperandsCount; ++i)
 //    {
 //        if (mOperands[i].type == Variable && mOperands[i].variable == oldName)
@@ -287,6 +176,7 @@ void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName
 
 void CmdSubProgram::onVariableRemoved(const QString& name)
 {
+    int TODO;
 //    for (int i = 0; i < OperandsCount; ++i)
 //    {
 //        if (mOperands[i].type == Variable && mOperands[i].variable == name)
@@ -311,21 +201,31 @@ void CmdSubProgram::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeAttribute("name", mText);
     writer->writeAttribute("file", mFilePath);
 
-//    QMetaEnum operation = QMetaEnum::fromType<CmdSubProgram::Operation>();
-//    QMetaEnum operandType = QMetaEnum::fromType<CmdSubProgram::OperandType>();
-//    QMetaEnum operandId = QMetaEnum::fromType<CmdSubProgram::OperandID>();
+    // input params
+    writer->writeStartElement("input_params");
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        writer->writeStartElement("param");
+        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("type", QString::number(int(it.value().type())));
+        writer->writeAttribute("value", it.value().toString());
+        writer->writeEndElement();
+    }
 
-//    writer->writeAttribute("operation", operation.valueToKey(mOperation));
+    writer->writeEndElement();
 
-//    for (int i = 0; i < OperandsCount; ++i)
-//    {
-//        writer->writeStartElement("operand");
-//        writer->writeAttribute("id", operandId.valueToKey(OperandID(i)));
-//        writer->writeAttribute("type", operandType.valueToKey(mOperands[i].type));
-//        writer->writeAttribute("value", QString::number(mOperands[i].value));
-//        writer->writeAttribute("variable", mOperands[i].variable);
-//        writer->writeEndElement();
-//    }
+    // output params
+    writer->writeStartElement("output_params");
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        writer->writeStartElement("param");
+        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("type", QString::number(int(it.value().type())));
+        writer->writeAttribute("value", it.value().toString());
+        writer->writeEndElement();
+    }
+
+    writer->writeEndElement();
 }
 
 void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
@@ -341,59 +241,102 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
         mText = attributes.value("name").toString();
     }
 
+    while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
+    {
+        if (reader->tokenType() == QXmlStreamReader::StartElement)
+        {
+            QString tokenName = reader->name().toString();
+
+            if (tokenName == "input_params")
+            {
+                while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == tokenName))
+                {
+                    if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
+                    {
+                        attributes = reader->attributes();
+                        QString name;
+
+                        if (attributes.hasAttribute("name"))
+                        {
+                            name = attributes.value("name").toString();
+                        }
+
+                        int metaType = QMetaType::UnknownType;
+
+                        if (attributes.hasAttribute("type"))
+                        {
+                            metaType = attributes.value("type").toInt();
+                        }
+
+                        if (attributes.hasAttribute("value"))
+                        {
+                            if (metaType == QMetaType::QString)
+                            {
+                                mInputParams[name] = attributes.value("value").toString();
+                            }
+                            else if (metaType == QMetaType::Double)
+                            {
+                                mInputParams[name] = attributes.value("value").toDouble();
+                            }
+                            else
+                            {
+                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
+                                mInputParams[name] = QVariant();
+                            }
+                        }
+                    }
+
+                    reader->readNext();
+                }
+            }
+            else if (tokenName == "output_params")
+            {
+                while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == tokenName))
+                {
+                    if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
+                    {
+                        attributes = reader->attributes();
+                        QString name;
+
+                        if (attributes.hasAttribute("name"))
+                        {
+                            name = attributes.value("name").toString();
+                        }
+
+                        int metaType = QMetaType::UnknownType;
+
+                        if (attributes.hasAttribute("type"))
+                        {
+                            metaType = attributes.value("type").toInt();
+                        }
+
+                        if (attributes.hasAttribute("value"))
+                        {
+                            if (metaType == QMetaType::QString)
+                            {
+                                mOutputParams[name] = attributes.value("value").toString();
+                            }
+                            else if (metaType == QMetaType::Double)
+                            {
+                                mOutputParams[name] = attributes.value("value").toDouble();
+                            }
+                            else
+                            {
+                                LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
+                                mOutputParams[name] = QVariant();
+                            }
+                        }
+                    }
+
+                    reader->readNext();
+                }
+            }
+        }
+
+        reader->readNext();
+    }
+
     load();
-
-//    QMetaEnum operation = QMetaEnum::fromType<CmdSubProgram::Operation>();
-//    QMetaEnum operandType = QMetaEnum::fromType<CmdSubProgram::OperandType>();
-//    QMetaEnum operandId = QMetaEnum::fromType<CmdSubProgram::OperandID>();
-
-//    QXmlStreamAttributes attributes = reader->attributes();
-//    if (attributes.hasAttribute("operation"))
-//    {
-//        QString str = attributes.value("operation").toString();
-//        mOperation = Operation(operation.keyToValue(qPrintable(str)));
-//    }
-
-//    while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
-//    {
-//        if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "operand")
-//        {
-//            attributes = reader->attributes();
-//            OperandID id;
-//            qreal value;
-//            OperandType type;
-//            QString variable;
-
-//            if (attributes.hasAttribute("id"))
-//            {
-//                QString str = attributes.value("id").toString();
-//                id = OperandID(operandId.keyToValue(qPrintable(str)));
-//            }
-
-//            if (attributes.hasAttribute("type"))
-//            {
-//                QString str = attributes.value("type").toString();
-//                type = OperandType(operandType.keyToValue(qPrintable(str)));
-//            }
-
-//            if (attributes.hasAttribute("value"))
-//            {
-//                value = attributes.value("value").toDouble();
-//            }
-
-//            if (attributes.hasAttribute("variable"))
-//            {
-//                variable = attributes.value("variable").toString();
-//            }
-
-//            mOperands[id].type = type;
-//            mOperands[id].value = value;
-//            mOperands[id].variable = variable;
-//        }
-
-//        reader->readNext();
-//    }
-
     updateText();
 }
 
@@ -428,5 +371,24 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
         return;
     }
 
+    int TODO; // write output params
+
     finish();
+}
+
+const QMap<QString, QVariant>& CmdSubProgram::inputParams() const
+{
+    return mInputParams;
+}
+
+const QMap<QString, QVariant>& CmdSubProgram::outputParams() const
+{
+    return mOutputParams;
+}
+
+void CmdSubProgram::setParams(const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out)
+{
+    mInputParams = in;
+    mOutputParams = out;
+    updateText();
 }

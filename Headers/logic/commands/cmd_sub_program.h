@@ -1,6 +1,8 @@
 #ifndef CMD_SUB_PROGRAM_H
 #define CMD_SUB_PROGRAM_H
 
+#include <QVariant>
+
 #include "Headers/logic/commands/cmd_action.h"
 
 class Cyclogram;
@@ -20,8 +22,13 @@ public:
     const QString& filePath() const;
     const QString& name() const;
 
+    void setParams(const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out);
+
     Cyclogram* cyclogram() const;
     bool loaded() const;
+
+    const QMap<QString, QVariant>& inputParams() const;
+    const QMap<QString, QVariant>& outputParams() const;
 
     void stop() override;
 #ifdef ENABLE_CYCLOGRAM_PAUSE
@@ -46,6 +53,9 @@ private:
     QString mFilePath;
     Cyclogram* mCyclogram;
     bool mLoaded;
+
+    QMap<QString, QVariant> mInputParams;
+    QMap<QString, QVariant> mOutputParams;
 };
 
 #endif // CMD_SUB_PROGRAM_H
