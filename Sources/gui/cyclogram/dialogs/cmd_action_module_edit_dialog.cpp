@@ -616,8 +616,8 @@ void CmdActionModuleEditDialog::onCheckBoxStateChanged(int state)
 
             bool varBoxSelected = (varSelectBox == changedBox) && (state == Qt::Checked);
             bool valueEditSelected = (valueSelectBox == changedBox) && (state == Qt::Checked);
-            bool varBoxUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
-            bool valueEditUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool varBoxUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool valueEditUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
 
             if (varSelectBox == changedBox)
             {

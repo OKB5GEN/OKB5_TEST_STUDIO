@@ -341,10 +341,10 @@ void CmdSubProgramEditDialog::updateUI()
 //                }
 //            }
         }
-        else // set output variable value to itself
+        else // set output variable value to itself by default
         {
-            int index = comboBox->findText(name); // output params are always variables
-            if (index != -1) // add default variable name, corresponding to this paramID
+            int index = comboBox->findText(name);
+            if (index != -1)
             {
                 comboBox->setCurrentIndex(index);
             }
@@ -376,19 +376,20 @@ void CmdSubProgramEditDialog::onCheckBoxStateChanged(int state)
     for (int row = 0; row < mInParams->rowCount(); row++)
     {
         QCheckBox* varSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 1));
-        QComboBox* varBox = qobject_cast<QComboBox*>(mInParams->cellWidget(row, 2));
         QCheckBox* valueSelectBox = qobject_cast<QCheckBox*>(mInParams->cellWidget(row, 3));
-        QLineEdit* valueEdit = qobject_cast<QLineEdit*>(mInParams->cellWidget(row, 4));
 
         if (varSelectBox == changedBox || valueSelectBox == changedBox)
         {
+            QComboBox* varBox = qobject_cast<QComboBox*>(mInParams->cellWidget(row, 2));
+            QLineEdit* valueEdit = qobject_cast<QLineEdit*>(mInParams->cellWidget(row, 4));
+
             varSelectBox->blockSignals(true);
             valueSelectBox->blockSignals(true);
 
             bool varBoxSelected = (varSelectBox == changedBox) && (state == Qt::Checked);
             bool valueEditSelected = (valueSelectBox == changedBox) && (state == Qt::Checked);
-            bool varBoxUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
-            bool valueEditUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool varBoxUnselected = (varSelectBox == changedBox) && (state == Qt::Unchecked);
+            bool valueEditUnselected = (valueSelectBox == changedBox) && (state == Qt::Unchecked);
 
             if (varSelectBox == changedBox)
             {
