@@ -2,7 +2,7 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/file_reader.h"
 #include "Headers/logic/cyclogram.h"
-
+#include "Headers/logic/variable_controller.h"
 
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -12,28 +12,11 @@
 #include <QMessageBox>
 #include <QDir>
 
-
-/* Команда-подпрограмма. Мысли вслух о реализации.
- *
- * 1. Данная команда - это по сути один файл циклограммы, сведенный в один квадратик
- * 2. Выполнение данной команды - это выполнение циклограммы
- * 3. Есть правда потенциальная опасность зацикливания циклограммы, когда подпрограмма вызывает другую подпрограмму, а та вызывает копию вызывающей (но это похеру)
- * 4. ПЕРЕМЕННЫЕ ПОДПРОГРАМЫ ИЗ ВЫЗЫВАЮЩЕЙ ПРОГРАММЫ НЕ ВИДНЫ!
- * 5. При редактировании команды мы заполняем две таблицы: "входные параметры" и "выходные параметры"
- * 6. "Входные параметры" - это переменные циклограммы-подпрограммы, которые могут быть проинициализированы либо ТЕКУЩИМ ЗНАЧЕНИЕМ переменной вызывающей циклограммы, либо числом.
- *    По умолчанию все переменные подпрограммы проинициализированы числами-начальными значениями из файла циклограммы-подпрограммы.
- * 7. "Выходные параметры" - это перемнные вызывающей циклограммы, которые могут быть изменены по результатам выполнения подпрограммы.
- *    По умолчанию выходные параметры равны сами себе (подпрограмма по умолчанию ничего не меняет), но могут быть поменяны на значение переменной подпрограммы (на число не могут)
- * 8. Внутри команды мы храним и копию циклограммы-подпрограммы и ссылку на файл:
- *    - Если копия и файл не сошлись, то спрашиваем что юзать
- *    - Если файл удалили/переместили/переименовали - всегда есть локальная копия внутри циклограммы
- *    - Если файл поменяли, то его можно перезагрузить (при открытии файла циклограммы и создании команды-подпрограммы мы спрашиваем чо делать)
- * 9. Так же мы можем хранить только ссылку на файл и маппинг входных-выходных параметров подпрограммы
- *
- *
- *
- * Гибридный вариант (сохраняем и ссылку и копию):
-*/
+namespace
+{
+    static const QString SUBPROGRAM_PREFIX = "Sub";
+    static const QString DELIMITER = ".";
+}
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
@@ -99,9 +82,26 @@ void CmdSubProgram::execute()
         return;
     }
 
-    int TODO; // set input params
+    // Set cyclogram variables current values according to input parameter mapping
+    VariableController* vc = mCyclogram->variableController();
 
-    // Load cyclogram
+    for (auto it = vc->variablesData().begin(); it != vc->variablesData().end(); ++it)
+    {
+        qreal value = 0;
+        QVariant valueVariant = mInputParams.value(subprogramPrefix() + it.key());
+
+        if (valueVariant.type() == QVariant::String)
+        {
+            value = mVarCtrl->currentValue(valueVariant.toString());
+        }
+        else if (valueVariant.type() == QVariant::Double)
+        {
+            value = valueVariant.toDouble();
+        }
+
+        vc->setCurrentValue(it.key(), value);
+    }
+
     mCyclogram->run();
 }
 
@@ -115,13 +115,6 @@ void CmdSubProgram::setFilePath(const QString& filePath)
     mFilePath = filePath;
     load();
     updateText();
-
-//    if (!QFileInfo(mFilePath).exists())
-//    {
-//        LOG_ERROR(QString("Subprogram command error. File '%1' does not exist").arg(mFilePath));
-//        updateText();
-//        return;
-//    }
 }
 
 bool CmdSubProgram::loaded() const
@@ -371,7 +364,42 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
         return;
     }
 
-    int TODO; // write output params
+    // Set calling cyclogram variables current values according to output parameter mapping
+    VariableController* vc = mCyclogram->variableController();
+
+    for (auto it = mVarCtrl->variablesData().begin(); it != mVarCtrl->variablesData().end(); ++it)
+    {
+        qreal value = 0;
+        QVariant valueVariant = mOutputParams.value(it.key());
+
+        if (valueVariant.type() == QMetaType::QString)
+        {
+            QString variableName = valueVariant.toString();
+
+            if (mVarCtrl->isVariableExist(variableName)) // set to own variable value
+            {
+                value = mVarCtrl->currentValue(variableName);
+            }
+            else // set to subprogram variable value
+            {
+                QStringList tokens = variableName.split(DELIMITER);
+                if (tokens.size() == 2)
+                {
+                    value = vc->currentValue(tokens.at(1));
+                }
+                else
+                {
+                    LOG_ERROR(QString("Invalid variable name '%1'").arg(variableName));
+                }
+            }
+        }
+        else if (valueVariant.type() == QMetaType::Double)
+        {
+            value = valueVariant.toDouble();
+        }
+
+        mVarCtrl->setCurrentValue(it.key(), value);
+    }
 
     finish();
 }
@@ -391,4 +419,9 @@ void CmdSubProgram::setParams(const QMap<QString, QVariant>& in, const QMap<QStr
     mInputParams = in;
     mOutputParams = out;
     updateText();
+}
+
+QString CmdSubProgram::subprogramPrefix() const
+{
+    return (SUBPROGRAM_PREFIX + DELIMITER);
 }

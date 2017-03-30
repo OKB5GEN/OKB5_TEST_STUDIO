@@ -262,7 +262,7 @@ void CmdSubProgramEditDialog::updateUI()
     for (auto it = subprogramVariables.begin(); it != subprogramVariables.end(); ++it)
     {
         // param name
-        QString name = mSubprogramNameStr->text() + "." + it.key();
+        QString name = mCommand->subprogramPrefix() + it.key();
         QLabel* text = new QLabel(mInParams);
         text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
@@ -339,7 +339,7 @@ void CmdSubProgramEditDialog::updateUI()
         QComboBox* comboBox = new QComboBox(mOutParams);
         for (auto iter = subprogramVariables.begin(); iter != subprogramVariables.end(); ++iter)
         {
-            QString subName = mSubprogramNameStr->text() + "." + iter.key();
+            QString subName = mCommand->subprogramPrefix() + iter.key();
             comboBox->addItem(subName);
         }
 

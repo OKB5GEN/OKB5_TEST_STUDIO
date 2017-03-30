@@ -111,12 +111,16 @@ void Cyclogram::run()
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
-        mVarController->restart();
         mCurrent = mFirst;
 
         if (mIsMainCyclogram)
         {
+            mVarController->restart(); // set current values to initial values if it is main cyclogram
             mSystemState->onCyclogramStart();
+        }
+        else
+        {
+            // subprogram case: current values for variable controller will be set by subprogram command
         }
 
         setState(RUNNING);
@@ -361,6 +365,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
     case DRAKON::SUBPROGRAM:
         {
             cmd = new CmdSubProgram(this);
+            cmd->setVariableController(mVarController);
         }
         break;
     case DRAKON::ACTION_MATH:
