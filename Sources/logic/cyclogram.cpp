@@ -106,7 +106,15 @@ void Cyclogram::createDefault()
 void Cyclogram::run()
 {
     LOG_INFO("==================================");
-    LOG_INFO("Cyclogram started");
+    if (mIsMainCyclogram)
+    {
+        LOG_INFO("Cyclogram started");
+    }
+    else
+    {
+        LOG_INFO("Subprogram started");
+    }
+
     LOG_INFO("==================================");
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
@@ -147,7 +155,14 @@ void Cyclogram::onCommandFinished(Command* cmd)
     else
     {
         LOG_INFO("==================================");
-        LOG_INFO("Cyclogram finished");
+        if (mIsMainCyclogram)
+        {
+            LOG_INFO("Main cyclogram finished");
+        }
+        else
+        {
+            LOG_INFO("Subprogram finished");
+        }
         LOG_INFO("==================================");
 
         stop();
@@ -162,7 +177,15 @@ void Cyclogram::onCriticalError(Command* cmd)
     LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
 
     LOG_ERROR("==================================");
-    LOG_ERROR("Cyclogram stopped due to critical runtime error");
+    if (mIsMainCyclogram)
+    {
+        LOG_ERROR("Cyclogram stopped due to critical runtime error");
+    }
+    else
+    {
+        LOG_ERROR("Subprogram stopped due to critical runtime error");
+    }
+
     LOG_ERROR("==================================");
 
     for (auto it = mVarController->variablesData().begin(); it != mVarController->variablesData().end(); ++it)

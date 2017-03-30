@@ -140,6 +140,7 @@ void CmdSubProgram::updateText()
     bool isOK = (!mFilePath.isEmpty() && fileInfo.exists());
 
     //TODO no file name is OK (implement this case)
+    //TODO what if file corrupted?
 
     if (hasError())
     {
@@ -155,38 +156,83 @@ void CmdSubProgram::updateText()
 
 void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName)
 {
-    int TODO;
-//    for (int i = 0; i < OperandsCount; ++i)
-//    {
-//        if (mOperands[i].type == Variable && mOperands[i].variable == oldName)
-//        {
-//            mOperands[i].variable = newName; // just change name
-//        }
-//    }
+    // input parameters update
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        if (it.value().type() == QVariant::String && it.value().toString() == oldName)
+        {
+            *it = newName;
+        }
+    }
 
-//    updateText();
+    // output parameters update
+    QVariant oldValue;
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.key() == oldName)
+        {
+            if (it.value() == QVariant(oldName))
+            {
+                oldValue = newName;
+            }
+            else
+            {
+                oldValue = it.value(); // store old value mapping
+            }
+        }
+
+        if (it.value().type() == QVariant::String && it.value().toString() == oldName)
+        {
+            *it = newName;
+        }
+    }
+
+    mOutputParams.remove(oldName); // remove old
+    mOutputParams[newName] = oldValue; // add new
+    updateText();
 }
 
 void CmdSubProgram::onVariableRemoved(const QString& name)
 {
-    int TODO;
-//    for (int i = 0; i < OperandsCount; ++i)
-//    {
-//        if (mOperands[i].type == Variable && mOperands[i].variable == name)
-//        {
-//            if (i == Operand2 && mOperation == Assign)
-//            {
-//                // do nothing
-//            }
-//            else
-//            {
-//                mOperands[i].type = OperandNotSet;
-//                mOperands[i].variable.clear();
-//            }
-//        }
-//    }
+    // input parameters update
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        if (it.value().type() == QVariant::String && it.value().toString() == name)
+        {
+            QStringList tokens = it.key().split(DELIMITER);
+            if (tokens.size() != 2)
+            {
+                LOG_ERROR(QString("Invalid variable name '%1'").arg(it.key()));
+                continue;
+            }
 
-//    updateText();
+            qreal value = mCyclogram->variableController()->initialValue(tokens.at(1));
+            LOG_WARNING(QString("Subprogram '%1' input link to variable '%2' is corrupted due to '%3' variable deletion. Replaced by initial value: %4")
+                        .arg(mText)
+                        .arg(it.key())
+                        .arg(name)
+                        .arg(value));
+
+            *it = QVariant(value);
+        }
+    }
+
+    // output parameters update
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.key() != name && it.value().type() == QVariant::String && it.value().toString() == name)
+        {
+            LOG_WARNING(QString("Subprogram '%1' output link to variable '%2' is corrupted due to '%3' variable deletion. Replaced by '%2' variable itself")
+                        .arg(mText)
+                        .arg(it.key())
+                        .arg(name));
+
+            *it = it.key();
+        }
+    }
+
+    mOutputParams.remove(name); // remove value from mapping table
+    updateText();
 }
 
 void CmdSubProgram::writeCustomAttributes(QXmlStreamWriter* writer)
@@ -372,7 +418,7 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
         qreal value = 0;
         QVariant valueVariant = mOutputParams.value(it.key());
 
-        if (valueVariant.type() == QMetaType::QString)
+        if (valueVariant.type() == QVariant::String)
         {
             QString variableName = valueVariant.toString();
 
@@ -393,7 +439,7 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
                 }
             }
         }
-        else if (valueVariant.type() == QMetaType::Double)
+        else if (valueVariant.type() == QVariant::Double)
         {
             value = valueVariant.toDouble();
         }

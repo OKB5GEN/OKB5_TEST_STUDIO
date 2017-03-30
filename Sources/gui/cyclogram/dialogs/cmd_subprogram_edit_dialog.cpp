@@ -295,7 +295,7 @@ void CmdSubProgramEditDialog::updateUI()
             auto it = inputParams.find(name);
             if (it != inputParams.end())
             {
-                if (it.value().type() == QMetaType::QString)
+                if (it.value().type() == QVariant::String)
                 {
                     int index = comboBox->findText(it.value().toString());
                     if (index != -1)
@@ -304,7 +304,7 @@ void CmdSubProgramEditDialog::updateUI()
                         isVariable = true;
                     }
                 }
-                else if (it.value().type() == QMetaType::Double)
+                else if (it.value().type() == QVariant::Double)
                 {
                     valueEdit->setText(it.value().toString());
                     isVariable = false;
@@ -363,7 +363,7 @@ void CmdSubProgramEditDialog::updateUI()
             auto it = outputParams.find(name);
             if (it != outputParams.end())
             {
-                if (it.value().type() == QMetaType::QString)
+                if (it.value().type() == QVariant::String)
                 {
                     int index = comboBox->findText(it.value().toString());
                     if (index != -1)
@@ -372,7 +372,7 @@ void CmdSubProgramEditDialog::updateUI()
                         isVariable = true;
                     }
                 }
-                else if (it.value().type() == QMetaType::Double)
+                else if (it.value().type() == QVariant::Double)
                 {
                     valueEdit->setText(it.value().toString());
                     isVariable = false;
