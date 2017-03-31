@@ -62,7 +62,15 @@ void CyclogramEndDialog::saveReportAs()
         path = QDir::currentPath();
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save report file"), path, tr("Excel file (*.xlsx)"));
+    QString dir = path;
+    QString extension = ".xlsx";
+    QString currentTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HH_mm_ss");
+
+    dir += "/Report_";
+    dir += currentTime;
+    dir += extension;
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save report file"), dir, tr("Excel file (*.xlsx)"));
 
     if (fileName.isEmpty())
     {

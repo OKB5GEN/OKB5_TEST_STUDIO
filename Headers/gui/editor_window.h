@@ -30,7 +30,7 @@ protected:
 
 private slots:
     void newFile();
-    void open();
+    void openFile();
     bool save();
     bool saveAs();
     void about();

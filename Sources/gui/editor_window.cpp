@@ -128,7 +128,7 @@ void EditorWindow::newFile()
     }
 }
 
-void EditorWindow::open()
+void EditorWindow::openFile()
 {
     if (maybeSave())
     {
@@ -228,7 +228,7 @@ void EditorWindow::createActions()
     mOpenAct = new QAction(openIcon, tr("&Open..."), this);
     mOpenAct->setShortcuts(QKeySequence::Open);
     mOpenAct->setStatusTip(tr("Open an existing file"));
-    connect(mOpenAct, &QAction::triggered, this, &EditorWindow::open);
+    connect(mOpenAct, &QAction::triggered, this, &EditorWindow::openFile);
     fileMenu->addAction(mOpenAct);
     fileToolBar->addAction(mOpenAct);
 
