@@ -1,6 +1,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QMetaEnum>
+#include <QDir>
 
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/commands/cmd_state_start.h"
@@ -587,4 +588,9 @@ bool Cyclogram::isMainCyclogram() const
 void Cyclogram::setMainCyclogram(bool isMain)
 {
     mIsMainCyclogram = isMain;
+}
+
+QString Cyclogram::defaultStorePath()
+{
+    return QDir::currentPath() + QString("/cyclograms/");
 }

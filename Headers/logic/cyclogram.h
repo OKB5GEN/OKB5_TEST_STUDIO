@@ -28,6 +28,8 @@ public:
 
     Cyclogram(QObject * parent);
 
+    static QString defaultStorePath();
+
     void createDefault();
 
     void run();

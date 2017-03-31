@@ -143,6 +143,15 @@ void EditorWindow::openFile()
         QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
         if (!fileName.isEmpty())
         {
+            // load cyclogram
+            QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
+
+            if (tokens.size() != 2)
+            {
+                LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
+                return;
+            }
+
             QString openPath = QFileInfo(fileName).absoluteDir().path();
             settings.setValue(SETTING_LAST_OPEN_FILE_DIR, openPath);
             loadFile(fileName);
@@ -308,14 +317,14 @@ void EditorWindow::createActions()
     const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual.png");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Add manual monitor"), this);
     addManualMonitorAct->setStatusTip(tr("Make data snapshot"));
-    connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::addManualMonitor);
+    connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::makeDataSnapshot);
     monitorMenu->addAction(addManualMonitorAct);
     monitorToolBar->addAction(addManualMonitorAct);
 
     const QIcon addAutoMonitorIcon = QIcon(":/images/monitor_auto.png");
     QAction *addAutoMonitorAct = new QAction(addAutoMonitorIcon, tr("Add auto monitor"), this);
     addAutoMonitorAct->setStatusTip(tr("Add auto parameter monitor"));
-    connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addAutoMonitor);
+    connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addChartWidget);
     monitorMenu->addAction(addAutoMonitorAct);
     monitorToolBar->addAction(addAutoMonitorAct);
 
@@ -531,7 +540,7 @@ void EditorWindow::addVariablesMonitor()
     mVariablesWindow->show();
 }
 
-void EditorWindow::addManualMonitor()
+void EditorWindow::makeDataSnapshot()
 {
     ++mSnapshotsCouner;
     mCyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
@@ -541,21 +550,20 @@ void EditorWindow::addManualMonitor()
     //dialog->show();
 }
 
-void EditorWindow::addAutoMonitor()
+void EditorWindow::addChartWidget()
 {
-    int TODO; // reset cyclogram when new cyclogram opened
     MonitorAuto* dialog = new MonitorAuto(this);
 
     mActiveMonitors.insert(dialog);
 
-    connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed(int)));
+    connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
 
     dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
-void EditorWindow::onAutoMonitorClosed(int result)
+void EditorWindow::onAutoMonitorClosed()
 {
     QObject* sender = QObject::sender();
     if (sender)

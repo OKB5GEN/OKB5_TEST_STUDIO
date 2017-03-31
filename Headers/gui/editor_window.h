@@ -40,13 +40,13 @@ private slots:
     void stopCyclogram();
 
     void addVariablesMonitor();
-    void addManualMonitor();
-    void addAutoMonitor();
+    void makeDataSnapshot();
+    void addChartWidget();
 
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
 
-    void onAutoMonitorClosed(int result);
+    void onAutoMonitorClosed();
 
     void commitData(QSessionManager &);
 

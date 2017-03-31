@@ -36,20 +36,19 @@ bool CmdSubProgram::load()
     mLoaded = false;
     mCyclogram->clear();
 
-    QFile file(mFilePath);
+    QString fileName = Cyclogram::defaultStorePath() + mFilePath;
+    QFile file(fileName);
     FileReader reader(mCyclogram);
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(mFilePath), file.errorString()));
-        //emit criticalError(this);
+        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
 
     if (!reader.read(&file))
     {
-        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(mFilePath), reader.errorString()));
-        //emit criticalError(this);
+        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
         return false;
     }
 
@@ -135,12 +134,14 @@ const QString& CmdSubProgram::name() const
 
 void CmdSubProgram::updateText()
 {
-    QFileInfo fileInfo(mFilePath);
+    bool isOK = true;
 
-    bool isOK = (!mFilePath.isEmpty() && fileInfo.exists());
-
-    //TODO no file name is OK (implement this case)
-    //TODO what if file corrupted?
+    if (!mFilePath.isEmpty())
+    {
+        QString fileName = Cyclogram::defaultStorePath() + mFilePath;
+        QFileInfo fileInfo(fileName);
+        isOK = fileInfo.exists();
+    }
 
     if (hasError())
     {

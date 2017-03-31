@@ -102,7 +102,7 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, Cyclogram* cycl
     {
         mSubprogramNameStr->setText(mCommand->name());
         mFileNameStr->setText(mCommand->filePath());
-        updateUI(); //TODO new command
+        updateUI();
     }
 }
 
@@ -183,10 +183,11 @@ void CmdSubProgramEditDialog::onAccept()
 
 void CmdSubProgramEditDialog::openFile()
 {
-    QString path;
-    QString currentFileName = mFileNameStr->text();
-    if (!currentFileName.isEmpty())
+    QString path = Cyclogram::defaultStorePath();
+
+    if (!mFileNameStr->text().isEmpty())
     {
+        QString currentFileName = path + mFileNameStr->text();
         if (QFileInfo(currentFileName).exists())
         {
             path = QFileInfo(currentFileName).absoluteDir().path();
@@ -197,21 +198,19 @@ void CmdSubProgramEditDialog::openFile()
         }
     }
 
-    if (path.isEmpty())
-    {
-        path = QDir::currentPath();
-    }
-
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
     if (!fileName.isEmpty())
     {
-        //TODO пока не очень понятно какие пути юзать абсолютные или относительные. Пока сделаны абсолютные
-        //абсолютный понятнее и копипастить его проще, но при переносе на другой комп ссылки на подпрограммы могут поехать (надо как-то решить)
-        // относительный безопаснее при переносе между машинами, но нечитабельный (от какой директории идет отсчет? по идее от директории приложения)
-        // по идее все циклограммы должны храниться в папке/подпапках приложения (или при выборе файла, он копируется в папку приложения и читается уже оттуда)
+        // load cyclogram
+        QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
 
-        //QString relativePath = QDir::current().relativeFilePath(fileName);
-        mFileNameStr->setText(fileName);
+        if (tokens.size() != 2)
+        {
+            LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
+            return;
+        }
+
+        mFileNameStr->setText(tokens.at(1));
         updateUI();
     }
 }
@@ -224,24 +223,31 @@ void CmdSubProgramEditDialog::updateUI()
         return;
     }
 
-    QString fileName = mFileNameStr->text();
-
     QSharedPointer<Cyclogram> cyclogram;
     cyclogram.reset(new Cyclogram(Q_NULLPTR));
 
-    QFile file(fileName);
-    FileReader reader(cyclogram.data());
-
-    if (!file.open(QFile::ReadOnly | QFile::Text))
+    if (!mFileNameStr->text().isEmpty()) // some cyclogram file name exist, load cyclogram from file
     {
-        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
+        QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
+
+        QFile file(fileName);
+        FileReader reader(cyclogram.data());
+
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+            return;
+        }
+
+        if (!reader.read(&file))
+        {
+            LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+            return;
+        }
     }
-
-    if (!reader.read(&file))
+    else // no cyclogram file set, possibly just batch calling cyclogram variables changing
     {
-        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-        return;
+        cyclogram->createDefault();
     }
 
     mInParams->clearContents();
