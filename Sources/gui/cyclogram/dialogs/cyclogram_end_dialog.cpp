@@ -7,7 +7,7 @@
 
 namespace
 {
-    static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir"; //TODO remove duplication
+    static const QString SETTING_LAST_REPORT_FILE_SAVE_DIR = "LastReportFileSaveDir";
 }
 
 CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
@@ -56,7 +56,7 @@ void CyclogramEndDialog::saveReportAs()
 
     // try read last file save path
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-    QString path = settings.value(SETTING_LAST_SAVE_FILE_DIR).toString();
+    QString path = settings.value(SETTING_LAST_REPORT_FILE_SAVE_DIR).toString();
     if (path.isEmpty())
     {
         path = QDir::currentPath();
@@ -76,6 +76,9 @@ void CyclogramEndDialog::saveReportAs()
     {
         return;
     }
+
+    QString savePath = QFileInfo(fileName).absoluteDir().path();
+    settings.setValue(SETTING_LAST_REPORT_FILE_SAVE_DIR, savePath);
 
     mCyclogram->variableController()->saveReport(fileName);
 }
