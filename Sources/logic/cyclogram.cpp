@@ -140,6 +140,9 @@ void Cyclogram::run()
         else
         {
             // subprogram case: current values for variable controller will be set by subprogram command
+
+            // start new data timeline
+            mVarController->clearDataTimeline(); // TODO проверить, что данные не профакиваются (начальные значения переменных, задаются извне)
         }
 
         setState(RUNNING);

@@ -29,6 +29,7 @@ public:
         qint64 timestamp;
         QMap<QString, qreal> variables;
         QString label;
+        QString subprogramFlag;
     };
 
     VariableController(QObject* parent);
@@ -54,10 +55,12 @@ public:
     void makeDataSnapshot(const QString& label = "");
     void clearDataTimeline();
     const QVector<DataSnapshot>& dataTimeline() const;
-    void createDependence(const QString& xVar, const QString& yVar, QList<qreal>& x, QList<qreal>& y) const;
-    void timeline(const QString& var, QList<qreal>& time, QList<qreal>& value) const;
 
     void saveReport(const QString& fileName);
+
+    void addDataTimeline(const QVector<DataSnapshot>& dataTimeline);
+    void startSubprogram(const QString& name, const QMap<QString, qreal>& variables);
+    void endSubprogram(const QString& name, const QMap<QString, qreal>& variables);
 
 public slots:
     void restart();

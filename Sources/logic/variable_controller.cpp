@@ -5,6 +5,13 @@
 
 #include <QDateTime>
 
+namespace
+{
+    static const QString START_FLAG = "START";
+    static const QString END_FLAG = "END";
+    static const QString DELIMITER = " ";
+}
+
 VariableController::VariableController(QObject* parent):
     QObject(parent)
 {
@@ -187,54 +194,6 @@ const QVector<VariableController::DataSnapshot>& VariableController::dataTimelin
     return mDataTimeline;
 }
 
-void VariableController::createDependence(const QString& xVar, const QString& yVar, QList<qreal>& x, QList<qreal>& y) const
-{
-    if (!mData.contains(xVar))
-    {
-        LOG_ERROR(QString("Can not create dependence. Variable '%1' not found").arg(xVar));
-        return;
-    }
-
-    if (!mData.contains(yVar))
-    {
-        LOG_ERROR(QString("Can not create dependence. Variable '%1' not found").arg(yVar));
-        return;
-    }
-
-    if (mDataTimeline.isEmpty())
-    {
-        LOG_ERROR(QString("Can not create dependence. Data timeline is empty"));
-        return;
-    }
-
-    for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
-    {
-        x.append(mDataTimeline[i].variables.value(xVar, 0));
-        y.append(mDataTimeline[i].variables.value(yVar, 0));
-    }
-}
-
-void VariableController::timeline(const QString& var, QList<qreal>& time, QList<qreal>& value) const
-{
-    if (!mData.contains(var))
-    {
-        LOG_ERROR(QString("Can not create timeline. Variable '%1' not found").arg(var));
-        return;
-    }
-
-    if (mDataTimeline.isEmpty())
-    {
-        LOG_ERROR(QString("Can not create timeline. Data timeline is empty"));
-        return;
-    }
-
-    for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
-    {
-        time.append(qreal(mDataTimeline[i].timestamp - mDataTimeline.front().timestamp));
-        value.append(mDataTimeline[i].variables.value(var, 0));
-    }
-}
-
 void VariableController::saveReport(const QString& fileName)
 {
     QXlsx::Document xlsx;
@@ -260,6 +219,8 @@ void VariableController::saveReport(const QString& fileName)
         startTime = mDataTimeline.front().timestamp;
     }
 
+    int columnShift = 0;
+
     // write data
     for (int i = 0, sz = mDataTimeline.size(); i < sz; ++i)
     {
@@ -268,20 +229,76 @@ void VariableController::saveReport(const QString& fileName)
         xlsx.write(row, column, time);
         ++column;
 
-        for (auto it = mDataTimeline[i].variables.begin(); it != mDataTimeline[i].variables.end(); ++it)
+        if (mDataTimeline[i].subprogramFlag.isEmpty())
         {
-            xlsx.write(row, column, it.value());
-            ++column;
-        }
+            for (auto it = mDataTimeline[i].variables.begin(); it != mDataTimeline[i].variables.end(); ++it)
+            {
+                xlsx.write(row, columnShift + column, it.value());
+                ++column;
+            }
 
-        if (!mDataTimeline[i].label.isEmpty())
+            if (!mDataTimeline[i].label.isEmpty())
+            {
+                xlsx.write(row, columnShift + column, mDataTimeline[i].label);
+                ++column;
+            }
+        }
+        else // subprogram start/end
         {
-            xlsx.write(row, column, mDataTimeline[i].label);
-            ++column;
+            QStringList token = mDataTimeline[i].subprogramFlag.split(DELIMITER);
+            if (token.size() != 2)
+            {
+                LOG_ERROR("Invalid subprogram name");
+                continue;
+            }
+
+            if (token.at(0) == START_FLAG)
+            {
+                columnShift += mDataTimeline[i].variables.size(); // shift right table start column to start write subprogram variables
+
+                // write subprogram name + variables header
+                xlsx.write(row, columnShift + column, token.at(1));
+                ++column;
+
+                for (auto it = mDataTimeline[i].variables.begin(); it != mDataTimeline[i].variables.end(); ++it)
+                {
+                    xlsx.write(row, columnShift + column, it.key());
+                    ++column;
+                }
+
+                ++columnShift;
+            }
+            else if (token.at(0) == END_FLAG)
+            {
+                columnShift -= mDataTimeline[i].variables.size(); // shift back table start column to write calling cyclogram variables further
+                --columnShift;
+                --row; // just skip currnt timeline stamp just indicating that current subprogram is finished
+            }
         }
 
         ++row;
     }
 
     xlsx.saveAs(fileName);
+}
+
+void VariableController::addDataTimeline(const QVector<DataSnapshot>& dataTimeline)
+{
+    mDataTimeline.append(dataTimeline);
+}
+
+void VariableController::startSubprogram(const QString& name, const QMap<QString, qreal>& variables)
+{
+    mDataTimeline.push_back(DataSnapshot());
+    mDataTimeline.back().timestamp = QDateTime::currentMSecsSinceEpoch();
+    mDataTimeline.back().subprogramFlag = START_FLAG + DELIMITER + name;
+    mDataTimeline.back().variables = variables;
+}
+
+void VariableController::endSubprogram(const QString& name, const QMap<QString, qreal>& variables)
+{
+    mDataTimeline.push_back(DataSnapshot());
+    mDataTimeline.back().timestamp = QDateTime::currentMSecsSinceEpoch();
+    mDataTimeline.back().subprogramFlag = END_FLAG + DELIMITER + name;
+    mDataTimeline.back().variables = variables;
 }

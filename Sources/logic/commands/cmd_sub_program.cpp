@@ -83,6 +83,7 @@ void CmdSubProgram::execute()
 
     // Set cyclogram variables current values according to input parameter mapping
     VariableController* vc = mCyclogram->variableController();
+    QMap<QString, qreal> variables;
 
     for (auto it = vc->variablesData().begin(); it != vc->variablesData().end(); ++it)
     {
@@ -98,8 +99,11 @@ void CmdSubProgram::execute()
             value = valueVariant.toDouble();
         }
 
+        variables[it.key()] = value;
         vc->setCurrentValue(it.key(), value);
     }
+
+    mVarCtrl->startSubprogram(mText, variables);
 
     mCyclogram->run();
 }
@@ -414,6 +418,10 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
     // Set calling cyclogram variables current values according to output parameter mapping
     VariableController* vc = mCyclogram->variableController();
 
+    // add subprogram data timeline to calling cyclogram
+    mVarCtrl->addDataTimeline(vc->dataTimeline());
+    QMap<QString, qreal> variables;
+
     for (auto it = mVarCtrl->variablesData().begin(); it != mVarCtrl->variablesData().end(); ++it)
     {
         qreal value = 0;
@@ -445,8 +453,11 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
             value = valueVariant.toDouble();
         }
 
+        variables[it.key()] = value;
         mVarCtrl->setCurrentValue(it.key(), value);
     }
+
+    mVarCtrl->endSubprogram(mText, variables);
 
     finish();
 }

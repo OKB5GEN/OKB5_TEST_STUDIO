@@ -388,7 +388,7 @@ void MonitorAuto::onCyclogramStateChanged(int state)
 
     if (state == Cyclogram::RUNNING)
     {
-        mPlot->clearGraphs();
+        mPlot->clearGraphs(); //TODO не очищать графики подпрограм, а сдлеать метод для очистки графиков/рестарта
 
         mStartTime = QDateTime::currentMSecsSinceEpoch();
         QFont font;
@@ -408,7 +408,9 @@ void MonitorAuto::onCyclogramStateChanged(int state)
         mMinX = 0;
         mMaxX = X_AXIS_ADD;
 
-        int TODO;
+        int TODO; // добавить какое-то управление минимумами-максимумами чтобы график прыгал по возможности пореже
+        // либо со скроллингом делать график
+
         mPlot->xAxis->setRange(mMinX, mMaxX);//Для оси Ox
         mPlot->yAxis->setRange(mMinY, mMaxY);//Для оси Oy
 
