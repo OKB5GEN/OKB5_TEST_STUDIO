@@ -15,6 +15,7 @@ public:
     CmdSubProgram(QObject* parent);
 
     void run() override;
+    void restart();
 
 public:
     void setFilePath(const QString& filePath);

@@ -472,3 +472,18 @@ QString CmdSubProgram::subprogramPrefix() const
 {
     return (SUBPROGRAM_PREFIX + DELIMITER);
 }
+
+void CmdSubProgram::restart()
+{
+    mVarCtrl->restart();
+
+    // clear all subprograms variables data
+    for (auto it = mCyclogram->commands().begin(); it != mCyclogram->commands().end(); ++it)
+    {
+        if ((*it)->type() == DRAKON::SUBPROGRAM)
+        {
+            CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(*it);
+            subprogram->restart();
+        }
+    }
+}

@@ -126,6 +126,16 @@ void Cyclogram::run()
         {
             mVarController->restart(); // set current values to initial values if it is main cyclogram
             mSystemState->onCyclogramStart();
+
+            // clear all subprograms variables data
+            for (auto it = mCommands.begin(); it != mCommands.end(); ++it)
+            {
+                if ((*it)->type() == DRAKON::SUBPROGRAM)
+                {
+                    CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(*it);
+                    subprogram->restart();
+                }
+            }
         }
         else
         {

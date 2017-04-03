@@ -163,8 +163,6 @@ QString VariableController::description(const QString& name) const
 
 void VariableController::makeDataSnapshot(const QString& label)
 {
-    bool isFirstPoint = mDataTimeline.isEmpty();
-
     mDataTimeline.push_back(DataSnapshot());
 
     mDataTimeline.back().label = label;
