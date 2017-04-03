@@ -26,6 +26,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
+#include "Headers/gui/tools/monitor_auto.h"
 
 #include "Headers/gui/cyclogram/shape_item.h"
 
@@ -304,6 +305,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
                 mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
                 QMenu *menu = new QMenu(this);
                 menu->addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
+                menu->addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
                 menu->exec(mapToGlobal(event->pos()));
                 menu->deleteLater();
             }
@@ -340,6 +342,32 @@ void CyclogramWidget::showSubprogramWidget()
     dialog->setLayout(layout);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->resize(w->size()); //TODO too big size case
+    dialog->show();
+}
+
+void CyclogramWidget::showSubprogramChart()
+{
+    //TODO по идее
+    if (!mCurSubprogram)
+    {
+        LOG_WARNING(QString("Subprogram not set"));
+        return;
+    }
+
+    if (!mCurSubprogram->loaded())
+    {
+        LOG_ERROR(QString("Subprogram configuration error"));
+        return;
+    }
+
+    MonitorAuto* dialog = new MonitorAuto(parentWidget());
+
+    //mActiveMonitors.insert(dialog);
+
+    //connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
+
+    dialog->setCyclogram(mCurSubprogram->cyclogram());
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 

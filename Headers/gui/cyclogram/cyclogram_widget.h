@@ -50,6 +50,7 @@ private slots:
     void onNeedUpdate();
     void onNeedToDelete(ShapeItem* shape);
     void showSubprogramWidget();
+    void showSubprogramChart();
 
 private:
     void drawSilhouette();
