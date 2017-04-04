@@ -254,7 +254,15 @@ void VariableController::saveReport(const QString& fileName)
 
             if (token.at(0) == START_FLAG)
             {
-                columnShift += mDataTimeline[i].variables.size(); // shift right table start column to start write subprogram variables
+                // shift right table start column to start write subprogram variables
+                if (columnShift == 0)
+                {
+                    columnShift += mData.keys().size();
+                }
+                else
+                {
+                    columnShift += mDataTimeline[i - 1].variables.size();
+                }
 
                 // write subprogram name + variables header
                 xlsx.write(row, columnShift + column, token.at(1));
@@ -289,6 +297,7 @@ void VariableController::addDataTimeline(const QVector<DataSnapshot>& dataTimeli
 
 void VariableController::startSubprogram(const QString& name, const QMap<QString, qreal>& variables)
 {
+    LOG_DEBUG(QString("VC: Start subprogram '%1'").arg(name));
     mDataTimeline.push_back(DataSnapshot());
     mDataTimeline.back().timestamp = QDateTime::currentMSecsSinceEpoch();
     mDataTimeline.back().subprogramFlag = START_FLAG + DELIMITER + name;
@@ -297,6 +306,7 @@ void VariableController::startSubprogram(const QString& name, const QMap<QString
 
 void VariableController::endSubprogram(const QString& name, const QMap<QString, qreal>& variables)
 {
+    LOG_DEBUG(QString("VC: End subprogram '%1'").arg(name));
     mDataTimeline.push_back(DataSnapshot());
     mDataTimeline.back().timestamp = QDateTime::currentMSecsSinceEpoch();
     mDataTimeline.back().subprogramFlag = END_FLAG + DELIMITER + name;

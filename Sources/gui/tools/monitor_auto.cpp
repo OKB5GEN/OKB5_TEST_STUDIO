@@ -418,7 +418,6 @@ void MonitorAuto::onCyclogramStateChanged(int state)
 
         const QMap<QString, VariableController::VariableData>& data = vc->variablesData();
 
-        int i = 0;
         int color = Qt::red;
         for (auto it = data.begin(); it != data.end(); ++it)
         {
@@ -441,5 +440,9 @@ void MonitorAuto::onCyclogramStateChanged(int state)
         mPlot->replot();
 
         connect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+    }
+    else if (state == Cyclogram::STOPPED)
+    {
+        //TODO some hacks with subprogram charts
     }
 }
