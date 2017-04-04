@@ -397,7 +397,7 @@ void MonitorAuto::onCyclogramStateChanged(int state)
 
         mPlot->xAxis->setTickLabelFont(font);
         mPlot->xAxis->setLabelFont(font);
-        mPlot->xAxis->setLabel(tr("Время, мс"));
+        mPlot->xAxis->setLabel(tr("Время, с"));
 
         mPlot->yAxis->setTickLabelFont(font);
         mPlot->yAxis->setLabelFont(font);

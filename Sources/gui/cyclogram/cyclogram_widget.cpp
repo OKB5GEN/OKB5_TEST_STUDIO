@@ -332,7 +332,14 @@ void CyclogramWidget::showSubprogramWidget()
     }
 
     QDialog* dialog = new QDialog(parentWidget());
-    dialog->setWindowTitle(mCurSubprogram->filePath());
+    QString windowTitle = parentWidget()->windowTitle();
+    if (!windowTitle.isEmpty())
+    {
+        windowTitle += QString(" -> ");
+    }
+
+    windowTitle += mCurSubprogram->text();
+    dialog->setWindowTitle(windowTitle);
 
     CyclogramWidget* w = new CyclogramWidget(dialog);
     w->load(mCurSubprogram->cyclogram());
@@ -347,7 +354,6 @@ void CyclogramWidget::showSubprogramWidget()
 
 void CyclogramWidget::showSubprogramChart()
 {
-    //TODO по идее
     if (!mCurSubprogram)
     {
         LOG_WARNING(QString("Subprogram not set"));
@@ -362,7 +368,16 @@ void CyclogramWidget::showSubprogramChart()
 
     MonitorAuto* dialog = new MonitorAuto(parentWidget());
 
-    //mActiveMonitors.insert(dialog);
+    //mActiveMonitors.insert(dialog); //TODO разобраться с иерархией окон, ее обновлением при изменении файлов и т.д.
+
+    QString windowTitle = parentWidget()->windowTitle();
+    if (!windowTitle.isEmpty())
+    {
+        windowTitle += QString(" -> ");
+    }
+
+    windowTitle += mCurSubprogram->text();
+    dialog->setWindowTitle(windowTitle);
 
     //connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
 
