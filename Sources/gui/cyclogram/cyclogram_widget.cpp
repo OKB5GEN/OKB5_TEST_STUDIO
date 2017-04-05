@@ -331,6 +331,7 @@ void CyclogramWidget::showSubprogramWidget()
         return;
     }
 
+    //TODO move dialog to separate class
     QDialog* dialog = new QDialog(parentWidget());
     QString windowTitle = parentWidget()->windowTitle();
     if (!windowTitle.isEmpty())
@@ -345,11 +346,49 @@ void CyclogramWidget::showSubprogramWidget()
     w->load(mCurSubprogram->cyclogram());
 
     QVBoxLayout* layout = new QVBoxLayout(dialog);
+    QHBoxLayout* buttonLayout = new QHBoxLayout();
+    layout->addLayout(buttonLayout);
+
+    QPushButton* saveBtn = new QPushButton(QIcon(":/images/save"), tr("Save"), dialog);
+    QPushButton* variablesBtn = new QPushButton(QIcon(":/images/variable"), tr("Variables"), dialog);
+    QPushButton* chartBtn = new QPushButton(QIcon(":/images/monitor_auto"), tr("Chart"), dialog);
+    QPushButton* deleteBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Delete"), dialog);
+
+    connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
+    connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
+    connect(chartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
+    connect(deleteBtn, SIGNAL(clicked(bool)), this, SLOT(onDeleteClick()));
+
+    buttonLayout->addWidget(saveBtn);
+    buttonLayout->addWidget(variablesBtn);
+    buttonLayout->addWidget(chartBtn);
+    buttonLayout->addWidget(deleteBtn);
+
     layout->addWidget(w);
     dialog->setLayout(layout);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->resize(w->size()); //TODO too big size case
     dialog->show();
+}
+
+void CyclogramWidget::onSaveClick()
+{
+    LOG_DEBUG("Save subprogram");
+}
+
+void CyclogramWidget::onVariablesClick()
+{
+    LOG_DEBUG("Show subprogram variables");
+}
+
+void CyclogramWidget::onChartClick()
+{
+    LOG_DEBUG("Show subprogram charts");
+}
+
+void CyclogramWidget::onDeleteClick()
+{
+    LOG_DEBUG("Delete subprogram command");
 }
 
 void CyclogramWidget::showSubprogramChart()
