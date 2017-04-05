@@ -114,6 +114,39 @@ void CyclogramWidget::resizeEvent(QResizeEvent * /* event */)
 {
 }
 
+void CyclogramWidget::deleteSelectedItem()
+{
+    if (mSelectedItem)
+    {
+        QString errorDesc;
+        if (canBeDeleted(mSelectedItem, errorDesc))
+        {
+            bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
+            QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
+            QString text = tr("Are you sure that you want to delete ");
+            if (isBranch)
+            {
+                text += tr("entire branch with all its commands?");
+            }
+            else
+            {
+                text += tr("this command?");
+            }
+
+            if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
+            {
+                ShapeItem* item = mSelectedItem;
+                clearSelection();
+                deleteCommand(item);
+            }
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Command deletion"), tr("Command can not be deleted!\nReason: ") + errorDesc);
+        }
+    }
+}
+
 void CyclogramWidget::keyPressEvent(QKeyEvent *event)
 {
     bool processed = true;
@@ -122,35 +155,7 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
     {
     case Qt::Key_Delete:
         {
-            if (mSelectedItem)
-            {
-                QString errorDesc;
-                if (canBeDeleted(mSelectedItem, errorDesc))
-                {
-                    bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
-                    QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
-                    QString text = tr("Are you sure that you want to delete ");
-                    if (isBranch)
-                    {
-                        text += tr("entire branch with all its commands?");
-                    }
-                    else
-                    {
-                        text += tr("this command?");
-                    }
-
-                    if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
-                    {
-                        ShapeItem* item = mSelectedItem;
-                        clearSelection();
-                        deleteCommand(item);
-                    }
-                }
-                else
-                {
-                    QMessageBox::warning(this, tr("Command deletion"), tr("Command can not be deleted!\nReason: ") + errorDesc);
-                }
-            }
+            deleteSelectedItem();
         }
         break;
 

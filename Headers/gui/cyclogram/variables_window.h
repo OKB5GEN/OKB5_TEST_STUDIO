@@ -3,12 +3,9 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QTableWidget;
 class QToolButton;
 class QDoubleValidator;
-QT_END_NAMESPACE
-
 class Cyclogram;
 
 class VariablesWindow: public QDialog

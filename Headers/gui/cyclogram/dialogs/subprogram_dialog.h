@@ -8,7 +8,9 @@ class QCheckBox;
 class QTableWidget;
 
 class CmdSubProgram;
+class CyclogramWidget;
 class Cyclogram;
+class VariablesWindow;
 
 class SubProgramDialog : public QDialog
 {
@@ -28,7 +30,6 @@ private slots:
     void onSaveClick();
     void onVariablesClick();
     void onChartClick();
-    void onDeleteClick();
 
 private:
 //    void setupUI();
@@ -36,6 +37,8 @@ private:
 //    void updateTable(QTableWidget* widget, QCheckBox* changedBox, int state);
 
     CmdSubProgram* mCommand;
+    CyclogramWidget* mWidget;
+    VariablesWindow* mVariablesWindow;
 
 //    Cyclogram* mCallingCyclogram;
 };

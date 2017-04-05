@@ -33,6 +33,7 @@ public:
 public slots:
     void load(Cyclogram* cyclogram);
     void showValidationError(Command* cmd);
+    void deleteSelectedItem();
 
 protected:
     bool event(QEvent *event) Q_DECL_OVERRIDE;
