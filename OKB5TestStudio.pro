@@ -79,7 +79,8 @@ SOURCES += main.cpp\
     Sources/system/codecs/power_unit_codec.cpp \
     Sources/gui/application_finish_dialog.cpp \
     Sources/logger/TextEditAppender.cpp \
-    Sources/gui/tools/app_console.cpp
+    Sources/gui/tools/app_console.cpp \
+    Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -142,7 +143,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/codecs/power_unit_codec.h \
     Headers/gui/application_finish_dialog.h \
     Headers/logger/TextEditAppender.h \
-    Headers/gui/tools/app_console.h
+    Headers/gui/tools/app_console.h \
+    Headers/gui/cyclogram/dialogs/subprogram_dialog.h
 
 
 FORMS    +=

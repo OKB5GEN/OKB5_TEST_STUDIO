@@ -52,11 +52,6 @@ private slots:
     void showSubprogramWidget();
     void showSubprogramChart();
 
-    void onSaveClick();
-    void onVariablesClick();
-    void onChartClick();
-    void onDeleteClick();
-
 private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
