@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables/>
+    <commands>
+        <command type="TERMINATOR" id="1491458159341" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491458159342" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491458159343"/>
+        <command type="BRANCH_BEGIN" id="1491458159344" name="End"/>
+        <command type="TERMINATOR" id="1491458159345" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1491458166765" name="Test_1(27V)" file="BUP_Test/sub_bup_test.cgr">
+            <input_params>
+                <param name="Sub.I" type="6" value="0"/>
+                <param name="Sub.I1" type="6" value="0"/>
+                <param name="Sub.I2" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuDestSt" type="6" value="30000"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuSDest" type="6" value="30000"/>
+                <param name="Sub.NuV" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyDestSt" type="6" value="15000"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsySDest" type="6" value="15000"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="27"/>
+                <param name="Sub.U(work)" type="6" value="27"/>
+                <param name="Sub.U1" type="6" value="27"/>
+                <param name="Sub.U2" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1491458212494" name="Test_2(25.65V)" file="BUP_Test/sub_bup_test.cgr">
+            <input_params>
+                <param name="Sub.I" type="6" value="0"/>
+                <param name="Sub.I1" type="6" value="0"/>
+                <param name="Sub.I2" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuDestSt" type="6" value="30000"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuSDest" type="6" value="30000"/>
+                <param name="Sub.NuV" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyDestSt" type="6" value="15000"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsySDest" type="6" value="15000"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="27"/>
+                <param name="Sub.U(work)" type="6" value="25.65"/>
+                <param name="Sub.U1" type="6" value="27"/>
+                <param name="Sub.U2" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1491458296040" name="Test_3(28.35V)" file="BUP_Test/sub_bup_test.cgr">
+            <input_params>
+                <param name="Sub.I" type="6" value="0"/>
+                <param name="Sub.I1" type="6" value="0"/>
+                <param name="Sub.I2" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuDestSt" type="6" value="30000"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuSDest" type="6" value="30000"/>
+                <param name="Sub.NuV" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyDestSt" type="6" value="15000"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsySDest" type="6" value="15000"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="27"/>
+                <param name="Sub.U(work)" type="6" value="28.35"/>
+                <param name="Sub.U1" type="6" value="27"/>
+                <param name="Sub.U2" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+    </commands>
+    <tree>
+        <item id="1491458159341" down="1491458159342" right="-1" under_arrow="-1"/>
+        <item id="1491458159342" down="1491458166765" right="-1" under_arrow="-1"/>
+        <item id="1491458159343" down="1491458159344" right="-1" under_arrow="-1"/>
+        <item id="1491458159344" down="1491458159345" right="-1" under_arrow="-1"/>
+        <item id="1491458159345" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1491458166765" down="1491458212494" right="-1" under_arrow="-1"/>
+        <item id="1491458212494" down="1491458296040" right="-1" under_arrow="-1"/>
+        <item id="1491458296040" down="1491458159343" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

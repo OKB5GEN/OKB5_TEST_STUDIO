@@ -403,6 +403,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         {
             cmd = new CmdSubProgram(this);
             cmd->setVariableController(mVarController);
+            cmd->setSystemState(mSystemState);
         }
         break;
     case DRAKON::ACTION_MATH:

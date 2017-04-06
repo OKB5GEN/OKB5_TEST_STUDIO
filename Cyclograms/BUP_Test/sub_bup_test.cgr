@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="Err" value="0" desc=""/>
+        <variable name="I" value="0" desc="Current, A"/>
+        <variable name="NuA" value="0" desc="Angle (Nu)"/>
+        <variable name="NuI" value="0" desc="Max current (Nu)"/>
+        <variable name="NuM" value="0" desc="Mode (Nu)"/>
+        <variable name="NuS" value="0" desc="Steps (Nu)"/>
+        <variable name="NuSDest" value="10000" desc=""/>
+        <variable name="NuV" value="0" desc="Velocity (Nu)"/>
+        <variable name="PsyA" value="0" desc="Angle (Psy)"/>
+        <variable name="PsyI" value="0" desc="Max current (Psy)"/>
+        <variable name="PsyM" value="0" desc="Mode (Psy)"/>
+        <variable name="PsyS" value="0" desc="Steps (Psy)"/>
+        <variable name="PsySDest" value="10000" desc=""/>
+        <variable name="PsyV" value="0" desc="Velocity (Psy)"/>
+        <variable name="T" value="0" desc="Temperature, °C"/>
+        <variable name="TSF" value="0" desc="Temperature sensor presense flag"/>
+        <variable name="U" value="27" desc="Уровень питающего напряжения"/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1488866617379" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1488866617380" name="Питание"/>
+        <command type="GO_TO_BRANCH" id="1488866617381"/>
+        <command type="BRANCH_BEGIN" id="1488866617382" name="Выход"/>
+        <command type="TERMINATOR" id="1488866617383" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1488866641979" module="POWER_UNIT_PNA" command="SET_VOLTAGE_AND_CURRENT" implicit_params="0">
+            <input_params>
+                <param name="Voltage, V" type="10" value="U"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488866671895" module="POWER_UNIT_BUP" command="SET_VOLTAGE_AND_CURRENT" implicit_params="">
+            <input_params>
+                <param name="Voltage, V" type="10" value="U"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488866679733" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488866690749" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488866711722" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488866728669" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="BRANCH_BEGIN" id="1488866769622" name="ВклБУП"/>
+        <command type="GO_TO_BRANCH" id="1488866769624"/>
+        <command type="ACTION_MODULE" id="1488869271509" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488869279714" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="DELAY" id="1488869320010" delay="2000"/>
+        <command type="ACTION_MODULE" id="1488869334711" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488869339395" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1488876450128" module="MKO" command="RECEIVE_TEST_ARRAY" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1489124511097" module="MKO" command="SEND_TO_ANGLE_SENSOR" implicit_params="">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1489124523438" module="MKO" command="SEND_TEST_ARRAY" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1489570624327" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="BRANCH_BEGIN" id="1489571234040" name="Проверка"/>
+        <command type="GO_TO_BRANCH" id="1489571234041"/>
+        <command type="ACTION_MODULE" id="1489571242686" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
+            <input_params/>
+            <output_params>
+                <param name="Angle (Nu)" type="10" value="NuA"/>
+                <param name="Angle (Psy)" type="10" value="PsyA"/>
+                <param name="Max current (Nu)" type="10" value="NuI"/>
+                <param name="Max current (Psy)" type="10" value="PsyI"/>
+                <param name="Mode (Nu)" type="10" value="NuM"/>
+                <param name="Mode (Psy)" type="10" value="PsyM"/>
+                <param name="Steps (Nu)" type="10" value="NuS"/>
+                <param name="Steps (Psy)" type="10" value="PsyS"/>
+                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
+                <param name="Temperature, °C" type="10" value="T"/>
+                <param name="Velocity (Nu)" type="10" value="NuV"/>
+                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1489571279814" operation="GreaterOrEqual" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="4969" variable="PsyS"/>
+            <operand id="Right" type="Variable" value="0" variable="PsySDest"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1489571279817"/>
+        <command type="QUESTION" id="1489571362772" operation="GreaterOrEqual" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="5039" variable="NuS"/>
+            <operand id="Right" type="Variable" value="0" variable="NuSDest"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1489571362775"/>
+        <command type="ACTION_MODULE" id="1489571538361" module="MKO" command="STOP_MKO" implicit_params="0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="DELAY" id="1489571551385" delay="200"/>
+        <command type="ACTION_MODULE" id="1489572533943" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="DELAY" id="1489572568336" delay="200"/>
+        <command type="BRANCH_BEGIN" id="1491462342598" name="Команда"/>
+        <command type="GO_TO_BRANCH" id="1491462342601"/>
+        <command type="ACTION_MODULE" id="1491462374770" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="">
+            <input_params>
+                <param name="Max current (Nu)" type="6" value="500"/>
+                <param name="Max current (Psy)" type="6" value="500"/>
+                <param name="Mode (Nu)" type="6" value="3"/>
+                <param name="Mode (Psy)" type="6" value="3"/>
+                <param name="Steps (Nu)" type="10" value="NuSDest"/>
+                <param name="Steps (Psy)" type="10" value="PsySDest"/>
+                <param name="Velocity (Nu)" type="6" value="5000"/>
+                <param name="Velocity (Psy)" type="6" value="5000"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="BRANCH_BEGIN" id="1491462885342" name="Настройка МКО"/>
+        <command type="GO_TO_BRANCH" id="1491462885345"/>
+        <command type="ACTION_MODULE" id="1491464840151" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,0">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="DELAY" id="1491464854969" delay="3000"/>
+        <command type="ACTION_MODULE" id="1491464863421" module="MKO" command="START_MKO" implicit_params="">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1491466959918" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="">
+            <input_params>
+                <param name="Max current (Nu)" type="6" value="0"/>
+                <param name="Max current (Psy)" type="6" value="0"/>
+                <param name="Mode (Nu)" type="6" value="5"/>
+                <param name="Mode (Psy)" type="6" value="5"/>
+                <param name="Steps (Nu)" type="6" value="0"/>
+                <param name="Steps (Psy)" type="6" value="0"/>
+                <param name="Velocity (Nu)" type="6" value="0"/>
+                <param name="Velocity (Psy)" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1491467008005" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="">
+            <input_params/>
+            <output_params>
+                <param name="Angle (Nu)" type="10" value="NuA"/>
+                <param name="Angle (Psy)" type="10" value="PsyA"/>
+                <param name="Max current (Nu)" type="10" value="NuI"/>
+                <param name="Max current (Psy)" type="10" value="PsyI"/>
+                <param name="Mode (Nu)" type="10" value="NuM"/>
+                <param name="Mode (Psy)" type="10" value="PsyM"/>
+                <param name="Steps (Nu)" type="10" value="NuS"/>
+                <param name="Steps (Psy)" type="10" value="PsyS"/>
+                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
+                <param name="Temperature, °C" type="10" value="T"/>
+                <param name="Velocity (Nu)" type="10" value="NuV"/>
+                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491470262056" operation="Equal" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="NuM"/>
+            <operand id="Right" type="Number" value="5" variable=""/>
+        </command>
+        <command type="QUESTION" id="1491470270467" operation="Equal" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="PsyM"/>
+            <operand id="Right" type="Number" value="5" variable=""/>
+        </command>
+        <command type="QUESTION" id="1491470295435" operation="Equal" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="NuS"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="QUESTION" id="1491470300125" operation="Equal" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="PsyS"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491470309725" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491470313053" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491470317351" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491470321632" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Err"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+    </commands>
+    <tree>
+        <item id="1488866617379" down="1488866617380" right="-1" under_arrow="-1"/>
+        <item id="1488866617380" down="1489572533943" right="-1" under_arrow="-1"/>
+        <item id="1488866617381" down="1491462885342" right="-1" under_arrow="-1"/>
+        <item id="1488866617382" down="1488869339395" right="-1" under_arrow="-1"/>
+        <item id="1488866617383" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1488866641979" down="1488866671895" right="-1" under_arrow="-1"/>
+        <item id="1488866671895" down="1488866679733" right="-1" under_arrow="-1"/>
+        <item id="1488866679733" down="1488866690749" right="-1" under_arrow="-1"/>
+        <item id="1488866690749" down="1488866617381" right="-1" under_arrow="-1"/>
+        <item id="1488866711722" down="1488866728669" right="-1" under_arrow="-1"/>
+        <item id="1488866728669" down="1489571538361" right="-1" under_arrow="-1"/>
+        <item id="1488866769622" down="1488869271509" right="-1" under_arrow="-1"/>
+        <item id="1488866769624" down="1491462342598" right="-1" under_arrow="-1"/>
+        <item id="1488869271509" down="1488869279714" right="-1" under_arrow="-1"/>
+        <item id="1488869279714" down="1488869320010" right="-1" under_arrow="-1"/>
+        <item id="1488869320010" down="1489124511097" right="-1" under_arrow="-1"/>
+        <item id="1488869334711" down="1488866711722" right="-1" under_arrow="-1"/>
+        <item id="1488869339395" down="1488869334711" right="-1" under_arrow="-1"/>
+        <item id="1488876450128" down="1488866769624" right="-1" under_arrow="-1"/>
+        <item id="1489124511097" down="1489124523438" right="-1" under_arrow="-1"/>
+        <item id="1489124523438" down="1488876450128" right="-1" under_arrow="-1"/>
+        <item id="1489570624327" down="1488866617383" right="-1" under_arrow="-1"/>
+        <item id="1489571234040" down="1489571242686" right="-1" under_arrow="-1"/>
+        <item id="1489571234041" down="1488866617382" right="-1" under_arrow="-1"/>
+        <item id="1489571242686" down="1489571279814" right="-1" under_arrow="-1"/>
+        <item id="1489571279814" down="1489571362772" right="1489571279817" under_arrow="-1"/>
+        <item id="1489571279817" down="1489571234040" right="-1" under_arrow="-1"/>
+        <item id="1489571362772" down="1491466959918" right="1489571362775" under_arrow="-1"/>
+        <item id="1489571362775" down="1489571234040" right="-1" under_arrow="-1"/>
+        <item id="1489571538361" down="1489571551385" right="-1" under_arrow="-1"/>
+        <item id="1489571551385" down="1489570624327" right="-1" under_arrow="-1"/>
+        <item id="1489572533943" down="1489572568336" right="-1" under_arrow="-1"/>
+        <item id="1489572568336" down="1488866641979" right="-1" under_arrow="-1"/>
+        <item id="1491462342598" down="1491462374770" right="-1" under_arrow="-1"/>
+        <item id="1491462342601" down="1489571234040" right="-1" under_arrow="-1"/>
+        <item id="1491462374770" down="1491462342601" right="-1" under_arrow="-1"/>
+        <item id="1491462885342" down="1491464840151" right="-1" under_arrow="-1"/>
+        <item id="1491462885345" down="1488866769622" right="-1" under_arrow="-1"/>
+        <item id="1491464840151" down="1491464854969" right="-1" under_arrow="-1"/>
+        <item id="1491464854969" down="1491464863421" right="-1" under_arrow="-1"/>
+        <item id="1491464863421" down="1491462885345" right="-1" under_arrow="-1"/>
+        <item id="1491466959918" down="1491467008005" right="-1" under_arrow="-1"/>
+        <item id="1491467008005" down="1491470262056" right="-1" under_arrow="-1"/>
+        <item id="1491470262056" down="1491470270467" right="1491470309725" under_arrow="1491470270467"/>
+        <item id="1491470270467" down="1491470295435" right="1491470313053" under_arrow="1491470295435"/>
+        <item id="1491470295435" down="1491470300125" right="1491470317351" under_arrow="1491470300125"/>
+        <item id="1491470300125" down="1489571234041" right="1491470321632" under_arrow="1489571234041"/>
+        <item id="1491470309725" down="1491470270467" right="-1" under_arrow="-1"/>
+        <item id="1491470313053" down="1491470295435" right="-1" under_arrow="-1"/>
+        <item id="1491470317351" down="1491470300125" right="-1" under_arrow="-1"/>
+        <item id="1491470321632" down="1489571234041" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

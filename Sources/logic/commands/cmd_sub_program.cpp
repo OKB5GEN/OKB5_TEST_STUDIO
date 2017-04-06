@@ -35,6 +35,7 @@ bool CmdSubProgram::load()
 {
     mLoaded = false;
     mCyclogram->clear();
+    mCyclogram->setSystemState(mSystemState);
 
     QString fileName = Cyclogram::defaultStorePath() + mFilePath;
     QFile file(fileName);
