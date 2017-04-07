@@ -517,7 +517,10 @@ void EditorWindow::stopCyclogram()
 {
     //mCyclogram->setExecuteOneCmd(false);
 
-    mCyclogram->stop();
+    if (QObject::sender() == mStopAct) // stop only by button signal
+    {
+        mCyclogram->stop();
+    }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     mRunAct->setIcon(mPlayIcon);
