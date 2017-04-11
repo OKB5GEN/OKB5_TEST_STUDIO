@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="CheckOK" value="0" desc=""/>
+        <variable name="OK" value="0" desc=""/>
+        <variable name="SendOK" value="0" desc=""/>
+        <variable name="SysOK" value="0" desc=""/>
+        <variable name="U" value="0" desc=""/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1491891253282" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491891253283" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491891253284"/>
+        <command type="BRANCH_BEGIN" id="1491891253285" name="End"/>
+        <command type="TERMINATOR" id="1491891253286" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1491891401632" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="BRANCH_BEGIN" id="1491891404569" name="Test1"/>
+        <command type="GO_TO_BRANCH" id="1491891404572"/>
+        <command type="BRANCH_BEGIN" id="1491891406747" name="Test2"/>
+        <command type="GO_TO_BRANCH" id="1491891406750"/>
+        <command type="BRANCH_BEGIN" id="1491891419261" name="Test3"/>
+        <command type="GO_TO_BRANCH" id="1491891419264"/>
+        <command type="BRANCH_BEGIN" id="1491891421567" name="Test4"/>
+        <command type="GO_TO_BRANCH" id="1491891421569"/>
+        <command type="BRANCH_BEGIN" id="1491891431793" name="Test5"/>
+        <command type="GO_TO_BRANCH" id="1491891431796"/>
+        <command type="BRANCH_BEGIN" id="1491891434147" name="Test6"/>
+        <command type="GO_TO_BRANCH" id="1491891434150"/>
+        <command type="BRANCH_BEGIN" id="1491891448692" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1491891448695"/>
+        <command type="BRANCH_BEGIN" id="1491891451414" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1491891451417"/>
+        <command type="QUESTION" id="1491891548089" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SysOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891548094"/>
+        <command type="SUBPROGRAM" id="1491891646132" name="Send1" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491891686240" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891686244"/>
+        <command type="SUBPROGRAM" id="1491891705619" name="Check1" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491891736336" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891736341"/>
+        <command type="SUBPROGRAM" id="1491891773395" name="Send2" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891777155" name="Send3" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891781150" name="Send4" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891786550" name="Send5" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MATH" id="1491891810046" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491891813255" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="SUBPROGRAM" id="1491891817376" name="Send6" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491891824978" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891824982"/>
+        <command type="QUESTION" id="1491891830395" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891830399"/>
+        <command type="QUESTION" id="1491891834277" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891834281"/>
+        <command type="QUESTION" id="1491891840119" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891840122"/>
+        <command type="QUESTION" id="1491891844034" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891844038"/>
+        <command type="SUBPROGRAM" id="1491891851123" name="Check2" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891854276" name="Check3" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891860453" name="Check4" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891865958" name="Check5" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1491891871062" name="Check6" file="">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491891920264" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891920268"/>
+        <command type="QUESTION" id="1491891929186" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891929190"/>
+        <command type="QUESTION" id="1491891934723" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891934727"/>
+        <command type="QUESTION" id="1491891939038" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891939042"/>
+        <command type="QUESTION" id="1491891945656" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491891945660"/>
+        <command type="SUBPROGRAM" id="1491893788257" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
+            <input_params/>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+    </commands>
+    <tree>
+        <item id="1491891253282" down="1491891253283" right="-1" under_arrow="-1"/>
+        <item id="1491891253283" down="1491891401632" right="-1" under_arrow="-1"/>
+        <item id="1491891253284" down="1491891404569" right="-1" under_arrow="-1"/>
+        <item id="1491891253285" down="1491893788257" right="-1" under_arrow="-1"/>
+        <item id="1491891253286" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1491891401632" down="1491891548089" right="-1" under_arrow="-1"/>
+        <item id="1491891404569" down="1491891646132" right="-1" under_arrow="-1"/>
+        <item id="1491891404572" down="1491891406747" right="-1" under_arrow="-1"/>
+        <item id="1491891406747" down="1491891773395" right="-1" under_arrow="-1"/>
+        <item id="1491891406750" down="1491891419261" right="-1" under_arrow="-1"/>
+        <item id="1491891419261" down="1491891777155" right="-1" under_arrow="-1"/>
+        <item id="1491891419264" down="1491891421567" right="-1" under_arrow="-1"/>
+        <item id="1491891421567" down="1491891781150" right="-1" under_arrow="-1"/>
+        <item id="1491891421569" down="1491891431793" right="-1" under_arrow="-1"/>
+        <item id="1491891431793" down="1491891786550" right="-1" under_arrow="-1"/>
+        <item id="1491891431796" down="1491891434147" right="-1" under_arrow="-1"/>
+        <item id="1491891434147" down="1491891817376" right="-1" under_arrow="-1"/>
+        <item id="1491891434150" down="1491891448692" right="-1" under_arrow="-1"/>
+        <item id="1491891448692" down="1491891810046" right="-1" under_arrow="-1"/>
+        <item id="1491891448695" down="1491891253285" right="-1" under_arrow="-1"/>
+        <item id="1491891451414" down="1491891813255" right="-1" under_arrow="-1"/>
+        <item id="1491891451417" down="1491891253285" right="-1" under_arrow="-1"/>
+        <item id="1491891548089" down="1491891253284" right="1491891548094" under_arrow="-1"/>
+        <item id="1491891548094" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891646132" down="1491891686240" right="-1" under_arrow="-1"/>
+        <item id="1491891686240" down="1491891705619" right="1491891686244" under_arrow="-1"/>
+        <item id="1491891686244" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891705619" down="1491891736336" right="-1" under_arrow="-1"/>
+        <item id="1491891736336" down="1491891404572" right="1491891736341" under_arrow="-1"/>
+        <item id="1491891736341" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891773395" down="1491891824978" right="-1" under_arrow="-1"/>
+        <item id="1491891777155" down="1491891830395" right="-1" under_arrow="-1"/>
+        <item id="1491891781150" down="1491891834277" right="-1" under_arrow="-1"/>
+        <item id="1491891786550" down="1491891840119" right="-1" under_arrow="-1"/>
+        <item id="1491891810046" down="1491891448695" right="-1" under_arrow="-1"/>
+        <item id="1491891813255" down="1491891451417" right="-1" under_arrow="-1"/>
+        <item id="1491891817376" down="1491891844034" right="-1" under_arrow="-1"/>
+        <item id="1491891824978" down="1491891851123" right="1491891824982" under_arrow="-1"/>
+        <item id="1491891824982" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891830395" down="1491891854276" right="1491891830399" under_arrow="-1"/>
+        <item id="1491891830399" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891834277" down="1491891860453" right="1491891834281" under_arrow="-1"/>
+        <item id="1491891834281" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891840119" down="1491891865958" right="1491891840122" under_arrow="-1"/>
+        <item id="1491891840122" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891844034" down="1491891871062" right="1491891844038" under_arrow="-1"/>
+        <item id="1491891844038" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891851123" down="1491891920264" right="-1" under_arrow="-1"/>
+        <item id="1491891854276" down="1491891929186" right="-1" under_arrow="-1"/>
+        <item id="1491891860453" down="1491891934723" right="-1" under_arrow="-1"/>
+        <item id="1491891865958" down="1491891939038" right="-1" under_arrow="-1"/>
+        <item id="1491891871062" down="1491891945656" right="-1" under_arrow="-1"/>
+        <item id="1491891920264" down="1491891406750" right="1491891920268" under_arrow="-1"/>
+        <item id="1491891920268" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891929186" down="1491891419264" right="1491891929190" under_arrow="-1"/>
+        <item id="1491891929190" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891934723" down="1491891421569" right="1491891934727" under_arrow="-1"/>
+        <item id="1491891934727" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891939038" down="1491891431796" right="1491891939042" under_arrow="-1"/>
+        <item id="1491891939042" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491891945656" down="1491891434150" right="1491891945660" under_arrow="-1"/>
+        <item id="1491891945660" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491893788257" down="1491891253286" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

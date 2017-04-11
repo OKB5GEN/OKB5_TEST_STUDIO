@@ -37,6 +37,12 @@ bool CmdSubProgram::load()
     mCyclogram->clear();
     mCyclogram->setSystemState(mSystemState);
 
+    if (mFilePath.isEmpty()) // no file link is normal
+    {
+        mLoaded = true;
+        return true;
+    }
+
     QString fileName = Cyclogram::defaultStorePath() + mFilePath;
     QFile file(fileName);
     FileReader reader(mCyclogram);

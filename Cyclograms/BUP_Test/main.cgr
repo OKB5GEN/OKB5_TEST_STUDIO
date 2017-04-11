@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="OK" value="0" desc=""/>
+        <variable name="TestOK" value="0" desc=""/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1491892365458" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491892365459" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491892365460"/>
+        <command type="BRANCH_BEGIN" id="1491892365462" name="End"/>
+        <command type="TERMINATOR" id="1491892365463" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1491892387211" name="TestSet1" file="BUP_TEST/sub_test_list.cgr">
+            <input_params>
+                <param name="Sub.CheckOK" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.SendOK" type="6" value="0"/>
+                <param name="Sub.SysOK" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="27"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="TestOK" type="10" value="Sub.OK"/>
+            </output_params>
+        </command>
+        <command type="BRANCH_BEGIN" id="1491892427913" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1491892427915"/>
+        <command type="BRANCH_BEGIN" id="1491892429602" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1491892429605"/>
+        <command type="ACTION_MATH" id="1491892451940" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1491892461782" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="QUESTION" id="1491892491479" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="TestOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491892491483"/>
+        <command type="SUBPROGRAM" id="1491892508600" name="TestSet2" file="BUP_TEST/sub_test_list.cgr">
+            <input_params>
+                <param name="Sub.CheckOK" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.SendOK" type="6" value="0"/>
+                <param name="Sub.SysOK" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="25.65"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="TestOK" type="10" value="Sub.OK"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491892539255" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="TestOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491892539258"/>
+        <command type="SUBPROGRAM" id="1491892556392" name="TestSet3" file="BUP_TEST/sub_test_list.cgr">
+            <input_params>
+                <param name="Sub.CheckOK" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.SendOK" type="6" value="0"/>
+                <param name="Sub.SysOK" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="28.35"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="TestOK" type="10" value="Sub.OK"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491892580758" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="TestOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491892580762"/>
+    </commands>
+    <tree>
+        <item id="1491892365458" down="1491892365459" right="-1" under_arrow="-1"/>
+        <item id="1491892365459" down="1491892387211" right="-1" under_arrow="-1"/>
+        <item id="1491892365460" down="1491892427913" right="-1" under_arrow="-1"/>
+        <item id="1491892365462" down="1491892365463" right="-1" under_arrow="-1"/>
+        <item id="1491892365463" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1491892387211" down="1491892491479" right="-1" under_arrow="-1"/>
+        <item id="1491892427913" down="1491892451940" right="-1" under_arrow="-1"/>
+        <item id="1491892427915" down="1491892427913" right="-1" under_arrow="-1"/>
+        <item id="1491892429602" down="1491892461782" right="-1" under_arrow="-1"/>
+        <item id="1491892429605" down="1491892429602" right="-1" under_arrow="-1"/>
+        <item id="1491892451940" down="1491892427915" right="-1" under_arrow="-1"/>
+        <item id="1491892461782" down="1491892429605" right="-1" under_arrow="-1"/>
+        <item id="1491892491479" down="1491892508600" right="1491892491483" under_arrow="-1"/>
+        <item id="1491892491483" down="1491892429602" right="-1" under_arrow="-1"/>
+        <item id="1491892508600" down="1491892539255" right="-1" under_arrow="-1"/>
+        <item id="1491892539255" down="1491892556392" right="1491892539258" under_arrow="-1"/>
+        <item id="1491892539258" down="1491892429602" right="-1" under_arrow="-1"/>
+        <item id="1491892556392" down="1491892580758" right="-1" under_arrow="-1"/>
+        <item id="1491892580758" down="1491892365460" right="1491892580762" under_arrow="-1"/>
+        <item id="1491892580762" down="1491892429602" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>
