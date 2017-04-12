@@ -6,6 +6,7 @@
 class QLineEdit;
 class QCheckBox;
 class QTableWidget;
+class QScrollArea;
 
 class CmdSubProgram;
 class CyclogramWidget;
@@ -37,8 +38,10 @@ private:
 //    void updateTable(QTableWidget* widget, QCheckBox* changedBox, int state);
 
     CmdSubProgram* mCommand;
-    CyclogramWidget* mWidget;
+    CyclogramWidget* mCyclogramWidget;
     VariablesWindow* mVariablesWindow;
+
+    QScrollArea * mScrollArea;
 
 //    Cyclogram* mCallingCyclogram;
 };

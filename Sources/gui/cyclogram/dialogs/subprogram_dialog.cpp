@@ -16,9 +16,8 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     mCommand(command),
     mVariablesWindow(Q_NULLPTR)
 {
-  //  setWindowTitle(tr("Edit sub program"));
-
-  //  adjustSize();
+    mScrollArea = new QScrollArea(this);
+    setMaximumSize(QSize(1600, 800)); // TODO i guess it will be enough for normal editing
 
     QString windowTitle = parent->windowTitle();
     if (!windowTitle.isEmpty())
@@ -29,8 +28,8 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     windowTitle += mCommand->text();
     setWindowTitle(windowTitle);
 
-    mWidget = new CyclogramWidget(this);
-    mWidget->load(mCommand->cyclogram());
+    mCyclogramWidget = new CyclogramWidget(this);
+    mCyclogramWidget->load(mCommand->cyclogram());
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -44,21 +43,26 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
     connect(chartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
-    connect(deleteBtn, SIGNAL(clicked(bool)), mWidget, SLOT(deleteSelectedItem()));
+    connect(deleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
 
     buttonLayout->addWidget(saveBtn);
     buttonLayout->addWidget(variablesBtn);
     buttonLayout->addWidget(chartBtn);
     buttonLayout->addWidget(deleteBtn);
+    buttonLayout->addStretch();
 
-    layout->addWidget(mWidget);
+    mScrollArea->setBackgroundRole(QPalette::Dark);
+    mScrollArea->setWidget(mCyclogramWidget);
+    mScrollArea->resize(mCyclogramWidget->size()); //TODO too big size case
+
+    layout->addWidget(mScrollArea);
     setLayout(layout);
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(mWidget->size()); //TODO too big size case
+    resize(mScrollArea->size());
 
     //TODO connect cyclogram & cyclogram widget signals
     // (file changed, can be saved, cyclogram command selected and can be deleted, variables window active)
-    // QFileSystemWatcher - for outside file/directory changing detection
+    // QFileSystemWatcher - for outside file/directory changing detection etc
 }
 
 SubProgramDialog::~SubProgramDialog()
