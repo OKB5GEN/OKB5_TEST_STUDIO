@@ -4,12 +4,20 @@
 #include <QCommandLineOption>
 
 #include <QDateTime>
+#include <QDir>
 
 #include "Headers/gui/editor_window.h"
 
 #include "Headers/logger/Logger.h"
 #include "Headers/logger/FileAppender.h"
 #include "Headers/logger/ConsoleAppender.h"
+
+namespace
+{
+    static const QString REPORTS_DIR = "reports";
+    static const QString LOGS_DIR = "logs";
+    static const QString CYCLOGRAMS_DIR = "cyclograms";
+}
 
 void initializeLogger()
 {
@@ -21,12 +29,30 @@ void initializeLogger()
 
     // create file output
     QString appStartTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HH_mm_ss");
-    QString fileBaseName = "OKB5TS_";
+    QString fileBaseName = LOGS_DIR + "/OKB5TS_";
     QString fileExtenstion = ".log";
 
     FileAppender* fileAppender = new FileAppender(fileBaseName + appStartTime + fileExtenstion);
-    fileAppender->setFormat("[%{type}] %{message}\n");
+    fileAppender->setFormat("%{time} [%{type}] %{message}\n");
     Logger::globalInstance()->registerAppender(fileAppender);
+}
+
+void createDirs()
+{
+    QList<QString> dirs;
+    dirs.append(REPORTS_DIR);
+    dirs.append(LOGS_DIR);
+    dirs.append(CYCLOGRAMS_DIR);
+
+    QDir currentDir = QDir::current();
+
+    for (auto it = dirs.begin(); it != dirs.end(); ++it)
+    {
+        if (!currentDir.exists(*it))
+        {
+            currentDir.mkdir(*it);
+        }
+    }
 }
 
 int main(int argc, char *argv[])
@@ -43,6 +69,8 @@ int main(int argc, char *argv[])
     parser.addVersionOption();
     parser.addPositionalArgument("file", "The file to open.");
     parser.process(app);
+
+    createDirs();
 
     QLocale::setDefault(QLocale::c());
 

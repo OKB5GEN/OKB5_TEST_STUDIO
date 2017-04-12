@@ -28,7 +28,7 @@ ApplicationFinishDialog::~ApplicationFinishDialog()
 bool ApplicationFinishDialog::init()
 {
     // TODO get "set initial state" cyclogram file name from configuration file data
-    QDir dir("D:/!Programs/OKB5_TEST_STUDIO/Cyclograms/set_initial_state.cgr");
+    QDir dir(Cyclogram::defaultStorePath() + "set_initial_state.cgr");
     QString fileName = dir.absolutePath();
 
     QFile file(fileName);
@@ -66,4 +66,3 @@ void ApplicationFinishDialog::onCyclogramFinish(const QString& error)
 
     close();
 }
-
