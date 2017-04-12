@@ -1,19 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
-    <variables/>
+    <variables>
+        <variable name="MaxI" value="0" desc=""/>
+        <variable name="MaxV" value="0" desc=""/>
+        <variable name="Mode" value="0" desc=""/>
+        <variable name="OK" value="0" desc=""/>
+        <variable name="Steps" value="0" desc=""/>
+    </variables>
     <commands>
         <command type="TERMINATOR" id="1491893392468" name="START" cmd_type="BEGIN"/>
         <command type="BRANCH_BEGIN" id="1491893392470" name="Start"/>
         <command type="GO_TO_BRANCH" id="1491893392471"/>
         <command type="BRANCH_BEGIN" id="1491893392472" name="End"/>
         <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1491990493031" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="">
+            <input_params>
+                <param name="Max current (Nu)" type="10" value="MaxI"/>
+                <param name="Max current (Psy)" type="10" value="MaxI"/>
+                <param name="Mode (Nu)" type="10" value="Mode"/>
+                <param name="Mode (Psy)" type="10" value="Mode"/>
+                <param name="Steps (Nu)" type="10" value="Steps"/>
+                <param name="Steps (Psy)" type="10" value="Steps"/>
+                <param name="Velocity (Nu)" type="10" value="MaxV"/>
+                <param name="Velocity (Psy)" type="10" value="MaxV"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MATH" id="1491998513701" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
-        <item id="1491893392470" down="1491893392471" right="-1" under_arrow="-1"/>
+        <item id="1491893392470" down="1491990493031" right="-1" under_arrow="-1"/>
         <item id="1491893392471" down="1491893392472" right="-1" under_arrow="-1"/>
         <item id="1491893392472" down="1491893392473" right="-1" under_arrow="-1"/>
         <item id="1491893392473" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1491990493031" down="1491998513701" right="-1" under_arrow="-1"/>
+        <item id="1491998513701" down="1491893392471" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

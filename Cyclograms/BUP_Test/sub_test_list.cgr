@@ -15,7 +15,9 @@
         <command type="BRANCH_BEGIN" id="1491891253285" name="End"/>
         <command type="TERMINATOR" id="1491891253286" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1491891401632" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
-            <input_params/>
+            <input_params>
+                <param name="Sub.U" type="10" value="U"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
@@ -45,12 +47,18 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891548094"/>
-        <command type="SUBPROGRAM" id="1491891646132" name="Send1" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891646132" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mode" type="6" value="3"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="10000"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
@@ -60,10 +68,13 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891686244"/>
-        <command type="SUBPROGRAM" id="1491891705619" name="Check1" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891705619" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
+            <input_params>
+                <param name="Sub.DestSteps" type="6" value="10000"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
@@ -75,42 +86,66 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891736341"/>
-        <command type="SUBPROGRAM" id="1491891773395" name="Send2" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891773395" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mode" type="6" value="3"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="1e+7"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891777155" name="Send3" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891777155" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mode" type="6" value="3"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="1e+7"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891781150" name="Send4" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891781150" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="50"/>
+                <param name="Sub.Mode" type="6" value="2"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="1333"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891786550" name="Send5" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891786550" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mode" type="6" value="3"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="10000"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
@@ -125,12 +160,18 @@
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="SUBPROGRAM" id="1491891817376" name="Send6" file="BUP_TEST/sub_send_cmd_array.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891817376" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="200"/>
+                <param name="Sub.MaxV" type="6" value="500"/>
+                <param name="Sub.Mode" type="6" value="4"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="1333"/>
+            </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
@@ -160,50 +201,73 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891844038"/>
-        <command type="SUBPROGRAM" id="1491891851123" name="Check2" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891851123" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="10000"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891854276" name="Check3" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891854276" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="400"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="1"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="10000"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891860453" name="Check4" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891860453" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
+            <input_params>
+                <param name="Sub.DestSteps" type="6" value="1333"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891865958" name="Check5" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891865958" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
+            <input_params>
+                <param name="Sub.DestSteps" type="6" value="10000"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891871062" name="Check6" file="">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491891871062" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
+            <input_params>
+                <param name="Sub.DestSteps" type="6" value="1333"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
                 <param name="SysOK" type="10" value="SysOK"/>
@@ -245,6 +309,326 @@
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
+        <command type="SUBPROGRAM" id="1491991092223" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491991186019" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491991186025"/>
+        <command type="SUBPROGRAM" id="1491991254104" name="Check12" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491991270534" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491991270540"/>
+        <command type="SUBPROGRAM" id="1491995677225" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491995683235" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491995683239"/>
+        <command type="SUBPROGRAM" id="1491996271432" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491996318484" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491996318489"/>
+        <command type="SUBPROGRAM" id="1491996354186" name="Check22" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491996388558" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491996388564"/>
+        <command type="SUBPROGRAM" id="1491996983811" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997026353" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997026359"/>
+        <command type="SUBPROGRAM" id="1491997071373" name="Check32" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997105384" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997105389"/>
+        <command type="SUBPROGRAM" id="1491997137287" name="Check42" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997141672" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997141677"/>
+        <command type="SUBPROGRAM" id="1491997328827" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997331965" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997331970"/>
+        <command type="SUBPROGRAM" id="1491997335316" name="Check52" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997338557" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997338563"/>
+        <command type="SUBPROGRAM" id="1491997514909" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997517710" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997517716"/>
+        <command type="SUBPROGRAM" id="1491997521906" name="Check62" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997525074" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997525080"/>
+        <command type="BRANCH_BEGIN" id="1491997762659" name="Test7"/>
+        <command type="GO_TO_BRANCH" id="1491997762662"/>
+        <command type="SUBPROGRAM" id="1491997801170" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="500"/>
+                <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mode" type="6" value="3"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="1333"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997804977" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997804982"/>
+        <command type="SUBPROGRAM" id="1491997826826" name="Check71" file="BUP_TEST/sub_check_dest_angle.cgr">
+            <input_params>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997831242" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997831248"/>
+        <command type="SUBPROGRAM" id="1491997835422" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="CheckOK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="Sub.OK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997839728" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997839732"/>
+        <command type="SUBPROGRAM" id="1491997844543" name="Check72" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+            <input_params>
+                <param name="Sub.DestMode" type="6" value="5"/>
+                <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="CheckOK" type="10" value="Sub.OK"/>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SendOK" type="10" value="SendOK"/>
+                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1491997848282" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1491997848288"/>
     </commands>
     <tree>
         <item id="1491891253282" down="1491891253283" right="-1" under_arrow="-1"/>
@@ -264,7 +648,7 @@
         <item id="1491891431793" down="1491891786550" right="-1" under_arrow="-1"/>
         <item id="1491891431796" down="1491891434147" right="-1" under_arrow="-1"/>
         <item id="1491891434147" down="1491891817376" right="-1" under_arrow="-1"/>
-        <item id="1491891434150" down="1491891448692" right="-1" under_arrow="-1"/>
+        <item id="1491891434150" down="1491997762659" right="-1" under_arrow="-1"/>
         <item id="1491891448692" down="1491891810046" right="-1" under_arrow="-1"/>
         <item id="1491891448695" down="1491891253285" right="-1" under_arrow="-1"/>
         <item id="1491891451414" down="1491891813255" right="-1" under_arrow="-1"/>
@@ -275,7 +659,7 @@
         <item id="1491891686240" down="1491891705619" right="1491891686244" under_arrow="-1"/>
         <item id="1491891686244" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891705619" down="1491891736336" right="-1" under_arrow="-1"/>
-        <item id="1491891736336" down="1491891404572" right="1491891736341" under_arrow="-1"/>
+        <item id="1491891736336" down="1491991092223" right="1491891736341" under_arrow="-1"/>
         <item id="1491891736341" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891773395" down="1491891824978" right="-1" under_arrow="-1"/>
         <item id="1491891777155" down="1491891830395" right="-1" under_arrow="-1"/>
@@ -299,16 +683,66 @@
         <item id="1491891860453" down="1491891934723" right="-1" under_arrow="-1"/>
         <item id="1491891865958" down="1491891939038" right="-1" under_arrow="-1"/>
         <item id="1491891871062" down="1491891945656" right="-1" under_arrow="-1"/>
-        <item id="1491891920264" down="1491891406750" right="1491891920268" under_arrow="-1"/>
+        <item id="1491891920264" down="1491996271432" right="1491891920268" under_arrow="-1"/>
         <item id="1491891920268" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891929186" down="1491891419264" right="1491891929190" under_arrow="-1"/>
+        <item id="1491891929186" down="1491995677225" right="1491891929190" under_arrow="-1"/>
         <item id="1491891929190" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891934723" down="1491891421569" right="1491891934727" under_arrow="-1"/>
+        <item id="1491891934723" down="1491996983811" right="1491891934727" under_arrow="-1"/>
         <item id="1491891934727" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891939038" down="1491891431796" right="1491891939042" under_arrow="-1"/>
+        <item id="1491891939038" down="1491997328827" right="1491891939042" under_arrow="-1"/>
         <item id="1491891939042" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891945656" down="1491891434150" right="1491891945660" under_arrow="-1"/>
+        <item id="1491891945656" down="1491997514909" right="1491891945660" under_arrow="-1"/>
         <item id="1491891945660" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491893788257" down="1491891253286" right="-1" under_arrow="-1"/>
+        <item id="1491991092223" down="1491991186019" right="-1" under_arrow="-1"/>
+        <item id="1491991186019" down="1491991254104" right="1491991186025" under_arrow="-1"/>
+        <item id="1491991186025" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491991254104" down="1491991270534" right="-1" under_arrow="-1"/>
+        <item id="1491991270534" down="1491891404572" right="1491991270540" under_arrow="-1"/>
+        <item id="1491991270540" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491995677225" down="1491995683235" right="-1" under_arrow="-1"/>
+        <item id="1491995683235" down="1491997071373" right="1491995683239" under_arrow="-1"/>
+        <item id="1491995683239" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491996271432" down="1491996318484" right="-1" under_arrow="-1"/>
+        <item id="1491996318484" down="1491996354186" right="1491996318489" under_arrow="-1"/>
+        <item id="1491996318489" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491996354186" down="1491996388558" right="-1" under_arrow="-1"/>
+        <item id="1491996388558" down="1491891406750" right="1491996388564" under_arrow="-1"/>
+        <item id="1491996388564" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491996983811" down="1491997026353" right="-1" under_arrow="-1"/>
+        <item id="1491997026353" down="1491997137287" right="1491997026359" under_arrow="-1"/>
+        <item id="1491997026359" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997071373" down="1491997105384" right="-1" under_arrow="-1"/>
+        <item id="1491997105384" down="1491891419264" right="1491997105389" under_arrow="-1"/>
+        <item id="1491997105389" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997137287" down="1491997141672" right="-1" under_arrow="-1"/>
+        <item id="1491997141672" down="1491891421569" right="1491997141677" under_arrow="-1"/>
+        <item id="1491997141677" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997328827" down="1491997331965" right="-1" under_arrow="-1"/>
+        <item id="1491997331965" down="1491997335316" right="1491997331970" under_arrow="-1"/>
+        <item id="1491997331970" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997335316" down="1491997338557" right="-1" under_arrow="-1"/>
+        <item id="1491997338557" down="1491891431796" right="1491997338563" under_arrow="-1"/>
+        <item id="1491997338563" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997514909" down="1491997517710" right="-1" under_arrow="-1"/>
+        <item id="1491997517710" down="1491997521906" right="1491997517716" under_arrow="-1"/>
+        <item id="1491997517716" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997521906" down="1491997525074" right="-1" under_arrow="-1"/>
+        <item id="1491997525074" down="1491891434150" right="1491997525080" under_arrow="-1"/>
+        <item id="1491997525080" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997762659" down="1491997801170" right="-1" under_arrow="-1"/>
+        <item id="1491997762662" down="1491891448692" right="-1" under_arrow="-1"/>
+        <item id="1491997801170" down="1491997804977" right="-1" under_arrow="-1"/>
+        <item id="1491997804977" down="1491997826826" right="1491997804982" under_arrow="-1"/>
+        <item id="1491997804982" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997826826" down="1491997831242" right="-1" under_arrow="-1"/>
+        <item id="1491997831242" down="1491997835422" right="1491997831248" under_arrow="-1"/>
+        <item id="1491997831248" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997835422" down="1491997839728" right="-1" under_arrow="-1"/>
+        <item id="1491997839728" down="1491997844543" right="1491997839732" under_arrow="-1"/>
+        <item id="1491997839732" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1491997844543" down="1491997848282" right="-1" under_arrow="-1"/>
+        <item id="1491997848282" down="1491997762662" right="1491997848288" under_arrow="-1"/>
+        <item id="1491997848288" down="1491891451414" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
