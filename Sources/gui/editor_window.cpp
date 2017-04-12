@@ -57,7 +57,7 @@ EditorWindow::EditorWindow():
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
 
-    setWindowTitle(tr("OKB5 Test Studio[*]"));
+    //setWindowTitle(tr("OKB5 Test Studio[*]"));
 
     mSystemState = new SystemState(this);
 
@@ -463,10 +463,12 @@ void EditorWindow::setCurrentFile(const QString &fileName)
     QString shownName = mCurFile;
     if (mCurFile.isEmpty())
     {
-        shownName = "untitled.txt";
+        shownName = "New file";
     }
 
+    shownName += "[*]";
     setWindowFilePath(shownName);
+    setWindowTitle(shownName);
 }
 
 QString EditorWindow::strippedName(const QString &fullFileName)
