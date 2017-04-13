@@ -16,13 +16,14 @@
         <command type="TERMINATOR" id="1491891253286" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1491891401632" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
             <input_params>
+                <param name="Sub.OK" type="6" value="0"/>
                 <param name="Sub.U" type="10" value="U"/>
             </input_params>
             <output_params>
                 <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
                 <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SysOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
