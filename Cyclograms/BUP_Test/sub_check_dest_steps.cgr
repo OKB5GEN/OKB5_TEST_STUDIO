@@ -2,8 +2,33 @@
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
     <variables>
+        <variable name="DestN" value="10" desc=""/>
         <variable name="DestSteps" value="0" desc=""/>
+        <variable name="Diff" value="0" desc=""/>
+        <variable name="MaxDelta" value="10" desc=""/>
+        <variable name="MaxI" value="0" desc=""/>
+        <variable name="MaxV" value="0" desc=""/>
+        <variable name="Mode" value="0" desc=""/>
+        <variable name="N" value="0" desc=""/>
+        <variable name="Nst" value="0" desc=""/>
+        <variable name="NstMax" value="1e+6" desc=""/>
+        <variable name="NuA" value="0" desc="Angle (Nu)"/>
+        <variable name="NuI" value="0" desc="Max current (Nu)"/>
+        <variable name="NuM" value="0" desc="Mode (Nu)"/>
+        <variable name="NuS" value="0" desc="Steps (Nu)"/>
+        <variable name="NuV" value="0" desc="Velocity (Nu)"/>
         <variable name="OK" value="0" desc=""/>
+        <variable name="PsyA" value="0" desc="Angle (Psy)"/>
+        <variable name="PsyI" value="0" desc="Max current (Psy)"/>
+        <variable name="PsyM" value="0" desc="Mode (Psy)"/>
+        <variable name="PsyS" value="0" desc="Steps (Psy)"/>
+        <variable name="PsyV" value="0" desc="Velocity (Psy)"/>
+        <variable name="Steps" value="0" desc=""/>
+        <variable name="StepsCur" value="0" desc=""/>
+        <variable name="StepsPrev" value="0" desc=""/>
+        <variable name="StopDelay" value="0" desc=""/>
+        <variable name="T" value="0" desc="Temperature, °C"/>
+        <variable name="TSF" value="0" desc="Temperature sensor presense flag"/>
     </variables>
     <commands>
         <command type="TERMINATOR" id="1491893392468" name="START" cmd_type="BEGIN"/>
@@ -11,18 +36,163 @@
         <command type="GO_TO_BRANCH" id="1491893392471"/>
         <command type="BRANCH_BEGIN" id="1491893392472" name="End"/>
         <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MATH" id="1491998562402" operation="Assign">
+        <command type="BRANCH_BEGIN" id="1492066042375" name="CheckStopped"/>
+        <command type="GO_TO_BRANCH" id="1492066042377"/>
+        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
+            <input_params/>
+            <output_params>
+                <param name="Angle (Nu)" type="10" value="NuA"/>
+                <param name="Angle (Psy)" type="10" value="PsyA"/>
+                <param name="Max current (Nu)" type="10" value="NuI"/>
+                <param name="Max current (Psy)" type="10" value="PsyI"/>
+                <param name="Mode (Nu)" type="10" value="NuM"/>
+                <param name="Mode (Psy)" type="10" value="PsyM"/>
+                <param name="Steps (Nu)" type="10" value="NuS"/>
+                <param name="Steps (Psy)" type="10" value="PsyS"/>
+                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
+                <param name="Temperature, °C" type="10" value="T"/>
+                <param name="Velocity (Nu)" type="10" value="NuV"/>
+                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
+            <input_params/>
+            <output_params>
+                <param name="Angle (Nu)" type="10" value="NuA"/>
+                <param name="Angle (Psy)" type="10" value="PsyA"/>
+                <param name="Max current (Nu)" type="10" value="NuI"/>
+                <param name="Max current (Psy)" type="10" value="PsyI"/>
+                <param name="Mode (Nu)" type="10" value="NuM"/>
+                <param name="Mode (Psy)" type="10" value="PsyM"/>
+                <param name="Steps (Nu)" type="10" value="NuS"/>
+                <param name="Steps (Psy)" type="10" value="PsyS"/>
+                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
+                <param name="Temperature, °C" type="10" value="T"/>
+                <param name="Velocity (Nu)" type="10" value="NuV"/>
+                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MATH" id="1492066322026" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="StepsPrev"/>
+            <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492066391567" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
+            <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="QUESTION" id="1492066416396" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="StepsPrev"/>
+            <operand id="Right" type="Variable" value="0" variable="StepsCur"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1492066416399"/>
+        <command type="ACTION_MATH" id="1492066513810" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="Nst"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Nst"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="QUESTION" id="1492066536488" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="Nst"/>
+            <operand id="Right" type="Variable" value="0" variable="NstMax"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1492066536492"/>
+        <command type="ACTION_MATH" id="1492066619262" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492066736294" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
+            <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492066755188" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="StepsPrev"/>
+            <operand id="Operand1" type="Variable" value="0" variable="StepsCur"/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492066898527" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="N"/>
+            <operand id="Operand1" type="Variable" value="0" variable="N"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="QUESTION" id="1492066922923" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="N"/>
+            <operand id="Right" type="Variable" value="0" variable="DestN"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1492066922926"/>
+        <command type="ACTION_MATH" id="1492066946109" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492070258798" operation="Subtract">
+            <operand id="Result" type="Variable" value="0" variable="Diff"/>
+            <operand id="Operand1" type="Variable" value="0" variable="DestSteps"/>
+            <operand id="Operand2" type="Variable" value="0" variable="StepsCur"/>
+        </command>
+        <command type="QUESTION" id="1492070269733" operation="Less" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="Diff"/>
+            <operand id="Right" type="Variable" value="0" variable="MaxDelta"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1492070269738"/>
+        <command type="ACTION_MATH" id="1492070275607" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="QUESTION" id="1492070463420" operation="Less" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="Diff"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492070479244" operation="Multiply">
+            <operand id="Result" type="Variable" value="0" variable="Diff"/>
+            <operand id="Operand1" type="Number" value="-1" variable=""/>
+            <operand id="Operand2" type="Variable" value="0" variable="Diff"/>
+        </command>
+        <command type="ACTION_MATH" id="1492070482052" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="Diff"/>
+            <operand id="Operand1" type="Variable" value="0" variable="Diff"/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1492070633385" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="N"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
-        <item id="1491893392470" down="1491998562402" right="-1" under_arrow="-1"/>
-        <item id="1491893392471" down="1491893392472" right="-1" under_arrow="-1"/>
+        <item id="1491893392470" down="1492066247981" right="-1" under_arrow="-1"/>
+        <item id="1491893392471" down="1492066042375" right="-1" under_arrow="-1"/>
         <item id="1491893392472" down="1491893392473" right="-1" under_arrow="-1"/>
         <item id="1491893392473" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1491998562402" down="1491893392471" right="-1" under_arrow="-1"/>
+        <item id="1492066042375" down="1492066755188" right="-1" under_arrow="-1"/>
+        <item id="1492066042377" down="1491893392472" right="-1" under_arrow="-1"/>
+        <item id="1492066061848" down="1492066391567" right="-1" under_arrow="-1"/>
+        <item id="1492066247981" down="1492066322026" right="-1" under_arrow="-1"/>
+        <item id="1492066322026" down="1492066736294" right="-1" under_arrow="-1"/>
+        <item id="1492066391567" down="1492066416396" right="-1" under_arrow="-1"/>
+        <item id="1492066416396" down="1492066898527" right="1492070633385" under_arrow="-1"/>
+        <item id="1492066416399" down="1491893392472" right="-1" under_arrow="-1"/>
+        <item id="1492066513810" down="1492066536488" right="-1" under_arrow="-1"/>
+        <item id="1492066536488" down="1492066619262" right="1492066536492" under_arrow="-1"/>
+        <item id="1492066536492" down="1492066042375" right="-1" under_arrow="-1"/>
+        <item id="1492066619262" down="1492066416399" right="-1" under_arrow="-1"/>
+        <item id="1492066736294" down="1491893392471" right="-1" under_arrow="-1"/>
+        <item id="1492066755188" down="1492066061848" right="-1" under_arrow="-1"/>
+        <item id="1492066898527" down="1492066922923" right="-1" under_arrow="-1"/>
+        <item id="1492066922923" down="1492070258798" right="1492066922926" under_arrow="-1"/>
+        <item id="1492066922926" down="1492066042375" right="-1" under_arrow="-1"/>
+        <item id="1492066946109" down="1492066042377" right="-1" under_arrow="-1"/>
+        <item id="1492070258798" down="1492070463420" right="-1" under_arrow="-1"/>
+        <item id="1492070269733" down="1492066946109" right="1492070275607" under_arrow="-1"/>
+        <item id="1492070269738" down="1491893392472" right="-1" under_arrow="-1"/>
+        <item id="1492070275607" down="1492070269738" right="-1" under_arrow="-1"/>
+        <item id="1492070463420" down="1492070479244" right="1492070482052" under_arrow="1492070269733"/>
+        <item id="1492070479244" down="1492070269733" right="-1" under_arrow="-1"/>
+        <item id="1492070482052" down="1492070269733" right="-1" under_arrow="-1"/>
+        <item id="1492070633385" down="1492066513810" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

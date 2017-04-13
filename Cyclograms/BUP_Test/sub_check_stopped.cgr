@@ -33,7 +33,7 @@
         <command type="GO_TO_BRANCH" id="1491893392471"/>
         <command type="BRANCH_BEGIN" id="1491893392472" name="End"/>
         <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492065923408" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="">
+        <command type="ACTION_MODULE" id="1492065923408" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="0">
             <input_params>
                 <param name="Max current (Nu)" type="10" value="MaxI"/>
                 <param name="Max current (Psy)" type="10" value="MaxI"/>
@@ -48,7 +48,7 @@
         </command>
         <command type="BRANCH_BEGIN" id="1492066042375" name="CheckStopped"/>
         <command type="GO_TO_BRANCH" id="1492066042377"/>
-        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="">
+        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
             <input_params/>
             <output_params>
                 <param name="Angle (Nu)" type="10" value="NuA"/>
@@ -66,7 +66,7 @@
             </output_params>
         </command>
         <command type="DELAY" id="1492066130784" delay="10000"/>
-        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="">
+        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
             <input_params/>
             <output_params>
                 <param name="Angle (Nu)" type="10" value="NuA"/>
