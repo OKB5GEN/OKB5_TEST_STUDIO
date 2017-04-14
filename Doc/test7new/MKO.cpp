@@ -12,7 +12,7 @@
 #include "WDMTMKv2.cpp"
 
 HANDLE hEvent, hEvent1;
-int hTmk,flag_ch,ch_cur=0;
+int hTmk,flag_ch,ch_cur=0, flag_error=0, flag_MKO=0, start=0;
 unsigned short wBase, wAddr, wMaxBase;
 unsigned short awBuf[64];
 byte AddrOU,SubAddrOU;
@@ -31,7 +31,7 @@ MKO::MKO(QString s) : name(s)
 void MKO::MKO_chan(int x)
 {
     flag_ch=x;
-    if(flag_ch==10||flag_ch==20){
+    /*if(flag_ch==10||flag_ch==20){
         stopMKO();
         flag_ch=0;
         ch_cur=0;
@@ -40,7 +40,7 @@ void MKO::MKO_chan(int x)
         stopMKO1();
         flag_ch=0;
         ch_cur=0;
-    }
+    }*/
 
 }
 
@@ -66,7 +66,7 @@ void MKO::MKO_timer()
 
 void MKO::startMKO1()
 {
-    QString data;
+    QString data = "";
     hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     hEvent1=CreateEvent(NULL, TRUE, FALSE, NULL);
     if (!hEvent1) { data+="МКО: CreateEvent1() не запустился!\n";
@@ -81,14 +81,16 @@ void MKO::startMKO1()
     if (tmkconfig(0) != 0 ) { data+="МКО: Конфигурация МКО 0 не произошла!\n"; }
     else printf("tmkconfig0() successful!\n");
     if (bcreset()!=0 ) { data+="МКО: Перезагрузка МКО не произошла!\n"; }
-
+    if (data != "")
+        flag_MKO++;
+    else flag_MKO = 0;
     emit start_MKO(data);
 }
 
 void MKO::startMKO()
 {
 
-    QString data;
+    QString data = "";
     hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (!hEvent) { data+="МКО: CreateEvent() не запустился!\n";
         printf("CreateEvent() failed!\n");   }
@@ -99,9 +101,15 @@ void MKO::startMKO()
     else printf("tmkconfig() successful!\n");
     if (bcreset()!=0 ) { data+="МКО: Перезагрузка МКО не произошла!\n"; }
 
+    if (data != "")
+        flag_MKO++;
+    else flag_MKO = 0;
     emit start_MKO(data);
 }
-
+void MKO::MKO_reset()
+{
+    startMKO1();
+}
 void MKO::stopMKO()
 {
     TmkClose();
@@ -125,7 +133,13 @@ QString MKO::OCcontrol(WORD oc)
     if (x==1) data1+=" - Принята недостоверная информация! \n";
     x=oc<<12;
     x=x>>15;
-    if (x==1) data1+=" - Нет возможности обмена! \n";
+    if (x==1){
+        flag_error++;
+        if (flag_error==3)  data1+=" - Нет возможности обмена! \n";
+    }
+    else {
+        flag_error=0;
+    }
     x=oc<<13;
     x=x>>15;
     if (x==1) data1+=" - Абонент неисправен! \n";
@@ -146,54 +160,21 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
     if (x==1) {
         err+="МКО: Основной полукомплект передача массива: \n";
         AddrOU = adr1;
-        if(ch_cur!=1&&ch_cur==2) {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur==0) {
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur==3) {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            Sleep(1100);
-            startMKO();
-        }
+        if (tmkselect(0)!= 0 ) { err+="МКО: Ошибка tmk0!\n"; }
+        bcreset();
+        Sleep(200);
         ch_cur=1;
     }
     else if (x==2) {
         err+="МКО: Резервный полукомплект передача массива: \n";
         AddrOU = adr2;
-        if(ch_cur!=2&&ch_cur==1) {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1,0);
-            emit MKO_CTM(2,1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur==0) {
-            emit MKO_CTM(2,1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur==3) {
-            stopMKO1();
-            Sleep(100);
-            emit MKO_CTM(1,0);
-            Sleep(1100);
-            startMKO();
-        }
+        if (tmkselect(1)!= 0 ) { err+="МКО: Ошибка tmk0!\n"; }
+        bcreset();
+        Sleep(200);
         ch_cur=2;
     }
     if (x==1 || x==2) {
+        Sleep(100);
         for(int i=0; i<11; i++)
             buf[i]=0;
         SubAddrOU = 12;
@@ -242,63 +223,13 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
         err_count=0;
     }
     if(x==3) {
-        /*if(ch_cur!=1&&ch_cur==2){
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-           }
-           else if(ch_cur==0) {
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-           }*/
-        for(int i=0; i<11; i++)
-            buf[i]=0;
-
-        if(ch_cur==1) {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,1);
-            Sleep(1200);
-            startMKO1();
-        }
-        if(ch_cur==2) {
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            Sleep(200);
-            emit MKO_CTM(1,1);
-            emit MKO_CTM(2,1);
-            Sleep(1200);
-            startMKO1();
-        }
-        if(ch_cur==0) {
-            emit MKO_CTM(1,1);
-            emit MKO_CTM(2,1);
-            Sleep(1200);
-            startMKO1();
-        }
-        /*if (ch_cur==3) {
-            stopMKO1();
-            emit MKO_CTM(1,0);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
-            emit MKO_CTM(2,1);
-        }*/
         for(int i=0; i<6; i++)
             buf[i]=0;
-        Sleep(200);
-        //startMKO1();
         ch_cur=3;
         if (tmkselect(0)!= 0 ) { err+="МКО: Ошибка tmk0!\n"; }
         bcreset();
         Sleep(200);
-        //ch_cur=1;
         AddrOU = adr1;
-
         SubAddrOU = 1;
         tx_mes();
         if(OCcontrol(buff[0])!=""){
@@ -341,14 +272,6 @@ void MKO::MKO_start_test(int x, int adr1, int adr2)
             err+=OCcontrol(buff[0]);
         }
         err_count=0;
-        /*if(ch_cur!=2&&ch_cur==1){
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1,0);
-            emit MKO_CTM(2,1);
-            Sleep(1100);
-            startMKO();
-           }*/
         if (tmkselect(1)!= 0 ) { err+="МКО: Ошибка tmk1!\n"; }//
         bcreset();
         Sleep(200);
@@ -451,7 +374,7 @@ void MKO::pow_DY(int x, int adr)
         Sleep(100);
         bcgetblk(4,buffer,1);
         if(OCcontrol(buffer[0])!=""){
-            err1+= "МКО: Питание ДУ:\n";
+            err1+= "МКО: Ошибка при включении питания ДУ!\n";
             err1+=OCcontrol(buff[0]);
         }
     }
@@ -469,7 +392,7 @@ void MKO::pow_DY(int x, int adr)
         Sleep(100);
         bcgetblk(4,buffer,1);
         if(OCcontrol(buffer[0])!=""){
-            err1+= "МКО: Питание ДУ:\n";
+            err1+= "МКО: Ошибка при включении питания ДУ!\n";
             err1+=OCcontrol(buffer[0]);
         }
         if (tmkselect(1)!= 0 ) { err1+="Ошибка! tmk1!\n"; }//
@@ -485,12 +408,12 @@ void MKO::pow_DY(int x, int adr)
         Sleep(100);
         bcgetblk(4,buffer,1);
         if(OCcontrol(buffer[0])!=""){
-            err1+= "МКО: Питание ДУ:\n";
+            err1+= "МКО: Ошибка при включении питания ДУ!\n";
             err1+=OCcontrol(buffer[0]);
         }
     }
     else {
-        err1+= "МКО: Выбирете полукомплект для передачи!:\n";
+        err1+= "МКО: Выберите полукомплект для передачи!:\n";
     }
     emit start_MKO(err1);
 }
@@ -616,21 +539,6 @@ void MKO::MKO_tr_cm(int x,QString cm, int adr1, int adr2)
         buf3[5]=0;
         for (int k=0; k<5; k++)
             buf3[5]=buf3[5]+buf3[k];
-        /*if(ch_cur!=1&&ch_cur==2){
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-           }
-           else if(ch_cur==0) {
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-           }
-           ch_cur=1;*/
-
         if(ch_cur==1) {
             stopMKO();
             Sleep(100);
@@ -792,24 +700,6 @@ void MKO::MKO_rc_cm(int x, int adr1, int adr2)
         }
         ch_cur=2;
     }
-    /* else if (x==3){
-        err3+=" Основной полукомплект прием массива: \n";
-        AddrOU = adr1;
-        if(ch_cur!=1&&ch_cur==2){
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(2,0);
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-        }
-        else if(ch_cur==0) {
-            emit MKO_CTM(1,1);
-            Sleep(1100);
-            startMKO();
-        }
-        ch_cur=1;
-       }*/
     if (x==1 || x==2) {
         SubAddrOU = 13;
         msgCmd = (AddrOU<<11)+RT_TRANSMIT+(SubAddrOU<<5)+(21 & NWORDS_MASK);
@@ -831,16 +721,6 @@ void MKO::MKO_rc_cm(int x, int adr1, int adr2)
     }
     if (x==3) {
         WORD buff2[23];
-        /*if(ch_cur!=2&&ch_cur==1){
-            stopMKO();
-            Sleep(100);
-            emit MKO_CTM(1,0);
-            emit MKO_CTM(2,1);
-            Sleep(1300);
-            startMKO();
-           }
-           ch_cur=2;*/
-
         AddrOU = adr1;
         if(ch_cur==1) {
             stopMKO();
@@ -882,6 +762,7 @@ void MKO::MKO_rc_cm(int x, int adr1, int adr2)
             err3+="МКО: Основной полукомплект прием массива: \n";
             err3+=OCcontrol(buff2[0]);
         }
+        else err3="";
         for (int i=1; i<22; i++) {
             data+=QString::number(buff2[i])+" ";
         }

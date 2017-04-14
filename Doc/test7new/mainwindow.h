@@ -41,6 +41,7 @@ private slots:
     void MKO_data_test(QString data);
     void MKO_cm_data(QString data);
     void MKO_change_ch(int x,int y);
+    void MKO_test_conditional(int cd1, int cd2, int cd3, int cd4, int cd5, int cd6, int cd7, int cd8);
     void statusM();
     void statusRS(QString data);
     void statusCAN(QString data);
@@ -95,7 +96,9 @@ private slots:
     void on_pow_DY_rez_clicked();
     void on_MKO_osn_clicked();
     void on_MKO_rez_clicked();
+    void MKO_start_condition();
     void on_MKO_test_clicked();
+    void MKO_control_tester( int );
     void on_pushButton_11_clicked();
     void on_pushButton_12_clicked();
     void on_MKO_avt_clicked();
@@ -154,6 +157,30 @@ private slots:
 
     void on_reset_clicked();
 
+    void on_MKO_test_1_clicked();
+
+    void on_MKO_test_3_clicked();
+
+    void on_MKO_test_4_clicked();
+
+    void on_MKO_test_5_clicked();
+
+    void on_MKO_test_6_clicked();
+
+    void on_MKO_test_7_clicked();
+
+    void on_MKO_test_8_clicked();
+
+    void on_MKO_test_9_clicked();
+
+    void on_MKO_test_10_clicked();
+
+    void on_checkBox_MKO_clicked();
+
+    void on_checkBox_MKO_2_clicked();
+
+    void on_checkBox_MKO_3_clicked();
+
 signals:
     void OTD1(int);
     void OTD_reset1();
@@ -177,6 +204,8 @@ signals:
     void MKO_cm_r(int x,int y,int z);
     void MKO_ch(int x);
     void MKO_auto(int x,int y,int adr1, int adr2);
+    void MKO_res ();
+    void MKO_stp ();
     void Tech_auto(int x,int y);
     void Tech_ssi (int x);
     void Tech_log (int x, QString S3);

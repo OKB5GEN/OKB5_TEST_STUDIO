@@ -28,6 +28,7 @@ public slots:
     void MKO_chan(int x);
     void MKO_avt(int x,int y,int adr1, int adr2);
     void MKO_timer();
+    void MKO_reset();
 
 
 signals:

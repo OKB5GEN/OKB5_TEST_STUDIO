@@ -43,6 +43,8 @@ void startpower()
         readData2.append(com6->readAll());
     setUIcom5(27);
     setUIcom6(27);
+    setoverUIcom6 (29, 2);
+    setoverUIcom6 (29, 2);
 
 
 }
@@ -121,6 +123,7 @@ int stm_on_mko(int x, int y)
     QByteArray readData1 = com4->readAll();
     while (com4->waitForReadyRead(100))
         readData1.append(com4->readAll());
+    Sleep(100);
     return readData1[3];
 }
 

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 //#include "WDMTMKv2.cpp"
 #include <QtSerialPort/QtSerialPort>
+#include <QElapsedTimer>
 #include "myclass.h"
 #include "bp.h"
 #include "OTD.h"
@@ -9,21 +10,23 @@
 #include "Tech.h"
 #include "math.h"
 #include "comport.h"
+#include "synchapi.h"
 
 int cErrors, fEventResult, strt, count_1=0,count_2=0, flag_mko_test=0;
 int flag_rem1 = 0, flag_rem2 = 0, flag_con1 = 0, flag_con2 = 0, k, flag_con3 = 0, flag_con4 = 0, flag_con5 = 0, flag_tech_log=0,flag_rm=0;
 int flag_mko_auto = 0, flag_mko_osn = 0, flag_mko_rez = 0, flag_otd_auto = 0, flag_bp_auto = 0, flag_tech_auto = 0, flag_tech_ssi=0,flag_rm_4=0;
-int flag_rlm=0, flag_rlm2=0;
+int flag_rlm=0, flag_rlm2=0,  flag_dy1=0,  flag_dy2=0, flag_double_click = 0;
 int buf_spd1[10]={0},buf_spd2[10]={0},buf_spd3[10]={0},buf_spd4[10]={0};
 double dat [1000] = { 0 }, dat1 [1000] = { 0 };
 unsigned dwMRT;
 int er,MKO_addr_o=0x1E,MKO_addr_r=0x1D;
-int spd1, spd2;
+int spd1, spd2, step1, step2, i1=0, i2=0, flag_push=0, flag_reset_test=0, angl1=0, angl2=0;
+int st1=step1, st2=step2, num1=0, num2 = 0, ch = 0, d1 = 0, d2 = 0;
 double d_h[3],d_v[3];
 uint16_t sum;
 WORD tx_data [4];
 QString TestOutStr, TestOutStr1, result_tech, error_m;
-QString error_mes_1, error_mes_2,error_mes_3,error_mes_4,error_mes_5,error_mes_6,error_mes_7,error_mes_8,error_mes_9;
+QString error_mes_1, error_mes_2,error_mes_3,error_mes_4,error_mes_5,error_mes_6,error_mes_7,error_mes_8,error_mes_9, error_mes_10;
 QString ncd, zcd, cdh, cdd;
 QString buf_SSI[20], buf_RM_2[20], buf_V[20]={0}, buf_H[20]={0},delta_V[20]={0}, delta_H[20]={0}, delta_RM_2[20]={0};
 
@@ -39,9 +42,7 @@ MKO *myMKO = new MKO ("B");
 QThread *threadBP = new QThread;
 bp *myBP = new bp ("B");
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow (parent),
-    ui (new Ui::MainWindow)
+MainWindow::MainWindow (QWidget *parent) : QMainWindow (parent), ui (new Ui::MainWindow)
 {
     ui->setupUi (this);
     startcondition ();
@@ -49,19 +50,27 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    //com5OFF ();
-    //com6OFF ();
+    on_MKO_test_9_clicked();
+    stm_on_com6 (1, 0);
+    stm_on_com6 (2, 0);
+    stm_on_com6 (3, 0);
+    stm_on_com5 (4, 0);
+    stm_on_com5 (5, 0);
+    stm_on_com5 (6, 0);
+    stm_on_mko(1,0);
+    stm_on_mko(2,0);
+    com6OFF ();
+    com5OFF ();
     COMClose5_6 ();
     COMClose4 ();
-    //COMClose8 ();
     delete ui;
 }
 void MainWindow::startcondition ()
 {
     COMConnector5_6 ();
     COMConnector4 ();
-    //COMConnector8 ();
     ui->radioButton->setChecked(true);
+    ui->checkBox_MKO->setChecked(true);
     ui->radioButton_3->setChecked(true);
     ui->bp_cyc->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     ui->MKO_avt->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
@@ -77,6 +86,13 @@ void MainWindow::startcondition ()
     ui->tech_avto->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_1->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_3->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    ui->MKO_test_8->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("9600"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("19200"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("38400"));
@@ -90,8 +106,6 @@ void MainWindow::startcondition ()
     ui->baudRateBox_tech->addItem (QStringLiteral ("921600"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("1250000"));
     ui->baudRateBox_tech->addItem (QStringLiteral ("3000000"));
-    //ui->lineEdit_Addr_2->setText (QString::number (0));
-    //ui->lineEdit_Addr_3->setText (QString::number (0));
     ui->lineEdit_period->setText (QString::number (100));
     ui->tech_period->setText (QString::number (1000));
     ui->lineEdit_period_OTD->setText (QString::number (1));
@@ -138,8 +152,8 @@ void MainWindow::startcondition ()
     ui->tableWidget_2->setShowGrid (true);
     ui->tableWidget_2->setSelectionMode (QAbstractItemView::SingleSelection);
     ui->tableWidget_2->setSelectionBehavior (QAbstractItemView::SelectRows);
-    stm_on_mko (1, 0);
-    stm_on_mko (2, 0);
+    stm_on_mko (1, 1);
+    stm_on_mko (2, 1);
     myBP->moveToThread (threadBP);
     connect (myBP, SIGNAL (paint ()), this, SLOT (paintvaluebp ()));
     threadBP->start ();
@@ -195,21 +209,20 @@ void MainWindow::startcondition ()
 
     ui->setU1->setText (QString::number (27));
     ui->setU2->setText (QString::number (27));
-    ui->setlimU1->setText (QString::number (28));
-    ui->setlimU2->setText (QString::number (28));
+    ui->setlimU1->setText (QString::number (29));
+    ui->setlimU2->setText (QString::number (29));
     ui->setlimI1->setText (QString::number (2));
     ui->setlimI2->setText (QString::number (2));
-    ui->error_mod->setStyleSheet ("font: 25 16pt GOST type A;" "color: red;");
     if (id_stm () != 1){
         error_m += "СТМ: Модуль установлен не в свой слот!\n";
-        //ui->error_mod->setText (error_m);
-
     }
     else error_m ="";
     write_message();
     //if (id_tech () != 1) error_m += " Модуль ТЕХНОЛОГИЧЕСКИЙ установлен не в свой слот!";
-
     error_m = "";
+    connect (this, SIGNAL (MKO_res ()), myMKO, SLOT (MKO_reset ()));
+    emit MKO_res ();
+    disconnect (this, SIGNAL (MKO_res ()), myMKO, SLOT (MKO_reset ()));
 }
 
 int MainWindow::simpltst1 (int z)
@@ -217,7 +230,6 @@ int MainWindow::simpltst1 (int z)
     if (z == 0) {
         ui->error_mod->setStyleSheet ("font: 25 10pt GOST type A;" "color: black;");
         TestOutStr = "Тест пройден успешно!\n";
-        //ui->error_mod->setText (TestOutStr);
         TestOutStr = "";
     }
     else{
@@ -226,8 +238,6 @@ int MainWindow::simpltst1 (int z)
         TestOutStr1 += "Ошибка! Тест провален с ";
         TestOutStr1 += QString::number (z);
         TestOutStr1 += " ошибками. Перезагрузите программу!\n";
-        //ui->error_mod->setText (TestOutStr1);
-
     }
     write_message();
     return z;
@@ -271,6 +281,10 @@ int MainWindow::add_string_table_MKO (int n, QString text_data, QString comm_dat
 
 void MainWindow::MKO_data (QString data)
 {
+    if (data == "МКО: Выберите полукомплект для передачи массива! \n"){
+        step1 = 100000000;
+        step2 = 100000000;
+    }
     error_mes_1=data;
     write_message();
 }
@@ -282,10 +296,12 @@ void MainWindow::MKO_data_test (QString data)
         ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
     }
     else   ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
-    for(int i=0; i<150; i++) {
+    for(int i=0; i<100; i++) {
         Sleep(10);
         QApplication::processEvents();
     }
+    error_mes_1= "";
+    write_message();
     ui->MKO_test->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
 }
 
@@ -361,6 +377,10 @@ void MainWindow::MKO_cm_data (QString data)
             }
             if (i < 10 && i != 1 && i != 6) {
                 a = z;
+                if(i==4)
+                    i1=a;
+                if(i==9)
+                    i2=a;
                 cdh += QString::number (z, 16);
                 cdd += QString::number (a);
             }
@@ -377,6 +397,10 @@ void MainWindow::MKO_cm_data (QString data)
                 V += "' ";
                 V += QString::number (s1);
                 V += "''";
+                if ( i == 10)
+                    angl1 = d1;
+                if ( i == 11)
+                    angl2 = d1;
                 //float k = z * 180.0 / 65536.0;
                 cdh += QString::number (z, 16);
                 cdd += V;
@@ -413,6 +437,10 @@ void MainWindow::MKO_cm_data (QString data)
                 i++;
                 cdh += QString::number (z, 16);
                 cdd += QString::number (k1);
+                if( i == 2 )
+                    step1 = k1;
+                if( i == 7 )
+                    step2 = k1;
             }
             add_string_table_MKO (ct, ncd, zcd, cdh, cdd);
             ct++;
@@ -528,10 +556,12 @@ void MainWindow::on_pushButton_start_com6_clicked ()
 {
     if (flag_rem1 == 0) {
         flag_rem1 = 1;
+        MKO_start_condition();
         com6ON ();
         ui->pushButton_start_com6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
     }
     else{
+        MKO_start_condition();
         flag_rem1 = 0;
         com6OFF ();
         ui->pushButton_start_com6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
@@ -540,12 +570,16 @@ void MainWindow::on_pushButton_start_com6_clicked ()
 
 void MainWindow::on_pushButton_start_com5_clicked ()
 {
+    error_mes_7=" ";
+    write_message();
     if (flag_rem2 == 0) {
         flag_rem2 = 1;
+        MKO_start_condition();
         com5ON ();
         ui->pushButton_start_com5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
     }
     else{
+        MKO_start_condition();
         flag_rem2 = 0;
         com5OFF ();
         ui->pushButton_start_com5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
@@ -646,30 +680,23 @@ void MainWindow::statusM ()
     QString res;
 
     res += req_stm ();
-    //res += req_tech ();
     connect (this, SIGNAL (OTD_req ()), myOTD, SLOT (OTD_req ()));
     emit OTD_req ();
     disconnect (this, SIGNAL (OTD_req ()), myOTD, SLOT (OTD_req ()));
-    //if (res!="") ui->error_mod->setText (res);
     error_mes_3=res;
-    //write_message();
+
 }
 void MainWindow::status_OTD (QString data)
 {
-    /*if (data != "") {
-        ui->error_mod->setText (data);
-    }*/
     error_mes_4=data;
     write_message();
 }
 void MainWindow::write_message ()
 {
-    QString data;
-    ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: red;");
-    if (error_mes_1== " МКО: Тест пройден успешно! ") ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: black;");
+    QString data = " ";
     data+=error_m;
     data+=TestOutStr;
-    data+= TestOutStr1;
+    data+=TestOutStr1;
     data+=error_mes_1;
     data+=error_mes_2;
     data+=error_mes_3;
@@ -679,6 +706,10 @@ void MainWindow::write_message ()
     data+=error_mes_7;
     data+=error_mes_8;
     data+=error_mes_9;
+    data+=error_mes_10;
+    ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: red;");
+    if (error_mes_1== " МКО: Тест пройден успешно! " || error_mes_10== " МКО: Тест пройден успешно! " )
+        ui->error_mod->setStyleSheet ("font: 25 12pt GOST type A;" "color: black;");
     ui->error_mod->setText (data);
 }
 void MainWindow::plot_point ()
@@ -844,29 +875,65 @@ void MainWindow::on_pushButton_3_clicked ()
 
 void MainWindow::on_pushButton_4_clicked ()
 {
-    if (stm_on_com6 (1, 1) == 1 && flag_con1 == 0) {
-        flag_con1 = 1;
-        ui->pushButton_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
-        ui->pushButton_14->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    if ( flag_con5 ==1 && flag_rem2 == 1){
+        if (stm_on_com6 (1, 1) == 1 && flag_con1 == 0) {
+            flag_con1 = 1;
+            MKO_start_condition();
+            ui->pushButton_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+            ui->pushButton_14->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        }
+        else if (stm_on_com6 (1, 0) == 1 && flag_con1 == 1) {
+            MKO_start_condition();
+            flag_con1 = 0;
+            ui->pushButton_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+            ui->pushButton_14->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        }
+        error_mes_7=" ";
+        write_message();
     }
-    else if (stm_on_com6 (1, 0) == 1 && flag_con1 == 1) {
+    else{
+        if ( flag_con1 == 0 )
+            error_mes_7="БП ПНА: Не включена подача питания БД!\n";
+        else error_mes_7=" ";
+        write_message();
+        stm_on_com6 (1, 0);
         flag_con1 = 0;
         ui->pushButton_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         ui->pushButton_14->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
+    if ( flag_bp_auto == 0 )
+        on_bp_cyc_clicked ();
 }
 void MainWindow::on_pushButton_7_clicked ()
 {
-    if (stm_on_com6 (2, 1) == 1 && flag_con3 == 0) {
-        flag_con3 = 1;
-        ui->pushButton_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
-        ui->pushButton_15->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    if ( flag_con5 ==1 && flag_rem2 == 1){
+        if (stm_on_com6 (2, 1) == 1 && flag_con3 == 0) {
+            flag_con3 = 1;
+            MKO_start_condition();
+            ui->pushButton_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+            ui->pushButton_15->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        }
+        else if (stm_on_com6 (2, 0) == 1 && flag_con3 == 1) {
+            MKO_start_condition();
+            flag_con3 = 0;
+            ui->pushButton_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+            ui->pushButton_15->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        }
+        error_mes_7=" ";
+        write_message();
     }
-    else if (stm_on_com6 (2, 0) == 1 && flag_con3 == 1) {
+    else{
+        if ( flag_con3 == 0 )
+            error_mes_7="БП ПНА: Не включена подача питания БД!\n";
+        else error_mes_7=" ";
+        write_message();
+        stm_on_com6 (2, 0);
         flag_con3 = 0;
         ui->pushButton_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         ui->pushButton_15->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
+    if ( flag_bp_auto == 0 )
+        on_bp_cyc_clicked ();
 }
 void MainWindow::on_pushButton_14_clicked()
 {
@@ -898,6 +965,8 @@ void MainWindow::on_pushButton_5_clicked ()
         ui->pushButton_5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         ui->pushButton_18->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
+    if ( flag_bp_auto == 0 )
+        on_bp_cyc_clicked ();
 }
 
 void MainWindow::on_pushButton_8_clicked ()
@@ -914,10 +983,15 @@ void MainWindow::on_pushButton_8_clicked ()
         ui->pushButton_8->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         ui->pushButton_16->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
+    if ( flag_bp_auto == 0 )
+        on_bp_cyc_clicked ();
 }
 
 void MainWindow::on_pushButton_10_clicked ()
 {
+    error_mes_7=" ";
+    write_message();
+    MKO_start_condition();
     if (stm_on_com5 (6, 1) == 1 && flag_con5 == 0) {
         flag_con5 = 1;
         ui->pushButton_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
@@ -928,6 +1002,8 @@ void MainWindow::on_pushButton_10_clicked ()
         ui->pushButton_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
         ui->pushButton_17->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
+    if ( flag_bp_auto == 0 )
+        on_bp_cyc_clicked ();
 }
 void MainWindow::on_pushButton_18_clicked()
 {
@@ -1202,7 +1278,6 @@ void MainWindow::OTD_err_res (int x)
 
 void MainWindow::on_res_err_tech_clicked ()
 {
-    //if (res_err_tech () != 1) ui->error_mod->setText ("ТЕХ: Не удалось сбросить ошибку!");
     connect (this, SIGNAL (Tech_res_err()), myTech, SLOT (res_err_tech ()));
     emit Tech_res_err();
     disconnect (this, SIGNAL (Tech_res_err()), myTech, SLOT (res_err_tech ()));
@@ -1390,7 +1465,6 @@ void MainWindow::OTDtemd (QString data)
 
 void MainWindow::on_OTD_reset_1_clicked ()
 {
-    //myOTD->moveToThread(threadOTD);
     connect (this, SIGNAL (OTD_reset1 ()), myOTD, SLOT (OTDres1 ()));
     emit OTD_reset1 ();
     disconnect (this, SIGNAL (OTD_reset1 ()), myOTD, SLOT (OTDres1 ()));
@@ -1449,7 +1523,6 @@ void MainWindow::OTDtm_err ()
 }
 void MainWindow::on_OTD_nd_clicked ()
 {
-    //myOTD->moveToThread(threadOTD);
     connect (this, SIGNAL (OTD_nd ()), myOTD, SLOT (OTDtemper ()));
     emit OTD_nd ();
     disconnect (this, SIGNAL (OTD_nd ()), myOTD, SLOT (OTDtemper ()));
@@ -1457,60 +1530,135 @@ void MainWindow::on_OTD_nd_clicked ()
 
 void MainWindow::on_pow_DY_osn_clicked ()
 {
-    //QString S1 = ui->lineEdit_Addr_2->text ();
-    //int u1 = S1.toInt ();
-
-    connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
-    emit MKO_DY (0, flag_mko_osn+flag_mko_rez);
-    disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+    if (flag_dy1 == 0) {
+        flag_dy1 = 1;
+        flag_dy2 = 1;
+        on_pow_DY_rez_clicked ();
+        ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+        emit MKO_DY (0, flag_mko_osn+flag_mko_rez);
+        disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+    }
+    else  {
+        flag_dy1 = 0;
+        ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    }
 }
 
 void MainWindow::on_pow_DY_rez_clicked ()
 {
-    //QString S2 = ui->lineEdit_Addr_3->text ();
-    //int u2 = S2.toInt ();
-
-    connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
-    emit MKO_DY (1, flag_mko_osn+flag_mko_rez);
-    disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+    if (flag_dy2 == 0) {
+        flag_dy1 = 1;
+        flag_dy2 = 1;
+        on_pow_DY_osn_clicked ();
+        ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        connect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+        emit MKO_DY (1, flag_mko_osn+flag_mko_rez);
+        disconnect (this, SIGNAL (MKO_DY (int,int)), myMKO, SLOT (pow_DY (int,int)));
+    }
+    else  {
+        flag_dy2 = 0;
+        ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    }
 }
 
 void MainWindow::on_MKO_osn_clicked ()
 {
-    if (flag_mko_osn == 0) {
-        flag_mko_osn = 1;
-        ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    if (flag_mko_auto == 1){
+        on_MKO_avt_clicked ();
     }
-    else if (flag_mko_osn == 1) {
-        flag_mko_osn = 0;
-        ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    if ( flag_con1 == 1 && flag_rem1 == 1 ){
+        flag_dy2 = 0;
+        ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_dy1 = 0;
+        ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        if (flag_mko_osn == 0) {
+            flag_mko_osn = 1;
+            ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        }
+        else if (flag_mko_osn == 1) {
+            flag_mko_osn = 0;
+            ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        }
+        connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+        emit MKO_ch (flag_mko_osn + flag_mko_rez);
+        disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+        if ( flag_con3 == 1 && flag_double_click == 0) {
+            flag_double_click = 1;
+            on_MKO_rez_clicked ();
+            on_MKO_test_clicked ();
+        }
+        if ( flag_double_click == 0 )
+            on_MKO_test_clicked ();
+        flag_double_click = 0;
+        error_mes_1 = "  ";
+        write_message();
     }
-    connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
-    emit MKO_ch (flag_mko_osn + flag_mko_rez);
-    disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+    else {
+        error_mes_1 = "МКО: Не включена подача питания на основной полукомплект! \n";
+        write_message();
+    }
 }
 
 void MainWindow::on_MKO_rez_clicked ()
 {
-    if (flag_mko_rez == 0) {
-        flag_mko_rez = 2;
-        ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    if (flag_mko_auto == 1){
+        on_MKO_avt_clicked ();
     }
-    else if (flag_mko_rez == 2) {
-        flag_mko_rez = 0;
-        ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    if (flag_con3 == 1 && flag_rem1 == 1 ){
+        flag_dy2 = 0;
+        ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_dy1 = 0;
+        ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        if (flag_mko_rez == 0) {
+            flag_mko_rez = 2;
+            ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        }
+        else if (flag_mko_rez == 2) {
+            flag_mko_rez = 0;
+            ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        }
+        connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+        emit MKO_ch (flag_mko_osn + flag_mko_rez);
+        disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+        if ( flag_con1 == 1 && flag_double_click == 0) {
+            flag_double_click = 1;
+            on_MKO_osn_clicked ();
+            on_MKO_test_clicked ();
+        }
+        if ( flag_double_click == 0 )
+            on_MKO_test_clicked ();
+        flag_double_click = 0;
+        error_mes_1 = "  ";
+        write_message();
     }
-    connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
-    emit MKO_ch (flag_mko_osn + flag_mko_rez);
-    disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+    else {
+        error_mes_1 = "МКО: Не включена подача питания на резервный полукомплект! \n";
+        write_message();
+    }
 }
-
+void MainWindow::MKO_start_condition ()
+{
+    if (flag_mko_auto == 1){
+        on_MKO_avt_clicked ();
+    }
+    flag_mko_rez = 0;
+    ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    flag_mko_osn = 0;
+    ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    flag_dy2 = 0;
+    ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    flag_dy1 = 0;
+    ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    error_mes_1 = " ";
+    error_mes_10 = "";
+    write_message();
+}
 void MainWindow::on_MKO_test_clicked ()
 {
-    //QString S1 = ui->lineEdit_Addr_2->text ();
-    //int u1 = S1.toInt ();
-    //QString S2 = ui->lineEdit_Addr_3->text ();
-    //int u2 = S2.toInt ();
+    if (flag_mko_auto == 1){
+        on_MKO_avt_clicked ();
+    }
     flag_mko_test=1;
     connect (this, SIGNAL (MKO_ts (int,int,int)), myMKO, SLOT (MKO_start_test (int,int,int)));
     emit MKO_ts (flag_mko_osn + flag_mko_rez, MKO_addr_o, MKO_addr_r);
@@ -1542,10 +1690,6 @@ void MainWindow::on_pushButton_11_clicked ()
     if (ui->radioButton_2->isChecked()==1){
         flag_mko_osn=flag_mko_osn+10;
     }
-    /*QString S3 = ui->lineEdit_Addr_2->text ();
-    int u1 = S3.toInt ();
-    QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();*/
     connect (this, SIGNAL (MKO_cm (int,QString,int,int)), myMKO, SLOT (MKO_tr_cm (int,QString,int,int)));
     emit MKO_cm (flag_mko_osn + flag_mko_rez, S1, MKO_addr_o, MKO_addr_r);
     disconnect (this, SIGNAL (MKO_cm (int,QString,int,int)), myMKO, SLOT (MKO_tr_cm (int,QString,int,int)));
@@ -1556,11 +1700,6 @@ void MainWindow::on_pushButton_11_clicked ()
 
 void MainWindow::on_pushButton_12_clicked ()
 {
-    /*QString S1 = ui->lineEdit_Addr_2->text ();
-    int u1 = S1.toInt ();
-    QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();*/
-
     connect (this, SIGNAL (MKO_cm_r (int,int,int)), myMKO, SLOT (MKO_rc_cm (int,int,int)));
     emit MKO_cm_r (flag_mko_osn + flag_mko_rez, MKO_addr_o, MKO_addr_r);
     disconnect (this, SIGNAL (MKO_cm_r (int,int,int)), myMKO, SLOT (MKO_rc_cm (int,int,int)));
@@ -1574,10 +1713,6 @@ void MainWindow::MKO_change_ch (int x, int y)
 
 void MainWindow::on_MKO_avt_clicked ()
 {
-    /*QString S1 = ui->lineEdit_Addr_2->text ();
-    int u1 = S1.toInt ();
-    QString S2 = ui->lineEdit_Addr_3->text ();
-    int u2 = S2.toInt ();*/
     QString S3 = ui->lineEdit_period->text ();
     int u3 = S3.toInt ();
 
@@ -1949,14 +2084,18 @@ void MainWindow::on_pushButton_24_clicked()
 
 void MainWindow::on_reset_clicked()
 {
+    on_MKO_test_9_clicked();
+    if (flag_mko_auto == 1){
+        on_MKO_avt_clicked ();
+    }
     ui->reset->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
     if (flag_mko_auto == 1) on_MKO_avt_clicked ();
     if (flag_otd_auto == 1) on_OTD_avt_2_clicked ();
     if (flag_tech_auto == 1) on_tech_avto_clicked();
     QApplication::processEvents();
-    connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
-    emit MKO_ch (flag_mko_osn*10 + flag_mko_rez*10);
-    disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+    //connect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
+    //emit MKO_ch (flag_mko_osn*10 + flag_mko_rez*10);
+    //disconnect (this, SIGNAL (MKO_ch (int)), myMKO, SLOT (MKO_chan (int)));
     if (flag_mko_osn == 1) {
         flag_mko_osn = 0;
         ui->MKO_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
@@ -1965,9 +2104,33 @@ void MainWindow::on_reset_clicked()
         flag_mko_rez = 0;
         ui->MKO_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     }
-    stm_on_mko (1, 0);
-    stm_on_mko (2, 0);
+    connect (this, SIGNAL (MKO_stp ()), myMKO, SLOT (stopMKO1 ()));
+    emit MKO_stp ();
+    disconnect (this, SIGNAL (MKO_stp ()), myMKO, SLOT (stopMKO1 ()));
+    for(int i=0; i<10; i++) {
+        Sleep(10);
+        QApplication::processEvents();
+    }
+    stm_on_mko(1,0);
+    stm_on_mko(2,0);
+    for(int i=0; i<10; i++) {
+        Sleep(10);
+        QApplication::processEvents();
+    }
+    stm_on_mko(1,1);
+    stm_on_mko(2,1);
+    for(int i=0; i<150; i++) {
+        Sleep(10);
+        QApplication::processEvents();
+    }
+    connect (this, SIGNAL (MKO_res ()), myMKO, SLOT (MKO_reset ()));
+    emit MKO_res ();
+    disconnect (this, SIGNAL (MKO_res ()), myMKO, SLOT (MKO_reset ()));
     startpower ();
+    flag_dy2 = 0;
+    ui->pow_DY_rez->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    flag_dy1 = 0;
+    ui->pow_DY_osn->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     flag_rem1 = 0;
     ui->pushButton_start_com6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
     flag_rem2 = 0;
@@ -2016,6 +2179,452 @@ void MainWindow::on_reset_clicked()
     error_mes_7 = "";
     error_mes_8 = "";
     error_mes_9 = "";
+    error_mes_10 = "";
     ui->error_mod->setText ("");
     ui->reset->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
 }
+void MainWindow::MKO_test_conditional(int cd1, int cd2, int cd3, int cd4, int cd5, int cd6, int cd7, int cd8)
+{
+    if (ui->checkBox_MKO_2->isChecked()==1)
+    {
+        cd5=0;
+        cd6=0;
+        cd7=0;
+        cd8=0;
+    }
+    if (ui->checkBox_MKO_3->isChecked()==1)
+    {
+        cd1=0;
+        cd2=0;
+        cd3=0;
+        cd4=0;
+    }
+    if (flag_mko_auto == 0){
+        on_MKO_avt_clicked ();
+    }
+    QApplication::processEvents();
+    step1 = 0;
+    step2 = 0;
+    ui->MKO_cd_0->setText (QString::number (cd1));
+    ui->MKO_cd_1->setText (QString::number (cd2));
+    ui->MKO_cd_3->setText (QString::number (cd3));
+    ui->MKO_cd_4->setText (QString::number (cd4));
+    ui->MKO_cd_5->setText (QString::number (cd5));
+    ui->MKO_cd_6->setText (QString::number (cd6));
+    ui->MKO_cd_8->setText (QString::number (cd7));
+    ui->MKO_cd_9->setText (QString::number (cd8));
+    on_pushButton_11_clicked ();
+}
+void MainWindow::MKO_control_tester( int mode)
+{
+    int ii1 = 1, ii2 = 1, fin1 = 0 , fin2 = 0;
+    if ( ui->checkBox_MKO_2->isChecked()==1 )
+        ii2 = 0;
+    if ( ui->checkBox_MKO_3->isChecked()==1 )
+        ii1 = 0;
+    if  ( mode  == 1){
+    ii1 = 0;
+    ii2 = 0;
+    }
+    error_mes_10 = "";
+    write_message();
+    flag_reset_test = 0;
+    if ( ui->checkBox_MKO_2->isChecked()==1 )
+        d2 = 0;
+    if ( ui->checkBox_MKO_3->isChecked()==1 )
+        d1 = 0;
+    flag_push = 1;
+    num1 = 0;
+    num2 = 0;
+    step1 = 0;
+    step2 = 0;
+    ch = 0;
+    Sleep(200);
+    while (1){
+        QApplication::processEvents();
+        Sleep(200);
+        QApplication::processEvents();
+        if (((step1-st1) < 1 && step1 < d1*0.9-1) || i1 < ii1 ){
+            num1++;
+        }
+        else
+            num1=0;
+        if (((step2-st2) < 1 && step2 < d2*0.9-1) || i2 < ii2 ){
+            num2++;
+        }
+        else
+            num2=0;
+        if (step1 >= d1-10 ){
+            fin1 = 1;
+        }
+        if (step2 >= d2-10 ){
+            fin2 = 1;
+        }
+        if (( num1 > 2 ) || ( num2 > 2  ) || ( fin1 == 1 && fin2 == 1 ) )
+            break;
+        st1=step1;
+        st2=step2;
+    }
+    if (step1 < d1-10 || step2 < d2-10){
+        if (step1 < d1-10 && num1 > 3)
+            ch = 1;
+        else ch = 2;
+        MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+    }
+    else
+        error_mes_10 = "";
+    for (int i=0 ; i < 40 ; i++){
+        Sleep(20);
+        QApplication::processEvents();
+        if ( flag_reset_test == 1 || ch != 0)
+            break;
+    }
+    Sleep(200);
+}
+void MainWindow::on_MKO_test_1_clicked()
+{
+    if ( flag_push == 0 ){
+        d1 = 10000, d2 = 10000;
+        flag_push = 1;
+        ui->MKO_test_1->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(3, d1, 5000, 500, 3, d2, 5000, 500);
+        MKO_control_tester(1);
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        if ((step1 != 0 || step2 != 0 || ch != 0) && flag_reset_test == 0  ){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Установка текущего положения' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Установка текущего положения' по оси υ! \n";
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_1->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_3_clicked()
+{
+    if ( flag_push == 0 ){
+        d1 = 3000, d2 = 3000;
+        flag_push = 1;
+        ui->MKO_test_3->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(3, 10000, 5000, 500, 3, 10000, 5000, 500);
+        MKO_control_tester(1);
+        MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        Sleep(200);
+        if ( ch != 0 && flag_reset_test == 0){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Стоянка без тока' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Стоянка без тока' по оси υ! \n";
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_3->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_4_clicked()
+{
+    if ( flag_push == 0 ){
+        int ii1 = 10, ii2 = 10;
+        if ( ui->checkBox_MKO_2->isChecked()==1 )
+            ii2 = 0;
+        if ( ui->checkBox_MKO_3->isChecked()==1 )
+            ii1 = 0;
+        d1 = 3000, d2 = 3000;
+        flag_push = 1;
+        ui->MKO_test_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(3, 10000, 5000, 500, 3, 10000, 5000, 500);
+        MKO_control_tester(1);
+        MKO_test_conditional(1, 0, 0, 100, 1, 0, 0, 100);
+        QApplication::processEvents();
+        Sleep(300);
+        QApplication::processEvents();
+        Sleep(300);
+        if ((i1 < ii1 || i2 < ii2 || ch != 0 ) && flag_reset_test == 0 ){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Стоянка под током' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Стоянка под током' по оси υ! \n";
+            MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_4->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_5_clicked()
+{
+    if ( flag_push == 0 ){
+        d1 = 400, d2 = 400;
+        flag_push = 1;
+        ui->MKO_test_5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(2, d1, 50, 500, 2, d2, 50, 500);
+        MKO_control_tester(1);
+        if ((step1 < d1-10 || step2 < d2-10 || ch != 0 ) && flag_reset_test == 0){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение НР' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение НР' по оси υ! \n";
+            MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_5->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_6_clicked()
+{
+    if ( flag_push == 0 ){
+        d1 = 10000, d2 = 10000;
+        flag_push = 1;
+        ui->MKO_test_6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(3, d1, 5000, 500, 3, d2, 5000, 500);
+        MKO_control_tester(1);
+        if ((step1 < d1-10 || step2 < d2-10 || ch != 0 ) && flag_reset_test == 0){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение BР' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение BР' по оси υ! \n";
+            MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_6->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_7_clicked()
+{
+    if ( flag_push == 0 ){
+        d1 = 400, d2 = 400;
+        flag_push = 1;
+        ui->MKO_test_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(200);
+        MKO_test_conditional(4, d1, 200, 100, 4, d2, 200, 100);
+        MKO_control_tester(0);
+        if ((step1 < d1-10 || step2 < d2-10 || ch != 0 ) && flag_reset_test == 0){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение без ДПР' по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при тестировании режима 'Отработка в заданное положение без ДПР' по оси υ! \n";
+            MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_7->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_8_clicked()
+{
+    if ( flag_push == 0 ){
+        int angle1 = angl1, angle2 = angl2;
+        d1 = 1333, d2 = 1333;
+        if ( ui->checkBox_MKO_2->isChecked()==1 )
+            angle2 = angl2 - 30;
+        if ( ui->checkBox_MKO_3->isChecked()==1 )
+            angle1 = angl1 - 30;
+        flag_push = 1;
+        ui->MKO_test_8->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+        Sleep(100);
+        MKO_test_conditional(3, d1, 5000, 500, 3, d2, 5000, 500);
+        MKO_control_tester(1);
+        if ((step1 < d1-10 || step2 < d2-10 || abs(angle1 - angl1) < 9 || abs(angle2 - angl2) < 9 || ch != 0 ) && flag_reset_test == 0){
+            if ( ch == 1 )
+                error_mes_10 = "МКО: Ошибка при проверке работы с датчиками угла по оси ψ! \n";
+            else
+                error_mes_10 = "МКО: Ошибка при проверке работы с датчиками угла по оси υ! \n";
+            MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        else
+            error_mes_10 = "";
+        ui->MKO_test_8->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+        flag_push = 0;
+        if ( flag_reset_test == 0 )
+            write_message();
+    }
+}
+
+void MainWindow::on_MKO_test_9_clicked()
+{
+    ui->MKO_test_9->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+    QApplication::processEvents();
+    MKO_test_conditional(1, 0, 0, 100, 1, 0, 0, 100);
+    Sleep(100);
+    MKO_test_conditional(0, 0, 0, 0, 0, 0, 0, 0);
+    Sleep(100);
+    MKO_test_conditional(5, 0, 0, 0, 5, 0, 0, 0);
+    Sleep(200);
+    step1 = 1111111;
+    step2 = 1111111;
+    flag_push = 0;
+    flag_reset_test = 1;
+    error_mes_10 = "";
+    write_message();
+    ui->MKO_test_9->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+}
+
+void MainWindow::on_MKO_test_10_clicked()
+{
+    if ( flag_push == 0 && error_mes_1 == ""){
+        flag_reset_test = 0;
+        if ( flag_dy1 == 0 && flag_dy2 == 0)
+            on_pow_DY_osn_clicked();
+        ui->MKO_test_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(0, 255, 0);"));
+        QApplication::processEvents();
+        on_MKO_test_1_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_3_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_4_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_5_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_6_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_7_clicked();
+        flag_push = 1;
+        for(int i=0; i<250; i++) {
+            if (flag_reset_test == 1 || error_mes_10 != "")
+                i=250;
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        flag_push = 0;
+    }
+    if ( flag_push == 0 && error_mes_1 == "" && flag_reset_test == 0 && error_mes_10 == 0){
+        on_MKO_test_8_clicked();
+        flag_reset_test = 0;
+        if ( error_mes_10 == "" ){
+            error_mes_10 = " МКО: Тест пройден успешно! " ;
+            write_message();
+        }
+        else   ui->MKO_test_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(250, 24, 0);"));
+        for(int i=0; i<100; i++) {
+            Sleep(10);
+            QApplication::processEvents();
+        }
+        error_mes_10 = "";
+        write_message();
+        ui->MKO_test_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    }
+    if (flag_reset_test == 1 || error_mes_10 != ""){
+        if (flag_reset_test == 1 && error_mes_10 != ""){
+            error_mes_10 = "";
+            write_message();
+        }
+        flag_push = 0;
+        flag_reset_test = 0;
+        ui->MKO_test_10->setStyleSheet (QString::fromUtf8 ("background-color: rgb(230, 230, 230);"));
+    }
+}
+
+void MainWindow::on_checkBox_MKO_clicked()
+{
+    if ( ui->checkBox_MKO->isChecked()==1 )
+    {
+        ui->checkBox_MKO_2->setChecked(false);
+        ui->checkBox_MKO_3->setChecked(false);
+    }
+}
+
+void MainWindow::on_checkBox_MKO_2_clicked()
+{
+    if ( ui->checkBox_MKO_2->isChecked()==1 )
+    {
+        ui->checkBox_MKO->setChecked(false);
+        ui->checkBox_MKO_3->setChecked(false);
+    }
+}
+
+void MainWindow::on_checkBox_MKO_3_clicked()
+{
+    if ( ui->checkBox_MKO_3->isChecked()==1 )
+    {
+        ui->checkBox_MKO_2->setChecked(false);
+        ui->checkBox_MKO->setChecked(false);
+    }
+}
+
+
+
