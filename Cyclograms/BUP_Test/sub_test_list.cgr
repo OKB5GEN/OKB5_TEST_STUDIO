@@ -2,10 +2,8 @@
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
     <variables>
-        <variable name="CheckOK" value="0" desc=""/>
         <variable name="OK" value="0" desc=""/>
-        <variable name="SendOK" value="0" desc=""/>
-        <variable name="SysOK" value="0" desc=""/>
+        <variable name="SubOK" value="0" desc=""/>
         <variable name="U" value="0" desc=""/>
     </variables>
     <commands>
@@ -20,10 +18,8 @@
                 <param name="Sub.U" type="10" value="U"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -44,62 +40,99 @@
         <command type="BRANCH_BEGIN" id="1491891451414" name="FAIL"/>
         <command type="GO_TO_BRANCH" id="1491891451417"/>
         <command type="QUESTION" id="1491891548089" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SysOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891548094"/>
         <command type="SUBPROGRAM" id="1491891646132" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="500"/>
                 <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="3"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="10000"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891686240" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891686244"/>
         <command type="SUBPROGRAM" id="1491891705619" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.DestSteps" type="6" value="10000"/>
+                <param name="Sub.Diff" type="6" value="0"/>
+                <param name="Sub.MaxDelta" type="6" value="10"/>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="1e+6"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891736336" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891736341"/>
         <command type="SUBPROGRAM" id="1491891773395" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="500"/>
                 <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="3"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="1e+7"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -112,10 +145,8 @@
                 <param name="Sub.Steps" type="6" value="1e+7"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -128,10 +159,8 @@
                 <param name="Sub.Steps" type="6" value="1333"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -144,10 +173,8 @@
                 <param name="Sub.Steps" type="6" value="10000"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -163,171 +190,284 @@
         </command>
         <command type="SUBPROGRAM" id="1491891817376" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="200"/>
                 <param name="Sub.MaxV" type="6" value="500"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="4"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="1333"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891824978" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891824982"/>
         <command type="QUESTION" id="1491891830395" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891830399"/>
         <command type="QUESTION" id="1491891834277" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891834281"/>
         <command type="QUESTION" id="1491891840119" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891840122"/>
         <command type="QUESTION" id="1491891844034" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891844038"/>
         <command type="SUBPROGRAM" id="1491891851123" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="100"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
                 <param name="Sub.StopDelay" type="6" value="10000"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891854276" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.MaxI" type="6" value="400"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="1"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="100"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
                 <param name="Sub.StopDelay" type="6" value="10000"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891860453" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.DestSteps" type="6" value="1333"/>
+                <param name="Sub.Diff" type="6" value="0"/>
+                <param name="Sub.MaxDelta" type="6" value="10"/>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="1e+6"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891865958" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.DestSteps" type="6" value="10000"/>
+                <param name="Sub.Diff" type="6" value="0"/>
+                <param name="Sub.MaxDelta" type="6" value="10"/>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="1e+6"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891871062" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
+                <param name="Sub.DestN" type="6" value="10"/>
                 <param name="Sub.DestSteps" type="6" value="1333"/>
+                <param name="Sub.Diff" type="6" value="0"/>
+                <param name="Sub.MaxDelta" type="6" value="10"/>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="0"/>
+                <param name="Sub.N" type="6" value="0"/>
+                <param name="Sub.Nst" type="6" value="0"/>
+                <param name="Sub.NstMax" type="6" value="1e+6"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.StepsCur" type="6" value="0"/>
+                <param name="Sub.StepsPrev" type="6" value="0"/>
+                <param name="Sub.StopDelay" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891920264" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891920268"/>
         <command type="QUESTION" id="1491891929186" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891929190"/>
         <command type="QUESTION" id="1491891934723" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891934727"/>
         <command type="QUESTION" id="1491891939038" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891939042"/>
         <command type="QUESTION" id="1491891945656" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891945660"/>
         <command type="SUBPROGRAM" id="1491893788257" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
             <input_params/>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="SubOK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491991092223" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491991186019" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991186025"/>
@@ -335,39 +475,56 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491991270534" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991270540"/>
         <command type="SUBPROGRAM" id="1491995677225" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491995683235" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491995683239"/>
@@ -380,15 +537,13 @@
                 <param name="Sub.Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491996318484" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996318489"/>
@@ -396,18 +551,28 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491996388558" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996388564"/>
@@ -420,15 +585,13 @@
                 <param name="Sub.Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997026353" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997026359"/>
@@ -436,18 +599,28 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997105384" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997105389"/>
@@ -455,18 +628,28 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997141672" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997141677"/>
@@ -479,15 +662,13 @@
                 <param name="Sub.Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997331965" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997331970"/>
@@ -495,39 +676,56 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997338557" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997338563"/>
         <command type="SUBPROGRAM" id="1491997514909" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997517710" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997517716"/>
@@ -535,18 +733,28 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997525074" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997525080"/>
@@ -554,22 +762,29 @@
         <command type="GO_TO_BRANCH" id="1491997762662"/>
         <command type="SUBPROGRAM" id="1491997801170" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="500"/>
                 <param name="Sub.MaxV" type="6" value="5000"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="3"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="1333"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997804977" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997804982"/>
@@ -578,36 +793,41 @@
                 <param name="Sub.OK" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997831242" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997831248"/>
         <command type="SUBPROGRAM" id="1491997835422" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="50"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="CheckOK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="Sub.OK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997839728" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SendOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997839732"/>
@@ -615,18 +835,28 @@
             <input_params>
                 <param name="Sub.DestMode" type="6" value="5"/>
                 <param name="Sub.DestSteps" type="6" value="0"/>
+                <param name="Sub.NuA" type="6" value="0"/>
+                <param name="Sub.NuI" type="6" value="0"/>
+                <param name="Sub.NuM" type="6" value="0"/>
+                <param name="Sub.NuS" type="6" value="0"/>
+                <param name="Sub.NuV" type="6" value="0"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PsyA" type="6" value="0"/>
+                <param name="Sub.PsyI" type="6" value="0"/>
+                <param name="Sub.PsyM" type="6" value="0"/>
+                <param name="Sub.PsyS" type="6" value="0"/>
+                <param name="Sub.PsyV" type="6" value="0"/>
+                <param name="Sub.T" type="6" value="0"/>
+                <param name="Sub.TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="CheckOK" type="10" value="Sub.OK"/>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SendOK" type="10" value="SendOK"/>
-                <param name="SysOK" type="10" value="SysOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997848282" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="CheckOK"/>
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997848288"/>
