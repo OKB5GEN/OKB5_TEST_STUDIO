@@ -78,7 +78,7 @@ private slots:
     void sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount);
     void requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse);
 
-    QString processResponseWord(uint16_t responseWord);
+    void processResponseWord(uint16_t responseWord, QStringList& errors);
 
     // TODO refactor
     void startMKO();
@@ -147,6 +147,8 @@ private:
     uint16_t mWordsToReceive;
     uint16_t mWordsSent;
     KitID mActiveKits = NO_KIT;
+
+    int mRepeatedRequests;
 };
 
 #endif // MODULE_MKO_H

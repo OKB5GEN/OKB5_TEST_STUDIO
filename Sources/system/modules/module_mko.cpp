@@ -17,6 +17,13 @@ namespace
     static const int RECEIVE_DELAY = 100; // msec
     static const int PROTECTION_DELAY = 100; // msec
     static const int RECEIVE_BUFFER_SIZE = 100; // words
+    static const int MAX_REPEAT_REQUESTS = 5; // Макс кол-во перезапросов при получении "Нет возможности обмена"
+
+    static const QString ERR_WRONG_INFO = "Wrong info received"; // "Принята недостоверная информация"
+    static const QString ERR_RESPONSE_NOT_READY = "Response not ready"; // "Нет возможности обмена"
+    static const QString ERR_SUBSCRIBER_MALFUNC = "Subscriber malfunction"; // "Абонент неисправен"
+    static const QString ERR_DEVICE_MALFUNCTION = "Terminal device works wrong"; // "ОУ функционирует неправильно"
+    static const QString ERR_ADDR_MISMATCH = "Address mismatch"; //"Неверный адрес в ОС"
 }
 
 ModuleMKO::ModuleMKO(QObject* parent):
@@ -25,7 +32,8 @@ ModuleMKO::ModuleMKO(QObject* parent):
     mReserveKitEnabled(false),
     mWordsToReceive(0),
     mWordsSent(0),
-    mActiveKits(NO_KIT)
+    mActiveKits(NO_KIT),
+    mRepeatedRequests(0)
 {
 }
 
@@ -36,8 +44,6 @@ ModuleMKO::~ModuleMKO()
 
 void ModuleMKO::readResponse()
 {
-    int TODO; // стопнули циклограмму, не дождавшись респонса
-
     // хитрожопая логика вычитывания: надо вычиывать столько, сколько послал и после этого будут лежать ответное слово + данные (если есть)
     // parsing response word for errors
     uint16_t buffer[RECEIVE_BUFFER_SIZE];
@@ -52,14 +58,41 @@ void ModuleMKO::readResponse()
 
     LOG_INFO(QString("Receive data from MKO: %1").arg(dataStr));
 
-    QString error = processResponseWord(buffer[0]);
-    if (!error.isEmpty())
+    QStringList errors;
+    processResponseWord(buffer[0], errors);
+
+    // process response errors
+    if (!errors.isEmpty())
     {
-        LOG_ERROR(QString("MKO response error: %1").arg(error));
-        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+        for (auto it = errors.begin(); it != errors.end(); ++it)
+        {
+            LOG_ERROR(QString("MKO response error: %1").arg(*it));
+        }
+
+        if (errors.size() == 1 && errors.at(0) == ERR_RESPONSE_NOT_READY)
+        {
+            if (mRepeatedRequests > MAX_REPEAT_REQUESTS)
+            {
+                LOG_ERROR(QString("Max repeat count of %1 exceeded! Error: %2").arg(MAX_REPEAT_REQUESTS).arg(ERR_RESPONSE_NOT_READY));
+                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+            }
+            else
+            {
+                ++mRepeatedRequests;
+                QTimer::singleShot(RECEIVE_DELAY, this, SLOT(readResponse()));
+                return;
+            }
+        }
+        else
+        {
+            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+        }
     }
 
+    // send response to cyclogram
     ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentResponse.value(SystemState::COMMAND_ID).toUInt());
+
+    mRepeatedRequests = 0;
 
     switch (command)
     {
@@ -409,12 +442,11 @@ void ModuleMKO::stopMKO1()
     CloseHandle(hEvent1);
 }
 
-QString ModuleMKO::processResponseWord(uint16_t oc)
+void ModuleMKO::processResponseWord(uint16_t responseWord, QStringList& errors)
 {
-    LOG_INFO(QString("Response word is %1").arg(QString::number(oc, 16)));
+    LOG_INFO(QString("Response word is %1").arg(QString::number(responseWord, 16)));
 
     //TODO use ADDRESS_MASK etc instead of bit shifts
-    QString error;
     uint16_t x;
 
     uint16_t address;
@@ -431,49 +463,42 @@ QString ModuleMKO::processResponseWord(uint16_t oc)
         LOG_ERROR(QString("Response received but no enabled BUP kit found"));
     }
 
-    if (oc >> 11 != address)
+    if (responseWord >> 11 != address)
     {
-        LOG_ERROR(QString("Addr from OS: %1, Addr cur: %2").arg(oc >> 11).arg(address));
-        error += " - Неверный адрес в ОС! \n";
+        LOG_ERROR(QString("Addr from OS: %1, Addr cur: %2").arg(responseWord >> 11).arg(address));
+        errors.append(ERR_ADDR_MISMATCH);
     }
 
-    x = oc << 5;
+    x = responseWord << 5;
     x = x >> 15;
     if (x == 1)
     {
-        error += " - Принята недостоверная информация! \n";
+        errors.append(ERR_WRONG_INFO);
     }
 
-    x = oc << 12;
-    x = x >> 15;
-
-    if (x == 1)
-    {
-        error += " - Нет возможности обмена! \n";
-    }
-
-    x = oc << 13;
+    x = responseWord << 12;
     x = x >> 15;
 
     if (x == 1)
     {
-        error += " - Абонент неисправен! \n";
+        errors.append(ERR_RESPONSE_NOT_READY);
     }
 
-    x = oc << 15;
+    x = responseWord << 13;
     x = x >> 15;
 
     if (x == 1)
     {
-        error += " - ОУ функционирует неправильно! \n";
+        errors.append(ERR_SUBSCRIBER_MALFUNC);
     }
 
-    if (error == "")
+    x = responseWord << 15;
+    x = x >> 15;
+
+    if (x == 1)
     {
-        error += "";
+        errors.append(ERR_DEVICE_MALFUNCTION);
     }
-
-    return error;
 }
 
 void ModuleMKO::MKO_start_test(int kit, int adr1, int adr2)
