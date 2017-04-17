@@ -703,8 +703,6 @@ void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
 
 void CyclogramWidget::onNeedUpdate()
 {
-    //qDebug("On need update w=%i, h=%i", mDiagramSize.width(), mDiagramSize.height());
-
     int W = ShapeItem::itemSize().width();
     int H = ShapeItem::itemSize().height();
     int w = ShapeItem::cellSize().width();
@@ -929,7 +927,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
 
     if (cmd->type() != DRAKON::TERMINATOR || cmd->nextCommands().empty())
     {
-        qDebug("Not cyclogram start terminator");
+        LOG_WARNING(QString("Not cyclogram start terminator"));
         return;
     }
 

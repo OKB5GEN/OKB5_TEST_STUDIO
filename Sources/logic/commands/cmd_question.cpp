@@ -1,7 +1,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/gui/cyclogram/valency_point.h"
-
+#include "Headers/logger/Logger.h"
 #include <QTimer>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
@@ -121,7 +121,7 @@ void CmdQuestion::setOperand(OperandID operand, qreal value)
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 1");
+        LOG_WARNING(QString("Invalid operand input 1"));
         return;
     }
 
@@ -135,13 +135,13 @@ void CmdQuestion::setOperand(OperandID operand, const QString& variable)
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input");
+        LOG_WARNING(QString("Invalid operand input"));
         return;
     }
 
     if (variable.isEmpty())
     {
-        qDebug("No variable name provided");
+        LOG_WARNING(QString("No variable name provided"));
         return;
     }
 
@@ -160,7 +160,7 @@ CmdQuestion::OperandType CmdQuestion::operandType(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 2");
+        LOG_WARNING(QString("Invalid operand input 2"));
         return OperandNotSet;
     }
 
@@ -171,13 +171,13 @@ QString CmdQuestion::variableName(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 3");
+        LOG_WARNING(QString("Invalid operand input 3"));
         return "";
     }
 
     if (mOperands[operand].type == Number)
     {
-        qDebug("Operand is not variable");
+        LOG_WARNING(QString("Operand is not variable"));
         return "";
     }
 
@@ -188,7 +188,7 @@ qreal CmdQuestion::value(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 4");
+        LOG_WARNING(QString("Invalid operand input 4"));
         return -1;
     }
 
@@ -545,7 +545,7 @@ void CmdQuestion::insertInSwitchState(Command* newCmd, ValencyPoint::Role role)
 
     if (role == ValencyPoint::UnderArrow)
     {
-        qDebug("Unexpected valency point!");
+        LOG_WARNING(QString("Unexpected valency point!"));
         return;
     }
 
@@ -773,7 +773,7 @@ void CmdQuestion::insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role
 {
     if (role == ValencyPoint::UnderArrow)
     {
-        qDebug("Unexpected valency point 2");
+        LOG_WARNING(QString("Unexpected valency point 2"));
         return;
     }
 
@@ -817,7 +817,7 @@ void CmdQuestion::insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role r
     }
     else
     {
-        qDebug("Unexpected valency point 3");
+        LOG_WARNING(QString("Unexpected valency point 3"));
     }
 }
 
@@ -860,7 +860,7 @@ void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::
 {
     if (role == ValencyPoint::UnderArrow)
     {
-        qDebug("Unexpected valency point");
+        LOG_WARNING(QString("Unexpected valency point"));
         return;
     }
 

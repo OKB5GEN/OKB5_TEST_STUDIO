@@ -1,5 +1,6 @@
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
 
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -93,13 +94,13 @@ void CmdActionMath::setOperand(OperandID operand, qreal value)
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 1");
+        LOG_WARNING(QString("Invalid operand input 1"));
         return;
     }
 
     if (operand == Result)
     {
-        qDebug("Operation result must be variable");
+        LOG_WARNING(QString("Operation result must be variable"));
         return;
     }
 
@@ -113,13 +114,13 @@ void CmdActionMath::setOperand(OperandID operand, const QString& variable)
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input");
+        LOG_WARNING(QString("Invalid operand input"));
         return;
     }
 
     if (variable.isEmpty())
     {
-        qDebug("No variable name provided");
+        LOG_WARNING(QString("No variable name provided"));
         return;
     }
 
@@ -138,7 +139,7 @@ CmdActionMath::OperandType CmdActionMath::operandType(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 2");
+        LOG_WARNING(QString("Invalid operand input 2"));
         return OperandNotSet;
     }
 
@@ -149,13 +150,13 @@ QString CmdActionMath::variableName(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 3");
+        LOG_WARNING(QString("Invalid operand input 3"));
         return "";
     }
 
     if (mOperands[operand].type == Number)
     {
-        qDebug("Operand is not variable");
+        LOG_WARNING(QString("Operand is not variable"));
         return "";
     }
 
@@ -166,7 +167,7 @@ qreal CmdActionMath::value(OperandID operand) const
 {
     if (operand < 0 || operand >= OperandsCount)
     {
-        qDebug("Invalid operand input 4");
+        LOG_WARNING(QString("Invalid operand input 4"));
         return -1;
     }
 

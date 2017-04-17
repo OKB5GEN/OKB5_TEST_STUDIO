@@ -8,6 +8,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/gui/cyclogram/valency_point.h"
+#include "Headers/logger/Logger.h"
 
 #include <QMetaEnum>
 
@@ -161,7 +162,7 @@ void FileReader::readCommandsLinks()
 {
     if (mCommands.empty()) //TODO validate file reading (temporary create default cyclogram)
     {
-        qDebug("File not loaded create default cyclogram");
+        LOG_WARNING(QString("File not loaded create default cyclogram"));
         mCyclogram->createDefault();
         return;
     }

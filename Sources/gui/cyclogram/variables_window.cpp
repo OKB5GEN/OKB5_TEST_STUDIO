@@ -146,11 +146,6 @@ void VariablesWindow::onNameChanged()
 {
     VariableController* controller = mCyclogram->variableController();
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(QObject::sender());
-    if (!lineEdit)
-    {
-        qDebug("WTF 1?");
-        return;
-    }
 
     QString oldName = lineEdit->property(PREV_NAME_PROPERTY).toString();
     QString newName = lineEdit->text();
@@ -181,11 +176,6 @@ void VariablesWindow::onInitialValueChanged()
 {
     VariableController* controller = mCyclogram->variableController();
     QLineEdit* valueLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
-    if (!valueLineEdit)
-    {
-        qDebug("WTF 2?");
-        return;
-    }
 
     qreal value = valueLineEdit->text().replace(",", ".").toDouble();
 
@@ -213,11 +203,6 @@ void VariablesWindow::onDescriptionChanged()
 {
     VariableController* controller = mCyclogram->variableController();
     QLineEdit* descriptionLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
-    if (!descriptionLineEdit)
-    {
-        qDebug("WTF 3?");
-        return;
-    }
 
     QString description = descriptionLineEdit->text();
 

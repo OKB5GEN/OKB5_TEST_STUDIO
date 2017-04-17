@@ -7,6 +7,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 
 #include "Headers/logic/cyclogram.h"
+#include "Headers/logger/Logger.h"
 
 /* Обобщенные правила редактирования ДРАКОН-схемы:
  *
@@ -891,7 +892,7 @@ void ShapeItem::adjust()
 {
     if (!mCommand || mCommand->type() != DRAKON::TERMINATOR || !mCommand->nextCommand())
     {
-        qDebug("Adjust operation is not applicable for this shape");
+        LOG_WARNING(QString("Adjust operation is not applicable for this shape"));
         return;
     }
 
@@ -1268,8 +1269,6 @@ ShapeItem* ShapeItem::findShape(Command* cmd, ValencyPoint::Role& role)
             }
         }
     }
-
-    qDebug("FFFUUUUUU--");
 
     return Q_NULLPTR;
 }

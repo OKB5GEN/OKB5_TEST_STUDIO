@@ -6,7 +6,7 @@
 
 #include "Headers/logic/command.h"
 #include "Headers/logic/variable_controller.h"
-
+#include "Headers/logger/Logger.h"
 #include "Headers/logic/commands/cmd_question.h" // TODO remove
 #include "Headers/gui/cyclogram/valency_point.h"
 
@@ -280,13 +280,13 @@ void Command::replaceReferences(Command* oldCmd, Command* newCmd, Command* tree)
 {
     if (!tree || !oldCmd)
     {
-        qDebug("Command::replaceReferences: incorrect input 1");
+        LOG_WARNING(QString("Command::replaceReferences: incorrect input 1"));
         return;
     }
 
     if (tree == oldCmd)
     {
-        qDebug("Command::replaceReferences: incorrect input 2");
+        LOG_WARNING(QString("Command::replaceReferences: incorrect input 2"));
         return;
     }
 
