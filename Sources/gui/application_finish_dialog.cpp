@@ -31,20 +31,10 @@ bool ApplicationFinishDialog::init()
     QDir dir(Cyclogram::defaultStorePath() + "set_initial_state.cgr");
     QString fileName = dir.absolutePath();
 
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        LOG_ERROR(QString("Could not open file '%1'. Skipping safe application finish...").arg(fileName));
-        return false;
-    }
-
     mCyclogram = new Cyclogram(this);
-    mCyclogram->clear();
-
-    FileReader reader(mCyclogram);
-    if (!reader.read(&file))
+    if (!mCyclogram->load(fileName))
     {
-        LOG_ERROR(QString("Parse error in file '%1'. Error: %2. Skipping safe application finish...").arg(fileName).arg(reader.errorString()));
+        LOG_ERROR(QString("Could not load file '%1'. Skipping safe application finish...").arg(fileName));
         return false;
     }
 

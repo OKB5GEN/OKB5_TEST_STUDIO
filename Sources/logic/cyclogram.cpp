@@ -18,6 +18,7 @@
 #include "Headers/logger/Logger.h"
 
 #include "Headers/system/system_state.h"
+#include "Headers/file_reader.h"
 
 namespace
 {
@@ -607,4 +608,28 @@ void Cyclogram::setMainCyclogram(bool isMain)
 QString Cyclogram::defaultStorePath()
 {
     return QDir::currentPath() + QString("/cyclograms/");
+}
+
+bool Cyclogram::load(const QString& fileName)
+{
+    clear();
+
+    QFile file(fileName);
+    FileReader reader(this);
+
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        LOG_ERROR(QString("Cannot open file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        createDefault();
+        return false;
+    }
+
+    if (!reader.read(&file))
+    {
+        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+        createDefault();
+        return false;
+    }
+
+    return true;
 }

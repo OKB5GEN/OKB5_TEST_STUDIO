@@ -44,18 +44,8 @@ bool CmdSubProgram::load()
     }
 
     QString fileName = Cyclogram::defaultStorePath() + mFilePath;
-    QFile file(fileName);
-    FileReader reader(mCyclogram);
-
-    if (!file.open(QFile::ReadOnly | QFile::Text))
+    if (!mCyclogram->load(fileName))
     {
-        LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return false;
-    }
-
-    if (!reader.read(&file))
-    {
-        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
         return false;
     }
 

@@ -391,33 +391,22 @@ bool EditorWindow::maybeSave()
 
 void EditorWindow::loadFile(const QString &fileName)
 {
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-    {
-        QMessageBox::warning(this, tr("OKB5 Test Studio"),
-                                   tr("Cannot read file %1:\n%2.").
-                                   arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
-    }
-
-    mCyclogram->clear();
     mCyclogramWidget->clear();
 
-    FileReader reader(mCyclogram);
-    if (!reader.read(&file))
+    if (!mCyclogram->load(fileName))
     {
-        mCyclogram->createDefault();
         mCyclogramWidget->load(mCyclogram);
 
         QMessageBox::warning(this, tr("OKB5 Test Studio"),
-                                   tr("Parse error in file %1:\n%2.").
-                                   arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+                                   tr("File '%1' not loaded.").
+                                   arg(QDir::toNativeSeparators(fileName)));
     }
     else
     {
+        mCyclogramWidget->load(mCyclogram);
+
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
-        mCyclogramWidget->load(mCyclogram);
     }
 
     for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)

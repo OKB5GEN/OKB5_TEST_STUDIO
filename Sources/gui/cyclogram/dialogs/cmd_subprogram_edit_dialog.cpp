@@ -230,18 +230,9 @@ void CmdSubProgramEditDialog::updateUI()
     {
         QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
 
-        QFile file(fileName);
-        FileReader reader(cyclogram.data());
-
-        if (!file.open(QFile::ReadOnly | QFile::Text))
+        if (!cyclogram->load(fileName))
         {
-            LOG_ERROR(QString("Cannot read file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
-            return;
-        }
-
-        if (!reader.read(&file))
-        {
-            LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+            LOG_ERROR(QString("Cannot load subprogram file '%1'").arg(QDir::toNativeSeparators(fileName)));
             return;
         }
     }
