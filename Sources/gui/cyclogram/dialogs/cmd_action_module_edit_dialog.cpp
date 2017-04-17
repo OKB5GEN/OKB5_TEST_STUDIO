@@ -445,10 +445,10 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
                     valueEdit->setText(it.value().toString());
                 }
             }
-
-            connect(valueSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
-            connect(varSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
         }
+
+        connect(valueSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
+        connect(varSelectBtn, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChanged(int)));
 
         valueEdit->setEnabled(!isVariable);
         valueSelectBtn->setChecked(!isVariable);
