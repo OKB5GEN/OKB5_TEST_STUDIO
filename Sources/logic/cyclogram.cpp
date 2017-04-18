@@ -13,7 +13,6 @@
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
-#include "Headers/logic/cyclogram_manager.h"
 
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
