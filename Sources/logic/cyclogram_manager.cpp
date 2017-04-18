@@ -80,6 +80,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createDefaultCyclogram()
 {
     Cyclogram* cyclogram = new Cyclogram(Q_NULLPTR);
     QSharedPointer<Cyclogram> p(cyclogram);
+    p->createDefault();
     smDefaultCyclograms.insert(p);
     return p;
 }
