@@ -66,7 +66,7 @@ public:
 
     static bool isCyclogramEndBranch(Command* cmd);
 
-    void clear(); //TODO possibly temporary
+    void clear();
 
     bool isMainCyclogram() const;
     void setMainCyclogram(bool isMain);
@@ -85,18 +85,16 @@ private:
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);
 
-    Command* mFirst = Q_NULLPTR;
-    Command* mLast = Q_NULLPTR;
-    Command* mCurrent = Q_NULLPTR;
-    State mState = STOPPED;
+    Command* mFirst;
+    Command* mLast;
+    Command* mCurrent;
+    State mState;
 
     QList<Command*> mCommands;
 
     VariableController* mVarController;
     SystemState* mSystemState;
     bool mIsMainCyclogram;
-
-    //bool mExecuteOneCmd;
     bool mModified;
 
 signals:

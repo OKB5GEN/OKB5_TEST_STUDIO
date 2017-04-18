@@ -43,11 +43,14 @@ namespace
 
 Cyclogram::Cyclogram(QObject * parent):
     QObject(parent),
+    mFirst(Q_NULLPTR),
+    mLast(Q_NULLPTR),
+    mCurrent(Q_NULLPTR),
     mState(STOPPED),
-    mModified(false),
+    mVarController(Q_NULLPTR),
+    mSystemState(Q_NULLPTR),
     mIsMainCyclogram(false),
-    mSystemState(Q_NULLPTR)
-//  , mExecuteOneCmd(false)
+    mModified(false)
 {
     mVarController = new VariableController(this);
 
