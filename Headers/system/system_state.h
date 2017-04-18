@@ -5,7 +5,6 @@
 #include <QStringList>
 
 #include "Headers/system/abstract_module.h"
-#include "Headers/logic/variable_controller.h" //TODO what for?
 #include "Headers/module_commands.h"
 
 class QSerialPort;
@@ -17,7 +16,7 @@ class ModuleTech;
 class ModulePower;
 class CmdActionModule;
 
-class SystemState: public QObject//: public VariableController //TODO possibly it's better to inherit from QObject
+class SystemState: public QObject
 {
     Q_OBJECT
 
@@ -82,33 +81,6 @@ public:
     void sendCommand(CmdActionModule* command);
 
 private slots:
-
-    //TODO refactor/remove
-    int simpltst1(int x);
-
-    void MKO_data(QString data);
-    void MKO_cm_data(QString data);
-
-    void checkModulesStatus();
-
-    void on_pushButton_tech_fd_clicked();
-    void on_pushButton_tech_hd_clicked();
-    void on_tech_set_speed_clicked();
-    void on_tech_clear_out_3_clicked();
-    void on_tech_clear_in_3_clicked();
-    void on_tech_clear_buf_3_clicked();
-    void on_tech_clear_out_4_clicked();
-    void on_tech_clear_in_4_clicked();
-    void on_tech_clear_buf_4_clicked();
-    void on_MKO_osn_clicked();
-    void on_MKO_rez_clicked();
-    void on_MKO_test_clicked();
-    void on_pushButton_11_clicked();
-    void on_pushButton_12_clicked();
-    void on_MKO_avt_clicked();
-    //<<<
-
-    // new slots
     void processResponse(const QMap<uint32_t, QVariant>& response);
     void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
@@ -152,8 +124,6 @@ private:
     ModuleTech* mTech;
     ModulePower* mPowerBUP;
     ModulePower* mPowerPNA;
-
-    int mEnablesMKOKits; //TODO remove/move to MKO
 
     QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];

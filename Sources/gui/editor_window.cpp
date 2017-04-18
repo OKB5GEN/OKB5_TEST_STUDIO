@@ -7,7 +7,7 @@
 #include "Headers/gui/application_finish_dialog.h"
 #include "Headers/gui/tools/app_console.h"
 #include "Headers/logic/cyclogram.h"
-
+#include "Headers/logic/variable_controller.h"
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/system/system_state.h"
