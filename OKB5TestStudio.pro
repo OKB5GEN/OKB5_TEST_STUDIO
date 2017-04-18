@@ -80,7 +80,8 @@ SOURCES += main.cpp\
     Sources/gui/application_finish_dialog.cpp \
     Sources/logger/TextEditAppender.cpp \
     Sources/gui/tools/app_console.cpp \
-    Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp
+    Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp \
+    Sources/logic/cyclogram_manager.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -144,7 +145,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/application_finish_dialog.h \
     Headers/logger/TextEditAppender.h \
     Headers/gui/tools/app_console.h \
-    Headers/gui/cyclogram/dialogs/subprogram_dialog.h
+    Headers/gui/cyclogram/dialogs/subprogram_dialog.h \
+    Headers/logic/cyclogram_manager.h
 
 
 FORMS    +=

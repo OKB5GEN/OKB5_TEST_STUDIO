@@ -2,7 +2,6 @@
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
-//#include <QtSerialPort>
 
 namespace
 {

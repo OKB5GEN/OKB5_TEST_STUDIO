@@ -23,7 +23,7 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     mCyclogram(Q_NULLPTR),
     mLoaded(false)
 {
-    mText = "Sub";
+    mText = SUBPROGRAM_PREFIX;
 
     mCyclogram = new Cyclogram(this);
     mCyclogram->setMainCyclogram(false);
