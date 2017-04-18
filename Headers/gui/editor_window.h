@@ -63,7 +63,7 @@ private:
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
 
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
     CyclogramWidget *mCyclogramWidget;
 
     VariablesWindow* mVariablesWindow;

@@ -17,7 +17,7 @@ public:
 
 private slots:
     void onCyclogramFinish(const QString& error);
+
 private:
-    Cyclogram* mCyclogram;
 };
 #endif // APPLICATION_FINISH_DIALOG_H

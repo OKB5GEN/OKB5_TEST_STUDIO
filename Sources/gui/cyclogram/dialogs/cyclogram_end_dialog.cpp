@@ -11,8 +11,7 @@ namespace
 }
 
 CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
-    QDialog(parent),
-    mCyclogram(Q_NULLPTR)
+    QDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -48,7 +47,8 @@ void CyclogramEndDialog::setText(const QString& text)
 
 void CyclogramEndDialog::saveReportAs()
 {
-    if (!mCyclogram)
+    auto cyclogram = mCyclogram.lock();
+    if (cyclogram.isNull())
     {
         LOG_ERROR(QString("Cyclogram not set"));
         return;
@@ -80,10 +80,10 @@ void CyclogramEndDialog::saveReportAs()
     QString savePath = QFileInfo(fileName).absoluteDir().path();
     settings.setValue(SETTING_LAST_REPORT_FILE_SAVE_DIR, savePath);
 
-    mCyclogram->variableController()->saveReport(fileName);
+    cyclogram->variableController()->saveReport(fileName);
 }
 
-void CyclogramEndDialog::setCyclogram(Cyclogram* cyclogram)
+void CyclogramEndDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
     mCyclogram = cyclogram;
 }

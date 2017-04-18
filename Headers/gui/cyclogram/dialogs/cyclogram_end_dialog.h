@@ -14,7 +14,7 @@ public:
     CyclogramEndDialog(QWidget * parent);
     ~CyclogramEndDialog();
 
-    void setCyclogram(Cyclogram* cyclogram);
+    void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
     void setText(const QString& text);
 
 private slots:
@@ -22,6 +22,6 @@ private slots:
 
 private:
      QLabel* mLabel;
-     Cyclogram* mCyclogram;
+     QWeakPointer<Cyclogram> mCyclogram;
 };
 #endif // CYCLOGRAM_END_DIALOG_H

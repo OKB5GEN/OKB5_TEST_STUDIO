@@ -2,6 +2,7 @@
 #define CMD_SUBPROGRAM_EDIT_DIALOG_H
 
 #include <QDialog>
+#include <QSharedPointer>
 
 class QLineEdit;
 class QCheckBox;
@@ -18,7 +19,7 @@ public:
     CmdSubProgramEditDialog(QWidget * parent);
     ~CmdSubProgramEditDialog();
 
-    void setCommand(CmdSubProgram* command, Cyclogram* cyclogram);
+    void setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> cyclogram);
 
 private slots:
     void onAccept();
@@ -39,7 +40,7 @@ private:
     QTableWidget* mInParams;
     QTableWidget* mOutParams;
 
-    Cyclogram* mCallingCyclogram;
+    QWeakPointer<Cyclogram> mCallingCyclogram;
 };
 
 #endif // CMD_SUBPROGRAM_EDIT_DIALOG_H

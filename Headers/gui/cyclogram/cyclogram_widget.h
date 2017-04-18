@@ -31,7 +31,7 @@ public:
     void setUpdateOnRemove(bool updateOnShapeRemove);
 
 public slots:
-    void load(Cyclogram* cyclogram);
+    void load(QSharedPointer<Cyclogram> cyclogram);
     void showValidationError(Command* cmd);
     void deleteSelectedItem();
 
@@ -93,7 +93,7 @@ private:
 
     ShapeItem* mRootShape;
 
-    Cyclogram* mCurrentCyclogram = Q_NULLPTR;
+    QWeakPointer<Cyclogram> mCurrentCyclogram;
 
     bool mUpdateOnShapeRemove;
 

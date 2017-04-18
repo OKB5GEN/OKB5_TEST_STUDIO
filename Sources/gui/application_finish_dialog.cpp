@@ -2,6 +2,7 @@
 #include "Headers/logic/cyclogram.h"
 #include "Headers/file_reader.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/logic/cyclogram_manager.h"
 
 #include <QTimer>
 #include <QtWidgets>
@@ -31,15 +32,18 @@ bool ApplicationFinishDialog::init()
     QDir dir(Cyclogram::defaultStorePath() + "set_initial_state.cgr");
     QString fileName = dir.absolutePath();
 
-    mCyclogram = new Cyclogram(this);
-    if (!mCyclogram->load(fileName))
+    bool ok = false;
+    auto cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+
+    if (!ok)
     {
         LOG_ERROR(QString("Could not load file '%1'. Skipping safe application finish...").arg(fileName));
+        CyclogramManager::removeDefaultCyclogram(cyclogram);
         return false;
     }
 
-    connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
-    mCyclogram->run();
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+    cyclogram->run();
     return true;
 }
 

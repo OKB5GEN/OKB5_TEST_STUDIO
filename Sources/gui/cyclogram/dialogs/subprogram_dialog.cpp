@@ -86,14 +86,10 @@ void SubProgramDialog::onSaveClick()
     if (writer.writeFile(&file))
     {
         LOG_INFO(QString("File '%1' saved").arg(fileName));
-        // save last save dir
-        //QSettings settings;
-        //QString savePath = QFileInfo(fileName).absoluteDir().path();
-        //settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
-
-        //setCurrentFile(fileName);
-        //statusBar()->showMessage(tr("File saved"), 2000);
-        //emit documentSaved(true);
+    }
+    else
+    {
+        LOG_ERROR(QString("File '%1' not saved!").arg(fileName));
     }
 }
 

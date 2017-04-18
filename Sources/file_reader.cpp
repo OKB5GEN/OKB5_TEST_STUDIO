@@ -12,7 +12,7 @@
 
 #include <QMetaEnum>
 
-FileReader::FileReader(Cyclogram *cyclogram)
+FileReader::FileReader(QSharedPointer<Cyclogram> cyclogram)
     : mCyclogram(cyclogram)
 {
 }
@@ -72,6 +72,8 @@ void FileReader::readCyclogram()
 
 void FileReader::readVariables()
 {
+    auto cyclogram = mCyclogram.lock();
+
     while (!(mXML.tokenType() == QXmlStreamReader::EndElement && mXML.name() == "variables"))
     {
         if (mXML.tokenType() == QXmlStreamReader::StartElement && mXML.name() == "variable")
@@ -96,7 +98,7 @@ void FileReader::readVariables()
                 desc = attributes.value("desc").toString();
             }
 
-            VariableController* varCtrl = mCyclogram->variableController();
+            VariableController* varCtrl = cyclogram->variableController();
             varCtrl->addVariable(name, value.toDouble());
             varCtrl->setDescription(name, desc);
         }
@@ -109,6 +111,7 @@ void FileReader::readCommands()
 {
     QMetaEnum commandTypes = QMetaEnum::fromType<DRAKON::IconType>();
     QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+    auto cyclogram = mCyclogram.lock();
 
     // read file, create commands and create links data
     while (!(mXML.tokenType() == QXmlStreamReader::EndElement && mXML.name() == "commands"))
@@ -117,7 +120,7 @@ void FileReader::readCommands()
         {
             QXmlStreamAttributes attributes = mXML.attributes();
             QString str;
-            qint64 commandID;
+            //qint64 commandID;
             DRAKON::IconType type;
             CmdQuestion::QuestionType questionType;
 
@@ -133,7 +136,7 @@ void FileReader::readCommands()
                 questionType = CmdQuestion::QuestionType(questionTypes.keyToValue(qPrintable(str)));
             }
 
-            Command* command = mCyclogram->createCommand(type, questionType);
+            Command* command = cyclogram->createCommand(type, questionType);
             if (command)
             {
                 command->read(&mXML); // read command custom data
@@ -144,11 +147,11 @@ void FileReader::readCommands()
                     CmdTitle* titleCmd = qobject_cast<CmdTitle*>(command);
                     if (titleCmd->titleType() == CmdTitle::BEGIN)
                     {
-                        mCyclogram->setFirst(command);
+                        cyclogram->setFirst(command);
                     }
                     else
                     {
-                        mCyclogram->setLast(command);
+                        cyclogram->setLast(command);
                     }
                 }
             }
@@ -163,7 +166,8 @@ void FileReader::readCommandsLinks()
     if (mCommands.empty()) //TODO validate file reading (temporary create default cyclogram)
     {
         LOG_WARNING(QString("File not loaded create default cyclogram"));
-        mCyclogram->createDefault();
+        auto cyclogram = mCyclogram.lock();
+        cyclogram->createDefault();
         return;
     }
 

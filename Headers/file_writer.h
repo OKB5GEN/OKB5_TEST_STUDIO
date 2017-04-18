@@ -2,13 +2,14 @@
 #define FILE_WRITER_H
 
 #include <QXmlStreamWriter>
+#include <QSharedPointer>
 
 class Cyclogram;
 
 class FileWriter
 {
 public:
-    FileWriter(Cyclogram* cyclogram);
+    FileWriter(QSharedPointer<Cyclogram> cyclogram);
     bool writeFile(QIODevice *device);
 
 private:
@@ -17,7 +18,7 @@ private:
     void writeCommandTree();
 
     QXmlStreamWriter mXML;
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
 };
 
 #endif // FILE_WRITER_H

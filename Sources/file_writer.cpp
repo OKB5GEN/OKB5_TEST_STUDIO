@@ -3,7 +3,7 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logic/command.h"
 
-FileWriter::FileWriter(Cyclogram* cyclogram)
+FileWriter::FileWriter(QSharedPointer<Cyclogram> cyclogram)
     : mCyclogram(cyclogram)
 {
     mXML.setAutoFormatting(true);
@@ -28,7 +28,8 @@ bool FileWriter::writeFile(QIODevice *device)
 
 void FileWriter::writeVariables()
 {
-    VariableController* varCtrl = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* varCtrl = cyclogram->variableController();
 
     mXML.writeStartElement("variables");
 
@@ -47,8 +48,9 @@ void FileWriter::writeVariables()
 void FileWriter::writeCommands()
 {
     mXML.writeStartElement("commands");
+    auto cyclogram = mCyclogram.lock();
 
-    foreach (Command* command, mCyclogram->commands())
+    foreach (Command* command, cyclogram->commands())
     {
         command->write(&mXML);
     }
@@ -59,8 +61,9 @@ void FileWriter::writeCommands()
 void FileWriter::writeCommandTree()
 {
     mXML.writeStartElement("tree");
+    auto cyclogram = mCyclogram.lock();
 
-    foreach (Command* command, mCyclogram->commands())
+    foreach (Command* command, cyclogram->commands())
     {
         mXML.writeStartElement("item");
         mXML.writeAttribute("id", QString::number(command->id()));

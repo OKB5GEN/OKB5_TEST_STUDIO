@@ -3,6 +3,7 @@
 
 #include <QXmlStreamReader>
 #include <QMap>
+#include <QSharedPointer>
 
 class Cyclogram;
 class Command;
@@ -10,7 +11,7 @@ class Command;
 class FileReader
 {
 public:
-    FileReader(Cyclogram* cyclogram);
+    FileReader(QSharedPointer<Cyclogram> cyclogram);
 
     bool read(QIODevice* device);
     QString errorString() const;
@@ -21,7 +22,7 @@ private:
     void readCommands();
     void readCommandsLinks();
 
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
     QMap<qint64, Command*> mCommands;
     QXmlStreamReader mXML;
 };

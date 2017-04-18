@@ -26,7 +26,7 @@ public:
 
     Q_ENUM(State)
 
-    bool load(const QString& fileName);
+    //bool load(const QString& fileName);
 
     Cyclogram(QObject * parent);
 

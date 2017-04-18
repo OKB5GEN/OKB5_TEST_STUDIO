@@ -11,6 +11,7 @@
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/system/system_state.h"
+#include "Headers/logic/cyclogram_manager.h"
 
 #include "Headers/file_reader.h"
 #include "Headers/file_writer.h"
@@ -31,14 +32,14 @@ EditorWindow::EditorWindow():
     mScrollArea = new QScrollArea(this);
 
     mCyclogramWidget = new CyclogramWidget(this);
-    mCyclogram = new Cyclogram(this);
-    mCyclogram->setMainCyclogram(true);
+    auto cyclogram = CyclogramManager::createDefaultCyclogram();
+    cyclogram->setMainCyclogram(true);
+    mCyclogram = cyclogram;
 
-    mCyclogram->createDefault();
-    mCyclogramWidget->load(mCyclogram);
+    mCyclogramWidget->load(cyclogram);
 
-    connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
-    connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
     mScrollArea->setWidget(mCyclogramWidget);
@@ -49,7 +50,7 @@ EditorWindow::EditorWindow():
 
     readSettings();
 
-    connect(mCyclogram, SIGNAL(modified()), this, SLOT(documentWasModified()));
+    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(documentWasModified()));
 
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &EditorWindow::commitData);
@@ -61,7 +62,7 @@ EditorWindow::EditorWindow():
 
     mSystemState = new SystemState(this);
 
-    mCyclogram->setSystemState(mSystemState);
+    cyclogram->setSystemState(mSystemState);
 }
 
 void EditorWindow::onApplicationStart()
@@ -71,7 +72,9 @@ void EditorWindow::onApplicationStart()
 
 void EditorWindow::closeEvent(QCloseEvent *event)
 {
-    if (mCyclogram->state() == Cyclogram::RUNNING)
+    auto cyclogram = mCyclogram.lock();
+
+    if (cyclogram->state() == Cyclogram::RUNNING)
     {
         int button =  QMessageBox::question(this,
                                             tr("Application exit"),
@@ -81,8 +84,8 @@ void EditorWindow::closeEvent(QCloseEvent *event)
 
         if (button == QMessageBox::Ok)
         {
-            mCyclogram->disconnect();
-            mCyclogram->stop();
+            cyclogram->disconnect();
+            cyclogram->stop();
 
             ApplicationFinishDialog appFinishDialog(this);
             if (appFinishDialog.init())
@@ -113,18 +116,22 @@ void EditorWindow::newFile()
     if (maybeSave())
     {
         mCyclogramWidget->setUpdateOnRemove(false);
-        mCyclogram->createDefault();
+        CyclogramManager::clear();
+        auto cyclogram = CyclogramManager::createDefaultCyclogram();
+        cyclogram->setMainCyclogram(true);
+        mCyclogram = cyclogram;
+
         mCyclogramWidget->setUpdateOnRemove(true);
-        mCyclogramWidget->load(mCyclogram);
+        mCyclogramWidget->load(cyclogram);
 
         for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
         {
-            (*it)->setCyclogram(mCyclogram);
+            (*it)->setCyclogram(cyclogram);
         }
 
         setCurrentFile(QString());
 
-        mCyclogram->setModified(true, true);
+        cyclogram->setModified(true, true);
     }
 }
 
@@ -211,9 +218,10 @@ void EditorWindow::about()
 
 void EditorWindow::documentWasModified()
 {
-    setWindowModified(mCyclogram->isModified());
+    auto cyclogram = mCyclogram.lock();
+    setWindowModified(cyclogram->isModified());
 
-    if (mCyclogram->isModified())
+    if (cyclogram->isModified())
     {
         emit documentSaved(false);
     }
@@ -367,7 +375,8 @@ void EditorWindow::writeSettings()
 
 bool EditorWindow::maybeSave()
 {
-    if (!mCyclogram->isModified())
+    auto cyclogram = mCyclogram.lock();
+    if (!cyclogram->isModified())
     {
         return true;
     }
@@ -392,27 +401,34 @@ bool EditorWindow::maybeSave()
 void EditorWindow::loadFile(const QString &fileName)
 {
     mCyclogramWidget->clear();
+    CyclogramManager::clear();
 
-    if (!mCyclogram->load(fileName))
+    bool ok = false;
+    auto cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+
+    mCyclogram = cyclogram;
+    mCyclogramWidget->load(cyclogram);
+
+    if (!ok)
     {
-        mCyclogramWidget->load(mCyclogram);
-
         QMessageBox::warning(this, tr("OKB5 Test Studio"),
                                    tr("File '%1' not loaded.").
                                    arg(QDir::toNativeSeparators(fileName)));
     }
     else
     {
-        mCyclogramWidget->load(mCyclogram);
-
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
     }
 
     for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
     {
-        (*it)->setCyclogram(mCyclogram);
+        (*it)->setCyclogram(cyclogram);
     }
+
+    // close all subprogram windows and charts
+    // because main cyclogram reloaded
+    int TODO;
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -426,7 +442,7 @@ bool EditorWindow::saveFile(const QString &fileName)
         return false;
     }
 
-    FileWriter writer(mCyclogram);
+    FileWriter writer(mCyclogram.lock());
     if (writer.writeFile(&file))
     {
         // save last save dir
@@ -435,6 +451,7 @@ bool EditorWindow::saveFile(const QString &fileName)
         settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
 
         setCurrentFile(fileName);
+        CyclogramManager::onCyclogramSaved(mCyclogram.lock(), fileName);
         statusBar()->showMessage(tr("File saved"), 2000);
         emit documentSaved(true);
         return true;
@@ -446,7 +463,8 @@ bool EditorWindow::saveFile(const QString &fileName)
 void EditorWindow::setCurrentFile(const QString &fileName)
 {
     mCurFile = fileName;
-    mCyclogram->setModified(false, false);
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->setModified(false, false);
     setWindowModified(false);
 
     QString shownName = mCurFile;
@@ -468,8 +486,9 @@ QString EditorWindow::strippedName(const QString &fullFileName)
 void EditorWindow::runCyclogram()
 {
     mSnapshotsCouner = 0;
+    auto cyclogram = mCyclogram.lock();
 
-    Command* errorCmd = mCyclogram->validate();
+    Command* errorCmd = cyclogram->validate();
     if (errorCmd)
     {
         mCyclogramWidget->showValidationError(errorCmd);
@@ -498,7 +517,7 @@ void EditorWindow::runCyclogram()
     }
 #else
     mRunAct->setEnabled(false);
-    mCyclogram->run();
+    cyclogram->run();
 #endif
 
     mStopAct->setEnabled(true);
@@ -506,11 +525,11 @@ void EditorWindow::runCyclogram()
 
 void EditorWindow::stopCyclogram()
 {
-    //mCyclogram->setExecuteOneCmd(false);
+    auto cyclogram = mCyclogram.lock();
 
     if (QObject::sender() == mStopAct) // stop only by button signal
     {
-        mCyclogram->stop();
+        cyclogram->stop();
     }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
@@ -537,7 +556,8 @@ void EditorWindow::addVariablesMonitor()
 void EditorWindow::makeDataSnapshot()
 {
     ++mSnapshotsCouner;
-    mCyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
 
     int TODO; // по идее надо делать снэпшот, не главной циклограммы, а активной подпрограммы, которая самая верхняя по стеку
     // хотя по большому счету важны не реальные значения переменных, а просто момент, что "вот в этот момент произошла
@@ -612,8 +632,9 @@ void EditorWindow::commitData(QSessionManager &manager)
     }
     else
     {
+        auto cyclogram = mCyclogram.lock();
         // Non-interactive: save without asking
-        if (mCyclogram->isModified())
+        if (cyclogram->isModified())
         {
             save();
         }

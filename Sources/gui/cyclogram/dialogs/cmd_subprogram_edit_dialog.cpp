@@ -1,6 +1,7 @@
 #include <QtWidgets>
 
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
+#include "Headers/logic/cyclogram_manager.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
@@ -9,8 +10,7 @@
 
 CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
     QDialog(parent),
-    mCommand(Q_NULLPTR),
-    mCallingCyclogram(Q_NULLPTR)
+    mCommand(Q_NULLPTR)
 {
     setupUI();
     setWindowTitle(tr("Edit sub program"));
@@ -93,7 +93,7 @@ void CmdSubProgramEditDialog::setupUI()
     setLayout(layout);
 }
 
-void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, Cyclogram* cyclogram)
+void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> cyclogram)
 {
     mCommand = command;
     mCallingCyclogram = cyclogram;
@@ -217,35 +217,39 @@ void CmdSubProgramEditDialog::openFile()
 
 void CmdSubProgramEditDialog::updateUI()
 {
-    if (!mCallingCyclogram)
+    if (mCallingCyclogram.isNull())
     {
         LOG_ERROR(QString("No calling cyclogram set to subprogram '%1'").arg(mSubprogramNameStr->text()));
         return;
     }
 
     QSharedPointer<Cyclogram> cyclogram;
-    cyclogram.reset(new Cyclogram(Q_NULLPTR));
+    auto callingCyclogram = mCallingCyclogram.lock();
 
     if (!mFileNameStr->text().isEmpty()) // some cyclogram file name exist, load cyclogram from file
     {
         QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
+        bool ok = false;
 
-        if (!cyclogram->load(fileName))
+        cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+
+        if (!ok)
         {
             LOG_ERROR(QString("Cannot load subprogram file '%1'").arg(QDir::toNativeSeparators(fileName)));
+            CyclogramManager::removeDefaultCyclogram(cyclogram);
             return;
         }
     }
     else // no cyclogram file set, possibly just batch calling cyclogram variables changing
     {
-        cyclogram->createDefault();
+        cyclogram = CyclogramManager::createDefaultCyclogram();
     }
 
     mInParams->clearContents();
     mOutParams->clearContents();
 
     const QMap<QString, VariableController::VariableData>& subprogramVariables = cyclogram->variableController()->variablesData();
-    const QMap<QString, VariableController::VariableData>& callingCyclogramVariables = mCallingCyclogram->variableController()->variablesData();
+    const QMap<QString, VariableController::VariableData>& callingCyclogramVariables = callingCyclogram->variableController()->variablesData();
 
     const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
     const QMap<QString, QVariant>& outputParams = mCommand->outputParams();
@@ -408,6 +412,11 @@ void CmdSubProgramEditDialog::updateUI()
 
     mOutParams->resizeColumnToContents(1);
     mOutParams->resizeColumnToContents(3);
+
+    if (mFileNameStr->text().isEmpty())
+    {
+        CyclogramManager::removeDefaultCyclogram(cyclogram);
+    }
 }
 
 void CmdSubProgramEditDialog::updateTable(QTableWidget* widget, QCheckBox* changedBox, int state)

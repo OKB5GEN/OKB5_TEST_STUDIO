@@ -67,14 +67,14 @@ VariablesWindow::~VariablesWindow()
 
 }
 
-void VariablesWindow::setCyclogram(Cyclogram * cyclogram)
+void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
     mCyclogram = cyclogram;
 
     mTableWidget->clearContents();
     mTableWidget->setRowCount(0);
 
-    VariableController* controller = mCyclogram->variableController();
+    VariableController* controller = cyclogram->variableController();
 
     connect(controller, SIGNAL(currentValueChanged(const QString&,qreal)), this, SLOT(onCurrentValueChanged(const QString&,qreal)));
 
@@ -95,7 +95,8 @@ void VariablesWindow::onAddClicked()
     QString prefix = "V";
     QString name = prefix;
     int index = 0;
-    VariableController* controller = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* controller = cyclogram->variableController();
 
     while (controller->isVariableExist(name))
     {
@@ -115,7 +116,8 @@ void VariablesWindow::updateTableSize()
 
 void VariablesWindow::onRemoveClicked()
 {
-    VariableController* controller = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* controller = cyclogram->variableController();
     QItemSelectionModel* selectionModel = mTableWidget->selectionModel();
 
     QList<int> rowsForDeletion;
@@ -144,7 +146,8 @@ void VariablesWindow::onRemoveClicked()
 
 void VariablesWindow::onNameChanged()
 {
-    VariableController* controller = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* controller = cyclogram->variableController();
     QLineEdit* lineEdit = qobject_cast<QLineEdit*>(QObject::sender());
 
     QString oldName = lineEdit->property(PREV_NAME_PROPERTY).toString();
@@ -174,7 +177,8 @@ void VariablesWindow::onNameChanged()
 
 void VariablesWindow::onInitialValueChanged()
 {
-    VariableController* controller = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* controller = cyclogram->variableController();
     QLineEdit* valueLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
 
     qreal value = valueLineEdit->text().replace(",", ".").toDouble();
@@ -201,7 +205,8 @@ void VariablesWindow::onInitialValueChanged()
 
 void VariablesWindow::onDescriptionChanged()
 {
-    VariableController* controller = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* controller = cyclogram->variableController();
     QLineEdit* descriptionLineEdit = qobject_cast<QLineEdit*>(QObject::sender());
 
     QString description = descriptionLineEdit->text();
@@ -249,9 +254,10 @@ void VariablesWindow::onCurrentValueChanged(const QString& name, qreal value)
 
 void VariablesWindow::onTableSelectionChanged()
 {
+    auto cyclogram = mCyclogram.lock();
     QItemSelectionModel* selectionModel = mTableWidget->selectionModel();
     int count = selectionModel->selectedRows().size();
-    mRemoveBtn->setEnabled(count > 0 && (mCyclogram->state() != Cyclogram::RUNNING));
+    mRemoveBtn->setEnabled(count > 0 && (cyclogram->state() != Cyclogram::RUNNING));
 }
 
 void VariablesWindow::addRow(int row, const QString& name, qreal initialValue, qreal currentValue, const QString& description)

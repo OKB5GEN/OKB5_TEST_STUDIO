@@ -37,7 +37,6 @@
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
-    mCurrentCyclogram(Q_NULLPTR),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
@@ -71,13 +70,13 @@ void CyclogramWidget::clear(bool onDestroy)
     qDeleteAll(mCommands);
     mCommands.clear();
 
-    if (!onDestroy && mCurrentCyclogram)
+    if (!onDestroy && mCurrentCyclogram.data())
     {
-        disconnect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+        disconnect(mCurrentCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCurrentCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
     }
 
-    mCurrentCyclogram = Q_NULLPTR;
+    mCurrentCyclogram.clear();
 }
 
 bool CyclogramWidget::event(QEvent *event)
@@ -239,7 +238,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
         //LOG_INFO("Mouse clicked");
 
         // no interaction while cyclogram running
-        if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
+        if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
         {
             return;
         }
@@ -381,7 +380,7 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
-        if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
+        if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
         {
             return; // to not edit cyclogram while it is executed
         }
@@ -535,11 +534,11 @@ void CyclogramWidget::drawSilhouette()
     }
 }
 
-void CyclogramWidget::load(Cyclogram* cyclogram)
+void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
 {
     clear();
 
-    if (!cyclogram)
+    if (cyclogram.isNull())
     {
         return;
     }
@@ -551,15 +550,15 @@ void CyclogramWidget::load(Cyclogram* cyclogram)
         return;
     }
 
-    if (mCurrentCyclogram)
+    if (mCurrentCyclogram.data())
     {
-        disconnect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+        disconnect(mCurrentCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCurrentCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
     }
 
     mCurrentCyclogram = cyclogram;
-    connect(mCurrentCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-    connect(mCurrentCyclogram, SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(cyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
     ShapeItem* title = addShape(first, QPoint(0, 0), 0);
     mRootShape = title;
@@ -585,7 +584,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     }
 
     // nothing can be deleted in running cyclogram
-    if (mCurrentCyclogram->state() == Cyclogram::RUNNING)
+    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
         error = tr("THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!");
         return false;
@@ -594,7 +593,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     if (item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         // START and END branches never can be deleted
-        Command* startBranch = mCurrentCyclogram->first();
+        Command* startBranch = mCurrentCyclogram.lock()->first();
 
         // check is start branch trying to delete
         if (startBranch->nextCommand() == item->command())
@@ -603,7 +602,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
             return false;
         }
 
-        const ShapeItem* lastBranch = findBranch(mCurrentCyclogram->last());
+        const ShapeItem* lastBranch = findBranch(mCurrentCyclogram.lock()->last());
 
         // check is end branch trying to delete
         if (lastBranch->command() == item->command())
@@ -698,7 +697,7 @@ void CyclogramWidget::removeShape(Command* command)
 
 void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
 {
-    mCurrentCyclogram->deleteCommand(shape->command());
+    mCurrentCyclogram.lock()->deleteCommand(shape->command());
 }
 
 void CyclogramWidget::onNeedUpdate()
@@ -886,7 +885,7 @@ void CyclogramWidget::showEditDialog(Command *command)
     case DRAKON::SUBPROGRAM:
         {
             CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
-            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram);
+            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram.lock());
             dialog = d;
         }
         break;
@@ -932,7 +931,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
     }
 
     QList<Command*> branches;
-    mCurrentCyclogram->getBranches(branches);
+    mCurrentCyclogram.lock()->getBranches(branches);
 
     int maxHeight = -1;
     int width = 0;
@@ -1128,7 +1127,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
     }
 
     // 1. Create new command
-    Command* newCmd = mCurrentCyclogram->createCommand(type, param);
+    Command* newCmd = mCurrentCyclogram.lock()->createCommand(type, param);
     if (!newCmd)
     {
         return Q_NULLPTR;
@@ -1270,7 +1269,7 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 {
     // Create and add BRANCH_BEGIN item
-    Command* newCmd = mCurrentCyclogram->createCommand(DRAKON::BRANCH_BEGIN);
+    Command* newCmd = mCurrentCyclogram.lock()->createCommand(DRAKON::BRANCH_BEGIN);
     if (!newCmd)
     {
         return Q_NULLPTR;
@@ -1305,7 +1304,7 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
     }
 
     item->remove();
-    mCurrentCyclogram->deleteCommand(item->command()); // shape will be deleted by the signal
+    mCurrentCyclogram.lock()->deleteCommand(item->command()); // shape will be deleted by the signal
 }
 
 void CyclogramWidget::deleteBranch(ShapeItem* item)
@@ -1356,7 +1355,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     }
 
     // 4. Kill all shapes and commands, belonging to deleting branch
-    mCurrentCyclogram->deleteCommand(item->command(), true);
+    mCurrentCyclogram.lock()->deleteCommand(item->command(), true);
 
     QRect r = mRootShape->rect();
     r.setRight(r.right() + xOffset);

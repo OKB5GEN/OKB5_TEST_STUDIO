@@ -2,6 +2,7 @@
 #define CMD_SUB_PROGRAM_H
 
 #include <QVariant>
+#include <QSharedPointer>
 
 #include "Headers/logic/commands/cmd_action.h"
 
@@ -25,7 +26,7 @@ public:
 
     void setParams(const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out);
 
-    Cyclogram* cyclogram() const;
+    QSharedPointer<Cyclogram> cyclogram();
     bool loaded() const;
 
     const QMap<QString, QVariant>& inputParams() const;
@@ -54,7 +55,7 @@ private:
     void readCustomAttributes(QXmlStreamReader* reader) override;
 
     QString mFilePath;
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
     bool mLoaded;
 
     QMap<QString, QVariant> mInputParams;

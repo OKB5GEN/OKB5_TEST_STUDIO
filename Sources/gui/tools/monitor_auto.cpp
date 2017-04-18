@@ -27,8 +27,7 @@ namespace
 }
 
 MonitorAuto::MonitorAuto(QWidget * parent):
-    QDialog(parent),
-    mCyclogram(Q_NULLPTR)
+    QDialog(parent)
 {
     QHBoxLayout* hLayout = new QHBoxLayout(this);
 
@@ -52,17 +51,17 @@ MonitorAuto::~MonitorAuto()
 
 }
 
-void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
+void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
-    if (!cyclogram)
+    if (cyclogram.isNull())
     {
         return;
     }
 
-    if (mCyclogram)
+    if (mCyclogram.lock())
     {
-        disconnect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+        disconnect(mCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCyclogram.lock()->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
     }
 
     mCyclogram = cyclogram;
@@ -73,7 +72,7 @@ void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
     mPlot->legend->setVisible(false);
     mPlot->replot();
 
-    const QMap<QString, VariableController::VariableData>& data = mCyclogram->variableController()->variablesData();
+    const QMap<QString, VariableController::VariableData>& data = cyclogram->variableController()->variablesData();
 
     for (auto it = data.begin(); it != data.end(); ++it)
     {
@@ -89,7 +88,7 @@ void MonitorAuto::setCyclogram(Cyclogram * cyclogram)
     }
 
     //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
-    connect(mCyclogram, SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO "hot" graphs adding
     {
@@ -242,7 +241,10 @@ void MonitorAuto::onCyclogramStateChanged(int state)
     darkMagenta,
     darkYellow,*/
 
-    disconnect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+    auto cyclogram = mCyclogram.lock();
+    VariableController* vc = cyclogram->variableController();
+
+    disconnect(vc, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
 
     if (state == Cyclogram::RUNNING)
     {
@@ -272,8 +274,6 @@ void MonitorAuto::onCyclogramStateChanged(int state)
         mPlot->xAxis->setRange(mMinX, mMaxX);//Для оси Ox
         mPlot->yAxis->setRange(mMinY, mMaxY);//Для оси Oy
 
-        VariableController* vc = mCyclogram->variableController();
-
         const QMap<QString, VariableController::VariableData>& data = vc->variablesData();
 
         int color = Qt::red;
@@ -297,7 +297,7 @@ void MonitorAuto::onCyclogramStateChanged(int state)
         mPlot->legend->setVisible(true);
         mPlot->replot();
 
-        connect(mCyclogram->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+        connect(vc, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
     }
     else if (state == Cyclogram::STOPPED)
     {

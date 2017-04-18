@@ -18,7 +18,7 @@ public:
     MonitorAuto(QWidget * parent);
     ~MonitorAuto();
 
-    void setCyclogram(Cyclogram * cyclogram);
+    void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
 private slots:
     //void updateGraphs(const VariableController::DataSnapshot& data); //TODO possibly not needed
@@ -32,7 +32,7 @@ private:
 
     QMap<QString, QCheckBox*> mCheckboxes;
 
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
     qreal mMinY;
     qreal mMaxY;
     qreal mMinX;

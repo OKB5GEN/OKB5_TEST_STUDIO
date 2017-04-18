@@ -16,7 +16,7 @@ public:
     VariablesWindow(QWidget * parent);
     ~VariablesWindow();
 
-    void setCyclogram(Cyclogram * cyclogram);
+    void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
 protected:
 
@@ -38,7 +38,7 @@ private:
     QTableWidget* mTableWidget;
     QToolButton* mRemoveBtn;
 
-    Cyclogram* mCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
 
     QDoubleValidator* mValidator;
 };

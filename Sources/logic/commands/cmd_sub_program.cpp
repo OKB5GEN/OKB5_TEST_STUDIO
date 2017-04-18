@@ -3,6 +3,7 @@
 #include "Headers/file_reader.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logic/cyclogram_manager.h"
 
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -20,22 +21,24 @@ namespace
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
-    mCyclogram(Q_NULLPTR),
     mLoaded(false)
 {
     mText = SUBPROGRAM_PREFIX;
 
-    mCyclogram = new Cyclogram(this);
-    mCyclogram->setMainCyclogram(false);
-    connect(mCyclogram, SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
+    auto cyclogram = CyclogramManager::createDefaultCyclogram();
+
+    mCyclogram = cyclogram;
+    cyclogram->setMainCyclogram(false);
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     updateText();
 }
 
 bool CmdSubProgram::load()
 {
     mLoaded = false;
-    mCyclogram->clear();
-    mCyclogram->setSystemState(mSystemState);
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->clear();
+    cyclogram->setSystemState(mSystemState);
 
     if (mFilePath.isEmpty()) // no file link is normal
     {
@@ -43,8 +46,15 @@ bool CmdSubProgram::load()
         return true;
     }
 
+    CyclogramManager::removeDefaultCyclogram(cyclogram);
+
     QString fileName = Cyclogram::defaultStorePath() + mFilePath;
-    if (!mCyclogram->load(fileName))
+    bool ok = false;
+    cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+    cyclogram->setSystemState(mSystemState);
+    mCyclogram = cyclogram;
+
+    if (!ok)
     {
         return false;
     }
@@ -53,9 +63,9 @@ bool CmdSubProgram::load()
     return true;
 }
 
-Cyclogram* CmdSubProgram::cyclogram() const
+QSharedPointer<Cyclogram> CmdSubProgram::cyclogram()
 {
-    return mCyclogram;
+    return mCyclogram.lock();
 }
 
 void CmdSubProgram::run()
@@ -79,7 +89,8 @@ void CmdSubProgram::execute()
     }
 
     // Set cyclogram variables current values according to input parameter mapping
-    VariableController* vc = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* vc = cyclogram->variableController();
     QMap<QString, qreal> variables;
 
     for (auto it = vc->variablesData().begin(); it != vc->variablesData().end(); ++it)
@@ -102,7 +113,7 @@ void CmdSubProgram::execute()
 
     mVarCtrl->startSubprogram(mText, variables);
 
-    mCyclogram->run();
+    cyclogram->run();
 }
 
 void CmdSubProgram::setFilePath(const QString& filePath)
@@ -196,6 +207,8 @@ void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName
 
 void CmdSubProgram::onVariableRemoved(const QString& name)
 {
+    auto cyclogram = mCyclogram.lock();
+
     // input parameters update
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
@@ -208,7 +221,7 @@ void CmdSubProgram::onVariableRemoved(const QString& name)
                 continue;
             }
 
-            qreal value = mCyclogram->variableController()->initialValue(tokens.at(1));
+            qreal value = cyclogram->variableController()->initialValue(tokens.at(1));
             LOG_WARNING(QString("Subprogram '%1' input link to variable '%2' is corrupted due to '%3' variable deletion. Replaced by initial value: %4")
                         .arg(mText)
                         .arg(it.key())
@@ -388,7 +401,8 @@ const QString& CmdSubProgram::filePath() const
 
 void CmdSubProgram::stop()
 {
-    mCyclogram->stop();
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->stop();
 }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
@@ -413,7 +427,8 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
     }
 
     // Set calling cyclogram variables current values according to output parameter mapping
-    VariableController* vc = mCyclogram->variableController();
+    auto cyclogram = mCyclogram.lock();
+    VariableController* vc = cyclogram->variableController();
 
     // add subprogram data timeline to calling cyclogram
     mVarCtrl->addDataTimeline(vc->dataTimeline());
@@ -485,8 +500,9 @@ void CmdSubProgram::restart()
 {
     mVarCtrl->restart();
 
+    auto cyclogram = mCyclogram.lock();
     // clear all subprograms variables data
-    for (auto it = mCyclogram->commands().begin(); it != mCyclogram->commands().end(); ++it)
+    for (auto it = cyclogram->commands().begin(); it != cyclogram->commands().end(); ++it)
     {
         if ((*it)->type() == DRAKON::SUBPROGRAM)
         {
