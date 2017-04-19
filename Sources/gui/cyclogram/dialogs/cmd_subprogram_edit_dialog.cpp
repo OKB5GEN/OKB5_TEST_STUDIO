@@ -230,19 +230,17 @@ void CmdSubProgramEditDialog::updateUI()
     {
         QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
         bool ok = false;
-
-        cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+        cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
 
         if (!ok)
         {
-            LOG_ERROR(QString("Cannot load subprogram file '%1'").arg(QDir::toNativeSeparators(fileName)));
-            CyclogramManager::removeDefaultCyclogram(cyclogram);
+            CyclogramManager::removeCyclogram(cyclogram);
             return;
         }
     }
     else // no cyclogram file set, possibly just batch calling cyclogram variables changing
     {
-        cyclogram = CyclogramManager::createDefaultCyclogram();
+        cyclogram = CyclogramManager::createCyclogram();
     }
 
     mInParams->clearContents();
@@ -415,7 +413,7 @@ void CmdSubProgramEditDialog::updateUI()
 
     if (mFileNameStr->text().isEmpty())
     {
-        CyclogramManager::removeDefaultCyclogram(cyclogram);
+        CyclogramManager::removeCyclogram(cyclogram);
     }
 }
 

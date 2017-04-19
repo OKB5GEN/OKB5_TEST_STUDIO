@@ -7,34 +7,45 @@
 #include <QFile>
 #include <QDir>
 
-QMap< QString, QSharedPointer<Cyclogram> > CyclogramManager::smOpenedCyclograms;
-QSet< QSharedPointer<Cyclogram> > CyclogramManager::smDefaultCyclograms;
+QSet< QSharedPointer<Cyclogram> > CyclogramManager::smCyclograms;
 
-CyclogramManager::CyclogramManager()
+QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileName, bool* ok)
 {
-
-}
-
-QSharedPointer<Cyclogram> CyclogramManager::loadFromFile(const QString& fileName, bool* ok)
-{
-    auto it = smOpenedCyclograms.find(fileName);
-    if (it != smOpenedCyclograms.end())
+    if (fileName.isEmpty())
     {
         if (ok)
         {
             *ok = true;
         }
 
-        return it.value();
+        return createDefault();
     }
 
-    Cyclogram* cyclogram = new Cyclogram(Q_NULLPTR);
-    QSharedPointer<Cyclogram> p(cyclogram);
+    LOG_INFO(QString("Loading '%1' cyclogram file...").arg(QDir::toNativeSeparators(fileName)));
 
-    // pointer "registration" must be before file loading to prevent stack overflow
-    // due to recursive file loading (when cyclogram has file link to itself in some of included subprograms)
-    smOpenedCyclograms[fileName] = p;
+    static QSet<QString> sLoadingFiles;
 
+    // 1. Check file is already loading to prevent recursive files loading (which tends to stack overflow)
+    auto itLoading = sLoadingFiles.find(fileName);
+    if (itLoading != sLoadingFiles.end())
+    {
+        LOG_ERROR(QString("Recursive '%1' file loading detected! Skip loading, create default cyclogram").arg(QDir::toNativeSeparators(fileName)));
+        if (ok)
+        {
+            *ok = false;
+        }
+
+        return createDefault();
+    }
+
+    // 2. If file is not loading, add file name to loading list, marking that this file loading started
+    sLoadingFiles.insert(fileName);
+
+    // 3. Create cyclogram object and
+    QSharedPointer<Cyclogram> p(new Cyclogram(Q_NULLPTR));
+    smCyclograms.insert(p);
+
+    // 4. Open file for reading
     QFile file(fileName);
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -49,6 +60,7 @@ QSharedPointer<Cyclogram> CyclogramManager::loadFromFile(const QString& fileName
         return p;
     }
 
+    // 5. Read file contents to cyclogram
     FileReader reader(p);
     if (!reader.read(&file))
     {
@@ -62,36 +74,31 @@ QSharedPointer<Cyclogram> CyclogramManager::loadFromFile(const QString& fileName
         return p;
     }
 
+    // 6. Cyclogram successfully loaded from file, erase file name from loading files list
+    sLoadingFiles.remove(fileName); // file loaded
     if (ok)
     {
         *ok = true;
     }
 
+    LOG_INFO(QString("'%1' cyclogram file loaded").arg(QDir::toNativeSeparators(fileName)));
     return p;
 }
 
 void CyclogramManager::clear()
 {
-    smOpenedCyclograms.clear();
-    smDefaultCyclograms.clear();
+    smCyclograms.clear();
 }
 
-QSharedPointer<Cyclogram> CyclogramManager::createDefaultCyclogram()
+QSharedPointer<Cyclogram> CyclogramManager::createDefault()
 {
-    Cyclogram* cyclogram = new Cyclogram(Q_NULLPTR);
-    QSharedPointer<Cyclogram> p(cyclogram);
+    QSharedPointer<Cyclogram> p(new Cyclogram(Q_NULLPTR));
     p->createDefault();
-    smDefaultCyclograms.insert(p);
+    smCyclograms.insert(p);
     return p;
 }
 
-void CyclogramManager::onCyclogramSaved(QSharedPointer<Cyclogram> cyclogram, const QString& fileName)
+void CyclogramManager::removeCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
-    smOpenedCyclograms[fileName] = cyclogram;
-    smDefaultCyclograms.remove(cyclogram);
-}
-
-void CyclogramManager::removeDefaultCyclogram(QSharedPointer<Cyclogram> cyclogram)
-{
-    smDefaultCyclograms.remove(cyclogram);
+    smCyclograms.remove(cyclogram);
 }

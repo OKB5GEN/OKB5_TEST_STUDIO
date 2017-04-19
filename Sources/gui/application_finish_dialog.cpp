@@ -33,12 +33,12 @@ bool ApplicationFinishDialog::init()
     QString fileName = dir.absolutePath();
 
     bool ok = false;
-    auto cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+    auto cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
 
     if (!ok)
     {
         LOG_ERROR(QString("Could not load file '%1'. Skipping safe application finish...").arg(fileName));
-        CyclogramManager::removeDefaultCyclogram(cyclogram);
+        CyclogramManager::removeCyclogram(cyclogram);
         return false;
     }
 

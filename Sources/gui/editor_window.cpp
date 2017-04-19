@@ -32,7 +32,7 @@ EditorWindow::EditorWindow():
     mScrollArea = new QScrollArea(this);
 
     mCyclogramWidget = new CyclogramWidget(this);
-    auto cyclogram = CyclogramManager::createDefaultCyclogram();
+    auto cyclogram = CyclogramManager::createCyclogram();
     cyclogram->setMainCyclogram(true);
     mCyclogram = cyclogram;
 
@@ -117,9 +117,13 @@ void EditorWindow::newFile()
     {
         mCyclogramWidget->setUpdateOnRemove(false);
         CyclogramManager::clear();
-        auto cyclogram = CyclogramManager::createDefaultCyclogram();
+        auto cyclogram = CyclogramManager::createCyclogram();
         cyclogram->setMainCyclogram(true);
         cyclogram->setSystemState(mSystemState);
+
+        connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+        connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+
         mCyclogram = cyclogram;
 
         mCyclogramWidget->setUpdateOnRemove(true);
@@ -405,8 +409,11 @@ void EditorWindow::loadFile(const QString &fileName)
     CyclogramManager::clear();
 
     bool ok = false;
-    auto cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+    auto cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
     cyclogram->setSystemState(mSystemState);
+
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     mCyclogram = cyclogram;
     mCyclogramWidget->load(cyclogram);
@@ -453,7 +460,6 @@ bool EditorWindow::saveFile(const QString &fileName)
         settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
 
         setCurrentFile(fileName);
-        CyclogramManager::onCyclogramSaved(mCyclogram.lock(), fileName);
         statusBar()->showMessage(tr("File saved"), 2000);
         emit documentSaved(true);
         return true;

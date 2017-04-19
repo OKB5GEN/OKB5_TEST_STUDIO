@@ -25,10 +25,10 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
 {
     mText = SUBPROGRAM_PREFIX;
 
-    auto cyclogram = CyclogramManager::createDefaultCyclogram();
+    auto cyclogram = CyclogramManager::createCyclogram();
+    cyclogram->setMainCyclogram(false);
 
     mCyclogram = cyclogram;
-    cyclogram->setMainCyclogram(false);
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     updateText();
 }
@@ -46,12 +46,13 @@ bool CmdSubProgram::load()
         return true;
     }
 
-    CyclogramManager::removeDefaultCyclogram(cyclogram);
+    CyclogramManager::removeCyclogram(cyclogram);
 
     QString fileName = Cyclogram::defaultStorePath() + mFilePath;
     bool ok = false;
-    cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+    cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
     cyclogram->setSystemState(mSystemState);
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     mCyclogram = cyclogram;
 
     if (!ok)
@@ -168,7 +169,7 @@ void CmdSubProgram::updateText()
 
     // update system state if it is not set
     auto cyclogram = mCyclogram.lock();
-    if (cyclogram->systemState() != mSystemState)
+    if (cyclogram && cyclogram->systemState() != mSystemState)
     {
         cyclogram->setSystemState(mSystemState);
     }
