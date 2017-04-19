@@ -30,16 +30,8 @@ EditorWindow::EditorWindow():
     mScaleFactor(1.0)
 {
     mScrollArea = new QScrollArea(this);
-
+    mSystemState = new SystemState(this);
     mCyclogramWidget = new CyclogramWidget(this);
-    auto cyclogram = CyclogramManager::createCyclogram();
-    cyclogram->setMainCyclogram(true);
-    mCyclogram = cyclogram;
-
-    mCyclogramWidget->load(cyclogram);
-
-    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
-    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
     mScrollArea->setWidget(mCyclogramWidget);
@@ -50,19 +42,15 @@ EditorWindow::EditorWindow():
 
     readSettings();
 
-    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(documentWasModified()));
-
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &EditorWindow::commitData);
+
+    setNewCyclogram(CyclogramManager::createCyclogram());
 
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
 
     //setWindowTitle(tr("OKB5 Test Studio[*]"));
-
-    mSystemState = new SystemState(this);
-
-    cyclogram->setSystemState(mSystemState);
 }
 
 void EditorWindow::onApplicationStart()
@@ -115,25 +103,10 @@ void EditorWindow::newFile()
 {
     if (maybeSave())
     {
-        mCyclogramWidget->setUpdateOnRemove(false);
         CyclogramManager::clear();
         auto cyclogram = CyclogramManager::createCyclogram();
-        cyclogram->setMainCyclogram(true);
-        cyclogram->setSystemState(mSystemState);
 
-        connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
-        connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-
-        mCyclogram = cyclogram;
-
-        mCyclogramWidget->setUpdateOnRemove(true);
-        mCyclogramWidget->load(cyclogram);
-
-        for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
-        {
-            (*it)->setCyclogram(cyclogram);
-        }
-
+        setNewCyclogram(cyclogram);
         setCurrentFile(QString());
 
         cyclogram->setModified(true, true);
@@ -405,18 +378,12 @@ bool EditorWindow::maybeSave()
 
 void EditorWindow::loadFile(const QString &fileName)
 {
-    mCyclogramWidget->clear();
     CyclogramManager::clear();
 
     bool ok = false;
     auto cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
-    cyclogram->setSystemState(mSystemState);
 
-    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
-    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-
-    mCyclogram = cyclogram;
-    mCyclogramWidget->load(cyclogram);
+    setNewCyclogram(cyclogram);
 
     if (!ok)
     {
@@ -428,11 +395,6 @@ void EditorWindow::loadFile(const QString &fileName)
     {
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
-    }
-
-    for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
-    {
-        (*it)->setCyclogram(cyclogram);
     }
 
     // close all subprogram windows and charts
@@ -649,3 +611,23 @@ void EditorWindow::commitData(QSessionManager &manager)
     }
 }
 
+void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
+{
+    mCyclogram = cyclogram;
+
+    mCyclogramWidget->clear();
+    cyclogram->setMainCyclogram(true);
+
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
+    connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(documentWasModified()));
+
+    cyclogram->setSystemState(mSystemState);
+
+    mCyclogramWidget->load(cyclogram);
+
+    for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
+    {
+        (*it)->setCyclogram(cyclogram);
+    }
+}

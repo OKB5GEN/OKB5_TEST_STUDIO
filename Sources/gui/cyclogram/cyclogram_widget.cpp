@@ -39,8 +39,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
-    mCurSubprogram(Q_NULLPTR),
-    mUpdateOnShapeRemove(true)
+    mCurSubprogram(Q_NULLPTR)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -689,10 +688,7 @@ void CyclogramWidget::removeShape(Command* command)
         }
     }
 
-    if (mUpdateOnShapeRemove)
-    {
-        onNeedUpdate();
-    }
+    onNeedUpdate();
 }
 
 void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
@@ -1365,7 +1361,3 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     mRootShape->adjust();
 }
 
-void CyclogramWidget::setUpdateOnRemove(bool updateOnShapeRemove)
-{
-    mUpdateOnShapeRemove = updateOnShapeRemove;
-}

@@ -28,7 +28,6 @@ public:
     ~CyclogramWidget();
 
     void clear(bool onDestroy = false);
-    void setUpdateOnRemove(bool updateOnShapeRemove);
 
 public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
@@ -94,8 +93,6 @@ private:
     ShapeItem* mRootShape;
 
     QWeakPointer<Cyclogram> mCurrentCyclogram;
-
-    bool mUpdateOnShapeRemove;
 
     CmdSubProgram* mCurSubprogram;
 };
