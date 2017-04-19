@@ -94,7 +94,7 @@ private:
         OperandType type;
     };
 
-    void updateText();
+    void updateText() override;
 
     void insertInCycle(Command* newCmd, ValencyPoint::Role role);
     void insertInIf(Command* newCmd, ValencyPoint::Role role);

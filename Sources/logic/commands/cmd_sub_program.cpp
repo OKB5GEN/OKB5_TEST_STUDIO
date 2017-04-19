@@ -165,6 +165,13 @@ void CmdSubProgram::updateText()
     }
 
     emit textChanged(mText);
+
+    // update system state if it is not set
+    auto cyclogram = mCyclogram.lock();
+    if (cyclogram->systemState() != mSystemState)
+    {
+        cyclogram->setSystemState(mSystemState);
+    }
 }
 
 void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName)

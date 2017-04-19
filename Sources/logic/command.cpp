@@ -259,6 +259,7 @@ VariableController* Command::variableController() const
 void Command::setSystemState(SystemState* state)
 {
     mSystemState = state;
+    updateText();
 }
 
 SystemState* Command::systemState() const
@@ -356,6 +357,11 @@ void Command::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void Command::readCustomAttributes(QXmlStreamReader* reader)
 {
+}
+
+void Command::updateText()
+{
+
 }
 
 qint64 Command::id() const

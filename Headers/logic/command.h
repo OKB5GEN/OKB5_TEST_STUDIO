@@ -90,6 +90,7 @@ protected:
 
     virtual void writeCustomAttributes(QXmlStreamWriter* writer);
     virtual void readCustomAttributes(QXmlStreamReader* reader);
+    virtual void updateText();
 
     DRAKON::IconType mType;
     QString mText;

@@ -406,33 +406,24 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
     case DRAKON::SUBPROGRAM:
         {
             cmd = new CmdSubProgram(this);
-            cmd->setVariableController(mVarController);
-            cmd->setSystemState(mSystemState);
         }
         break;
     case DRAKON::ACTION_MATH:
         {
-            CmdActionMath* tmp = new CmdActionMath(this);
-            tmp->setVariableController(mVarController);
-            tmp->setSystemState(mSystemState);
-            cmd = tmp;
+            cmd = new CmdActionMath(this);
         }
         break;
 
     case DRAKON::QUESTION:
         {
             CmdQuestion* tmp = new CmdQuestion(this);
-            tmp->setVariableController(mVarController);
             tmp->setQuestionType(CmdQuestion::QuestionType(param));
             cmd = tmp;
         }
         break;
     case DRAKON::ACTION_MODULE:
         {
-            CmdActionModule* tmp = new CmdActionModule(this);
-            tmp->setVariableController(mVarController);
-            tmp->setSystemState(mSystemState);
-            cmd = tmp;
+            cmd = new CmdActionModule(this);
         }
         break;
 
@@ -443,6 +434,9 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
 
     if (cmd)
     {
+        cmd->setVariableController(mVarController);
+        cmd->setSystemState(mSystemState);
+
         mCommands.push_back(cmd);
         connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
         setModified(true, true); // modified on command adding
@@ -493,6 +487,16 @@ VariableController* Cyclogram::variableController() const
 void Cyclogram::setSystemState(SystemState* state)
 {
     mSystemState = state;
+
+    foreach (Command* cmd, mCommands)
+    {
+        cmd->setSystemState(state);
+    }
+}
+
+SystemState* Cyclogram::systemState() const
+{
+    return mSystemState;
 }
 
 void Cyclogram::getBranches(QList<Command*>& branches) const

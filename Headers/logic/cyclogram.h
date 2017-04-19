@@ -63,6 +63,7 @@ public:
 
     VariableController* variableController() const;
     void setSystemState(SystemState* state);
+    SystemState* systemState() const;
 
     static bool isCyclogramEndBranch(Command* cmd);
 

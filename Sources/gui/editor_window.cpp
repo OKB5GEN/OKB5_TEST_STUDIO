@@ -119,6 +119,7 @@ void EditorWindow::newFile()
         CyclogramManager::clear();
         auto cyclogram = CyclogramManager::createDefaultCyclogram();
         cyclogram->setMainCyclogram(true);
+        cyclogram->setSystemState(mSystemState);
         mCyclogram = cyclogram;
 
         mCyclogramWidget->setUpdateOnRemove(true);
@@ -405,6 +406,7 @@ void EditorWindow::loadFile(const QString &fileName)
 
     bool ok = false;
     auto cyclogram = CyclogramManager::loadFromFile(fileName, &ok);
+    cyclogram->setSystemState(mSystemState);
 
     mCyclogram = cyclogram;
     mCyclogramWidget->load(cyclogram);

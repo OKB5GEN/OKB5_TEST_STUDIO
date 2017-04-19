@@ -68,7 +68,7 @@ private:
         OperandType type;
     };
 
-    void updateText();
+    void updateText() override;
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;

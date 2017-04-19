@@ -30,7 +30,7 @@ private slots:
     void onCommandFinished(bool success);
 
 private:
-    void updateText();
+    void updateText() override;
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
