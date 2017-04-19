@@ -11,11 +11,6 @@
         <command type="GO_TO_BRANCH" id="1491893961474"/>
         <command type="BRANCH_BEGIN" id="1491893961475" name="End"/>
         <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492075429516" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,1">
-            <input_params/>
-            <output_params/>
-        </command>
-        <command type="DELAY" id="1492075441193" delay="200"/>
         <command type="ACTION_MODULE" id="1492075726270" module="POWER_UNIT_PNA" command="SET_VOLTAGE_AND_CURRENT" implicit_params="0">
             <input_params>
                 <param name="Voltage, V" type="10" value="U"/>
@@ -33,15 +28,6 @@
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1492075931577" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="0">
-            <input_params/>
-            <output_params/>
-        </command>
-        <command type="ACTION_MODULE" id="1492075934308" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,0">
-            <input_params/>
-            <output_params/>
-        </command>
-        <command type="DELAY" id="1492075938267" delay="3000"/>
-        <command type="ACTION_MODULE" id="1492075940971" module="MKO" command="START_MKO" implicit_params="0">
             <input_params/>
             <output_params/>
         </command>
@@ -76,19 +62,14 @@
     </commands>
     <tree>
         <item id="1491893961471" down="1491893961473" right="-1" under_arrow="-1"/>
-        <item id="1491893961473" down="1492075429516" right="-1" under_arrow="-1"/>
+        <item id="1491893961473" down="1492075726270" right="-1" under_arrow="-1"/>
         <item id="1491893961474" down="1492076062943" right="-1" under_arrow="-1"/>
         <item id="1491893961475" down="1492076393801" right="-1" under_arrow="-1"/>
         <item id="1491893961476" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1492075429516" down="1492075441193" right="-1" under_arrow="-1"/>
-        <item id="1492075441193" down="1492075726270" right="-1" under_arrow="-1"/>
         <item id="1492075726270" down="1492075728788" right="-1" under_arrow="-1"/>
         <item id="1492075728788" down="1492075928678" right="-1" under_arrow="-1"/>
         <item id="1492075928678" down="1492075931577" right="-1" under_arrow="-1"/>
-        <item id="1492075931577" down="1492075934308" right="-1" under_arrow="-1"/>
-        <item id="1492075934308" down="1492075938267" right="-1" under_arrow="-1"/>
-        <item id="1492075938267" down="1492075940971" right="-1" under_arrow="-1"/>
-        <item id="1492075940971" down="1491893961474" right="-1" under_arrow="-1"/>
+        <item id="1492075931577" down="1491893961474" right="-1" under_arrow="-1"/>
         <item id="1492076062943" down="1492076065054" right="-1" under_arrow="-1"/>
         <item id="1492076062945" down="1491893961475" right="-1" under_arrow="-1"/>
         <item id="1492076065054" down="1492076087337" right="-1" under_arrow="-1"/>

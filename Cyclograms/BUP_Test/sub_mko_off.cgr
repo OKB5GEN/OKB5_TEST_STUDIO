@@ -10,38 +10,30 @@
         <command type="GO_TO_BRANCH" id="1491893961474"/>
         <command type="BRANCH_BEGIN" id="1491893961475" name="End"/>
         <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492076328367" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,1">
-            <input_params/>
-            <output_params/>
-        </command>
-        <command type="ACTION_MODULE" id="1492076330202" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,1">
-            <input_params/>
-            <output_params/>
-        </command>
         <command type="ACTION_MATH" id="1492076365886" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1492076572761" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="1">
+        <command type="ACTION_MODULE" id="1492076657452" module="MKO" command="STOP_MKO" implicit_params="0">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076574706" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="1">
+        <command type="DELAY" id="1492076672891" delay="200"/>
+        <command type="ACTION_MODULE" id="1492076679741" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,1">
             <input_params/>
             <output_params/>
         </command>
     </commands>
     <tree>
         <item id="1491893961471" down="1491893961473" right="-1" under_arrow="-1"/>
-        <item id="1491893961473" down="1492076328367" right="-1" under_arrow="-1"/>
+        <item id="1491893961473" down="1492076657452" right="-1" under_arrow="-1"/>
         <item id="1491893961474" down="1491893961475" right="-1" under_arrow="-1"/>
         <item id="1491893961475" down="1492076365886" right="-1" under_arrow="-1"/>
         <item id="1491893961476" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1492076328367" down="1492076330202" right="-1" under_arrow="-1"/>
-        <item id="1492076330202" down="1492076572761" right="-1" under_arrow="-1"/>
         <item id="1492076365886" down="1491893961476" right="-1" under_arrow="-1"/>
-        <item id="1492076572761" down="1492076574706" right="-1" under_arrow="-1"/>
-        <item id="1492076574706" down="1491893961474" right="-1" under_arrow="-1"/>
+        <item id="1492076657452" down="1492076672891" right="-1" under_arrow="-1"/>
+        <item id="1492076672891" down="1492076679741" right="-1" under_arrow="-1"/>
+        <item id="1492076679741" down="1491893961474" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
