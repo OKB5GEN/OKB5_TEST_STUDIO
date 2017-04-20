@@ -24,6 +24,8 @@ public:
     const QString& filePath() const;
     const QString& name() const;
 
+    void setLoaded(bool loaded);
+
     void setParams(const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out);
 
     QSharedPointer<Cyclogram> cyclogram();

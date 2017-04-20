@@ -77,6 +77,7 @@ void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     VariableController* controller = cyclogram->variableController();
 
     connect(controller, SIGNAL(currentValueChanged(const QString&,qreal)), this, SLOT(onCurrentValueChanged(const QString&,qreal)));
+    connect(cyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 
     foreach (QString key, controller->variablesData().keys())
     {

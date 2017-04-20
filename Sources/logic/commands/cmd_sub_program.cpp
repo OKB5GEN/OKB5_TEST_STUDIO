@@ -26,7 +26,6 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     mText = SUBPROGRAM_PREFIX;
 
     auto cyclogram = CyclogramManager::createCyclogram();
-    cyclogram->setMainCyclogram(false);
 
     mCyclogram = cyclogram;
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
@@ -35,14 +34,14 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
 
 bool CmdSubProgram::load()
 {
-    mLoaded = false;
+    setLoaded(false);
+
     auto cyclogram = mCyclogram.lock();
-    cyclogram->clear();
     cyclogram->setSystemState(mSystemState);
 
     if (mFilePath.isEmpty()) // no file link is normal
     {
-        mLoaded = true;
+        setLoaded(true);
         return true;
     }
 
@@ -60,7 +59,7 @@ bool CmdSubProgram::load()
         return false;
     }
 
-    mLoaded = true;
+    setLoaded(true);
     return true;
 }
 
@@ -85,6 +84,7 @@ void CmdSubProgram::execute()
 {
     if (!mLoaded)
     {
+        mErrorText = tr("Subprogram not loaded");
         emit criticalError(this);
         return;
     }
@@ -518,4 +518,9 @@ void CmdSubProgram::restart()
             subprogram->restart();
         }
     }
+}
+
+void CmdSubProgram::setLoaded(bool loaded)
+{
+    mLoaded = loaded;
 }

@@ -152,6 +152,10 @@ void Cyclogram::run()
         setState(RUNNING);
         runCurrentCommand();
     }
+    else
+    {
+        LOG_ERROR(QString("Icorrect cyclogram state"));
+    }
 }
 
 void Cyclogram::onCommandFinished(Command* cmd)
@@ -405,7 +409,9 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         break;
     case DRAKON::SUBPROGRAM:
         {
-            cmd = new CmdSubProgram(this);
+            CmdSubProgram* tmp = new CmdSubProgram(this);
+            tmp->setLoaded(true);
+            cmd = tmp;
         }
         break;
     case DRAKON::ACTION_MATH:
