@@ -29,6 +29,7 @@ public:
 
     void clear(bool onDestroy = false);
     void setDialogParent(QWidget* widget);
+    void setParentTitle(const QString& title);
 
 public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
@@ -56,7 +57,7 @@ private slots:
 private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
-    void updateWindowTitle(QWidget* dialog);
+    QString updateWindowTitle(QWidget* dialog);
 
     void drawCyclogram(ShapeItem* item);
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
@@ -99,6 +100,7 @@ private:
     CmdSubProgram* mCurSubprogram;
 
     QWidget* mDialogParent;
+    QString mParentTitle;
 };
 
 #endif //CYCLOGRAM_WIDGET_H

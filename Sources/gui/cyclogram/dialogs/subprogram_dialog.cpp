@@ -107,3 +107,8 @@ void SubProgramDialog::onChartClick()
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
+
+CyclogramWidget* SubProgramDialog::cyclogramWidget() const
+{
+    return mCyclogramWidget;
+}

@@ -21,21 +21,14 @@ public:
     SubProgramDialog(CmdSubProgram* command, QWidget * parent);
     ~SubProgramDialog();
 
-//    void setCommand(CmdSubProgram* command, Cyclogram* cyclogram);
+    CyclogramWidget* cyclogramWidget() const;
 
 private slots:
-//    void onAccept();
-//    void openFile();
-//    void onInputCheckBoxStateChanged(int state);
-//    void onOutputCheckBoxStateChanged(int state);
     void onSaveClick();
     void onVariablesClick();
     void onChartClick();
 
 private:
-//    void setupUI();
-//    void updateUI();
-//    void updateTable(QTableWidget* widget, QCheckBox* changedBox, int state);
 
     CmdSubProgram* mCommand;
     CyclogramWidget* mCyclogramWidget;

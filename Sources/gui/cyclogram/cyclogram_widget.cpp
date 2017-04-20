@@ -338,7 +338,8 @@ void CyclogramWidget::showSubprogramWidget()
 
     Q_ASSERT(mDialogParent);
     SubProgramDialog* subProgramDialog = new SubProgramDialog(mCurSubprogram, mDialogParent);
-    updateWindowTitle(subProgramDialog);
+    QString title = updateWindowTitle(subProgramDialog);
+    subProgramDialog->cyclogramWidget()->setParentTitle(title);
     subProgramDialog->show();
 }
 
@@ -365,32 +366,33 @@ void CyclogramWidget::showSubprogramChart()
     dialog->show();
 }
 
-void CyclogramWidget::updateWindowTitle(QWidget* dialog)
+QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
 {
+    QString title;
     if (!mCurSubprogram)
     {
         LOG_WARNING(QString("Subprogram not set 2"));
-        return;
+        return title;
     }
 
     if (!mCurSubprogram->loaded())
     {
         LOG_ERROR(QString("Subprogram configuration error 2"));
-        return;
+        return title;
     }
 
     if (mCurrentCyclogram.lock()->isMainCyclogram())
     {
-        dialog->setWindowTitle(mCurSubprogram->text());
+        title = mCurSubprogram->text();
     }
     else
     {
-        QWidget* w = parentWidget()->parentWidget()->parentWidget(); // SubProgramDialog <- ScrollArea <- CyclogramWidget
-        QString title = w->windowTitle();
+        title = mParentTitle;
         title += QString(" -> ");
         title += mCurSubprogram->text();
-        dialog->setWindowTitle(title);
     }
+
+    dialog->setWindowTitle(title);
 }
 
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1018,8 +1020,8 @@ void CyclogramWidget::drawChildren(ShapeItem* item, const QList<Command*>& stopD
 
         if (stopDrawingCommands.contains(nextCmd))
         {
-            QString msg = QString("Stopping draw chidren: Cmd:%1 Next:%2 ").arg(cmd->text()).arg(nextCmd->text());
-            LOG_DEBUG(msg);
+            //QString msg = QString("Stopping draw chidren: Cmd:%1 Next:%2 ").arg(cmd->text()).arg(nextCmd->text());
+            //LOG_DEBUG(msg);
             return;
         }
 
@@ -1384,4 +1386,9 @@ void CyclogramWidget::setDialogParent(QWidget* widget)
 {
     int TODO; // what in case of replace parent?
     mDialogParent = widget;
+}
+
+void CyclogramWidget::setParentTitle(const QString& title)
+{
+    mParentTitle = title;
 }
