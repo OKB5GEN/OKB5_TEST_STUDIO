@@ -396,9 +396,7 @@ void EditorWindow::loadFile(const QString &fileName)
         statusBar()->showMessage(tr("File loaded"), 2000);
     }
 
-    // close all subprogram windows and charts
-    // because main cyclogram reloaded
-    int TODO;
+    mSaveAct->setDisabled(true);
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
