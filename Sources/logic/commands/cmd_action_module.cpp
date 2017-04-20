@@ -159,13 +159,13 @@ void CmdActionModule::updateText()
 
 //    mText += ")";
 
+    if (!isValid)
+    {
+        mText = tr("Invalid cmd");
+    }
+
     if ((hasError() && isValid) || (!hasError() && !isValid))
     {
-        if (!isValid)
-        {
-            mText = tr("Invalid cmd");
-        }
-
         setErrorStatus(!isValid);
     }
 
