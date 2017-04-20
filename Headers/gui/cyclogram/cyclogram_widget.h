@@ -28,6 +28,7 @@ public:
     ~CyclogramWidget();
 
     void clear(bool onDestroy = false);
+    void setDialogParent(QWidget* widget);
 
 public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
@@ -55,6 +56,7 @@ private slots:
 private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
+    void updateWindowTitle(QWidget* dialog);
 
     void drawCyclogram(ShapeItem* item);
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
@@ -95,6 +97,8 @@ private:
     QWeakPointer<Cyclogram> mCurrentCyclogram;
 
     CmdSubProgram* mCurSubprogram;
+
+    QWidget* mDialogParent;
 };
 
 #endif //CYCLOGRAM_WIDGET_H

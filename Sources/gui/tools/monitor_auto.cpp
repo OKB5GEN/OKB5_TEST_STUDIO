@@ -43,7 +43,7 @@ MonitorAuto::MonitorAuto(QWidget * parent):
 
     setLayout(hLayout);
 
-    setWindowTitle(tr("Monitor")); // TODO write cyclogram path / subprogram name
+    setWindowTitle(tr("Main cyclogram")); // TODO write cyclogram path / subprogram name
 }
 
 MonitorAuto::~MonitorAuto()
@@ -62,6 +62,7 @@ void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     {
         disconnect(mCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
         disconnect(mCyclogram.lock()->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+        disconnect(mCyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
     }
 
     mCyclogram = cyclogram;
@@ -89,6 +90,7 @@ void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+    connect(cyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO "hot" graphs adding
     {
@@ -96,7 +98,7 @@ void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     }
 }
 
-void  MonitorAuto::onVariableSelectionChanged(bool toggled)
+void MonitorAuto::onVariableSelectionChanged(bool toggled)
 {
     QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
     if (changedBox && !toggled)

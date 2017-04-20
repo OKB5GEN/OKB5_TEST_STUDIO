@@ -46,8 +46,6 @@ private slots:
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
 
-    void onAutoMonitorClosed();
-
     void commitData(QSessionManager &);
 
 signals:
@@ -87,8 +85,6 @@ private:
 
     QScrollArea * mScrollArea;
     qreal mScaleFactor;
-
-    QSet<MonitorAuto*> mActiveMonitors;
 
     int mSnapshotsCouner; // hack for force data snapshot save
 };

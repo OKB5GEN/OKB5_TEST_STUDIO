@@ -39,7 +39,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
-    mCurSubprogram(Q_NULLPTR)
+    mCurSubprogram(Q_NULLPTR),
+    mDialogParent(Q_NULLPTR)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -325,17 +326,19 @@ void CyclogramWidget::showSubprogramWidget()
 {
     if (!mCurSubprogram)
     {
-        LOG_WARNING(QString("Subprogram not set"));
+        LOG_WARNING(QString("Subprogram not set 1"));
         return;
     }
 
     if (!mCurSubprogram->loaded())
     {
-        LOG_ERROR(QString("Subprogram configuration error"));
+        LOG_ERROR(QString("Subprogram configuration error 1"));
         return;
     }
 
-    SubProgramDialog* subProgramDialog = new SubProgramDialog(mCurSubprogram, parentWidget());
+    Q_ASSERT(mDialogParent);
+    SubProgramDialog* subProgramDialog = new SubProgramDialog(mCurSubprogram, mDialogParent);
+    updateWindowTitle(subProgramDialog);
     subProgramDialog->show();
 }
 
@@ -343,40 +346,56 @@ void CyclogramWidget::showSubprogramChart()
 {
     if (!mCurSubprogram)
     {
-        LOG_WARNING(QString("Subprogram not set"));
+        LOG_WARNING(QString("Subprogram not set 3"));
         return;
     }
 
     if (!mCurSubprogram->loaded())
     {
-        LOG_ERROR(QString("Subprogram configuration error"));
+        LOG_ERROR(QString("Subprogram configuration error 3"));
         return;
     }
 
-    MonitorAuto* dialog = new MonitorAuto(parentWidget());
-
-    //mActiveMonitors.insert(dialog); //TODO разобраться с иерархией окон, ее обновлением при изменении файлов и т.д.
-
-    QString windowTitle = parentWidget()->windowTitle();
-    if (!windowTitle.isEmpty())
-    {
-        windowTitle += QString(" -> ");
-    }
-
-    windowTitle += mCurSubprogram->text();
-    dialog->setWindowTitle(windowTitle);
-
-    //connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
+    Q_ASSERT(mDialogParent);
+    MonitorAuto* dialog = new MonitorAuto(mDialogParent);
+    updateWindowTitle(dialog);
 
     dialog->setCyclogram(mCurSubprogram->cyclogram());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
+void CyclogramWidget::updateWindowTitle(QWidget* dialog)
+{
+    if (!mCurSubprogram)
+    {
+        LOG_WARNING(QString("Subprogram not set 2"));
+        return;
+    }
+
+    if (!mCurSubprogram->loaded())
+    {
+        LOG_ERROR(QString("Subprogram configuration error 2"));
+        return;
+    }
+
+    if (mCurrentCyclogram.lock()->isMainCyclogram())
+    {
+        dialog->setWindowTitle(mCurSubprogram->text());
+    }
+    else
+    {
+        QWidget* w = parentWidget()->parentWidget()->parentWidget(); // SubProgramDialog <- ScrollArea <- CyclogramWidget
+        QString title = w->windowTitle();
+        title += QString(" -> ");
+        title += mCurSubprogram->text();
+        dialog->setWindowTitle(title);
+    }
+}
+
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //remember that mousePressEvent will be called first!
-
+    //TODO remember that mousePressEvent will be called first!
     if (event->button() == Qt::LeftButton)
     {
         if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
@@ -1361,3 +1380,8 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     mRootShape->adjust();
 }
 
+void CyclogramWidget::setDialogParent(QWidget* widget)
+{
+    int TODO; // what in case of replace parent?
+    mDialogParent = widget;
+}

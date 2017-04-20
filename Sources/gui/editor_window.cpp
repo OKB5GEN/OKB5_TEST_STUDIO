@@ -32,6 +32,7 @@ EditorWindow::EditorWindow():
     mScrollArea = new QScrollArea(this);
     mSystemState = new SystemState(this);
     mCyclogramWidget = new CyclogramWidget(this);
+    mCyclogramWidget->setDialogParent(this);
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
     mScrollArea->setWidget(mCyclogramWidget);
@@ -49,8 +50,6 @@ EditorWindow::EditorWindow():
 
     setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
-
-    //setWindowTitle(tr("OKB5 Test Studio[*]"));
 }
 
 void EditorWindow::onApplicationStart()
@@ -538,22 +537,9 @@ void EditorWindow::addChartWidget()
 {
     MonitorAuto* dialog = new MonitorAuto(this);
 
-    mActiveMonitors.insert(dialog);
-
-    connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
-
     dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
-}
-
-void EditorWindow::onAutoMonitorClosed()
-{
-    QObject* sender = QObject::sender();
-    if (sender)
-    {
-        mActiveMonitors.remove(qobject_cast<MonitorAuto*>(sender));
-    }
 }
 
 void EditorWindow::onCyclogramFinish(const QString& errorText)
@@ -625,9 +611,4 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     cyclogram->setSystemState(mSystemState);
 
     mCyclogramWidget->load(cyclogram);
-
-    for (auto it = mActiveMonitors.begin(); it != mActiveMonitors.end(); ++it)
-    {
-        (*it)->setCyclogram(cyclogram);
-    }
 }

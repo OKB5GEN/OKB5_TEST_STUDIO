@@ -17,19 +17,13 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     mVariablesWindow(Q_NULLPTR)
 {
     mScrollArea = new QScrollArea(this);
-    setMaximumSize(QSize(1600, 800)); // TODO i guess it will be enough for normal editing
-
-    QString windowTitle = parent->windowTitle();
-    if (!windowTitle.isEmpty())
-    {
-        windowTitle += QString(" -> ");
-    }
-
-    windowTitle += mCommand->text();
-    setWindowTitle(windowTitle);
+    setMaximumSize(QSize(1600, 800));
 
     mCyclogramWidget = new CyclogramWidget(this);
+    mCyclogramWidget->setDialogParent(parent);
     mCyclogramWidget->load(mCommand->cyclogram());
+
+    connect(mCommand->cyclogram().data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -107,22 +101,8 @@ void SubProgramDialog::onVariablesClick()
 
 void SubProgramDialog::onChartClick()
 {
-    MonitorAuto* dialog = new MonitorAuto(this);
-
-    //mActiveMonitors.insert(dialog); //TODO разобраться с иерархией окон, ее обновлением при изменении файлов и т.д.
-
-    //TODO remove copypaste from cyclogram widget
-    QString windowTitle = this->windowTitle();
-    if (!windowTitle.isEmpty())
-    {
-        windowTitle += QString(" -> ");
-    }
-
-    windowTitle += mCommand->text();
-    dialog->setWindowTitle(windowTitle);
-
-    //connect(dialog, SIGNAL(finished(int)), this, SLOT(onAutoMonitorClosed()));
-
+    MonitorAuto* dialog = new MonitorAuto(parentWidget());
+    dialog->setWindowTitle(windowTitle());
     dialog->setCyclogram(mCommand->cyclogram());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
