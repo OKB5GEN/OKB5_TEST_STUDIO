@@ -15,7 +15,7 @@
 
 namespace
 {
-    bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules)
+    bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules, bool& emulatorEnabled)
     {
         modules.clear();
 
@@ -32,6 +32,8 @@ namespace
 
         xml.setDevice(&file);
         QMetaEnum metaEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+
+        emulatorEnabled = false;
 
         if (xml.readNextStartElement())
         {
@@ -89,6 +91,15 @@ namespace
                                 }
 
                                 xml.readNext();
+                            }
+                        }
+                        else if (name == "emulator")
+                        {
+                            QXmlStreamAttributes attributes = xml.attributes();
+
+                            if (attributes.hasAttribute("enabled"))
+                            {
+                                emulatorEnabled = (attributes.value("enabled").toInt() != 0);
                             }
                         }
                     }
@@ -185,17 +196,20 @@ SystemState::~SystemState()
 void SystemState::onApplicationStart()
 {
     // Load modules configuration file
+    bool emulatorEnabled = false;
     QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
-    loadSystemConfig(modules);
+    loadSystemConfig(modules, emulatorEnabled);
 
     // Create modules objects
     mMKO = new ModuleMKO(this);
+    mMKO->setEmulator(emulatorEnabled);
     mMKO->setModuleID(ModuleCommands::MKO);
     connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
     connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
     connect(mMKO, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mOTD = new ModuleOTD(this);
+    mOTD->setEmulator(emulatorEnabled);
     mOTD->setId(modules.value(ModuleCommands::OTD));
     mOTD->setModuleID(ModuleCommands::OTD);
     connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
@@ -203,6 +217,7 @@ void SystemState::onApplicationStart()
     connect(mOTD, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mSTM = new ModuleSTM(this);
+    mSTM->setEmulator(emulatorEnabled);
     mSTM->setId(modules.value(ModuleCommands::STM));
     mSTM->setModuleID(ModuleCommands::STM);
     connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
@@ -210,6 +225,7 @@ void SystemState::onApplicationStart()
     connect(mSTM, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mTech = new ModuleTech(this);
+    mTech->setEmulator(emulatorEnabled);
     mTech->setId(modules.value(ModuleCommands::TECH));
     mTech->setModuleID(ModuleCommands::TECH);
     connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
@@ -217,6 +233,7 @@ void SystemState::onApplicationStart()
     connect(mTech, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerBUP = new ModulePower(this);
+    mPowerBUP->setEmulator(emulatorEnabled);
     mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
     mPowerBUP->setModuleID(ModuleCommands::POWER_UNIT_BUP);
     connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
@@ -224,6 +241,7 @@ void SystemState::onApplicationStart()
     connect(mPowerBUP, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerPNA = new ModulePower(this);
+    mPowerPNA->setEmulator(emulatorEnabled);
     mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
     mPowerPNA->setModuleID(ModuleCommands::POWER_UNIT_PNA);
     connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));

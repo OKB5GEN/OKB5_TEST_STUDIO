@@ -25,6 +25,9 @@ public:
 
     AbstractModule(QObject* parent);
 
+    void setEmulator(bool isEmulator);
+    bool isEmulator() const;
+
     void setModuleID(ModuleCommands::ModuleID id);
     ModuleCommands::ModuleID moduleID() const;
 
@@ -50,6 +53,7 @@ private:
     ModuleCommands::ModuleID mModuleID;
     QString mModuleName;
     QString mErrorString;
+    bool mIsEmulator;
 };
 
 #endif // ABSTRACT_MODULE_H

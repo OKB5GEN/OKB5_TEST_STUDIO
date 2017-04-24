@@ -3,9 +3,23 @@
 
 #include <QMetaEnum>
 
+/* TODO: Эмулятор (общая задумка)
+ *
+ * Главная цель эмулятора - проверить ПРОГРАММУ, что ее данным можно доверять
+ *
+ * 1. В АбстрактномМодуле заводим флажок "эмулятор", чтобы на его основе реализовывать логику.
+ * 2. Флажок этот грузится из system_config.xml
+ * 3. В каждую модульную команду добавляем целочисленный параметр "ИдентификаторОтветаЭмулятора"
+ * 4. В ГУИ этот параметр виден только при включенном эмуляторе
+ * 5. При включенном же эмуляторе этот параметр и используется.
+ * 6. Этот идентификатор нужен для того, чтобы идентифицировать ответ, который мы хотим получить
+ *
+*/
+
 AbstractModule::AbstractModule(QObject* parent):
     QObject(parent),
-    mState(NOT_INITIALIZED)
+    mState(NOT_INITIALIZED),
+    mIsEmulator(false)
 {
 }
 
@@ -54,3 +68,12 @@ const QString& AbstractModule::errorString() const
     return mErrorString;
 }
 
+void AbstractModule::setEmulator(bool isEmulator)
+{
+    mIsEmulator = isEmulator;
+}
+
+bool AbstractModule::isEmulator() const
+{
+    return mIsEmulator;
+}
