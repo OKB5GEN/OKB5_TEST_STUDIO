@@ -2,7 +2,6 @@
 #define MODULE_MKO_H
 
 #include "Headers/system/abstract_module.h"
-#include <QVariant>
 
 class QTimer;
 
@@ -58,18 +57,11 @@ public:
     ~ModuleMKO();
 
 public slots:
-    void onApplicationStart() override;
-
     void processCommand(const QMap<uint32_t, QVariant>& params) override;
+
+    void onApplicationStart() override;
     void setDefaultState() override;
-    void onCyclogramStart(); //TODO remove
-
-
-signals:
-    void test_MKO(int x);
-    void start_MKO(QString x);
-    void data_MKO(QString x);
-    void MKO_CTM(int x, int y);
+    void onCyclogramStart(); //TODO remove (ваще какая-то шляпа, из-за которой вероятно все проблемы и есть)
 
 private slots:
     void readResponse();
@@ -85,10 +77,6 @@ private slots:
     void startMKO1();
     void stopMKO();
     void stopMKO1();
-
-    void MKO_start_test(int kit, int adr1, int adr2);
-    void MKO_tr_cm(int kit, QString cm, int adr1, int adr2);
-    void MKO_rc_cm(int kit, int adr1, int adr2);
 
 private:
     struct AxisData
@@ -140,8 +128,6 @@ private:
 
     bool mMainKitEnabled;
     bool mReserveKitEnabled;
-
-    QMap<uint32_t, QVariant> mCurrentResponse;
 
     //TODO remove
     uint16_t mWordsToReceive;

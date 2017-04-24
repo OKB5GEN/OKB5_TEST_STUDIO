@@ -3,8 +3,6 @@
 
 #include "Headers/system/com_port_module.h"
 
-#include <QVariant>
-
 class ModuleOKB: public COMPortModule
 {
     Q_OBJECT
@@ -38,8 +36,6 @@ protected:
     bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
 
     void addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2);
-
-    QMap<uint32_t, QVariant> mTmpResponse;//TODO simplify internal protocol (remove copy-paste)
 
 private:
     bool canReturnError(ModuleCommands::CommandID cmd) const;

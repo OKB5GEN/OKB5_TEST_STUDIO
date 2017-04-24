@@ -116,9 +116,9 @@ void ModuleOTD::setDefaultState()
 void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
 {
     mTemperatureData.clear();
-    mTmpResponse.clear();
-    mTmpResponse = response;
-    mTmpResponse.detach();
+    mCurrentResponse.clear();
+    mCurrentResponse = response;
+    mCurrentResponse.detach();
 
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
 
@@ -167,12 +167,12 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
     for (int i = 0; i < paramsCount; ++i)
     {
         QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
     }
 
     if (paramsCount > 0)
     {
-        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
     }
 }
 
@@ -275,7 +275,7 @@ void ModuleOTD::onModuleError()
 void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
 {
     // fill response
-    int paramsCount = mTmpResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
+    int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
     int valuesCount = mTemperatureData.size();
 
     if (paramsCount != valuesCount)
@@ -286,13 +286,13 @@ void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
 
     for (int i = 0; i < paramsCount; ++i)
     {
-        mTmpResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
+        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
     }
 
     if (paramsCount > 0)
     {
-        mTmpResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
+        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
     }
 
-    response = mTmpResponse;
+    response = mCurrentResponse;
 }

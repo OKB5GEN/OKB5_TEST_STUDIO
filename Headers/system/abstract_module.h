@@ -2,6 +2,8 @@
 #define ABSTRACT_MODULE_H
 
 #include <QObject>
+#include <QVariant>
+
 #include "Headers/module_commands.h"
 
 class AbstractModule: public QObject
@@ -43,6 +45,8 @@ public slots:
 
 protected:
     void setModuleState(ModuleState moduleState, const QString& error = QString(""));
+
+    QMap<uint32_t, QVariant> mCurrentResponse;
 
 signals:
     void commandResult(const QMap<uint32_t, QVariant>& response);

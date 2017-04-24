@@ -2,9 +2,6 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/system/system_state.h"
 
-#include <QMap>
-#include <QVariant>
-
 namespace
 {
     static const int OKB_MODULE_MESSAGE_SIZE = 4; // all OKB modules requests/responses have 4-byte length
