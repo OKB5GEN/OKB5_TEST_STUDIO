@@ -152,6 +152,11 @@ SystemState::SystemState(QObject* parent):
     mParamNames[ANGLE_NU] = tr("Angle (Nu)");
     mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
 
+    // implicit params
+    mParamNames[SUBADDRESS] = tr("Subaddress");
+    mParamNames[POWER_STATE] = tr("Power State");
+    mParamNames[CHANNEL_ID] = tr("Channel");
+
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
     mDefaultVariables[TEMPERATURE] = "T";
@@ -532,7 +537,6 @@ void SystemState::sendCommand(CmdActionModule* command)
 
     const QMap<QString, QVariant>& inputParams = command->inputParams();
     const QMap<QString, QVariant>& outputParams = command->outputParams();
-    const QList<int>& implicitInputParams = command->implicitParams();
 
     VariableController* vc = command->variableController();
 
@@ -562,8 +566,6 @@ void SystemState::sendCommand(CmdActionModule* command)
         uint32_t type = uint32_t(paramID(it.key()));
         transaction.outputParams[type] = it.value();
     }
-
-    transaction.implicitInputParams = implicitInputParams; //TODO move to input params
 
     switch (command->module())
     {
@@ -717,4 +719,22 @@ void SystemState::onModuleStateChanged(ModuleCommands::ModuleID id, AbstractModu
 void SystemState::onCyclogramStart()
 {
     mMKO->onCyclogramStart();
+}
+
+bool SystemState::isImplicit(const QString &name) const
+{
+    ParamID param = paramID(name);
+
+    switch (param)
+    {
+    case SUBADDRESS:
+    case CHANNEL_ID:
+    case POWER_STATE:
+        return true;
+
+    default:
+        break;
+    }
+
+    return false;
 }

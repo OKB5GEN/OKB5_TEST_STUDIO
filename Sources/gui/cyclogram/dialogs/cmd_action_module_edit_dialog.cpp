@@ -95,9 +95,10 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 
 void CmdActionModuleEditDialog::onModuleChanged(int index)
 {
-    //TODO: причесать прокидывание параметров в функции (к теме переделки внутреннего протокола)
     mModuleID = index;
     mCommands->clear();
+
+    SystemState* sysState = mCommand->systemState();
 
     // module changed -> update command list for this module
     switch (index)
@@ -112,17 +113,14 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
             //TODO здесь подключение основного/резервного полукомплекта БУП и относится оно скорее всего к POWER_UNIT_BUP только
 
-            QList<int> params;
-            params.push_back(ModuleCommands::SET_POWER_STATE);
-            params.push_back(1); //params count
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить подачу питания"), params);
+            QMap<QString, QVariant> implicitParams;
+            QString paramName = sysState->paramName(SystemState::POWER_STATE);
+            implicitParams[paramName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить подачу питания"), ModuleCommands::SET_POWER_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_STATE);
-            params.push_back(1); //params count
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить подачу питания"), params);
+            implicitParams.clear();
+            implicitParams[paramName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить подачу питания"), ModuleCommands::SET_POWER_STATE, implicitParams);
         }
         break;
 
@@ -133,56 +131,24 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(tr("Принять командный массив"), ModuleMKO::SEND_COMMAND_ARRAY);
             addCommand(tr("Выдать командный массив"), ModuleMKO::RECEIVE_COMMAND_ARRAY);
 
-            QList<int> params;
-            params.push_back(ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
-            addCommand(tr("Принять тестовый массив по линии ψ"), params);
+            QMap<QString, QVariant> implicitParamsPsy;
+            QMap<QString, QVariant> implicitParamsNu;
+            QString paramName = sysState->paramName(SystemState::SUBADDRESS);
+            implicitParamsPsy[paramName] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
+            implicitParamsNu[paramName] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
 
-            params.clear();
-            params.push_back(ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
-            addCommand(tr("Принять тестовый массив по линии υ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
-            addCommand(tr("Выдать тестовый массив по линии ψ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
-            addCommand(tr("Выдать тестовый массив по линии υ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
-            addCommand(tr("Принять командный массив по линии ψ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
-            addCommand(tr("Принять командный массив по линии υ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::PSY_CHANNEL_SUBADDRESS);
-            addCommand(tr("Выдать командный массив по линии ψ"), params);
-
-            params.clear();
-            params.push_back(ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL);
-            params.push_back(1); //params count
-            params.push_back(ModuleMKO::NU_CHANNEL_SUBADDRESS);
-            addCommand(tr("Выдать командный массив по линии υ"), params);
+            addCommand(tr("Принять тестовый массив по линии ψ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Принять тестовый массив по линии υ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Выдать тестовый массив по линии υ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Принять командный массив по линии ψ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Принять командный массив по линии υ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Выдать командный массив по линии ψ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Выдать командный массив по линии υ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
             addCommand(tr("Подать питание на ДУ"), ModuleMKO::SEND_TO_ANGLE_SENSOR);
 
+            // TODO добавить для резервного комплекта
             addCommand(tr("Старт Осн."), ModuleMKO::START_MKO);
             addCommand(tr("Стоп Осн."), ModuleMKO::STOP_MKO);
         }
@@ -190,91 +156,69 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::STM:
         {
-            QList<int> params;
+            QMap<QString, QVariant> implicitParams;
+            QString channelIDName = sysState->paramName(SystemState::CHANNEL_ID);
+            QString powerStateName = sysState->paramName(SystemState::POWER_STATE);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::BUP_MAIN);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить основной комплект БУП"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::BUP_MAIN);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить основной комплект БУП"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::BUP_RESERVE);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить резервный комплект БУП"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::BUP_RESERVE);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить резервный комплект БУП"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::HEATER_LINE_1);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить нагреватели ПНА на линии 1"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::HEATER_LINE_1);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить нагреватели ПНА на линии 1"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::HEATER_LINE_2);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить нагреватели ПНА на линии 2"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::HEATER_LINE_2);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить нагреватели ПНА на линии 2"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::DRIVE_CONTROL);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить подачу силового питания"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::DRIVE_CONTROL);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить подачу силового питания"), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::MKO_1);
-            params.push_back(ModuleCommands::POWER_ON);
-            addCommand(tr("Включить подачу питания на МКО Осн."), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
-            params.clear();
-            params.push_back(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE);
-            params.push_back(2); //params count
-            params.push_back(ModuleCommands::MKO_1);
-            params.push_back(ModuleCommands::POWER_OFF);
-            addCommand(tr("Выключить подачу питания на МКО Осн."), params);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
             //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
@@ -318,17 +262,28 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         {
             QListWidgetItem* item = mCommands->item(i);
             int commandID = item->data(Qt::UserRole).toInt();
-            int paramsCount = item->data(Qt::UserRole + 1).toInt();
 
             if (commandID == mCommand->operation())
             {
-                const QList<int>& implicitParams = mCommand->implicitParams();
+                const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
+                QMap<QString, QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
+                if (implicitParams.empty())
+                {
+                    mCommands->setCurrentRow(i);
+                    break;
+                }
 
                 bool allEqual = true;
-                for (int j = 0; j < paramsCount; ++j)
+                for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
                 {
-                    int param = item->data(Qt::UserRole + j + 2).toInt();
-                    if (param != implicitParams[j])
+                    auto iter = inputParams.find(it.key());
+                    if (iter == inputParams.end())
+                    {
+                        allEqual = false;
+                        break;
+                    }
+
+                    if (iter.value() != it.value())
                     {
                         allEqual = false;
                         break;
@@ -349,22 +304,15 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     }
 }
 
-void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID)
-{
-    QList<int> params;
-    params.push_back(commandID);
-    params.push_back(0);
-    addCommand(text, params);
-}
-
-void CmdActionModuleEditDialog::addCommand(const QString& text, const QList<int>& params)
+void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID, const QMap<QString, QVariant>& implicitParams)
 {
     QListWidgetItem* item = new QListWidgetItem();
     item->setText(text);
+    item->setData(Qt::UserRole, QVariant(commandID));
 
-    for (int i = 0, sz = params.size(); i < sz; ++i)
+    if (!implicitParams.isEmpty())
     {
-        item->setData(Qt::UserRole + i, QVariant(params[i]));
+        item->setData(Qt::UserRole + 1, QVariant(implicitParams));
     }
 
     mCommands->addItem(item);
@@ -382,13 +330,11 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         return;
     }
 
-    const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
-    const QMap<QString, QVariant>& outputParams = mCommand->outputParams();
-
     mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
     int inCount = system->paramsCount(mModuleID, mCommandID, true);
     int outCount = system->paramsCount(mModuleID, mCommandID, false);
+
     mInParams->setRowCount(inCount);
     mOutParams->setRowCount(outCount);
 
@@ -428,8 +374,9 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
+            const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
             auto it = inputParams.find(name);
-            if (it != inputParams.end())
+            if (it != inputParams.end() && !system->isImplicit(name))
             {
                 if (it.value().type() == QMetaType::QString)
                 {
@@ -440,7 +387,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
                         isVariable = true;
                     }
                 }
-                else if (it.value().type() == QMetaType::Double)
+                else //if (it.value().type() == QMetaType::Double)
                 {
                     valueEdit->setText(it.value().toString());
                 }
@@ -473,8 +420,9 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
+            const QMap<QString, QVariant>& outputParams = mCommand->outputParams();
             auto it = outputParams.find(name);
-            if (it != outputParams.end())
+            if (it != outputParams.end() && !system->isImplicit(name))
             {
                 int index = comboBox->findText(it.value().toString()); // output params are always variables
                 if (index != -1) // add default variable name, corresponding to this paramID
@@ -577,17 +525,15 @@ void CmdActionModuleEditDialog::onAccept()
             }
         }
 
-        // get implicit params (TODO)
+        // add implicit params to command input params
         QListWidgetItem* item = mCommands->currentItem();
-        int paramsCount = item->data(Qt::UserRole + 1).toInt();
-
-        QList<int> implicitParams;
-        for (int j = 0; j < paramsCount; ++j)
+        QMap<QString,QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
+        for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
         {
-            implicitParams.push_back(item->data(Qt::UserRole + j + 2).toInt());
+            input[it.key()] = it.value();
         }
 
-        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output, implicitParams);
+        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
     }
 
     accept();

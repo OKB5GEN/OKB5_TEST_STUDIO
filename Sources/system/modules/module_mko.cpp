@@ -713,31 +713,31 @@ void ModuleMKO::processCommand(const Transaction& params)
 
     ModuleMKO::CommandID command = ModuleMKO::CommandID(params.commandID);
 
-    // implicit params check
-    switch (command)
-    {
-    case SEND_TEST_ARRAY_FOR_CHANNEL:
-    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
-    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
-    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
-        {
-            if (params.implicitInputParams.size() != 1)
-            {
-                LOG_ERROR(QString("Malformed request for MKO command %1").arg(int(command)));
-                mCurrentTransaction.errorCode = 50; //TODO define error codes internal or hardware
-                emit commandResult(mCurrentTransaction);
-                return;
-            }
+//    // implicit params check
+//    switch (command)
+//    {
+//    case SEND_TEST_ARRAY_FOR_CHANNEL:
+//    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+//    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+//    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+//        {
+//            if (params.implicitInputParams.size() != 1)
+//            {
+//                LOG_ERROR(QString("Malformed request for MKO command %1").arg(int(command)));
+//                mCurrentTransaction.errorCode = 50; //TODO define error codes internal or hardware
+//                emit commandResult(mCurrentTransaction);
+//                return;
+//            }
 
-            //case SEND_COMMAND_ARRAY:
-            //case SEND_COMMAND_ARRAY_FOR_CHANNEL:
-            int TODO; // check input params?
-        }
-        break;
+//            //case SEND_COMMAND_ARRAY:
+//            //case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+//            int TODO; // check input params?
+//        }
+//        break;
 
-    default:
-        break;
-    }
+//    default:
+//        break;
+//    }
 
     int errorCode = 0;
 
@@ -805,14 +805,14 @@ void ModuleMKO::processCommand(const Transaction& params)
         break;
     case SEND_TEST_ARRAY_FOR_CHANNEL:
         {
-            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
+            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             sendTestArrayForChannel(address, subaddress);
         }
         break;
     case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
             mCurrentTransaction.outputParams = params.outputParams;
-            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
+            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveTestArrayForChannel(address, subaddress);
         }
         break;
@@ -843,14 +843,14 @@ void ModuleMKO::processCommand(const Transaction& params)
                 }
             }
 
-            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
+            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             sendCommandArrayForChannel(address, subaddress, data);
         }
         break;
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
             mCurrentTransaction.outputParams = params.outputParams;
-            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
+            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveCommandArrayForChannel(address, subaddress);
         }
         break;

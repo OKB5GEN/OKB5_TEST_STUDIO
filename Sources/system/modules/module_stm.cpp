@@ -91,9 +91,8 @@ void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& re
 {
     mCurrentTransaction.clear();
     mCurrentTransaction = response;
-    mCurrentTransaction.inputParams.detach();
-    mCurrentTransaction.outputParams.detach();
-    mCurrentTransaction.implicitInputParams.detach();
+    //mCurrentTransaction.inputParams.detach();
+    //mCurrentTransaction.outputParams.detach();
 
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
 
@@ -101,16 +100,8 @@ void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& re
     {
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
-            int paramsCount = request.implicitInputParams.size();
-            if (paramsCount != 2)
-            {
-                LOG_ERROR("Malformed request for STM command");
-                response.errorCode = 1; //TODO define error codes
-                return;
-            }
-
-            int channel = request.implicitInputParams.at(0);
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(1));
+            int channel = request.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
 
             setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), state);
         }
@@ -118,16 +109,8 @@ void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& re
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
-            int paramsCount = request.implicitInputParams.size();
-            if (paramsCount != 2)
-            {
-                LOG_ERROR("Malformed request for STM command");
-                response.errorCode = 1; //TODO define error codes
-                return;
-            }
-
-            int channel = request.implicitInputParams.at(0);
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(1));
+            int channel = request.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
 
             setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), state);
         }

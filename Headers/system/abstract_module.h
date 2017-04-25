@@ -13,7 +13,6 @@ struct Transaction
     uint32_t errorCode; // 0 - no error
     QMap<uint32_t, QVariant> inputParams;
     QMap<uint32_t, QVariant> outputParams;
-    QList<int> implicitInputParams; //TODO remove implicit params, move them to inputParams
 
     Transaction()
     {
@@ -24,7 +23,6 @@ struct Transaction
     {
         inputParams.clear();
         outputParams.clear();
-        implicitInputParams.clear();
         errorCode = 0; // no error by default
         moduleID = UINT32_MAX;
         commandID = UINT32_MAX;

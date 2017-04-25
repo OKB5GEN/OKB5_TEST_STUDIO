@@ -305,13 +305,7 @@ void ModulePower::setVoltageAndCurrent(const Transaction& request)
 
 bool ModulePower::setPowerState(const Transaction& request)
 {
-    int paramsCount = request.implicitInputParams.size();
-    if (paramsCount != 1)
-    {
-        return false;
-    }
-
-    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(0));
+    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
     if (state == ModuleCommands::POWER_ON)
     {
         sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);

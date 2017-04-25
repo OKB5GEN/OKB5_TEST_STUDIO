@@ -12,6 +12,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QMetaEnum>
+#include <QVariant>
 
 CmdActionModule::CmdActionModule(QObject* parent):
     CmdAction(DRAKON::ACTION_MODULE, parent),
@@ -54,13 +55,12 @@ void CmdActionModule::onCommandFinished(bool success)
     }
 }
 
-void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out, const QList<int>& implicitParams)
+void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out)
 {
     mModule = module;
     mOperation = operation;
     mInputParams = in;
     mOutputParams = out;
-    mImplicitParams = implicitParams;
     updateText();
 }
 
@@ -251,71 +251,69 @@ QString CmdActionModule::commandName() const
     {
     case ModuleCommands::SET_POWER_CHANNEL_STATE: // Управление подачей питания 27В на модуле питания
         {
-            if (!mImplicitParams.empty())
+            QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
+            QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
+            int channel = mInputParams.value(paramName1).toInt();
+            int state = mInputParams.value(paramName2).toInt();
+
+            if (state == ModuleCommands::POWER_ON)
             {
-                int channel = mImplicitParams.front();
-                int state = mImplicitParams.back();
+                text = tr("СТМ.Вкл");
+            }
+            else
+            {
+                text = tr("СТМ.Выкл");
+            }
 
-                if (state == ModuleCommands::POWER_ON)
-                {
-                    text = tr("СТМ.Вкл");
-                }
-                else
-                {
-                    text = tr("СТМ.Выкл");
-                }
-
-                switch (channel)
-                {
-                case ModuleCommands::BUP_MAIN:
-                    text += tr("БУПОсн");
-                    break;
-                case ModuleCommands::BUP_RESERVE:
-                    text += tr("БУПРез");
-                    break;
-                case ModuleCommands::HEATER_LINE_1:
-                    text += tr("Нагр1");
-                    break;
-                case ModuleCommands::HEATER_LINE_2:
-                    text += tr("Нагр2");
-                    break;
-                case ModuleCommands::DRIVE_CONTROL:
-                    text += tr("СилПит");
-                    break;
-                default:
-                    break;
-                }
+            switch (channel)
+            {
+            case ModuleCommands::BUP_MAIN:
+                text += tr("БУПОсн");
+                break;
+            case ModuleCommands::BUP_RESERVE:
+                text += tr("БУПРез");
+                break;
+            case ModuleCommands::HEATER_LINE_1:
+                text += tr("Нагр1");
+                break;
+            case ModuleCommands::HEATER_LINE_2:
+                text += tr("Нагр2");
+                break;
+            case ModuleCommands::DRIVE_CONTROL:
+                text += tr("СилПит");
+                break;
+            default:
+                break;
             }
         }
         break;
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE: // Управление подачей питания на МКО
         {
-            if (!mImplicitParams.empty())
+            QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
+            QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
+            int channel = mInputParams.value(paramName1).toInt();
+            int state = mInputParams.value(paramName2).toInt();
+
+            if (state == ModuleCommands::POWER_ON)
             {
-                int channel = mImplicitParams.front();
-                int state = mImplicitParams.back();
+                text = tr("СТМ.Вкл");
+            }
+            else
+            {
+                text = tr("СТМ.Выкл");
+            }
 
-                if (state == ModuleCommands::POWER_ON)
-                {
-                    text = tr("СТМ.Вкл");
-                }
-                else
-                {
-                    text = tr("СТМ.Выкл");
-                }
-
-                switch (channel)
-                {
-                case ModuleCommands::MKO_1:
-                    text += tr("MKOОсн");
-                    break;
-                case ModuleCommands::MKO_2:
-                    text += tr("MKOРез");
-                    break;
-                default:
-                    break;
-                }
+            switch (channel)
+            {
+            case ModuleCommands::MKO_1:
+                text += tr("MKOОсн");
+                break;
+            case ModuleCommands::MKO_2:
+                text += tr("MKOРез");
+                break;
+            default:
+                break;
             }
         }
         break;
@@ -363,9 +361,9 @@ QString CmdActionModule::commandName() const
                 text += tr("ПолНапрТок");
                 break;
             case ModuleCommands::SET_POWER_STATE:
-                if (!mImplicitParams.empty())
                 {
-                    int state = mImplicitParams.front();
+                    QString paramName = mSystemState->paramName(SystemState::POWER_STATE);
+                    int state = mInputParams.value(paramName).toInt();
                     if (state == ModuleCommands::POWER_ON)
                     {
                         text += tr("ВклПит");
@@ -455,20 +453,6 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
         writer->writeAttribute("command", command.valueToKey(mOperation));
     }
 
-    // implicit params (TODO)
-    QString str;
-    for (int i = 0, sz = mImplicitParams.size(); i < sz; ++i)
-    {
-        if (i > 0)
-        {
-            str += QString(",");
-        }
-
-        str += QString::number(mImplicitParams[i]);
-    }
-
-    writer->writeAttribute("implicit_params", str);
-
     // input params
     writer->writeStartElement("input_params");
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
@@ -521,16 +505,6 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
         }
     }
 
-    if (attributes.hasAttribute("implicit_params"))
-    {
-        QString str = attributes.value("implicit_params").toString();
-        QStringList list = str.split(",");
-        foreach (QString param, list)
-        {
-            mImplicitParams.push_back(param.toInt());
-        }
-    }
-
     while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
     {
         if (reader->tokenType() == QXmlStreamReader::StartElement)
@@ -551,37 +525,28 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                             name = attributes.value("name").toString();
                         }
 
-                        if (attributes.hasAttribute("variable")) // for backward compatibility TODO remove
+                        int metaType = QMetaType::UnknownType;
+
+                        if (attributes.hasAttribute("type"))
                         {
-                            QString variable;
-                            variable = attributes.value("variable").toString();
-                            mInputParams[name] = variable;
+                            metaType = attributes.value("type").toInt();
                         }
-                        else
+
+                        if (attributes.hasAttribute("value"))
                         {
-                            int metaType = QMetaType::UnknownType;
-
-                            if (attributes.hasAttribute("type"))
+                            if (metaType == QMetaType::QString)
                             {
-                                metaType = attributes.value("type").toInt();
+                                mInputParams[name] = attributes.value("value").toString();
                             }
-
-                            if (attributes.hasAttribute("value"))
+                            else //if (metaType == QMetaType::Double)
                             {
-                                if (metaType == QMetaType::QString)
-                                {
-                                    mInputParams[name] = attributes.value("value").toString();
-                                }
-                                else if (metaType == QMetaType::Double)
-                                {
-                                    mInputParams[name] = attributes.value("value").toDouble();
-                                }
-                                else
-                                {
-                                    LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
-                                    mInputParams[name] = QVariant();
-                                }
+                                mInputParams[name] = attributes.value("value").toDouble();
                             }
+//                            else
+//                            {
+//                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
+//                                mInputParams[name] = QVariant();
+//                            }
                         }
                     }
 
@@ -623,15 +588,15 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                                 {
                                     mOutputParams[name] = attributes.value("value").toString();
                                 }
-                                else if (metaType == QMetaType::Double)
+                                else //if (metaType == QMetaType::Double)
                                 {
                                     mOutputParams[name] = attributes.value("value").toDouble();
                                 }
-                                else
-                                {
-                                    LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
-                                    mOutputParams[name] = QVariant();
-                                }
+//                                else
+//                                {
+//                                    LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
+//                                    mOutputParams[name] = QVariant();
+//                                }
                             }
                         }
                     }
@@ -647,7 +612,3 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
     updateText();
 }
 
-const QList<int>& CmdActionModule::implicitParams() const
-{
-    return mImplicitParams;
-}

@@ -15,13 +15,12 @@ public:
 
     void run() override;
 
-    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out, const QList<int>& implicitParams);
+    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out);
 
     uint32_t operation() const;
     ModuleCommands::ModuleID module() const;
     const QMap<QString, QVariant>& inputParams() const;
     const QMap<QString, QVariant>& outputParams() const;
-    const QList<int>& implicitParams() const;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
@@ -43,7 +42,5 @@ private:
 
     QMap<QString, QVariant> mInputParams;
     QMap<QString, QVariant> mOutputParams;
-    QList<int> mImplicitParams; //TODO possibly use QVariant instead of int
-
 };
 #endif // CMD_ACTION_MODULE_H

@@ -336,15 +336,15 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
                             {
                                 mInputParams[name] = attributes.value("value").toString();
                             }
-                            else if (metaType == QMetaType::Double)
+                            else //if (metaType == QMetaType::Double)
                             {
                                 mInputParams[name] = attributes.value("value").toDouble();
                             }
-                            else
-                            {
-                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
-                                mInputParams[name] = QVariant();
-                            }
+//                            else
+//                            {
+//                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
+//                                mInputParams[name] = QVariant();
+//                            }
                         }
                     }
 
@@ -378,15 +378,15 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
                             {
                                 mOutputParams[name] = attributes.value("value").toString();
                             }
-                            else if (metaType == QMetaType::Double)
+                            else// if (metaType == QMetaType::Double)
                             {
                                 mOutputParams[name] = attributes.value("value").toDouble();
                             }
-                            else
-                            {
-                                LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
-                                mOutputParams[name] = QVariant();
-                            }
+//                            else
+//                            {
+//                                LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
+//                                mOutputParams[name] = QVariant();
+//                            }
                         }
                     }
 

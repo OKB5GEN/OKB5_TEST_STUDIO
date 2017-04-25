@@ -118,9 +118,8 @@ void ModuleOTD::processCustomCommand(const Transaction& request, Transaction& re
     mTemperatureData.clear();
     mCurrentTransaction.clear();
     mCurrentTransaction = response;
-    mCurrentTransaction.inputParams.detach();
-    mCurrentTransaction.outputParams.detach();
-    mCurrentTransaction.implicitInputParams.detach();
+    //mCurrentTransaction.inputParams.detach();
+    //mCurrentTransaction.outputParams.detach();
 
     ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
 
