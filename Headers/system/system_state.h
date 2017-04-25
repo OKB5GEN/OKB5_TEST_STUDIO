@@ -24,12 +24,12 @@ public:
     enum ParamID // command parameters
     {
         // common command params
-        MODULE_ID             = 0x00000000,
-        COMMAND_ID            = 0x00000001,
-        INPUT_PARAMS_COUNT    = 0x00000002,
-        OUTPUT_PARAMS_COUNT   = 0x00000003,
-        IMPLICIT_PARAMS_COUNT = 0x00000004,
-        ERROR_CODE            = 0x00000005,
+//        MODULE_ID             = 0x00000000,
+//        COMMAND_ID            = 0x00000001,
+//        INPUT_PARAMS_COUNT    = 0x00000002,
+//        OUTPUT_PARAMS_COUNT   = 0x00000003,
+//        IMPLICIT_PARAMS_COUNT = 0x00000004,
+//        ERROR_CODE            = 0x00000005,
 
         // param types
         VOLTAGE               = 0x00000006,
@@ -53,9 +53,9 @@ public:
         VELOCITY              = 0x00000016,
 
         // custom command params
-        INPUT_PARAM_BASE      = 0x00001000, // all input params will have code "in base + i"
-        OUTPUT_PARAM_BASE     = 0x00100000, // all output params will have code "out base + i"
-        IMPLICIT_PARAM_BASE   = 0x10000000, // all implicit input params will have code "implicit base + i"
+//        INPUT_PARAM_BASE      = 0x00001000, // all input params will have code "in base + i"
+//        OUTPUT_PARAM_BASE     = 0x00100000, // all output params will have code "out base + i"
+//        IMPLICIT_PARAM_BASE   = 0x10000000, // all implicit input params will have code "implicit base + i"
 
         UNDEFINED             = 0xffffffff
     };
@@ -81,7 +81,7 @@ public:
     void sendCommand(CmdActionModule* command);
 
 private slots:
-    void processResponse(const QMap<uint32_t, QVariant>& response);
+    void processResponse(const Transaction& response);
     void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 signals:
@@ -97,12 +97,12 @@ signals:
     // <<<
 
     // new signals
-    void sendToSTM(const QMap<uint32_t, QVariant>& request);
-    void sendToOTD(const QMap<uint32_t, QVariant>& request);
-    void sendToTech(const QMap<uint32_t, QVariant>& request);
-    void sendToMKO(const QMap<uint32_t, QVariant>& request);
-    void sendToPowerUnitBUP(const QMap<uint32_t, QVariant>& request);
-    void sendToPowerUnitPNA(const QMap<uint32_t, QVariant>& request);
+    void sendToSTM(const Transaction& request);
+    void sendToOTD(const Transaction& request);
+    void sendToTech(const Transaction& request);
+    void sendToMKO(const Transaction& request);
+    void sendToPowerUnitBUP(const Transaction& request);
+    void sendToPowerUnitPNA(const Transaction& request);
 
 private:
     void setupCommandsParams();

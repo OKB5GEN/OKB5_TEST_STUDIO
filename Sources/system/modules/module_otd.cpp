@@ -113,14 +113,16 @@ void ModuleOTD::setDefaultState()
     addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
 }
 
-void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+void ModuleOTD::processCustomCommand(const Transaction& request, Transaction& response)
 {
     mTemperatureData.clear();
-    mCurrentResponse.clear();
-    mCurrentResponse = response;
-    mCurrentResponse.detach();
+    mCurrentTransaction.clear();
+    mCurrentTransaction = response;
+    mCurrentTransaction.inputParams.detach();
+    mCurrentTransaction.outputParams.detach();
+    mCurrentTransaction.implicitInputParams.detach();
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
 
     switch (command)
     {
@@ -162,18 +164,7 @@ void ModuleOTD::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         break;
     }
 
-    // set variables
-    int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
-    for (int i = 0; i < paramsCount; ++i)
-    {
-        QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
-    }
-
-    if (paramsCount > 0)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
-    }
+    mCurrentTransaction.outputParams = request.outputParams;
 }
 
 bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
@@ -272,10 +263,10 @@ void ModuleOTD::onModuleError()
     int TODO; //TODO here will be processing
 }
 
-void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
+void ModuleOTD::createResponse(Transaction& response)
 {
     // fill response
-    int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
+    int paramsCount = mCurrentTransaction.outputParams.size();
     int valuesCount = mTemperatureData.size();
 
     if (paramsCount != valuesCount)
@@ -284,15 +275,17 @@ void ModuleOTD::createResponse(QMap<uint32_t, QVariant>& response)
         return;
     }
 
-    for (int i = 0; i < paramsCount; ++i)
+    QMap<uint32_t, QVariant> outputParams;
+    int i = 0;
+    for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
     {
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(mTemperatureData[i]);
+        QList<QVariant> list;
+        list.append(it.value());
+        list.append(QVariant(mTemperatureData[i]));
+        outputParams[it.key()] = list;
+        ++i;
     }
 
-    if (paramsCount > 0)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
-    }
-
-    response = mCurrentResponse;
+    mCurrentTransaction.outputParams = outputParams;
+    response = mCurrentTransaction;
 }

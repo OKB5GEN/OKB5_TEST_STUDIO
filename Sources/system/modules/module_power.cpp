@@ -94,8 +94,8 @@ void ModulePower::setDefaultState()
 
 void ModulePower::setCurVoltage(qreal voltage)
 {
-    QMap<uint32_t, QVariant> request;
-    request[SystemState::INPUT_PARAM_BASE + 1] = voltage;
+    Transaction request;
+    request.inputParams[SystemState::VOLTAGE] = QVariant(voltage);
     setVoltageAndCurrent(request);
 }
 
@@ -166,9 +166,9 @@ void ModulePower::getCurVoltageAndCurrent()
     addRequest(GET_CUR_VOLTAGE_AND_CURRENT, request);
 }
 
-void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
+void ModulePower::processCommand(const Transaction& params)
 {
-    mCurrentResponse.clear();
+    mCurrentTransaction.clear();
 
 //    if (!mIsInitialized)
 //    {
@@ -178,7 +178,7 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
 //        return;
 //    }
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.commandID);
 
     switch (command)
     {
@@ -202,8 +202,8 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
         if (!setPowerState(params))
         {
             LOG_ERROR(QString("Malformed request for Power UNIT command"));
-            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(300)); //TODO define error codes internal or hardware
-            emit commandResult(mCurrentResponse);
+            mCurrentTransaction.errorCode = 300; //TODO define error codes internal or hardware
+            emit commandResult(mCurrentTransaction);
             return;
         }
 
@@ -212,44 +212,29 @@ void ModulePower::processCommand(const QMap<uint32_t, QVariant>& params)
     default:
         {
             LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
-            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(100)); //TODO define error codes internal or hardware
-            emit commandResult(mCurrentResponse);
+            mCurrentTransaction.errorCode = 100; //TODO define error codes internal or hardware
+            emit commandResult(mCurrentTransaction);
             return;
         }
         break;
     }
 
-    mCurrentResponse[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
-    mCurrentResponse[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
-    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
-    mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+    mCurrentTransaction.moduleID = params.moduleID;
+    mCurrentTransaction.commandID = command;
+    mCurrentTransaction.errorCode = 0;
 }
 
-void ModulePower::getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
+void ModulePower::getVoltageAndCurrent(const Transaction& request)
 {
     getCurVoltageAndCurrent(); // add request to queue
 
-    uint32_t paramType1 = request.value(SystemState::OUTPUT_PARAM_BASE + 0).toUInt();
-    QString varName1    = request.value(SystemState::OUTPUT_PARAM_BASE + 1).toString();
-    uint32_t paramType2 = request.value(SystemState::OUTPUT_PARAM_BASE + 2).toUInt();
-    QString varName2    = request.value(SystemState::OUTPUT_PARAM_BASE + 3).toString();
-
-    if (paramType1 == SystemState::VOLTAGE)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName1);
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName2);
-    }
-    else
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 0] = QVariant(varName2);
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 2] = QVariant(varName1);
-    }
+    mCurrentTransaction.outputParams = request.outputParams;
 }
 
-void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
+void ModulePower::setVoltageAndCurrent(const Transaction& request)
 {
     // get input params
-    qreal voltage = request.value(SystemState::INPUT_PARAM_BASE + 1).toDouble();
+    qreal voltage = request.inputParams.value(SystemState::VOLTAGE).toDouble();
     LOG_INFO("Try to set current voltage to : U=%f", voltage);
 
     if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
@@ -292,7 +277,7 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
     LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, maxCurrentByPower);
 }
 
-//void ModulePower::setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+//void ModulePower::setMaxVoltageAndCurrent(const Transaction& request, Transaction& response)
 //{
 //    // get input params
 //    uint32_t paramType1 = request.value(SystemState::INPUT_PARAM_BASE + 0).toUInt();
@@ -318,15 +303,15 @@ void ModulePower::setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request)
 //    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
 //}
 
-bool ModulePower::setPowerState(const QMap<uint32_t, QVariant>& request)
+bool ModulePower::setPowerState(const Transaction& request)
 {
-    int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+    int paramsCount = request.implicitInputParams.size();
     if (paramsCount != 1)
     {
         return false;
     }
 
-    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(0));
     if (state == ModuleCommands::POWER_ON)
     {
         sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
@@ -555,12 +540,25 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
             mCurrent = (uu1 << 8) | uu2;
             mCurrent = mCurrent * mNominalCurrent / STEPS_COUNT;
 
-            if (!mCurrentResponse.empty())
+            if (!mCurrentTransaction.outputParams.isEmpty())
             {
-                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(mError));
-                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 1] = QVariant(mVoltage);
-                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + 3] = QVariant(mCurrent);
-                mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(4);
+                mCurrentTransaction.errorCode = mError;
+                QString voltageVar = mCurrentTransaction.outputParams.value(SystemState::VOLTAGE).toString();
+                QString currentVar = mCurrentTransaction.outputParams.value(SystemState::CURRENT).toString();
+
+                {
+                    QList<QVariant> list;
+                    list.append(QVariant(voltageVar));
+                    list.append(QVariant(mVoltage));
+                    mCurrentTransaction.outputParams[SystemState::VOLTAGE] = list;
+                }
+
+                {
+                    QList<QVariant> list;
+                    list.append(QVariant(currentVar));
+                    list.append(QVariant(mCurrent));
+                    mCurrentTransaction.outputParams[SystemState::CURRENT] = list;
+                }
             }
         }
         break;
@@ -638,10 +636,8 @@ void ModulePower::onTransmissionError(uint32_t operationID)
 
 void ModulePower::onTransmissionComplete()
 {
-    if (!mCurrentResponse.empty())
+    if (!mCurrentTransaction.outputParams.isEmpty())
     {
-        emit commandResult(mCurrentResponse);
+        emit commandResult(mCurrentTransaction);
     }
-
-    int TODO;
 }

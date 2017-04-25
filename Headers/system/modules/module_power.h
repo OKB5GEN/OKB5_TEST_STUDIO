@@ -44,7 +44,7 @@ public:
 public slots:
     void setDefaultState() override;
 
-    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void processCommand(const Transaction& params) override;
     void onApplicationFinish() override;
 
 protected:
@@ -129,11 +129,11 @@ private:
 
     void getCurVoltageAndCurrent();
 
-    //void setMaxVoltageAndCurrent(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response); // TODO not available to user API, possibly must be
-    void getVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
-    void setVoltageAndCurrent(const QMap<uint32_t, QVariant>& request);
+    //void setMaxVoltageAndCurrent(const Transaction& request, Transaction& response); // TODO not available to user API, possibly must be
+    void getVoltageAndCurrent(const Transaction& request);
+    void setVoltageAndCurrent(const Transaction& request);
     void setCurVoltage(qreal voltage);
-    bool setPowerState(const QMap<uint32_t, QVariant>& request);
+    bool setPowerState(const Transaction& request);
 
     // power units command
     void sendPowerSupplyControlCommand(PowerSupplyCommandID command);

@@ -22,7 +22,7 @@ public:
     QString tech_read_buf(int x, int len);
 
 public slots:
-    void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) override;
+    void processCustomCommand(const Transaction& request, Transaction& response) override;
     void onApplicationFinish() override;
     void setDefaultState() override;
 

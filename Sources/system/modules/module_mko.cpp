@@ -74,7 +74,7 @@ void ModuleMKO::readResponse()
             if (mRepeatedRequests > MAX_REPEAT_REQUESTS)
             {
                 LOG_ERROR(QString("Max repeat count of %1 exceeded! Error: %2").arg(MAX_REPEAT_REQUESTS).arg(ERR_RESPONSE_NOT_READY));
-                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+                mCurrentTransaction.errorCode = 305; //TODO define error codes internal or hardware
             }
             else
             {
@@ -85,12 +85,12 @@ void ModuleMKO::readResponse()
         }
         else
         {
-            mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(305)); //TODO define error codes internal or hardware
+            mCurrentTransaction.errorCode = 306; //TODO define error codes internal or hardware
         }
     }
 
     // send response to cyclogram
-    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentResponse.value(SystemState::COMMAND_ID).toUInt());
+    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentTransaction.commandID);
 
     mRepeatedRequests = 0;
 
@@ -113,7 +113,7 @@ void ModuleMKO::readResponse()
                 if (buffer[i] != 0)
                 {
                     LOG_ERROR(QString("Incorrect test array received"));
-                    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(405)); //TODO define error codes internal or hardware
+                    mCurrentTransaction.errorCode = 405; //TODO define error codes internal or hardware
                     break;
                 }
             }
@@ -125,195 +125,195 @@ void ModuleMKO::readResponse()
             LOG_DEBUG("Receive command addray");
             int offset = 1;
 
-            int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT).toInt() * 2;
-            for (int i = 0; i < paramsCount; ++i)
+            QMap<uint32_t, QVariant> outputParams;
+            for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
             {
-                if (i % 2 == 0)
+                uint32_t type = it.key();
+                QString variable = it.value().toString();
+                qreal value = 0;
+
+                LOG_DEBUG(QString("Param type %1 variable name is %2").arg(type).arg(variable));
+
+                switch (type)
                 {
-                    int type = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i).toInt();
-                    QString variable = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i + 1).toString();
-                    qreal value = 0;
-
-                    LOG_DEBUG(QString("Param type %1 variable name is %2").arg(type).arg(variable));
-
-                    switch (type)
+                case SystemState::MODE_PSY:
                     {
-                    case SystemState::MODE_PSY:
-                        {
-                            int16_t v = buffer[0 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_PSY").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[0]=%2").arg(v).arg(buffer[0 + offset]));
-                        }
-                        break;
-                    case SystemState::STEPS_PSY:
-                        {
-                            int16_t v1 = buffer[1 + offset];
-                            int32_t v = buffer[2 + offset] + (v1 << 16);
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_PSY").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[1]=%2 buffer[2]=%3").arg(v).arg(buffer[1]).arg(buffer[2 + offset]));
-                        }
-                        break;
-                    case SystemState::VELOCITY_PSY:
-                        {
-                            int16_t v = buffer[3 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_PSY").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[3]=%2").arg(v).arg(buffer[3 + offset]));
-                        }
-                        break;
-                    case SystemState::CURRENT_PSY:
-                        {
-                            int16_t v = buffer[4 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_PSY").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[4]=%2").arg(v).arg(buffer[4 + offset]));
-                        }
-                        break;
-                    case SystemState::ANGLE_PSY:
-                        {
-                            qreal rawData = buffer[10 + offset];
-                            value = rawData * 180 / 65536;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_PSY").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[10]=%2").arg(rawData).arg(buffer[10 + offset]));
-                        }
-                        break;
-                    case SystemState::MODE_NU:
-                        {
-                            int16_t v = buffer[5 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_NU").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[5]=%2").arg(v).arg(buffer[5 + offset]));
-                        }
-                        break;
-                    case SystemState::STEPS_NU:
-                        {
-                            int16_t v1 = buffer[6 + offset];
-                            int32_t v = buffer[7 + offset] + (v1 << 16);
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_NU").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[6]=%2 buffer[7]=%3").arg(v).arg(buffer[6 + offset]).arg(buffer[7 + offset]));
-                        }
-                        break;
-                    case SystemState::VELOCITY_NU:
-                        {
-                            int16_t v = buffer[8 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_NU").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[8]=%2").arg(v).arg(buffer[8 + offset]));
-                        }
-                        break;
-                    case SystemState::CURRENT_NU:
-                        {
-                            int16_t v = buffer[9 + offset];
-                            value = v;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_NU").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[9]=%2").arg(v).arg(buffer[9 + offset]));
-                        }
-                        break;
-                    case SystemState::ANGLE_NU:
-                        {
-                            qreal rawData = buffer[11 + offset];
-                            value = rawData * 180 / 65536;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_NU").arg(value));
-                            LOG_DEBUG(QString("v=%1 buffer[11]=%2").arg(rawData).arg(buffer[11 + offset]));
-                        }
-                        break;
-                    case SystemState::SENSOR_FLAG:
-                        {
-                            uint16_t tmp = buffer[19 + offset];
-                            tmp = tmp << 3;
-                            tmp = tmp >> 15;
-                            value = tmp;
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("SENSOR_FLAG").arg(value));
-                        }
-                        break;
-                    case SystemState::TEMPERATURE:
-                        {
-                            uint16_t tmp = buffer[19 + offset];
-                            tmp = tmp << 3;
-                            tmp = tmp >> 15;
-                            if (tmp == 1) // has temperature sensor
-                            {
-                                int16_t temper = buffer[19 + offset] & 0x0fff; //TODO скорее всего какая-то хуйня, если это интерпретировать как int, а не float
-                                value = temper;
-                            }
-                            else
-                            {
-                                value = 0xffff;
-                            }
-
-                            LOG_DEBUG(QString("Param %1 value is %2").arg("TEMPERATURE").arg(value));
-                            LOG_DEBUG(QString("temper=%1 buffer[19]=%2").arg(buffer[19] & 0x0fff).arg(buffer[19 + offset]));
-                        }
-                        break;
-
-                    default:
-                        LOG_ERROR(QString("Internal error occured in MKO response parsing"));
-                        break;
+                        int16_t v = buffer[0 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_PSY").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[0]=%2").arg(v).arg(buffer[0 + offset]));
                     }
+                    break;
+                case SystemState::STEPS_PSY:
+                    {
+                        int16_t v1 = buffer[1 + offset];
+                        int32_t v = buffer[2 + offset] + (v1 << 16);
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_PSY").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[1]=%2 buffer[2]=%3").arg(v).arg(buffer[1]).arg(buffer[2 + offset]));
+                    }
+                    break;
+                case SystemState::VELOCITY_PSY:
+                    {
+                        int16_t v = buffer[3 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_PSY").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[3]=%2").arg(v).arg(buffer[3 + offset]));
+                    }
+                    break;
+                case SystemState::CURRENT_PSY:
+                    {
+                        int16_t v = buffer[4 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_PSY").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[4]=%2").arg(v).arg(buffer[4 + offset]));
+                    }
+                    break;
+                case SystemState::ANGLE_PSY:
+                    {
+                        qreal rawData = buffer[10 + offset];
+                        value = rawData * 180 / 65536;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_PSY").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[10]=%2").arg(rawData).arg(buffer[10 + offset]));
+                    }
+                    break;
+                case SystemState::MODE_NU:
+                    {
+                        int16_t v = buffer[5 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_NU").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[5]=%2").arg(v).arg(buffer[5 + offset]));
+                    }
+                    break;
+                case SystemState::STEPS_NU:
+                    {
+                        int16_t v1 = buffer[6 + offset];
+                        int32_t v = buffer[7 + offset] + (v1 << 16);
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_NU").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[6]=%2 buffer[7]=%3").arg(v).arg(buffer[6 + offset]).arg(buffer[7 + offset]));
+                    }
+                    break;
+                case SystemState::VELOCITY_NU:
+                    {
+                        int16_t v = buffer[8 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_NU").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[8]=%2").arg(v).arg(buffer[8 + offset]));
+                    }
+                    break;
+                case SystemState::CURRENT_NU:
+                    {
+                        int16_t v = buffer[9 + offset];
+                        value = v;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_NU").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[9]=%2").arg(v).arg(buffer[9 + offset]));
+                    }
+                    break;
+                case SystemState::ANGLE_NU:
+                    {
+                        qreal rawData = buffer[11 + offset];
+                        value = rawData * 180 / 65536;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_NU").arg(value));
+                        LOG_DEBUG(QString("v=%1 buffer[11]=%2").arg(rawData).arg(buffer[11 + offset]));
+                    }
+                    break;
+                case SystemState::SENSOR_FLAG:
+                    {
+                        uint16_t tmp = buffer[19 + offset];
+                        tmp = tmp << 3;
+                        tmp = tmp >> 15;
+                        value = tmp;
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("SENSOR_FLAG").arg(value));
+                    }
+                    break;
+                case SystemState::TEMPERATURE:
+                    {
+                        uint16_t tmp = buffer[19 + offset];
+                        tmp = tmp << 3;
+                        tmp = tmp >> 15;
+                        if (tmp == 1) // has temperature sensor
+                        {
+                            int16_t temper = buffer[19 + offset] & 0x0fff; //TODO скорее всего какая-то хуйня, если это интерпретировать как int, а не float
+                            value = temper;
+                        }
+                        else
+                        {
+                            value = 0xffff;
+                        }
 
-                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = QVariant(variable);
-                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i + 1] = QVariant(value);
+                        LOG_DEBUG(QString("Param %1 value is %2").arg("TEMPERATURE").arg(value));
+                        LOG_DEBUG(QString("temper=%1 buffer[19]=%2").arg(buffer[19] & 0x0fff).arg(buffer[19 + offset]));
+                    }
+                    break;
+
+                default:
+                    LOG_ERROR(QString("Internal error occured in MKO response parsing"));
+                    break;
                 }
 
-                mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+                QList<QVariant> list;
+                list.append(it.value());
+                list.append(value);
+                outputParams[it.key()] = list;
             }
+
+            mCurrentTransaction.outputParams = outputParams;
         }
         break;
 
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
             int offset = 1;
-            int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT).toInt() * 2;
-            for (int i = 0; i < paramsCount; ++i)
+            QMap<uint32_t, QVariant> outputParams;
+            for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
             {
-                if (i % 2 == 0)
+                uint32_t type = it.key();
+                QString variable = it.value().toString();
+                qreal value = 0;
+
+                LOG_DEBUG(QString("Param type %1 variable name is %2").arg(type).arg(variable));
+
+                switch (type)
                 {
-                    int type = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i).toInt();
-                    QString variable = mCurrentResponse.value(SystemState::OUTPUT_PARAM_BASE + i + 1).toString();
-                    qreal value = 0;
-
-                    switch (type)
+                case SystemState::MODE:
                     {
-                    case SystemState::MODE:
-                        {
-                            int16_t v = buffer[0 + offset];
-                            value = v;
-                        }
-                        break;
-                    case SystemState::STEPS:
-                        {
-                            int16_t v1 = buffer[1 + offset];
-                            int32_t v = buffer[2 + offset] + (v1 << 16);
-                            value = v;
-                        }
-                        break;
-                    case SystemState::VELOCITY:
-                        {
-                            int16_t v = buffer[3 + offset];
-                            value = v;
-                        }
-                        break;
-                    case SystemState::CURRENT:
-                        {
-                            int16_t v = buffer[4 + offset];
-                            value = v;
-                        }
-                        break;
-
-                    default:
-                        LOG_ERROR(QString("Internal error occured in MKO response parsing"));
-                        break;
+                        int16_t v = buffer[0 + offset];
+                        value = v;
                     }
+                    break;
+                case SystemState::STEPS:
+                    {
+                        int16_t v1 = buffer[1 + offset];
+                        int32_t v = buffer[2 + offset] + (v1 << 16);
+                        value = v;
+                    }
+                    break;
+                case SystemState::VELOCITY:
+                    {
+                        int16_t v = buffer[3 + offset];
+                        value = v;
+                    }
+                    break;
+                case SystemState::CURRENT:
+                    {
+                        int16_t v = buffer[4 + offset];
+                        value = v;
+                    }
+                    break;
 
-                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = QVariant(variable);
-                    mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i + 1] = QVariant(value);
+                default:
+                    LOG_ERROR(QString("Internal error occured in MKO response parsing"));
+                    break;
                 }
+
+                QList<QVariant> list;
+                list.append(it.value());
+                list.append(value);
+                outputParams[it.key()] = list;
             }
 
-            mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
+            mCurrentTransaction.outputParams = outputParams;
         }
         break;
 
@@ -327,7 +327,7 @@ void ModuleMKO::readResponse()
 
 void ModuleMKO::sendResponse()
 {
-    emit commandResult(mCurrentResponse);
+    emit commandResult(mCurrentTransaction);
 }
 
 void ModuleMKO::startMKO1()
@@ -690,11 +690,9 @@ void ModuleMKO::sendAngleSensorData(uint16_t address)
     sendDataToBUP(address, ANGLE_SENSOR_SUBADDRESS, data, wordsCount);
 }
 
-void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
+void ModuleMKO::processCommand(const Transaction& params)
 {
-    mCurrentResponse.clear();
-
-    mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+    mCurrentTransaction.clear();
 
     uint16_t address = 0;
     if (mMainKitEnabled)
@@ -708,12 +706,12 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
     else
     {
         LOG_ERROR(QString("No MKO Kit enabled"));
-        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(500)); //TODO define error codes internal or hardware
-        emit commandResult(mCurrentResponse);
+        mCurrentTransaction.errorCode = 500; //TODO define error codes internal or hardware
+        emit commandResult(mCurrentTransaction);
         return;
     }
 
-    ModuleMKO::CommandID command = ModuleMKO::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+    ModuleMKO::CommandID command = ModuleMKO::CommandID(params.commandID);
 
     // implicit params check
     switch (command)
@@ -723,12 +721,11 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
     case SEND_COMMAND_ARRAY_FOR_CHANNEL:
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            int paramsCount = params.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
-            if (paramsCount != 1)
+            if (params.implicitInputParams.size() != 1)
             {
                 LOG_ERROR(QString("Malformed request for MKO command %1").arg(int(command)));
-                mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(50)); //TODO define error codes internal or hardware
-                emit commandResult(mCurrentResponse);
+                mCurrentTransaction.errorCode = 50; //TODO define error codes internal or hardware
+                emit commandResult(mCurrentTransaction);
                 return;
             }
 
@@ -761,45 +758,39 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
             AxisData psy;
             AxisData nu;
 
-            int paramsCount = params.value(SystemState::INPUT_PARAMS_COUNT).toInt() * 2;
-            for (int i = 0; i < paramsCount; ++i)
+            for (auto it = params.inputParams.begin(); it != params.inputParams.end(); ++it)
             {
-                if (i % 2 == 0)
-                {
-                    int type = params.value(SystemState::INPUT_PARAM_BASE + i).toInt();
-                    //qreal vr = params.value(SystemState::INPUT_PARAM_BASE + i + 1).toDouble();
-                    //QVariant vart = params.value(SystemState::INPUT_PARAM_BASE + i + 1);
-                    int32_t value = int32_t(params.value(SystemState::INPUT_PARAM_BASE + i + 1).toDouble());
+                uint32_t type = it.key();
+                int32_t value = int32_t(it.value().toDouble());
 
-                    switch (type)
-                    {
-                    case SystemState::MODE_PSY:
-                        psy.mode = value;
-                        break;
-                    case SystemState::STEPS_PSY:
-                        psy.steps = value;
-                        break;
-                    case SystemState::VELOCITY_PSY:
-                        psy.velocity = value;
-                        break;
-                    case SystemState::CURRENT_PSY:
-                        psy.current = value;
-                        break;
-                    case SystemState::MODE_NU:
-                        nu.mode = value;
-                        break;
-                    case SystemState::STEPS_NU:
-                        nu.steps = value;
-                        break;
-                    case SystemState::VELOCITY_NU:
-                        nu.velocity = value;
-                        break;
-                    case SystemState::CURRENT_NU:
-                        nu.current = value;
-                        break;
-                    default:
-                        break;
-                    }
+                switch (type)
+                {
+                case SystemState::MODE_PSY:
+                    psy.mode = value;
+                    break;
+                case SystemState::STEPS_PSY:
+                    psy.steps = value;
+                    break;
+                case SystemState::VELOCITY_PSY:
+                    psy.velocity = value;
+                    break;
+                case SystemState::CURRENT_PSY:
+                    psy.current = value;
+                    break;
+                case SystemState::MODE_NU:
+                    nu.mode = value;
+                    break;
+                case SystemState::STEPS_NU:
+                    nu.steps = value;
+                    break;
+                case SystemState::VELOCITY_NU:
+                    nu.velocity = value;
+                    break;
+                case SystemState::CURRENT_NU:
+                    nu.current = value;
+                    break;
+                default:
+                    break;
                 }
             }
 
@@ -808,80 +799,58 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
         break;
     case RECEIVE_COMMAND_ARRAY:
         {
-            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
-            mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
-
-            for (int i = 0; i < paramsCount * 2; ++i)
-            {
-                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAM_BASE + i);
-            }
-
+            mCurrentTransaction.outputParams = params.outputParams;
             receiveCommandArray(address);
         }
         break;
     case SEND_TEST_ARRAY_FOR_CHANNEL:
         {
-            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
             sendTestArrayForChannel(address, subaddress);
         }
         break;
     case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
-            mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
-
-            for (int i = 0; i < paramsCount; ++i)
-            {
-                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAMS_COUNT + i);
-            }
-
-            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            mCurrentTransaction.outputParams = params.outputParams;
+            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
             receiveTestArrayForChannel(address, subaddress);
         }
         break;
     case SEND_COMMAND_ARRAY_FOR_CHANNEL:
         {
             AxisData data;
-            int paramsCount = params.value(SystemState::INPUT_PARAMS_COUNT).toInt();
-            for (int i = 0; i < paramsCount; ++i)
+            for (auto it = params.inputParams.begin(); it != params.inputParams.end(); ++it)
             {
-                if (i % 2 == 0)
-                {
-                    int type = params.value(SystemState::INPUT_PARAM_BASE + i).toInt();
-                    int32_t value = int32_t(params.value(SystemState::INPUT_PARAM_BASE + i + 1).toDouble());
+                uint32_t type = it.key();
+                int32_t value = int32_t(it.value().toDouble());
 
-                    switch (type)
-                    {
-                    case SystemState::MODE:
-                        data.mode = value;
-                        break;
-                    case SystemState::STEPS:
-                        data.steps = value;
-                        break;
-                    case SystemState::VELOCITY:
-                        data.velocity = value;
-                        break;
-                    case SystemState::CURRENT:
-                        data.current = value;
-                        break;
-                    default:
-                        break;
-                    }
+                switch (type)
+                {
+                case SystemState::MODE:
+                    data.mode = value;
+                    break;
+                case SystemState::STEPS:
+                    data.steps = value;
+                    break;
+                case SystemState::VELOCITY:
+                    data.velocity = value;
+                    break;
+                case SystemState::CURRENT:
+                    data.current = value;
+                    break;
+                default:
+                    break;
                 }
             }
-            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+
+            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
             sendCommandArrayForChannel(address, subaddress, data);
         }
         break;
     case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            int paramsCount = params.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
-            for (int i = 0; i < paramsCount; ++i)
-            {
-                mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i] = params.value(SystemState::OUTPUT_PARAMS_COUNT + i);
-            }
-
-            Subaddress subaddress = Subaddress(params.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt());
+            mCurrentTransaction.outputParams = params.outputParams;
+            Subaddress subaddress = Subaddress(params.implicitInputParams.at(0));
             receiveCommandArrayForChannel(address, subaddress);
         }
         break;
@@ -911,26 +880,26 @@ void ModuleMKO::processCommand(const QMap<uint32_t, QVariant>& params)
     if (errorCode != 0)
     {
         LOG_ERROR(QString("Error in MKO command id=%1").arg(int(command)));
-        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(errorCode)); //TODO define error codes internal or hardware
-        emit commandResult(mCurrentResponse);
+        mCurrentTransaction.errorCode = errorCode; //TODO define error codes internal or hardware
+        emit commandResult(mCurrentTransaction);
         return;
     }
 
     if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
     {
         LOG_ERROR(QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE));
-        mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
-        emit commandResult(mCurrentResponse);
+        mCurrentTransaction.errorCode = 200; //TODO define error codes internal or hardware
+        emit commandResult(mCurrentTransaction);
         return;
     }
 
-    mCurrentResponse[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
-    mCurrentResponse[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
-    mCurrentResponse[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
+    mCurrentTransaction.moduleID = params.moduleID;
+    mCurrentTransaction.commandID = command;
+    mCurrentTransaction.errorCode = 0;
 
     if (command == START_MKO || command == STOP_MKO)
     {
-        emit commandResult(mCurrentResponse);
+        emit commandResult(mCurrentTransaction);
     }
 }
 

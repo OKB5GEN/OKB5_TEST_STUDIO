@@ -6,6 +6,31 @@
 
 #include "Headers/module_commands.h"
 
+struct Transaction
+{
+    uint32_t moduleID;
+    uint32_t commandID;
+    uint32_t errorCode; // 0 - no error
+    QMap<uint32_t, QVariant> inputParams;
+    QMap<uint32_t, QVariant> outputParams;
+    QList<int> implicitInputParams; //TODO remove implicit params, move them to inputParams
+
+    Transaction()
+    {
+        clear();
+    }
+
+    void clear()
+    {
+        inputParams.clear();
+        outputParams.clear();
+        implicitInputParams.clear();
+        errorCode = 0; // no error by default
+        moduleID = UINT32_MAX;
+        commandID = UINT32_MAX;
+    }
+};
+
 class AbstractModule: public QObject
 {
     Q_OBJECT
@@ -39,17 +64,17 @@ public:
     const QString& errorString() const;
 
 public slots:
-    virtual void processCommand(const QMap<uint32_t, QVariant>& request) = 0;
+    virtual void processCommand(const Transaction& request) = 0;
     virtual void setDefaultState() = 0;
     virtual void onApplicationStart() = 0;
 
 protected:
     void setModuleState(ModuleState moduleState, const QString& error = QString(""));
 
-    QMap<uint32_t, QVariant> mCurrentResponse;
+    Transaction mCurrentTransaction;
 
 signals:
-    void commandResult(const QMap<uint32_t, QVariant>& response);
+    void commandResult(const Transaction& response);
     void stateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 private:

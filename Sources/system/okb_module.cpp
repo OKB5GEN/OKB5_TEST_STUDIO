@@ -111,16 +111,15 @@ void ModuleOKB::initializeCustomOKBModule()
     setModuleState(AbstractModule::INITIALIZED_OK);
 }
 
-void ModuleOKB::processCommand(const QMap<uint32_t, QVariant>& params)
+void ModuleOKB::processCommand(const Transaction& params)
 {
-    QMap<uint32_t, QVariant> response;
+    Transaction response;
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.value(SystemState::COMMAND_ID).toUInt());
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.commandID);
 
-    response[SystemState::MODULE_ID] = params.value(SystemState::MODULE_ID);
-    response[SystemState::COMMAND_ID] = QVariant(uint32_t(command));
-    response[SystemState::ERROR_CODE] = QVariant(uint32_t(0));
-    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
+    response.moduleID = params.moduleID;
+    response.commandID = command;
+    response.errorCode = 0;
 
     switch (command)
     {
@@ -301,17 +300,22 @@ void ModuleOKB::onTransmissionError(uint32_t operationID)
 
 void ModuleOKB::onTransmissionComplete()
 {
-    QMap<uint32_t, QVariant> response;
+    Transaction response;
     createResponse(response);
 
-    if (!response.empty())
+    if (!response.outputParams.isEmpty() || !response.inputParams.isEmpty())
     {
         LOG_INFO("Send response to cyclogram");
         emit commandResult(response);
     }
+    else
+    {
+        LOG_ERROR(QString("No output params in response. Result to cyclogram not sent"));
+    }
 }
 
-void ModuleOKB::createResponse(QMap<uint32_t, QVariant>& response)
+void ModuleOKB::createResponse(Transaction& response)
 {
+    LOG_WARNING(QString("ModuleOKB::createResponse not reimplemented"));
     int TODO; // do nothing?
 }

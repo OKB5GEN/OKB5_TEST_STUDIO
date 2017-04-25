@@ -19,7 +19,7 @@ public:
     virtual ~ModuleOKB();
 
 public slots:
-    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void processCommand(const Transaction& params) override;
 
 protected:
     void initializeCustom() override;
@@ -28,8 +28,8 @@ protected:
     void onTransmissionComplete() override;
 
     virtual void initializeCustomOKBModule();
-    virtual void createResponse(QMap<uint32_t, QVariant>& response);
-    virtual void processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response) = 0;
+    virtual void createResponse(Transaction& response);
+    virtual void processCustomCommand(const Transaction& request, Transaction& response) = 0;
     virtual bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;
     virtual void onModuleError() = 0;
 

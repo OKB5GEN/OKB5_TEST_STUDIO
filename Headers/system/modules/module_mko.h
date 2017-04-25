@@ -57,7 +57,7 @@ public:
     ~ModuleMKO();
 
 public slots:
-    void processCommand(const QMap<uint32_t, QVariant>& params) override;
+    void processCommand(const Transaction& params) override;
 
     void onApplicationStart() override;
     void setDefaultState() override;

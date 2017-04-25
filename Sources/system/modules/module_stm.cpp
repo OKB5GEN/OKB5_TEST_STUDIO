@@ -87,49 +87,49 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
     return ModuleSTM::FuseStates(state); //TODO undefined values
 }
 
-void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QMap<uint32_t, QVariant>& response)
+void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& response)
 {
-    mCurrentResponse.clear();
-    mCurrentResponse = response;
-    mCurrentResponse.detach();
+    mCurrentTransaction.clear();
+    mCurrentTransaction = response;
+    mCurrentTransaction.inputParams.detach();
+    mCurrentTransaction.outputParams.detach();
+    mCurrentTransaction.implicitInputParams.detach();
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.value(SystemState::COMMAND_ID).toUInt());
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
 
     switch (command)
     {
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
-            int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+            int paramsCount = request.implicitInputParams.size();
             if (paramsCount != 2)
             {
                 LOG_ERROR("Malformed request for STM command");
-                response[SystemState::ERROR_CODE] = QVariant(1);
+                response.errorCode = 1; //TODO define error codes
                 return;
             }
 
-            int channel = request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt();
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 1).toInt());
+            int channel = request.implicitInputParams.at(0);
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(1));
 
             setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), state);
-            response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
         }
         break;
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
-            int paramsCount = request.value(SystemState::IMPLICIT_PARAMS_COUNT).toInt();
+            int paramsCount = request.implicitInputParams.size();
             if (paramsCount != 2)
             {
                 LOG_ERROR("Malformed request for STM command");
-                response[SystemState::ERROR_CODE] = QVariant(1);
+                response.errorCode = 1; //TODO define error codes
                 return;
             }
 
-            int channel = request.value(SystemState::IMPLICIT_PARAM_BASE + 0).toInt();
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.value(SystemState::IMPLICIT_PARAM_BASE + 1).toInt());
+            int channel = request.implicitInputParams.at(0);
+            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.implicitInputParams.at(1));
 
             setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), state);
-            response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
         }
         break;
 
@@ -138,18 +138,7 @@ void ModuleSTM::processCustomCommand(const QMap<uint32_t, QVariant>& request, QM
         break;
     }
 
-    // set variables
-    int paramsCount = request.value(SystemState::OUTPUT_PARAMS_COUNT).toInt();
-    for (int i = 0; i < paramsCount; ++i)
-    {
-        QString varName = request.value(SystemState::OUTPUT_PARAM_BASE + i * 2 + 1).toString();
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2] = QVariant(varName);
-    }
-
-    if (paramsCount > 0)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount);
-    }
+    mCurrentTransaction.outputParams = request.outputParams;
 }
 
 bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
@@ -266,29 +255,10 @@ void ModuleSTM::onModuleError()
     int TODO; //TODO here will be processing
 }
 
-void ModuleSTM::createResponse(QMap<uint32_t, QVariant>& response)
+void ModuleSTM::createResponse(Transaction& response)
 {
     // fill response
-    int paramsCount = mCurrentResponse.value(SystemState::OUTPUT_PARAMS_COUNT, 0).toInt();
-    int valuesCount = 0; //mTemperatureData.size();
-
-    if (paramsCount != valuesCount)
-    {
-        LOG_ERROR("Request output params count (%i) and values count (%i) mismatch", paramsCount, valuesCount);
-        return;
-    }
-
-    for (int i = 0; i < paramsCount; ++i)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAM_BASE + i * 2 + 1] = QVariant(0/*mTemperatureData[i]*/);
-    }
-
-    if (paramsCount > 0)
-    {
-        mCurrentResponse[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(paramsCount * 2);
-    }
-
-    response = mCurrentResponse;
+    response = mCurrentTransaction;
 }
 
 void ModuleSTM::initializeCustomOKBModule()

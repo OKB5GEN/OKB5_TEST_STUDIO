@@ -204,48 +204,48 @@ void SystemState::onApplicationStart()
     mMKO = new ModuleMKO(this);
     mMKO->setEmulator(emulatorEnabled);
     mMKO->setModuleID(ModuleCommands::MKO);
-    connect(this, SIGNAL(sendToMKO(const QMap<uint32_t,QVariant>&)), mMKO, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mMKO, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToMKO(const Transaction&)), mMKO, SLOT(processCommand(const Transaction&)));
+    connect(mMKO, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mMKO, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mOTD = new ModuleOTD(this);
     mOTD->setEmulator(emulatorEnabled);
     mOTD->setId(modules.value(ModuleCommands::OTD));
     mOTD->setModuleID(ModuleCommands::OTD);
-    connect(this, SIGNAL(sendToOTD(const QMap<uint32_t,QVariant>&)), mOTD, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mOTD, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToOTD(const Transaction&)), mOTD, SLOT(processCommand(const Transaction&)));
+    connect(mOTD, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mOTD, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mSTM = new ModuleSTM(this);
     mSTM->setEmulator(emulatorEnabled);
     mSTM->setId(modules.value(ModuleCommands::STM));
     mSTM->setModuleID(ModuleCommands::STM);
-    connect(this, SIGNAL(sendToSTM(const QMap<uint32_t,QVariant>&)), mSTM, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mSTM, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToSTM(const Transaction&)), mSTM, SLOT(processCommand(const Transaction&)));
+    connect(mSTM, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mSTM, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mTech = new ModuleTech(this);
     mTech->setEmulator(emulatorEnabled);
     mTech->setId(modules.value(ModuleCommands::TECH));
     mTech->setModuleID(ModuleCommands::TECH);
-    connect(this, SIGNAL(sendToTech(const QMap<uint32_t,QVariant>&)), mTech, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mTech, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToTech(const Transaction&)), mTech, SLOT(processCommand(const Transaction&)));
+    connect(mTech, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mTech, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setEmulator(emulatorEnabled);
     mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
     mPowerBUP->setModuleID(ModuleCommands::POWER_UNIT_BUP);
-    connect(this, SIGNAL(sendToPowerUnitBUP(const QMap<uint32_t,QVariant>&)), mPowerBUP, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerBUP, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToPowerUnitBUP(const Transaction&)), mPowerBUP, SLOT(processCommand(const Transaction&)));
+    connect(mPowerBUP, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mPowerBUP, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setEmulator(emulatorEnabled);
     mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
     mPowerPNA->setModuleID(ModuleCommands::POWER_UNIT_PNA);
-    connect(this, SIGNAL(sendToPowerUnitPNA(const QMap<uint32_t,QVariant>&)), mPowerPNA, SLOT(processCommand(const QMap<uint32_t,QVariant>&)));
-    connect(mPowerPNA, SIGNAL(commandResult(const QMap<uint32_t,QVariant>&)), this, SLOT(processResponse(const QMap<uint32_t,QVariant>&)));
+    connect(this, SIGNAL(sendToPowerUnitPNA(const Transaction&)), mPowerPNA, SLOT(processCommand(const Transaction&)));
+    connect(mPowerPNA, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
     connect(mPowerPNA, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mModules[ModuleCommands::MKO] = mMKO;
@@ -536,74 +536,54 @@ void SystemState::sendCommand(CmdActionModule* command)
 
     VariableController* vc = command->variableController();
 
-    QMap<uint32_t, QVariant> params;
-    params[MODULE_ID] = QVariant(uint32_t(command->module()));
-    params[COMMAND_ID] = QVariant(uint32_t(command->operation()));
-    params[INPUT_PARAMS_COUNT] = QVariant(uint32_t(inputParams.size()));
-    params[OUTPUT_PARAMS_COUNT] = QVariant(uint32_t(outputParams.size()));
-    params[IMPLICIT_PARAMS_COUNT] = QVariant(uint32_t(implicitInputParams.size()));
-
-    int TODO; // start "waiting for execution" protection timer
+    Transaction transaction;
+    transaction.moduleID = uint32_t(command->module());
+    transaction.commandID = uint32_t(command->operation());
 
     // input params -> [type, value]
-
-    uint32_t i = 0;
     for (auto it = inputParams.begin(); it != inputParams.end(); ++it)
     {
-        params[INPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
-        ++i;
+        uint32_t type = uint32_t(paramID(it.key()));
 
-        if (it.value().type() == QMetaType::QString)
+        if (it.value().type() == QMetaType::QString) // input param is variable, get its current value
         {
             qreal value = vc->currentValue(it.value().toString());
-            params[INPUT_PARAM_BASE + i] = QVariant(value);
+            transaction.inputParams[type] = QVariant(value);
         }
-        else
+        else //input param is direct value
         {
-            params[INPUT_PARAM_BASE + i] = it.value();
+            transaction.inputParams[type] = it.value();
         }
-
-        ++i;
     }
 
     // output params -> [type, vaiableName]
-    i = 0;
     for (auto it = outputParams.begin(); it != outputParams.end(); ++it)
     {
-        params[OUTPUT_PARAM_BASE + i] = QVariant(uint32_t(paramID(it.key())));
-        ++i;
-
-        params[OUTPUT_PARAM_BASE + i] = QVariant(it.value());
-        ++i;
+        uint32_t type = uint32_t(paramID(it.key()));
+        transaction.outputParams[type] = it.value();
     }
 
-    // implicit input params
-    i = 0;
-    for (auto it = implicitInputParams.begin(); it != implicitInputParams.end(); ++it)
-    {
-        params[IMPLICIT_PARAM_BASE + i] = QVariant(*it);
-        ++i;
-    }
+    transaction.implicitInputParams = implicitInputParams; //TODO move to input params
 
     switch (command->module())
     {
     case ModuleCommands::POWER_UNIT_BUP:
-        emit sendToPowerUnitBUP(params);
+        emit sendToPowerUnitBUP(transaction);
         break;
     case ModuleCommands::POWER_UNIT_PNA:
-        emit sendToPowerUnitPNA(params);
+        emit sendToPowerUnitPNA(transaction);
         break;
     case ModuleCommands::OTD:
-        emit sendToOTD(params);
+        emit sendToOTD(transaction);
         break;
     case ModuleCommands::STM:
-        emit sendToSTM(params);
+        emit sendToSTM(transaction);
         break;
     case ModuleCommands::MKO:
-        emit sendToMKO(params);
+        emit sendToMKO(transaction);
         break;
     case ModuleCommands::TECH:
-        emit sendToTech(params);
+        emit sendToTech(transaction);
         break;
 
     default:
@@ -628,7 +608,7 @@ void SystemState::onExecutionFinished(uint32_t error)
     emit commandFinished(error == 0);
 }
 
-void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
+void SystemState::processResponse(const Transaction& response)
 {
     if (!mCurCommand)
     {
@@ -636,25 +616,21 @@ void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
         return;
     }
 
-    int TODO; // stop "waiting for execution" protection timer
-
     VariableController* vc = mCurCommand->variableController();
-    uint32_t paramsCount = response.value(OUTPUT_PARAMS_COUNT).toUInt();
+    uint32_t paramsCount = response.outputParams.size();
 
-    QString varName;
-    qreal value;
-
-    for (uint32_t i = 0; i < paramsCount; ++i)
+    for (auto it = response.outputParams.begin(); it != response.outputParams.end(); ++it)
     {
-        if (i % 2 == 0)
+        QList<QVariant> list = it.value().toList();
+        if (list.size() != 2)
         {
-            varName = response.value(OUTPUT_PARAM_BASE + i).toString();
+            LOG_ERROR(QString("Invalid output param in response"));
+            continue;
         }
-        else
-        {
-            value = response.value(OUTPUT_PARAM_BASE + i).toDouble();
-            vc->setCurrentValue(varName, value);
-        }
+
+        QString varName = list.at(0).toString();
+        qreal value = list.at(1).toDouble();
+        vc->setCurrentValue(varName, value);
     }
 
     if (paramsCount > 0)
@@ -662,7 +638,7 @@ void SystemState::processResponse(const QMap<uint32_t, QVariant>& response)
         vc->makeDataSnapshot();
     }
 
-    uint32_t error = response.value(ERROR_CODE, QVariant(uint32_t(0))).toUInt();
+    uint32_t error = response.errorCode;
 
     // in case of power unit
     //if (error == 1) ui->err1->setText("Overvoltage protection!"); //TODO - ошибки установки на блоке питания, если 0 - ошибки нет
