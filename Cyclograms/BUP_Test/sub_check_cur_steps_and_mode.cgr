@@ -29,7 +29,7 @@
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1492065220240" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="">
+        <command type="ACTION_MODULE" id="1492065220240" module="MKO" command="RECEIVE_COMMAND_ARRAY">
             <input_params/>
             <output_params>
                 <param name="Angle (Nu)" type="10" value="NuA"/>

@@ -11,47 +11,63 @@
         <command type="GO_TO_BRANCH" id="1491893961474"/>
         <command type="BRANCH_BEGIN" id="1491893961475" name="End"/>
         <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492075726270" module="POWER_UNIT_PNA" command="SET_VOLTAGE_AND_CURRENT" implicit_params="0">
+        <command type="ACTION_MODULE" id="1492075726270" module="POWER_UNIT_PNA" command="SET_VOLTAGE_AND_CURRENT">
             <input_params>
                 <param name="Voltage, V" type="10" value="U"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492075728788" module="POWER_UNIT_BUP" command="SET_VOLTAGE_AND_CURRENT" implicit_params="0">
+        <command type="ACTION_MODULE" id="1492075728788" module="POWER_UNIT_BUP" command="SET_VOLTAGE_AND_CURRENT">
             <input_params>
                 <param name="Voltage, V" type="10" value="U"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492075928678" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492075928678" module="POWER_UNIT_PNA" command="SET_POWER_STATE">
+            <input_params>
+                <param name="Power State" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492075931577" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492075931577" module="POWER_UNIT_BUP" command="SET_POWER_STATE">
+            <input_params>
+                <param name="Power State" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
         <command type="BRANCH_BEGIN" id="1492076062943" name="PowerOn"/>
         <command type="GO_TO_BRANCH" id="1492076062945"/>
-        <command type="ACTION_MODULE" id="1492076065054" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076065054" module="STM" command="SET_POWER_CHANNEL_STATE">
+            <input_params>
+                <param name="Channel" type="2" value="6"/>
+                <param name="Power State" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076087337" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076087337" module="STM" command="SET_POWER_CHANNEL_STATE">
+            <input_params>
+                <param name="Channel" type="2" value="1"/>
+                <param name="Power State" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1492076145322" delay="2000"/>
-        <command type="ACTION_MODULE" id="1492076152225" module="MKO" command="SEND_TO_ANGLE_SENSOR" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076152225" module="MKO" command="SEND_TO_ANGLE_SENSOR">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076197939" module="MKO" command="SEND_TEST_ARRAY" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076197939" module="MKO" command="SEND_TEST_ARRAY">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076206524" module="MKO" command="RECEIVE_TEST_ARRAY" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076206524" module="MKO" command="RECEIVE_TEST_ARRAY">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MATH" id="1492076393801" operation="Assign">

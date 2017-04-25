@@ -15,13 +15,18 @@
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1492076657452" module="MKO" command="STOP_MKO" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076657452" module="MKO" command="STOP_MKO">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1492076672891" delay="200"/>
-        <command type="ACTION_MODULE" id="1492076679741" module="STM" command="SET_MKO_POWER_CHANNEL_STATE" implicit_params="1,1">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076679741" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
+            <input_params>
+                <param name="Channel" type="2" value="1"/>
+                <param name="Power State" type="2" value="1"/>
+            </input_params>
             <output_params/>
         </command>
     </commands>

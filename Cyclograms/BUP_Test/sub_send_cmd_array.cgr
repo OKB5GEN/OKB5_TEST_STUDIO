@@ -27,7 +27,7 @@
         <command type="GO_TO_BRANCH" id="1492067633344"/>
         <command type="BRANCH_BEGIN" id="1492067755761" name="Send"/>
         <command type="GO_TO_BRANCH" id="1492067755764"/>
-        <command type="ACTION_MODULE" id="1492067766840" module="MKO" command="SEND_COMMAND_ARRAY" implicit_params="0">
+        <command type="ACTION_MODULE" id="1492067766840" module="MKO" command="SEND_COMMAND_ARRAY">
             <input_params>
                 <param name="Max current (Nu)" type="10" value="MaxI"/>
                 <param name="Max current (Psy)" type="10" value="MaxI"/>
@@ -37,6 +37,7 @@
                 <param name="Steps (Psy)" type="10" value="Steps"/>
                 <param name="Velocity (Nu)" type="10" value="MaxV"/>
                 <param name="Velocity (Psy)" type="10" value="MaxV"/>
+                <param name="Subaddress" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>

@@ -38,8 +38,10 @@
         <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
         <command type="BRANCH_BEGIN" id="1492066042375" name="CheckStopped"/>
         <command type="GO_TO_BRANCH" id="1492066042377"/>
-        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params>
                 <param name="Angle (Nu)" type="10" value="NuA"/>
                 <param name="Angle (Psy)" type="10" value="PsyA"/>
@@ -55,8 +57,10 @@
                 <param name="Velocity (Psy)" type="10" value="PsyV"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY" implicit_params="0">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY">
+            <input_params>
+                <param name="Subaddress" type="2" value="0"/>
+            </input_params>
             <output_params>
                 <param name="Angle (Nu)" type="10" value="NuA"/>
                 <param name="Angle (Psy)" type="10" value="PsyA"/>

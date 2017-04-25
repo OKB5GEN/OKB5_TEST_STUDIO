@@ -10,12 +10,18 @@
         <command type="GO_TO_BRANCH" id="1491893961474"/>
         <command type="BRANCH_BEGIN" id="1491893961475" name="End"/>
         <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492076328367" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="6,1">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076328367" module="STM" command="SET_POWER_CHANNEL_STATE">
+            <input_params>
+                <param name="Channel" type="2" value="6"/>
+                <param name="Power State" type="2" value="1"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076330202" module="STM" command="SET_POWER_CHANNEL_STATE" implicit_params="1,1">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076330202" module="STM" command="SET_POWER_CHANNEL_STATE">
+            <input_params>
+                <param name="Channel" type="2" value="1"/>
+                <param name="Power State" type="2" value="1"/>
+            </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MATH" id="1492076365886" operation="Assign">
@@ -23,12 +29,16 @@
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1492076572761" module="POWER_UNIT_BUP" command="SET_POWER_STATE" implicit_params="1">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076572761" module="POWER_UNIT_BUP" command="SET_POWER_STATE">
+            <input_params>
+                <param name="Power State" type="2" value="1"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076574706" module="POWER_UNIT_PNA" command="SET_POWER_STATE" implicit_params="1">
-            <input_params/>
+        <command type="ACTION_MODULE" id="1492076574706" module="POWER_UNIT_PNA" command="SET_POWER_STATE">
+            <input_params>
+                <param name="Power State" type="2" value="1"/>
+            </input_params>
             <output_params/>
         </command>
     </commands>
