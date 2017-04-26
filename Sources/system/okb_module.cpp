@@ -106,11 +106,6 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     return false;
 }
 
-//void ModuleOKB::initializeCustomOKBModule()
-//{
-//    setModuleState(AbstractModule::INITIALIZED_OK);
-//}
-
 void ModuleOKB::processCommand(const Transaction& params)
 {
     Transaction response;
@@ -119,7 +114,6 @@ void ModuleOKB::processCommand(const Transaction& params)
 
     response.moduleID = params.moduleID;
     response.commandID = command;
-    response.errorCode = 0;
 
     switch (command)
     {

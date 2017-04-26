@@ -88,7 +88,7 @@ signals:
 private:
     void setupCommandsParams();
 
-    void onExecutionFinished(uint32_t error);
+    void onExecutionFinished(const QString& error);
 
     bool sendPowerUnitCommand(CmdActionModule* command);
     bool sendOTDCommand(CmdActionModule* command);

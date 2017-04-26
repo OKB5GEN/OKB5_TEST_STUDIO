@@ -10,7 +10,7 @@ struct Transaction
 {
     uint32_t moduleID;
     uint32_t commandID;
-    uint32_t errorCode; // 0 - no error
+    QString error; // empty - no error
     QMap<uint32_t, QVariant> inputParams;
     QMap<uint32_t, QVariant> outputParams;
 
@@ -23,7 +23,7 @@ struct Transaction
     {
         inputParams.clear();
         outputParams.clear();
-        errorCode = 0; // no error by default
+        error.clear();
         moduleID = UINT32_MAX;
         commandID = UINT32_MAX;
     }
@@ -63,8 +63,6 @@ public:
 
 public slots:
     virtual void processCommand(const Transaction& request) = 0; // this method must be reimplemented in inherited classes to receive calls from cyclogram commands
-//    virtual void setDefaultState() = 0;
-//    virtual void onApplicationStart() = 0;
 
 protected:
 //    void setModuleState(ModuleState moduleState, const QString& error = QString(""));

@@ -73,8 +73,7 @@ void ModuleMKO::readResponse()
         {
             if (mRepeatedRequests > MAX_REPEAT_REQUESTS)
             {
-                LOG_ERROR(QString("Max repeat count of %1 exceeded! Error: %2").arg(MAX_REPEAT_REQUESTS).arg(ERR_RESPONSE_NOT_READY));
-                mCurrentTransaction.errorCode = 305; //TODO define error codes internal or hardware
+                mCurrentTransaction.error = QString("Max repeat count of %1 exceeded! Error: %2").arg(MAX_REPEAT_REQUESTS).arg(ERR_RESPONSE_NOT_READY);
             }
             else
             {
@@ -85,7 +84,7 @@ void ModuleMKO::readResponse()
         }
         else
         {
-            mCurrentTransaction.errorCode = 306; //TODO define error codes internal or hardware
+            mCurrentTransaction.error = QString("Critial hardware errors received");
         }
     }
 
@@ -112,8 +111,7 @@ void ModuleMKO::readResponse()
             {
                 if (buffer[i] != 0)
                 {
-                    LOG_ERROR(QString("Incorrect test array received"));
-                    mCurrentTransaction.errorCode = 405; //TODO define error codes internal or hardware
+                    mCurrentTransaction.error = QString("Incorrect test array received");
                     break;
                 }
             }
@@ -705,41 +703,12 @@ void ModuleMKO::processCommand(const Transaction& params)
     }
     else
     {
-        LOG_ERROR(QString("No MKO Kit enabled"));
-        mCurrentTransaction.errorCode = 500; //TODO define error codes internal or hardware
+        mCurrentTransaction.error = QString("No MKO Kit enabled"); //TODO define error codes internal or hardware
         emit commandResult(mCurrentTransaction);
         return;
     }
 
     ModuleMKO::CommandID command = ModuleMKO::CommandID(params.commandID);
-
-//    // implicit params check
-//    switch (command)
-//    {
-//    case SEND_TEST_ARRAY_FOR_CHANNEL:
-//    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
-//    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
-//    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
-//        {
-//            if (params.implicitInputParams.size() != 1)
-//            {
-//                LOG_ERROR(QString("Malformed request for MKO command %1").arg(int(command)));
-//                mCurrentTransaction.errorCode = 50; //TODO define error codes internal or hardware
-//                emit commandResult(mCurrentTransaction);
-//                return;
-//            }
-
-//            //case SEND_COMMAND_ARRAY:
-//            //case SEND_COMMAND_ARRAY_FOR_CHANNEL:
-//            int TODO; // check input params?
-//        }
-//        break;
-
-//    default:
-//        break;
-//    }
-
-    int errorCode = 0;
 
     switch (command)
     {
@@ -873,54 +842,29 @@ void ModuleMKO::processCommand(const Transaction& params)
         break;
 
     default:
-        errorCode = 100; //TODO define error code
+        {
+            mCurrentTransaction.error = QString("Unknown MKO command id=%1").arg(int(command));
+            emit commandResult(mCurrentTransaction);
+            return;
+        }
         break;
     }
 
-    if (errorCode != 0)
-    {
-        LOG_ERROR(QString("Error in MKO command id=%1").arg(int(command)));
-        mCurrentTransaction.errorCode = errorCode; //TODO define error codes internal or hardware
-        emit commandResult(mCurrentTransaction);
-        return;
-    }
+
 
     if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
     {
-        LOG_ERROR(QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE));
-        mCurrentTransaction.errorCode = 200; //TODO define error codes internal or hardware
+        mCurrentTransaction.error = QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE);
         emit commandResult(mCurrentTransaction);
         return;
     }
 
     mCurrentTransaction.moduleID = params.moduleID;
     mCurrentTransaction.commandID = command;
-    mCurrentTransaction.errorCode = 0;
+    mCurrentTransaction.error.clear();
 
     if (command == START_MKO || command == STOP_MKO)
     {
         emit commandResult(mCurrentTransaction);
     }
 }
-
-//void ModuleMKO::onApplicationStart()
-//{
-//    setModuleState(AbstractModule::INITIALIZING);
-//    setModuleState(AbstractModule::INITIALIZED_OK);
-//    //startMKO(); //TODO when to stop MKO? and we are using main kit only for now
-//}
-
-//void ModuleMKO::setDefaultState()
-//{
-//    //TODO check state
-//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
-//    setModuleState(AbstractModule::SAFE_STATE);
-//    mMainKitEnabled = false;
-//    mReserveKitEnabled = false;
-//    int TODO;
-//}
-
-//void ModuleMKO::onCyclogramStart()
-//{
-//    startMKO();
-//}

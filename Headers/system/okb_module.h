@@ -22,12 +22,9 @@ public slots:
     void processCommand(const Transaction& params) override;
 
 protected:
-//    void initializeCustom() override;
-
     void onTransmissionError(uint32_t operationID) override;
     void onTransmissionComplete() override;
 
-//    virtual void initializeCustomOKBModule();
     virtual void createResponse(Transaction& response);
     virtual void processCustomCommand(const Transaction& request, Transaction& response) = 0;
     virtual bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;

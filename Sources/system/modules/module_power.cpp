@@ -201,8 +201,7 @@ void ModulePower::processCommand(const Transaction& params)
     case ModuleCommands::SET_POWER_STATE:
         if (!setPowerState(params))
         {
-            LOG_ERROR(QString("Malformed request for Power UNIT command"));
-            mCurrentTransaction.errorCode = 300; //TODO define error codes internal or hardware
+            mCurrentTransaction.error = QString("Malformed request for Power UNIT command");
             emit commandResult(mCurrentTransaction);
             return;
         }
@@ -211,8 +210,7 @@ void ModulePower::processCommand(const Transaction& params)
 
     default:
         {
-            LOG_ERROR(QString("Unknown command id=%1").arg(int(command)));
-            mCurrentTransaction.errorCode = 100; //TODO define error codes internal or hardware
+            mCurrentTransaction.error = QString("Unknown command id=%1").arg(int(command));
             emit commandResult(mCurrentTransaction);
             return;
         }
@@ -221,7 +219,7 @@ void ModulePower::processCommand(const Transaction& params)
 
     mCurrentTransaction.moduleID = params.moduleID;
     mCurrentTransaction.commandID = command;
-    mCurrentTransaction.errorCode = 0;
+    mCurrentTransaction.error.clear();;
 }
 
 void ModulePower::getVoltageAndCurrent(const Transaction& request)
@@ -518,11 +516,29 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
         {
             uint8_t uu1, uu2;
             mError = (response[4] >> 4);
-            if (mError != 0)
+            QString error;
+
+            switch (mError)
             {
-                LOG_ERROR("Error occured! TODO");
+            case 0: // no error
+                break;
+            case 1:
+                error = QString("Overvoltage protection!");
+                break;
+            case 2:
+                error = QString("Overcurrent protection!");
+                break;
+            case 4:
+                error = QString("Overpower protection!");
+                break;
+            case 8:
+                error = QString("Overtemperature protection!");
+                break;
+
+            default:
+                error = QString("Unknown error: %1").arg(QString::number(mError));
+                break;
             }
-            int TODO; // parse error and save it locally
 
             uu1 = response[5];
             uu2 = response[6];
@@ -536,7 +552,7 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
             if (!mCurrentTransaction.outputParams.empty())
             {
-                mCurrentTransaction.errorCode = mError;
+                mCurrentTransaction.error = error;
                 QString voltageVar = mCurrentTransaction.outputParams.value(SystemState::VOLTAGE).toString();
                 QString currentVar = mCurrentTransaction.outputParams.value(SystemState::CURRENT).toString();
 

@@ -84,25 +84,6 @@ int ModuleOTD::dsCount(LineID line) const
 //    // read sensors count on both lines (TODO do not change call order)
 //    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
 //    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
-
-//    // get sensors adresses TODO (what for this functionality is used?)
-//    /*
-//    ModuleCommands::CommandID commandGetAddr = (line == PSY) ? ModuleCommands::GET_DS1820_ADDR_LINE_1 : ModuleCommands::GET_DS1820_ADDR_LINE_2;
-
-//    for(int j = 0; j < count; ++j)
-//    {
-//        for(int k = 0; k < SERIAL_NUMBER_BYTES_COUNT; ++k)
-//        {
-//            QByteArray response1;
-//            if (!sendCommand(commandGetAddr, j + 1, k, &response1))
-//            {
-//                continue;
-//            }
-
-//            uint8_t addr = response1[2];
-//            //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
-//        }
-//    }*/
 //}
 
 //void ModuleOTD::setDefaultState()
@@ -251,11 +232,6 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     return true;
 }
-
-//void ModuleOTD::onApplicationFinish()
-//{
-//    int TODO;
-//}
 
 void ModuleOTD::onModuleError()
 {

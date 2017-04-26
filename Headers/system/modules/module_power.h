@@ -39,11 +39,7 @@ public:
     ModulePower(QObject* parent);
     ~ModulePower();
 
-    //void initializeCustom() override;
-
 public slots:
-    //void setDefaultState() override;
-
     void processCommand(const Transaction& params) override;
     //void onApplicationFinish() override;
 

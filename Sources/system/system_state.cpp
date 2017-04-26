@@ -596,21 +596,21 @@ void SystemState::sendCommand(CmdActionModule* command)
     }
 }
 
-void SystemState::onExecutionFinished(uint32_t error)
+void SystemState::onExecutionFinished(const QString& error)
 {
-    if (error != 0) // 0 - successful execution
+    if (!error.isEmpty())
     {
         QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
         QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
 
-        LOG_ERROR("Command execution failed. Module:%s Command:%s Error:%s",
+        LOG_ERROR("Command execution failed. Module:%s, Command:%s, Error:%s",
                   moduleEnum.valueToKey(mCurCommand->module()),
                   commandEnum.valueToKey(mCurCommand->operation()),
-                  QString::number(error));
+                  error);
     }
 
     mCurCommand = Q_NULLPTR;
-    emit commandFinished(error == 0);
+    emit commandFinished(error.isEmpty());
 }
 
 void SystemState::processResponse(const Transaction& response)
@@ -643,15 +643,7 @@ void SystemState::processResponse(const Transaction& response)
         vc->makeDataSnapshot();
     }
 
-    uint32_t error = response.errorCode;
-
-    // in case of power unit
-    //if (error == 1) ui->err1->setText("Overvoltage protection!"); //TODO - ошибки установки на блоке питания, если 0 - ошибки нет
-    //if (error == 2) ui->err1->setText("Overcurrent protection!");
-    //if (error == 4) ui->err1->setText("Overpower protection!");
-    //if (error == 8) ui->err1->setText("Overtemperature protection!");
-
-    onExecutionFinished(error);
+    onExecutionFinished(response.error);
 }
 
 QString SystemState::paramName(ParamID param) const
@@ -717,11 +709,6 @@ SystemState::ParamID SystemState::paramID(const QString& name) const
 //            setDefaultState();
 //        }
 //    }
-//}
-
-//void SystemState::onCyclogramStart()
-//{
-//    mMKO->onCyclogramStart();
 //}
 
 bool SystemState::isImplicit(const QString &name) const

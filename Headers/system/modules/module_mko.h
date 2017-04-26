@@ -59,10 +59,6 @@ public:
 public slots:
     void processCommand(const Transaction& params) override;
 
-//    void onApplicationStart() override;
-//    void setDefaultState() override;
-//    void onCyclogramStart(); //TODO remove (ваще какая-то шляпа, из-за которой вероятно все проблемы и есть)
-
 private slots:
     void readResponse();
     void sendResponse();
