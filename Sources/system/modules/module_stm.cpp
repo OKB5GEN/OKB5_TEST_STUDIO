@@ -196,10 +196,10 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
 
             int TODO; // form response
 
-            if (moduleState() == AbstractModule::INITIALIZING && channel == ModuleCommands::MKO_4)
-            {
-                setModuleState(AbstractModule::INITIALIZED_OK);
-            }
+//            if (moduleState() == AbstractModule::INITIALIZING && channel == ModuleCommands::MKO_4)
+//            {
+//                setModuleState(AbstractModule::INITIALIZED_OK);
+//            }
         }
         break;
 
@@ -228,10 +228,10 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
     return true;
 }
 
-void ModuleSTM::onApplicationFinish()
-{
-    int TODO;
-}
+//void ModuleSTM::onApplicationFinish()
+//{
+//    int TODO;
+//}
 
 void ModuleSTM::onModuleError()
 {
@@ -244,46 +244,46 @@ void ModuleSTM::createResponse(Transaction& response)
     response = mCurrentTransaction;
 }
 
-void ModuleSTM::initializeCustomOKBModule()
-{
-    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
-    {
-        addModuleCmd(ModuleCommands::GET_POWER_CHANNEL_STATE, i, 0);
-    }
+//void ModuleSTM::initializeCustomOKBModule()
+//{
+//    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
+//    {
+//        addModuleCmd(ModuleCommands::GET_POWER_CHANNEL_STATE, i, 0);
+//    }
 
-    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
-    {
-        addModuleCmd(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, i, 0);
-    }
-}
+//    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
+//    {
+//        addModuleCmd(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, i, 0);
+//    }
+//}
 
-void ModuleSTM::setDefaultState()
-{
-    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
+//void ModuleSTM::setDefaultState()
+//{
+//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
-    int TODO; // for more reliability ask for channel state from module?
+//    int TODO; // for more reliability ask for channel state from module?
 
-    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
-    {
-        ModuleCommands::PowerState state = mPowerSupplyRelayStates.value(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-        if (state == ModuleCommands::POWER_ON)
-        {
-            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-        }
-    }
+//    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
+//    {
+//        ModuleCommands::PowerState state = mPowerSupplyRelayStates.value(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+//        if (state == ModuleCommands::POWER_ON)
+//        {
+//            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+//        }
+//    }
 
-    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
-    {
-        ModuleCommands::PowerState state = mMKOPowerSupplyRelayStates.value(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-        if (state == ModuleCommands::POWER_ON)
-        {
-            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-        }
-    }
+//    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
+//    {
+//        ModuleCommands::PowerState state = mMKOPowerSupplyRelayStates.value(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+//        if (state == ModuleCommands::POWER_ON)
+//        {
+//            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
+//        }
+//    }
 
-    //setModuleState(AbstractModule::SAFE_STATE);
+//    //setModuleState(AbstractModule::SAFE_STATE);
 
-    // TODO: possibly give powe supply to MKO?
-    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_OFF); // Hardcode enable MKO power supply (main?) TODO to cyclogram
-    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_OFF); // enable MKO power supply (reserve?) TODO
-}
+//    // TODO: possibly give powe supply to MKO?
+//    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_OFF); // Hardcode enable MKO power supply (main?) TODO to cyclogram
+//    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_OFF); // enable MKO power supply (reserve?) TODO
+//}

@@ -129,7 +129,7 @@ void Cyclogram::run()
         if (mIsMainCyclogram)
         {
             mVarController->restart(); // set current values to initial values if it is main cyclogram
-            mSystemState->onCyclogramStart();
+            //mSystemState->onCyclogramStart();
 
             // clear all subprograms variables data
             for (auto it = mCommands.begin(); it != mCommands.end(); ++it)
@@ -249,10 +249,10 @@ void Cyclogram::stop()
     mCurrent = mFirst;
     setState(STOPPED);
 
-    if (mIsMainCyclogram && mSystemState)
-    {
-        mSystemState->setDefaultState();
-    }
+//    if (mIsMainCyclogram && mSystemState)
+//    {
+//        mSystemState->setDefaultState();
+//    }
 }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE

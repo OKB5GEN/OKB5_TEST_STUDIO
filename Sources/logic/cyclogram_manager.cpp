@@ -29,7 +29,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileN
     auto itLoading = sLoadingFiles.find(fileName);
     if (itLoading != sLoadingFiles.end())
     {
-        LOG_ERROR(QString("Recursive '%1' file loading detected! Skip loading, create default cyclogram").arg(QDir::toNativeSeparators(fileName)));
+        LOG_ERROR(QString("Recursive '%1' file loading detected! Skip loading, creating default cyclogram").arg(QDir::toNativeSeparators(fileName)));
         if (ok)
         {
             *ok = false;
@@ -50,7 +50,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileN
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
-        LOG_ERROR(QString("Cannot open file %1: %2. Create default cyclogram").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        LOG_ERROR(QString("Cannot open file %1: %2. Creating default cyclogram").arg(QDir::toNativeSeparators(fileName), file.errorString()));
         p->createDefault();
         if (ok)
         {
@@ -64,7 +64,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileN
     FileReader reader(p);
     if (!reader.read(&file))
     {
-        LOG_ERROR(QString("Parse error in file %1: %2. Create default cyclogram").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+        LOG_ERROR(QString("Parse error in file %1: %2. Creating default cyclogram").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
         p->createDefault();
         if (ok)
         {

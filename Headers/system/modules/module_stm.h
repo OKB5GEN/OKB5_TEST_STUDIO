@@ -24,14 +24,14 @@ public:
 
 public slots:
     void processCustomCommand(const Transaction& request, Transaction& response) override;
-    void setDefaultState() override;
-    void onApplicationFinish() override;
+//    void setDefaultState() override;
+//    void onApplicationFinish() override;
 
 protected:
     void onModuleError() override;
     bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
     void createResponse(Transaction& response) override;
-    void initializeCustomOKBModule() override;
+//    void initializeCustomOKBModule() override;
 
 private:
     void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на БУП и ПНА

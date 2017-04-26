@@ -205,13 +205,16 @@ void SystemState::onApplicationStart()
     QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
     loadSystemConfig(modules, emulatorEnabled);
 
+    QString mode = emulatorEnabled ? tr("EMULATOR") : tr("REAL DEVICE");
+    LOG_INFO(QString("System mode: %1").arg(mode));
+
     // Create modules objects
     mMKO = new ModuleMKO(this);
     mMKO->setEmulator(emulatorEnabled);
     mMKO->setModuleID(ModuleCommands::MKO);
     connect(this, SIGNAL(sendToMKO(const Transaction&)), mMKO, SLOT(processCommand(const Transaction&)));
     connect(mMKO, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mMKO, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mMKO, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mOTD = new ModuleOTD(this);
     mOTD->setEmulator(emulatorEnabled);
@@ -219,7 +222,7 @@ void SystemState::onApplicationStart()
     mOTD->setModuleID(ModuleCommands::OTD);
     connect(this, SIGNAL(sendToOTD(const Transaction&)), mOTD, SLOT(processCommand(const Transaction&)));
     connect(mOTD, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mOTD, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mOTD, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mSTM = new ModuleSTM(this);
     mSTM->setEmulator(emulatorEnabled);
@@ -227,7 +230,7 @@ void SystemState::onApplicationStart()
     mSTM->setModuleID(ModuleCommands::STM);
     connect(this, SIGNAL(sendToSTM(const Transaction&)), mSTM, SLOT(processCommand(const Transaction&)));
     connect(mSTM, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mSTM, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mSTM, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mTech = new ModuleTech(this);
     mTech->setEmulator(emulatorEnabled);
@@ -235,7 +238,7 @@ void SystemState::onApplicationStart()
     mTech->setModuleID(ModuleCommands::TECH);
     connect(this, SIGNAL(sendToTech(const Transaction&)), mTech, SLOT(processCommand(const Transaction&)));
     connect(mTech, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mTech, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mTech, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setEmulator(emulatorEnabled);
@@ -243,7 +246,7 @@ void SystemState::onApplicationStart()
     mPowerBUP->setModuleID(ModuleCommands::POWER_UNIT_BUP);
     connect(this, SIGNAL(sendToPowerUnitBUP(const Transaction&)), mPowerBUP, SLOT(processCommand(const Transaction&)));
     connect(mPowerBUP, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mPowerBUP, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mPowerBUP, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setEmulator(emulatorEnabled);
@@ -251,42 +254,42 @@ void SystemState::onApplicationStart()
     mPowerPNA->setModuleID(ModuleCommands::POWER_UNIT_PNA);
     connect(this, SIGNAL(sendToPowerUnitPNA(const Transaction&)), mPowerPNA, SLOT(processCommand(const Transaction&)));
     connect(mPowerPNA, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-    connect(mPowerPNA, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
+//    connect(mPowerPNA, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
-    mModules[ModuleCommands::MKO] = mMKO;
-    mModules[ModuleCommands::OTD] = mOTD;
-    mModules[ModuleCommands::STM] = mSTM;
-    mModules[ModuleCommands::TECH] = mTech;
-    mModules[ModuleCommands::POWER_UNIT_BUP] = mPowerBUP;
-    mModules[ModuleCommands::POWER_UNIT_PNA] = mPowerPNA;
+//    mModules[ModuleCommands::MKO] = mMKO;
+//    mModules[ModuleCommands::OTD] = mOTD;
+//    mModules[ModuleCommands::STM] = mSTM;
+//    mModules[ModuleCommands::TECH] = mTech;
+//    mModules[ModuleCommands::POWER_UNIT_BUP] = mPowerBUP;
+//    mModules[ModuleCommands::POWER_UNIT_PNA] = mPowerPNA;
 
     // Start modules initialization. They will send 'initializationFinished' signal on initialization finish depending on its internal logic
     // The entire system will be initialized and ready to execute commands after 'initializationFinished' signal will be receceived from all modules
-    mPowerBUP->onApplicationStart();
-    mPowerPNA->onApplicationStart();
-    mOTD->onApplicationStart();
-    mSTM->onApplicationStart();
-    mTech->onApplicationStart();
-    mMKO->onApplicationStart();
+    //mPowerBUP->onApplicationStart();
+    //mPowerPNA->onApplicationStart();
+    //mOTD->onApplicationStart();
+    //mSTM->onApplicationStart();
+    //mTech->onApplicationStart();
+    //mMKO->onApplicationStart();
 
     // Create templates for internal protocol commands parameters
     setupCommandsParams();
 }
 
-void SystemState::setDefaultState()
-{
-    LOG_INFO("Setting default system state...");
+//void SystemState::setDefaultState()
+//{
+//    LOG_INFO("Setting default system state...");
 
-    foreach (AbstractModule* module, mModules.values())
-    {
-        LOG_INFO(QString("Module %1 state is %2").arg(module->moduleName()).arg(module->moduleState()));
+//    foreach (AbstractModule* module, mModules.values())
+//    {
+//        LOG_INFO(QString("Module %1 state is %2").arg(module->moduleName()).arg(module->moduleState()));
 
-        if (module->moduleState() == AbstractModule::INITIALIZED_OK)
-        {
-            module->setDefaultState();
-        }
-    }
-}
+//        if (module->moduleState() == AbstractModule::INITIALIZED_OK)
+//        {
+//            module->setDefaultState();
+//        }
+//    }
+//}
 
 QString SystemState::paramName(int module, int command, int param, bool isInputParam) const
 {
@@ -401,7 +404,6 @@ void SystemState::setupCommandsParams()
         //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
         //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
         //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
-
     }
 
     {
@@ -589,6 +591,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         break;
 
     default:
+        LOG_ERROR(QString("Module not defined"));
         break;
     }
 }
@@ -671,55 +674,55 @@ SystemState::ParamID SystemState::paramID(const QString& name) const
     return mParamNames.key(name, UNDEFINED);
 }
 
-void SystemState::onModuleStateChanged(ModuleCommands::ModuleID id, AbstractModule::ModuleState from, AbstractModule::ModuleState to)
-{
-    QMetaEnum stateEnum = QMetaEnum::fromType<AbstractModule::ModuleState>();
-    AbstractModule* module = mModules.value(id);
+//void SystemState::onModuleStateChanged(ModuleCommands::ModuleID id, AbstractModule::ModuleState from, AbstractModule::ModuleState to)
+//{
+//    QMetaEnum stateEnum = QMetaEnum::fromType<AbstractModule::ModuleState>();
+//    AbstractModule* module = mModules.value(id);
 
-    if (from == AbstractModule::INITIALIZING)
-    {
-        if (to == AbstractModule::INITIALIZED_OK)
-        {
-            LOG_INFO(QString("%1 initializion SUCCESS").arg(module->moduleName()));
-            if (id == ModuleCommands::OTD)
-            {
-                createOTDCommandsParams();
-            }
-        }
-        else if (to == AbstractModule::INITIALIZED_FAILED)
-        {
-            LOG_ERROR(QString("%1 initialization FAILED! Error: %2").arg(module->moduleName()).arg(module->errorString()));
-        }
-        else
-        {
-            LOG_ERROR(QString("Unexpected %1 state changing from %2 to %3").arg(module->moduleName()).arg(stateEnum.valueToKey(from)).arg(stateEnum.valueToKey(to)));
-        }
+//    if (from == AbstractModule::INITIALIZING)
+//    {
+//        if (to == AbstractModule::INITIALIZED_OK)
+//        {
+//            LOG_INFO(QString("%1 initializion SUCCESS").arg(module->moduleName()));
+//            if (id == ModuleCommands::OTD)
+//            {
+//                createOTDCommandsParams();
+//            }
+//        }
+//        else if (to == AbstractModule::INITIALIZED_FAILED)
+//        {
+//            LOG_ERROR(QString("%1 initialization FAILED! Error: %2").arg(module->moduleName()).arg(module->errorString()));
+//        }
+//        else
+//        {
+//            LOG_ERROR(QString("Unexpected %1 state changing from %2 to %3").arg(module->moduleName()).arg(stateEnum.valueToKey(from)).arg(stateEnum.valueToKey(to)));
+//        }
 
-        // check all modules are started
-        bool allModulesStarted = true;
-        foreach (AbstractModule* m, mModules.values())
-        {
-            if (m->moduleState() == AbstractModule::INITIALIZED_FAILED || m->moduleState() == AbstractModule::INITIALIZED_OK)
-            {
-                continue;
-            }
+//        // check all modules are started
+//        bool allModulesStarted = true;
+//        foreach (AbstractModule* m, mModules.values())
+//        {
+//            if (m->moduleState() == AbstractModule::INITIALIZED_FAILED || m->moduleState() == AbstractModule::INITIALIZED_OK)
+//            {
+//                continue;
+//            }
 
-            allModulesStarted = false;
-            break;
-        }
+//            allModulesStarted = false;
+//            break;
+//        }
 
-        // if all modules are started, set them to default state
-        if (allModulesStarted)
-        {
-            setDefaultState();
-        }
-    }
-}
+//        // if all modules are started, set them to default state
+//        if (allModulesStarted)
+//        {
+//            setDefaultState();
+//        }
+//    }
+//}
 
-void SystemState::onCyclogramStart()
-{
-    mMKO->onCyclogramStart();
-}
+//void SystemState::onCyclogramStart()
+//{
+//    mMKO->onCyclogramStart();
+//}
 
 bool SystemState::isImplicit(const QString &name) const
 {

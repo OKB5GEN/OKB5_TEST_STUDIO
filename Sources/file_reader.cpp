@@ -165,7 +165,7 @@ void FileReader::readCommandsLinks()
 {
     if (mCommands.empty()) //TODO validate file reading (temporary create default cyclogram)
     {
-        LOG_WARNING(QString("File not loaded create default cyclogram"));
+        LOG_WARNING(QString("File not loaded creating default cyclogram"));
         auto cyclogram = mCyclogram.lock();
         cyclogram->createDefault();
         return;

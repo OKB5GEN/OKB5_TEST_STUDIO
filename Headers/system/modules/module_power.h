@@ -39,13 +39,13 @@ public:
     ModulePower(QObject* parent);
     ~ModulePower();
 
-    void initializeCustom() override;
+    //void initializeCustom() override;
 
 public slots:
-    void setDefaultState() override;
+    //void setDefaultState() override;
 
     void processCommand(const Transaction& params) override;
-    void onApplicationFinish() override;
+    //void onApplicationFinish() override;
 
 protected:
     bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;

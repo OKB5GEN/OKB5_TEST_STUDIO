@@ -903,24 +903,24 @@ void ModuleMKO::processCommand(const Transaction& params)
     }
 }
 
-void ModuleMKO::onApplicationStart()
-{
-    setModuleState(AbstractModule::INITIALIZING);
-    setModuleState(AbstractModule::INITIALIZED_OK);
-    //startMKO(); //TODO when to stop MKO? and we are using main kit only for now
-}
+//void ModuleMKO::onApplicationStart()
+//{
+//    setModuleState(AbstractModule::INITIALIZING);
+//    setModuleState(AbstractModule::INITIALIZED_OK);
+//    //startMKO(); //TODO when to stop MKO? and we are using main kit only for now
+//}
 
-void ModuleMKO::setDefaultState()
-{
-    //TODO check state
-    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
-    setModuleState(AbstractModule::SAFE_STATE);
-    mMainKitEnabled = false;
-    mReserveKitEnabled = false;
-    int TODO;
-}
+//void ModuleMKO::setDefaultState()
+//{
+//    //TODO check state
+//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
+//    setModuleState(AbstractModule::SAFE_STATE);
+//    mMainKitEnabled = false;
+//    mReserveKitEnabled = false;
+//    int TODO;
+//}
 
-void ModuleMKO::onCyclogramStart()
-{
-    startMKO();
-}
+//void ModuleMKO::onCyclogramStart()
+//{
+//    startMKO();
+//}

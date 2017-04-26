@@ -54,43 +54,43 @@ ModulePower::~ModulePower()
 
 }
 
-void ModulePower::initializeCustom()
-{
-    // receive device parameters:
+//void ModulePower::initializeCustom()
+//{
+//    // receive device parameters:
 
-    // MANDATORY:
-    // - device class
-    // - nominal voltage
-    // - nominal current
-    // - nominal power
-    // - OVP threshold
-    // - OCP threshold
-    // - actual device state (voltage, current, alarms)
+//    // MANDATORY:
+//    // - device class
+//    // - nominal voltage
+//    // - nominal current
+//    // - nominal power
+//    // - OVP threshold
+//    // - OCP threshold
+//    // - actual device state (voltage, current, alarms)
 
-    // perform first step: get nominal values
-    getDeviceClass();
-    getNominalValue(NOMINAL_CURRENT);
-    getNominalValue(NOMINAL_VOLTAGE);
-    getNominalValue(NOMINAL_POWER);
+//    // perform first step: get nominal values
+//    getDeviceClass();
+//    getNominalValue(NOMINAL_CURRENT);
+//    getNominalValue(NOMINAL_VOLTAGE);
+//    getNominalValue(NOMINAL_POWER);
 
-    // OPTIONAL (for logging only): //TODO
-    // - device type
-    // - device serial number
-    // - device article number
-    // - device software version
-    // - device manufacturer
-}
+//    // OPTIONAL (for logging only): //TODO
+//    // - device type
+//    // - device serial number
+//    // - device article number
+//    // - device software version
+//    // - device manufacturer
+//}
 
-void ModulePower::setDefaultState()
-{
-    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
+//void ModulePower::setDefaultState()
+//{
+//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
-    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
-    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off external power output
+//    sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS); // reset error if exist
+//    sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF); // switch off external power output
 
-    //setCurVoltage(MIN_VOLTAGE); // Hardcode
-    //sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON); // Hardcode
-}
+//    //setCurVoltage(MIN_VOLTAGE); // Hardcode
+//    //sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON); // Hardcode
+//}
 
 void ModulePower::setCurVoltage(qreal voltage)
 {
@@ -419,10 +419,10 @@ void ModulePower::getDeviceClass()
     addRequest(GET_DEVICE_CLASS, request);
 }
 
-void ModulePower::onApplicationFinish()
-{
-    int TODO; // power off on app close
-}
+//void ModulePower::onApplicationFinish()
+//{
+//    int TODO; // power off on app close
+//}
 
 bool ModulePower::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
@@ -472,16 +472,16 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
             tmp.push_back(response[6]);
             mNominalPower = qreal(byteArrayToFloat(tmp));
 
-            // second step of initialization, add some requests (TODO move to the initialization cyclogram?)
-            getCurVoltageAndCurrent();
-            sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // switch module to remote control to have ability to set U and I
+            //TODO: remove  second step of initialization, add some requests (TODO move to the initialization cyclogram?)
+//            getCurVoltageAndCurrent();
+//            sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL); // switch module to remote control to have ability to set U and I
 
-            getObjectValue(OVP_THRESHOLD);
-            getObjectValue(OCP_THRESHOLD);
+//            getObjectValue(OVP_THRESHOLD);
+//            getObjectValue(OCP_THRESHOLD);
 
-            // set voltage and current thresholds
-            setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
-            setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
+//            // set voltage and current thresholds
+//            setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
+//            setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
         }
         break;
 
@@ -493,10 +493,10 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 
     case SET_OCP_THRESHOLD:
         {
-            if (moduleState() == AbstractModule::INITIALIZING)
-            {
-                setModuleState(AbstractModule::INITIALIZED_OK);
-            }
+//            if (moduleState() == AbstractModule::INITIALIZING)
+//            {
+//                setModuleState(AbstractModule::INITIALIZED_OK);
+//            }
 
             int TODO; // parse response that is all OK
         }
@@ -534,7 +534,7 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
             mCurrent = (uu1 << 8) | uu2;
             mCurrent = mCurrent * mNominalCurrent / STEPS_COUNT;
 
-            if (!mCurrentTransaction.outputParams.isEmpty())
+            if (!mCurrentTransaction.outputParams.empty())
             {
                 mCurrentTransaction.errorCode = mError;
                 QString voltageVar = mCurrentTransaction.outputParams.value(SystemState::VOLTAGE).toString();
@@ -604,10 +604,10 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
             int TODO; // parse response, to not have errors
             mState = ModuleCommands::POWER_ON;
 
-            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
-            {
-                setModuleState(AbstractModule::SAFE_STATE);
-            }
+//            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
+//            {
+//                setModuleState(AbstractModule::SAFE_STATE);
+//            }
         }
         break;
 

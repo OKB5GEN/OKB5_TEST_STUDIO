@@ -77,41 +77,41 @@ int ModuleOTD::dsCount(LineID line) const
     return mSensorsCntNu;
 }
 
-void ModuleOTD::initializeCustomOKBModule()
-{
-    setDefaultState();
+//void ModuleOTD::initializeCustomOKBModule()
+//{
+//    setDefaultState();
 
-    // read sensors count on both lines (TODO do not change call order)
-    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
-    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
+//    // read sensors count on both lines (TODO do not change call order)
+//    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
+//    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
 
-    // get sensors adresses TODO (what for this functionality is used?)
-    /*
-    ModuleCommands::CommandID commandGetAddr = (line == PSY) ? ModuleCommands::GET_DS1820_ADDR_LINE_1 : ModuleCommands::GET_DS1820_ADDR_LINE_2;
+//    // get sensors adresses TODO (what for this functionality is used?)
+//    /*
+//    ModuleCommands::CommandID commandGetAddr = (line == PSY) ? ModuleCommands::GET_DS1820_ADDR_LINE_1 : ModuleCommands::GET_DS1820_ADDR_LINE_2;
 
-    for(int j = 0; j < count; ++j)
-    {
-        for(int k = 0; k < SERIAL_NUMBER_BYTES_COUNT; ++k)
-        {
-            QByteArray response1;
-            if (!sendCommand(commandGetAddr, j + 1, k, &response1))
-            {
-                continue;
-            }
+//    for(int j = 0; j < count; ++j)
+//    {
+//        for(int k = 0; k < SERIAL_NUMBER_BYTES_COUNT; ++k)
+//        {
+//            QByteArray response1;
+//            if (!sendCommand(commandGetAddr, j + 1, k, &response1))
+//            {
+//                continue;
+//            }
 
-            uint8_t addr = response1[2];
-            //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
-        }
-    }*/
-}
+//            uint8_t addr = response1[2];
+//            //LOG_INFO("DS1820 sensor %i address is %i", j + 1, addr);
+//        }
+//    }*/
+//}
 
-void ModuleOTD::setDefaultState()
-{
-    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
+//void ModuleOTD::setDefaultState()
+//{
+//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
 
-    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
-    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
-}
+//    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
+//    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
+//}
 
 void ModuleOTD::processCustomCommand(const Transaction& request, Transaction& response)
 {
@@ -184,10 +184,10 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
             mSensorsCntNu = response[2];
             LOG_INFO("DS1820 sensors count at line 2 is %i", mSensorsCntNu);
 
-            if (moduleState() == AbstractModule::INITIALIZING)
-            {
-                setModuleState(AbstractModule::INITIALIZED_OK);
-            }
+//            if (moduleState() == AbstractModule::INITIALIZING)
+//            {
+//                setModuleState(AbstractModule::INITIALIZED_OK);
+//            }
         }
         break;
 
@@ -236,10 +236,10 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::RESET_LINE_2:
         {
-            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
-            {
-                setModuleState(AbstractModule::SAFE_STATE);
-            }
+//            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
+//            {
+//                setModuleState(AbstractModule::SAFE_STATE);
+//            }
         }
         break;
 
@@ -252,10 +252,10 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
     return true;
 }
 
-void ModuleOTD::onApplicationFinish()
-{
-    int TODO;
-}
+//void ModuleOTD::onApplicationFinish()
+//{
+//    int TODO;
+//}
 
 void ModuleOTD::onModuleError()
 {

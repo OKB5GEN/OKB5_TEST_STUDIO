@@ -4,7 +4,7 @@
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
 #include "Headers/gui/tools/monitor_manual.h"
 #include "Headers/gui/tools/monitor_auto.h"
-#include "Headers/gui/application_finish_dialog.h"
+#include "Headers/gui/modal_cyclogram_execution_dialog.h"
 #include "Headers/gui/tools/app_console.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
@@ -23,6 +23,12 @@ namespace
     static const int TOOLBAR_ICON_SIZE = 64;
     static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir";
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
+
+    // TODO move to configuration file
+    static const QString APP_START_CYCLOGRAM_FILE = "on_app_start.cgr";
+    static const QString APP_FINISH_CYCLOGRAM_FILE = "on_app_finish.cgr";
+    static const QString CYCLOGRAM_START_CYCLOGRAM_FILE = "on_cyclogram_start.cgr";
+    static const QString CYCLOGRAM_FINISH_CYCLOGRAM_FILE = "on_cyclogram_finish.cgr";
 }
 
 EditorWindow::EditorWindow():
@@ -55,6 +61,7 @@ EditorWindow::EditorWindow():
 void EditorWindow::onApplicationStart()
 {
     mSystemState->onApplicationStart();
+    runModalCyclogram(APP_START_CYCLOGRAM_FILE, tr("Running application start cyclogram..."));
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
@@ -73,12 +80,6 @@ void EditorWindow::closeEvent(QCloseEvent *event)
         {
             cyclogram->disconnect();
             cyclogram->stop();
-
-            ApplicationFinishDialog appFinishDialog(this);
-            if (appFinishDialog.init())
-            {
-                appFinishDialog.exec();
-            }
         }
         else
         {
@@ -90,6 +91,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     if (maybeSave())
     {
         writeSettings();
+        runModalCyclogram(APP_FINISH_CYCLOGRAM_FILE, tr("Running application finish cyclogram..."));
         event->accept();
     }
     else
@@ -463,6 +465,8 @@ void EditorWindow::runCyclogram()
         return;
     }
 
+    runModalCyclogram(CYCLOGRAM_START_CYCLOGRAM_FILE, tr("Running pre-execution cyclogram..."));
+
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     if (mCyclogram->state() == Cyclogram::STOPPED)
     {
@@ -558,13 +562,27 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
     }
 
     dialog->exec();
+
+    runModalCyclogram(CYCLOGRAM_FINISH_CYCLOGRAM_FILE, tr("Running post-execution cyclogram..."));
+}
+
+void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString& text)
+{
+    ModalCyclogramExecutionDialog dialog(Q_NULLPTR);
+    if (dialog.init(shortFileName, text))
+    {
+        setEnabled(false);
+        dialog.exec();
+        setEnabled(true);
+    }
 }
 
 void EditorWindow::onCyclogramStateChanged(int state)
 {
+    auto cyclogram = mCyclogram.lock();
     mOpenAct->setEnabled(state == Cyclogram::STOPPED);
     mNewAct->setEnabled(state == Cyclogram::STOPPED);
-    mSaveAct->setEnabled(state == Cyclogram::STOPPED);
+    mSaveAct->setEnabled(state == Cyclogram::STOPPED && cyclogram->isModified());
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     if (state == Cyclogram::PAUSED)

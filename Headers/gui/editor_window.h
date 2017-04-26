@@ -45,13 +45,14 @@ private slots:
 
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
-
     void commitData(QSessionManager &);
 
 signals:
     void documentSaved(bool saved);
 
 private:
+    void runModalCyclogram(const QString& shortFileName, const QString& text);
+
     void createActions();
     void createStatusBar();
     void readSettings();

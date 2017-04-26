@@ -24,13 +24,13 @@ public:
 
 public slots:
     void processCustomCommand(const Transaction& request, Transaction& response) override;
-    void setDefaultState() override;
-    void onApplicationFinish() override;
+//    void setDefaultState() override;
+//    void onApplicationFinish() override;
 
 protected:
     bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
     void createResponse(Transaction& response) override;
-    void initializeCustomOKBModule() override;
+//    void initializeCustomOKBModule() override;
     void onModuleError() override;
 
 private:

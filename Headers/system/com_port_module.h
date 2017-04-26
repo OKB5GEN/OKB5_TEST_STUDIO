@@ -29,10 +29,10 @@ public:
     void setId(const Identifier& id);
     const Identifier& id() const;
 
-    void onApplicationStart() override;
+    //void onApplicationStart() override;
 
     // callback for some actions that must be performed on application finish
-    virtual void onApplicationFinish() = 0;
+    //virtual void onApplicationFinish() = 0; //TODO
 
 protected:
     // return true if processing successful
@@ -46,7 +46,7 @@ protected:
     virtual void onTransmissionComplete() = 0;
 
     // inherited class custom initialization. Module state must be set to INITIALIZED_OK/INITIALIZED_FAILED after initialization success/fail
-    virtual void initializeCustom() = 0;
+    //virtual void initializeCustom() = 0;
 
     void addRequest(uint32_t operationID, const QByteArray& request);
     void softReset();

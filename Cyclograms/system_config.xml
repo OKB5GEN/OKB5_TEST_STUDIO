@@ -8,6 +8,6 @@
 	<module type="OTD" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000014" vendorId="1155"/>
 	<module type="TECH" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000016" vendorId="1155"/>
     </modules>
-    <emulator enabled="1"> <!-- 0 or no attribute - use real hardware -->
+    <emulator enabled="0"> <!-- 0 or no attribute - use real hardware -->
     </emulator>
 </system_config>

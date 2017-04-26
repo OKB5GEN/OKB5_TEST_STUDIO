@@ -23,8 +23,8 @@ public:
 
 public slots:
     void processCustomCommand(const Transaction& request, Transaction& response) override;
-    void onApplicationFinish() override;
-    void setDefaultState() override;
+//    void onApplicationFinish() override;
+//    void setDefaultState() override;
 
 protected:
     void onModuleError() override;

@@ -57,8 +57,8 @@ public:
 
     void onApplicationStart();
 
-    void setDefaultState();
-    void onCyclogramStart(); //TODO remove
+    //void setDefaultState();
+    //void onCyclogramStart(); //TODO remove
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
@@ -73,21 +73,11 @@ public:
 
 private slots:
     void processResponse(const Transaction& response);
-    void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
+//    void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 signals:
     void commandFinished(bool success);
 
-    // TODO refactor >>>
-    void MKO_DY(int x, int y);
-    void MKO_ts(int x,int y, int z);
-    void MKO_cm(int x,QString y,int z, int k);
-    void MKO_cm_r(int x,int y,int z);
-    void MKO_ch(int x);
-    void MKO_auto(int x,int y,int adr1, int adr2);
-    // <<<
-
-    // new signals
     void sendToSTM(const Transaction& request);
     void sendToOTD(const Transaction& request);
     void sendToTech(const Transaction& request);
@@ -124,6 +114,6 @@ private:
     QMap<ParamID, QString> mDefaultVariables;
     QMap<ParamID, QString> mDefaultDescriptions;
 
-    QMap<ModuleCommands::ModuleID, AbstractModule*> mModules;
+//    QMap<ModuleCommands::ModuleID, AbstractModule*> mModules;
 };
 #endif // SYSTEM_STATE_H

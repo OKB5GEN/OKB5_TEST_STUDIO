@@ -34,19 +34,19 @@ class AbstractModule: public QObject
     Q_OBJECT
 
 public:
-    enum ModuleState
-    {
-        NOT_INITIALIZED,      // module state on application start
-        INITIALIZING,         // module object created, its initialization started
-        INITIALIZED_FAILED,   // module initialization finished with error, module is not ready to process commands (possibly soft reset will help)
-        INITIALIZED_OK,       // module initialization succesfully finished, module is raedy to process commands
-        SETTING_TO_SAFE_STATE,// module resetting to "cyclogram-applicable" state started
-        SAFE_STATE,           // module is ready to process cyclogram commands
-        UNSAFE_STATE,         // cyclogram started, some module commands could be executed
-        SOFT_RESETTING        // module is in soft reset state
-    };
+//    enum ModuleState
+//    {
+//        NOT_INITIALIZED,      // module state on application start
+//        INITIALIZING,         // module object created, its initialization started
+//        INITIALIZED_FAILED,   // module initialization finished with error, module is not ready to process commands (possibly soft reset will help)
+//        INITIALIZED_OK,       // module initialization succesfully finished, module is raedy to process commands
+//        SETTING_TO_SAFE_STATE,// module resetting to "cyclogram-applicable" state started
+//        SAFE_STATE,           // module is ready to process cyclogram commands
+//        UNSAFE_STATE,         // cyclogram started, some module commands could be executed
+//        SOFT_RESETTING        // module is in soft reset state
+//    };
 
-    Q_ENUM(ModuleState)
+//    Q_ENUM(ModuleState)
 
     AbstractModule(QObject* parent);
 
@@ -57,26 +57,26 @@ public:
     ModuleCommands::ModuleID moduleID() const;
 
     const QString& moduleName() const;
-    ModuleState moduleState() const;
+//    ModuleState moduleState() const;
 
     const QString& errorString() const;
 
 public slots:
-    virtual void processCommand(const Transaction& request) = 0;
-    virtual void setDefaultState() = 0;
-    virtual void onApplicationStart() = 0;
+    virtual void processCommand(const Transaction& request) = 0; // this method must be reimplemented in inherited classes to receive calls from cyclogram commands
+//    virtual void setDefaultState() = 0;
+//    virtual void onApplicationStart() = 0;
 
 protected:
-    void setModuleState(ModuleState moduleState, const QString& error = QString(""));
+//    void setModuleState(ModuleState moduleState, const QString& error = QString(""));
 
     Transaction mCurrentTransaction;
 
 signals:
-    void commandResult(const Transaction& response);
-    void stateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
+    void commandResult(const Transaction& response); // this signal must be sent when module command execution finished (succesful or not)
+//    void stateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 private:
-    ModuleState mState;
+//    ModuleState mState;
     ModuleCommands::ModuleID mModuleID;
     QString mModuleName;
     QString mErrorString;

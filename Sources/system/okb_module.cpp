@@ -20,24 +20,24 @@ ModuleOKB::~ModuleOKB()
 
 }
 
-void ModuleOKB::initializeCustom()
-{
-    // OKB Module initialization process:
-    //  1. Ask module for its default address
-    //  2. Ask module for its current address
-    //  3. Compare module default and current addresses
-    //  4. If addresses are not equal - send initializationFinished signal with ERROR and abort further initialization
-    //  5. If addresses are equal - ask module for its status word to check errors
-    //  6. If module has errors - send initializationFinished signal with ERROR and abort further initialization
-    //  7. If module has no errors - begin module custom initialization, by calling initializeCustomOKBModule()
-    //  8. If initializeCustomOKBModule() not overridden it just will send initializationFinished SUCCESS signal without error
-    //  9. Otherwise initializationFinished signal must be sent from inherited class (SUCCES or ERROR depending on custom logic)
-    // 10. If some transmission error will happen during initialization, we consider it as critical error and abort initialization
+//void ModuleOKB::initializeCustom()
+//{
+//    // OKB Module initialization process:
+//    //  1. Ask module for its default address
+//    //  2. Ask module for its current address
+//    //  3. Compare module default and current addresses
+//    //  4. If addresses are not equal - send initializationFinished signal with ERROR and abort further initialization
+//    //  5. If addresses are equal - ask module for its status word to check errors
+//    //  6. If module has errors - send initializationFinished signal with ERROR and abort further initialization
+//    //  7. If module has no errors - begin module custom initialization, by calling initializeCustomOKBModule()
+//    //  8. If initializeCustomOKBModule() not overridden it just will send initializationFinished SUCCESS signal without error
+//    //  9. Otherwise initializationFinished signal must be sent from inherited class (SUCCES or ERROR depending on custom logic)
+//    // 10. If some transmission error will happen during initialization, we consider it as critical error and abort initialization
 
-    // Initialization step 1: Aquire and check module addresses
-    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
-    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
-}
+//    // Initialization step 1: Aquire and check module addresses
+//    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
+//    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
+//}
 
 void ModuleOKB::addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
@@ -106,10 +106,10 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     return false;
 }
 
-void ModuleOKB::initializeCustomOKBModule()
-{
-    setModuleState(AbstractModule::INITIALIZED_OK);
-}
+//void ModuleOKB::initializeCustomOKBModule()
+//{
+//    setModuleState(AbstractModule::INITIALIZED_OK);
+//}
 
 void ModuleOKB::processCommand(const Transaction& params)
 {
@@ -156,11 +156,11 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
 
     if (!error.isEmpty())
     {
-        if (moduleState() == AbstractModule::INITIALIZING)
-        {
-            setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-        }
-        else
+//        if (moduleState() == AbstractModule::INITIALIZING)
+//        {
+//            setModuleState(AbstractModule::INITIALIZED_FAILED, error);
+//        }
+//        else
         {
             LOG_ERROR(error);
             onModuleError();
@@ -187,20 +187,20 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 LOG_INFO("Module default address is 0x%x", mDefaultAddress);
             }
 
-            // Initialization step 1 finish >>>
-            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && moduleState() == AbstractModule::INITIALIZING)
-            {
-                if (mCurrentAddress != mDefaultAddress)
-                {
-                    QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
-                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-                }
-                else
-                {
-                    // Initialization step 2: Check module status word
-                    addModuleCmd(ModuleCommands::GET_STATUS_WORD, 0, 0);
-                }
-            }
+            // TODO: remove Initialization step 1 finish >>>
+//            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && moduleState() == AbstractModule::INITIALIZING)
+//            {
+//                if (mCurrentAddress != mDefaultAddress)
+//                {
+//                    QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
+//                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
+//                }
+//                else
+//                {
+//                    // Initialization step 2: Check module status word
+//                    addModuleCmd(ModuleCommands::GET_STATUS_WORD, 0, 0);
+//                }
+//            }
         }
         break;
 
@@ -238,19 +238,19 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 LOG_WARNING("UMART data byte lost in module 0x%02x due to buffer overflow", mCurrentAddress);//TODO is it error?
             }
 
-            // Initialization step 2 finish >>>
-            if (moduleState() == AbstractModule::INITIALIZING)
-            {
-                if (!error.isEmpty())
-                {
-                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-                }
-                else
-                {
-                    initializeCustomOKBModule();
-                }
-            }
-            else
+            // TODO: remove Initialization step 2 finish >>>
+//            if (moduleState() == AbstractModule::INITIALIZING)
+//            {
+//                if (!error.isEmpty())
+//                {
+//                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
+//                }
+//                else
+//                {
+//                    initializeCustomOKBModule();
+//                }
+//            }
+//            else
             {
                 if (!error.isEmpty())
                 {

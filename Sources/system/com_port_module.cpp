@@ -95,28 +95,28 @@ QString COMPortModule::findPortName() const
     return QString();
 }
 
-void COMPortModule::onApplicationStart()
-{
-    setModuleState(AbstractModule::INITIALIZING);
+//void COMPortModule::onApplicationStart()
+//{
+//    setModuleState(AbstractModule::INITIALIZING);
 
-    QString portName = findPortName();
+//    QString portName = findPortName();
 
-    if (portName.isNull())
-    {
-        setModuleState(AbstractModule::INITIALIZED_FAILED, QString("Module %1 configuration error. No COM port module found").arg(moduleName()));
-        return;
-    }
+//    if (portName.isNull())
+//    {
+//        setModuleState(AbstractModule::INITIALIZED_FAILED, QString("Module %1 configuration error. No COM port module found").arg(moduleName()));
+//        return;
+//    }
 
-    QString error = createPort(portName);
+//    QString error = createPort(portName);
 
-    if (!error.isEmpty())
-    {
-        setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-        return;
-    }
+//    if (!error.isEmpty())
+//    {
+//        setModuleState(AbstractModule::INITIALIZED_FAILED, error);
+//        return;
+//    }
 
-    initializeCustom();
-}
+//    initializeCustom();
+//}
 
 QString COMPortModule::createPort(const QString& portName)
 {
@@ -288,7 +288,7 @@ void COMPortModule::softReset()
     mPort->close();
     mPort->deleteLater();
     mPort = Q_NULLPTR;
-    setModuleState(AbstractModule::SOFT_RESETTING);
+    //setModuleState(AbstractModule::SOFT_RESETTING);
 
     mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
 }
@@ -313,7 +313,8 @@ void COMPortModule::tryCreatePort()
     }
 
     LOG_INFO(QString("%1 (%2) is up after soft reset").arg(moduleName()).arg(mPort->portName()));
-    onApplicationStart();
+
+    //onApplicationStart();
 }
 
 const COMPortModule::Identifier& COMPortModule::id() const
