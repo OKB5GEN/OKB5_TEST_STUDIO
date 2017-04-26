@@ -562,8 +562,6 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
     }
 
     dialog->exec();
-
-    runModalCyclogram(CYCLOGRAM_FINISH_CYCLOGRAM_FILE, tr("Running post-execution cyclogram..."));
 }
 
 void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString& text)
@@ -591,6 +589,11 @@ void EditorWindow::onCyclogramStateChanged(int state)
         mRunAct->setStatusTip(tr("Execute cyclogram"));
     }
 #endif
+
+    if (state == Cyclogram::STOPPED)
+    {
+        runModalCyclogram(CYCLOGRAM_FINISH_CYCLOGRAM_FILE, tr("Running post-execution cyclogram..."));
+    }
 }
 
 void EditorWindow::commitData(QSessionManager &manager)
