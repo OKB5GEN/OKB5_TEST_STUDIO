@@ -5,7 +5,6 @@
 #include "Headers/system/modules/module_power.h"
 #include "Headers/system/modules/module_stm.h"
 #include "Headers/system/modules/module_tech.h"
-//#include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
@@ -96,7 +95,6 @@ void CmdActionModule::updateText()
     mText = "";
     bool isValid = true;
 
-
     for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
         if (!it.value().isValid())
@@ -104,20 +102,6 @@ void CmdActionModule::updateText()
             isValid = false;
             break;
         }
-        else
-        {
-//            if (!mText.isEmpty())
-//            {
-//                mText += ",";
-//            }
-//
-//            mText += it.value();
-        }
-    }
-
-    if (!mOutputParams.isEmpty())
-    {
-//        mText += "=";
     }
 
     if (mInputParams.size() < mSystemState->paramsCount(mModule, mOperation, true))
@@ -130,12 +114,7 @@ void CmdActionModule::updateText()
         isValid = false;
     }
 
-//    mText += moduleName();
-//    mText += ".";
     mText += commandName();
-//    mText += "(";
-
-//    bool isFirstParam = true;
 
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
@@ -144,20 +123,7 @@ void CmdActionModule::updateText()
             isValid = false;
             break;
         }
-        else
-        {
-//            if (!isFirstParam)
-//            {
-//                mText += ",";
-//            }
-
-//            mText += it.value();
-        }
-
-//        isFirstParam = false;
     }
-
-//    mText += ")";
 
     if (!isValid)
     {
@@ -246,10 +212,18 @@ QString CmdActionModule::moduleName() const
 
 QString CmdActionModule::commandName() const
 {
-    QString text = tr("ЗАГЛУШКА");
+    QString text = moduleName();
+    text += tr(".");
+
     switch (mOperation)
     {
-    case ModuleCommands::SET_POWER_CHANNEL_STATE: // Управление подачей питания 27В на модуле питания
+    case ModuleCommands::GET_MODULE_STATUS:
+        text += tr("ПолСтат");
+        break;
+    case ModuleCommands::SET_MODULE_LOGIC_STATUS:
+        text += tr("УстСтат");
+        break;
+    case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
             QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
             QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
@@ -258,11 +232,11 @@ QString CmdActionModule::commandName() const
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text = tr("СТМ.Вкл");
+                text += tr("Вкл");
             }
             else
             {
-                text = tr("СТМ.Выкл");
+                text += tr("Выкл");
             }
 
             switch (channel)
@@ -288,7 +262,7 @@ QString CmdActionModule::commandName() const
         }
         break;
 
-    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE: // Управление подачей питания на МКО
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
             QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
             QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
@@ -297,11 +271,11 @@ QString CmdActionModule::commandName() const
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text = tr("СТМ.Вкл");
+                text += tr("Вкл");
             }
             else
             {
-                text = tr("СТМ.Выкл");
+                text += tr("Выкл");
             }
 
             switch (channel)
@@ -317,119 +291,80 @@ QString CmdActionModule::commandName() const
             }
         }
         break;
-
-    // own modules commands
-    //case ModuleCommands::RESET_ERROR:                   text = tr("СбросОшб"); break;  // Команда сброса ошибок
-    //case ModuleCommands::SOFT_RESET:                    text = tr("Перезагр"); break;  // Soft reset
-    //case ModuleCommands::ECHO:                          text = tr("ЭХО"); break; // Echo
-    //case ModuleCommands::GET_PWR_MODULE_FUSE_STATE:     text = tr("СОСТ"); break;// Запрос проверки целостности предохранителя с модулей питания
-    //case ModuleCommands::SET_MKO_PWR_CHANNEL_STATE:     text = tr("УП"); break;  // Команда управления питанием МКО интерфейсов
-    //case ModuleCommands::GET_POWER_MODULE_STATE:        text = tr("СОСТ"); break; // Запрос состояния модуля подачи питания 27В
-    //case ModuleCommands::GET_MKO_MODULE_STATE:          text = tr("СОСТ"); break; // Запрос состояния МКО
-    //case ModuleCommands::RESET_LINE_1:                  text = tr("СDS1"); break; // Ресет датчиков на линии 1 (нет в интерфейсе)
-    //case ModuleCommands::RESET_LINE_2:                  text = tr("СDS2"); break; // Ресет датчиков на линии 2 (нет в интерфейсе)
-    case ModuleCommands::GET_CHANNEL_TELEMETRY:         text = tr("ОТД.ПолТелем"); break;  // Запрос данных сигналов телеметрии СТМ
-    case ModuleCommands::GET_TEMPERATURE_PT100:         text = tr("ОТД.ПолТемпПТ"); break;  // Запрос значений температурных датчиков ПТ-100
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1: text = tr("ОТД.ПолТемпDS1"); break; // Запрос значений температурных датчиков DS1820 на линии 1
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2: text = tr("ОТД.ПолТемпDS2"); break; // Запрос значений температурных датчиков DS1820 на линии 2
-
-    // Third party modules commands (arbitrary) >>>>
-
+    case ModuleCommands::GET_CHANNEL_TELEMETRY:
+        text = tr("ПолТелем");
+        break;
+    case ModuleCommands::GET_TEMPERATURE_PT100:
+        text = tr("ПолТемпПТ");
+        break;
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+        text = tr("ПолТемпDS1");
+        break;
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+        text = tr("ПолТемпDS2");
+        break;
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
+        text += tr("УстНапр");
+        break;
     case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
+        text += tr("УстОгр");
+        break;
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
+        text += tr("ПолНапрТок");
+        break;
     case ModuleCommands::SET_POWER_STATE:
         {
-            if (mModule == ModuleCommands::POWER_UNIT_BUP)
+            QString paramName = mSystemState->paramName(SystemState::POWER_STATE);
+            int state = mInputParams.value(paramName).toInt();
+            if (state == ModuleCommands::POWER_ON)
             {
-                text = tr("БПБУП.");
+                text += tr("ВклПит");
             }
             else
             {
-                text = tr("БППНА.");
-            }
-
-            switch (mOperation)
-            {
-            case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-                text += tr("УстНапр");
-                break;
-            case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
-                text += tr("УстОгр");
-                break;
-            case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-                text += tr("ПолНапрТок");
-                break;
-            case ModuleCommands::SET_POWER_STATE:
-                {
-                    QString paramName = mSystemState->paramName(SystemState::POWER_STATE);
-                    int state = mInputParams.value(paramName).toInt();
-                    if (state == ModuleCommands::POWER_ON)
-                    {
-                        text += tr("ВклПит");
-                    }
-                    else
-                    {
-                        text += tr("ВыклПит");
-                    }
-                }
-                break;
-
-            default:
-                break;
+                text += tr("ВыклПит");
             }
         }
         break;
 
+    case ModuleCommands::SEND_TEST_ARRAY:
+        text += tr("ПТМ");
+        break;
+    case ModuleCommands::RECEIVE_TEST_ARRAY:
+        text += tr("ВТМ");
+        break;
+    case ModuleCommands::SEND_COMMAND_ARRAY:
+        text += tr("ПКМ");
+        break;
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY:
+        text += tr("ВКМ");
+        break;
+    case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
+        text += tr("ПТМК");
+        break;
+    case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+        text += tr("ВТМК");
+        break;
+    case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
+        text += tr("ПКМК");
+        break;
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+        text += tr("ВКМК");
+        break;
+    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
+        text += tr("ВклПитДУ");
+        break;
+    case ModuleCommands::START_MKO:
+        text += tr("Старт");
+        break;
+    case ModuleCommands::STOP_MKO:
+        text += tr("Стоп");
+        break;
+
     default:
         {
-            if (mModule == ModuleCommands::MKO) //TODO
-            {
-                text = tr("МКО.");
-                switch (mOperation)
-                {
-                case ModuleMKO::SEND_TEST_ARRAY:
-                    text += tr("ПТМ");
-                    break;
-                case ModuleMKO::RECEIVE_TEST_ARRAY:
-                    text += tr("ВТМ");
-                    break;
-                case ModuleMKO::SEND_COMMAND_ARRAY:
-                    text += tr("ПКМ");
-                    break;
-                case ModuleMKO::RECEIVE_COMMAND_ARRAY:
-                    text += tr("ВКМ");
-                    break;
-                case ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL:
-                    text += tr("ПТМК");
-                    break;
-                case ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
-                    text += tr("ВТМК");
-                    break;
-                case ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL:
-                    text += tr("ПКМК");
-                    break;
-                case ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
-                    text += tr("ВКМК");
-                    break;
-                case ModuleMKO::SEND_TO_ANGLE_SENSOR:
-                    text += tr("ВклПитДУ");
-                    break;
-                case ModuleMKO::START_MKO:
-                    text += tr("Старт");
-                    break;
-                case ModuleMKO::STOP_MKO:
-                    text += tr("Стоп");
-                    break;
-
-                default: //TODO
-                    break;
-                }
-            }
-            else
-            {
-                LOG_WARNING(QString("CmdActionModule command not implemented")); //TODO
-            }
+            QMetaEnum commands = QMetaEnum::fromType<ModuleCommands::CommandID>();
+            LOG_WARNING(QString("CmdActionModule command '%1' text not implemented").arg(commands.valueToKey(mOperation)));
         }
         break;
     }
@@ -442,16 +377,8 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
     QMetaEnum module = QMetaEnum::fromType<ModuleCommands::ModuleID>();
     writer->writeAttribute("module", module.valueToKey(mModule));
 
-    if (mModule == ModuleCommands::MKO)
-    {
-        QMetaEnum command = QMetaEnum::fromType<ModuleMKO::CommandID>();
-        writer->writeAttribute("command", command.valueToKey(mOperation));
-    }
-    else
-    {
-        QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
-        writer->writeAttribute("command", command.valueToKey(mOperation));
-    }
+    QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
+    writer->writeAttribute("command", command.valueToKey(mOperation));
 
     // input params
     writer->writeStartElement("input_params");
@@ -493,16 +420,8 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
     if (attributes.hasAttribute("command"))
     {
         QString str = attributes.value("command").toString();
-        if (mModule == ModuleCommands::MKO)
-        {
-            QMetaEnum command = QMetaEnum::fromType<ModuleMKO::CommandID>();
-            mOperation = ModuleMKO::CommandID(command.keyToValue(qPrintable(str)));
-        }
-        else
-        {
-            QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
-            mOperation = ModuleCommands::CommandID(command.keyToValue(qPrintable(str)));
-        }
+        QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
+        mOperation = ModuleCommands::CommandID(command.keyToValue(qPrintable(str)));
     }
 
     while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))

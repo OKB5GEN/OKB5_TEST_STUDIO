@@ -89,23 +89,23 @@ void ModuleMKO::readResponse()
     }
 
     // send response to cyclogram
-    ModuleMKO::CommandID command = ModuleMKO::CommandID(mCurrentTransaction.commandID);
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     mRepeatedRequests = 0;
 
     switch (command)
     {
-    case SEND_TEST_ARRAY:
-    case SEND_COMMAND_ARRAY:
-    case SEND_TEST_ARRAY_FOR_CHANNEL:
-    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
-    case SEND_TO_ANGLE_SENSOR:
+    case ModuleCommands::SEND_TEST_ARRAY:
+    case ModuleCommands::SEND_COMMAND_ARRAY:
+    case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
             // no special processing needed, just response word on OK/FAIL is enough
         }
         break;
-    case RECEIVE_TEST_ARRAY:
-    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::RECEIVE_TEST_ARRAY:
+    case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
             for (uint16_t i = 1; i < mWordsToReceive; ++i) // 1 - skip response word
             {
@@ -118,9 +118,9 @@ void ModuleMKO::readResponse()
         }
         break;
 
-    case RECEIVE_COMMAND_ARRAY:
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY:
         {
-            LOG_DEBUG("Receive command addray");
+            LOG_DEBUG(QString("Receive command addray"));
             int offset = 1;
 
             QMap<uint32_t, QVariant> outputParams;
@@ -260,7 +260,7 @@ void ModuleMKO::readResponse()
         }
         break;
 
-    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
             int offset = 1;
             QMap<uint32_t, QVariant> outputParams;
@@ -336,49 +336,49 @@ void ModuleMKO::startMKO1()
     if (!hEvent1)
     {
         data += "МКО: CreateEvent1() не запустился!\n";
-        LOG_ERROR("CreateEvent() failed!");
+        LOG_ERROR(QString("CreateEvent() failed!"));
     }
 
     if (!hEvent)
     {
         data += "МКО: CreateEvent() не запустился!\n";
-        LOG_ERROR("CreateEvent() failed!");
+        LOG_ERROR(QString("CreateEvent() failed!"));
     }
 
     if (TmkOpen())
     {
         data += "МКО: Библиотека не запустилась!\n";
-        LOG_ERROR("TmkOpen() failed!");
+        LOG_ERROR(QString("TmkOpen() failed!"));
     }
     else
     {
-        LOG_INFO("TmkOpen() successful!");
+        LOG_INFO(QString("TmkOpen() successful!"));
     }
 
     if (tmkconfig(1) != 0)
     {
         data += "МКО: Конфигурация МКО 1 не произошла!\n";
-        LOG_ERROR("MKO 1 config failed");
+        LOG_ERROR(QString("MKO 1 config failed"));
     }
     else
     {
-        LOG_INFO("tmkconfig1() successful!");
+        LOG_INFO(QString("tmkconfig1() successful!"));
     }
 
     if (tmkconfig(0) != 0)
     {
         data += "МКО: Конфигурация МКО 0 не произошла!\n";
-        LOG_ERROR("MKO 0 config failed");
+        LOG_ERROR(QString("MKO 0 config failed"));
     }
     else
     {
-        LOG_INFO("tmkconfig0() successful!\n");
+        LOG_INFO(QString("tmkconfig0() successful!\n"));
     }
 
     if (bcreset() != 0)
     {
         data += "МКО: Перезагрузка МКО не произошла!\n";
-        LOG_ERROR("MKO reset failed");
+        LOG_ERROR(QString("MKO reset failed"));
     }
 }
 
@@ -389,33 +389,33 @@ void ModuleMKO::startMKO()
     if (!hEvent)
     {
         data += "МКО: CreateEvent() не запустился!\n";
-        LOG_ERROR("CreateEvent() failed!");
+        LOG_ERROR(QString("CreateEvent() failed!"));
     }
 
     if (TmkOpen())
     {
         data += "МКО: Библиотека МКО не запустилась!\n";
-        LOG_ERROR("TmkOpen() failed!");
+        LOG_ERROR(QString("TmkOpen() failed!"));
     }
     else
     {
-        LOG_INFO("TmkOpen() successful!");
+        LOG_INFO(QString("TmkOpen() successful!"));
     }
 
     if (tmkconfig(0) != 0)
     {
         data += "МКО: Конфигурация МКО не произошла!\n";
-        LOG_ERROR("MKO config failed");
+        LOG_ERROR(QString("MKO config failed"));
     }
     else
     {
-        LOG_INFO("tmkconfig() successful!");
+        LOG_INFO(QString("tmkconfig() successful!"));
     }
 
     if (bcreset() != 0)
     {
         data += "МКО: Перезагрузка МКО не произошла!\n";
-        LOG_ERROR("MKO reset failed");
+        LOG_ERROR(QString("MKO reset failed"));
     }
 
     mMainKitEnabled = true;
@@ -423,7 +423,7 @@ void ModuleMKO::startMKO()
 
 void ModuleMKO::stopMKO()
 {
-    LOG_INFO("Stopping MKO");
+    LOG_INFO(QString("Stopping MKO"));
     mMainKitEnabled = false; //TODO
     TmkClose();
     CloseHandle(hEvent);
@@ -431,7 +431,7 @@ void ModuleMKO::stopMKO()
 
 void ModuleMKO::stopMKO1()
 {
-    LOG_INFO("Stopping MKO 1");
+    LOG_INFO(QString("Stopping MKO 1"));
     TmkClose();
     CloseHandle(hEvent);
     CloseHandle(hEvent1);
@@ -439,7 +439,7 @@ void ModuleMKO::stopMKO1()
 
 void ModuleMKO::processResponseWord(uint16_t responseWord, QStringList& errors)
 {
-    LOG_INFO(QString("Response word is %1").arg(QString::number(responseWord, 16)));
+    LOG_INFO(QString("Response word is 0x%1").arg(QString::number(responseWord, 16)));
 
     //TODO use ADDRESS_MASK etc instead of bit shifts
     uint16_t x;
@@ -708,21 +708,21 @@ void ModuleMKO::processCommand(const Transaction& params)
         return;
     }
 
-    ModuleMKO::CommandID command = ModuleMKO::CommandID(params.commandID);
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.commandID);
 
     switch (command)
     {
-    case SEND_TEST_ARRAY:
+    case ModuleCommands::SEND_TEST_ARRAY:
         {
             sendTestArray(address);
         }
         break;
-    case RECEIVE_TEST_ARRAY:
+    case ModuleCommands::RECEIVE_TEST_ARRAY:
         {
             receiveTestArray(address);
         }
         break;
-    case SEND_COMMAND_ARRAY:
+    case ModuleCommands::SEND_COMMAND_ARRAY:
         {
             AxisData psy;
             AxisData nu;
@@ -766,26 +766,26 @@ void ModuleMKO::processCommand(const Transaction& params)
             sendCommandArray(address, psy, nu);
         }
         break;
-    case RECEIVE_COMMAND_ARRAY:
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY:
         {
             mCurrentTransaction.outputParams = params.outputParams;
             receiveCommandArray(address);
         }
         break;
-    case SEND_TEST_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
         {
             Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             sendTestArrayForChannel(address, subaddress);
         }
         break;
-    case RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
             mCurrentTransaction.outputParams = params.outputParams;
             Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveTestArrayForChannel(address, subaddress);
         }
         break;
-    case SEND_COMMAND_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
         {
             AxisData data;
             for (auto it = params.inputParams.begin(); it != params.inputParams.end(); ++it)
@@ -816,26 +816,26 @@ void ModuleMKO::processCommand(const Transaction& params)
             sendCommandArrayForChannel(address, subaddress, data);
         }
         break;
-    case RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
             mCurrentTransaction.outputParams = params.outputParams;
             Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveCommandArrayForChannel(address, subaddress);
         }
         break;
-    case SEND_TO_ANGLE_SENSOR:
+    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
             sendAngleSensorData(address);
         }
         break;
 
-    case START_MKO:
+    case ModuleCommands::START_MKO:
         {
             startMKO();
         }
         break;
 
-    case STOP_MKO:
+    case ModuleCommands::STOP_MKO:
         {
             stopMKO();
         }
@@ -861,7 +861,7 @@ void ModuleMKO::processCommand(const Transaction& params)
     mCurrentTransaction.commandID = command;
     mCurrentTransaction.error.clear();
 
-    if (command == START_MKO || command == STOP_MKO)
+    if (command == ModuleCommands::START_MKO || command == ModuleCommands::STOP_MKO)
     {
         emit commandResult(mCurrentTransaction);
     }

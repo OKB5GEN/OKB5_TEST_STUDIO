@@ -25,7 +25,7 @@ namespace
         QFile file(fileName);
         if (!file.open(QFile::ReadOnly | QFile::Text))
         {
-            LOG_FATAL("No system_config.xml found");
+            LOG_FATAL(QString("No system_config.xml found"));
             //QMessageBox::warning(this, tr("OKB5 Test Studio"), tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
             return false;
         }
@@ -152,6 +152,9 @@ SystemState::SystemState(QObject* parent):
     mParamNames[ANGLE_NU] = tr("Angle (Nu)");
     mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
 
+    mParamNames[STATUS_PHYSICAL] = tr("Phys.status");
+    mParamNames[STATUS_LOGICAL] = tr("Logic.status");
+
     // implicit params
     mParamNames[SUBADDRESS] = tr("Subaddress");
     mParamNames[POWER_STATE] = tr("Power State");
@@ -174,6 +177,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[CURRENT_NU] = "NuI";
     mDefaultVariables[ANGLE_NU] = "NuA";
     mDefaultVariables[SENSOR_FLAG] = "TSF";
+    mDefaultVariables[STATUS_PHYSICAL] = tr("Active");
+    mDefaultVariables[STATUS_LOGICAL] = tr("Ready");
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -192,6 +197,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[CURRENT_NU] = tr("Max current (Nu)");
     mDefaultDescriptions[ANGLE_NU] = tr("Angle (Nu)");
     mDefaultDescriptions[SENSOR_FLAG] = tr("Temperature sensor presense flag");
+    mDefaultDescriptions[STATUS_PHYSICAL] = tr("Pysical module status. 1 - active, 0 - inactive");
+    mDefaultDescriptions[STATUS_LOGICAL] = tr("Logical module status. 1 - enabled, 0 - disabled");
 }
 
 SystemState::~SystemState()
@@ -250,8 +257,12 @@ void SystemState::onApplicationStart()
     connect(this, SIGNAL(sendToPowerUnitPNA(const Transaction&)), mPowerPNA, SLOT(processCommand(const Transaction&)));
     connect(mPowerPNA, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
 
-    // Create templates for internal protocol commands parameters
-    setupCommandsParams();
+    // Create commands params list
+    createPowerUnitCommandsParams();
+    createMKOCommandsParams();
+    createOTDCommandsParams();
+    createTechCommandsParams();
+    createSTMCommandsParams();
 }
 
 void SystemState::onApplicationFinish()
@@ -297,179 +308,130 @@ int SystemState::paramsCount(int module, int command, bool isInputParam) const
     return 0;
 }
 
-void SystemState::setupCommandsParams()
-{
-    createPowerUnitCommandsParams();
-
-    int TODO; // replace by constant usage
-
-    {
-        QMap<int, QStringList> inParams;
-        QMap<int, QStringList> outParams;
-
-        // commands input params
-        QStringList sendTestArrayParams; // hardcoded with 0
-        QStringList receiveTestArrayParams; // hardcoded with 0 checks on receive
-        QStringList sendTestArrayForChannelParams; // hardcoded with 0
-        QStringList receiveTestArrayForChannelParams; // hardcoded with 0 checks on receive
-        QStringList enablePowerSupplyForAngleSensorParams; // auto set params (main of reserve kit)
-
-        QStringList sendCommandArrayParams;
-        sendCommandArrayParams.push_back(paramName(MODE_PSY));
-        sendCommandArrayParams.push_back(paramName(STEPS_PSY));
-        sendCommandArrayParams.push_back(paramName(VELOCITY_PSY));
-        sendCommandArrayParams.push_back(paramName(CURRENT_PSY));
-        sendCommandArrayParams.push_back(paramName(MODE_NU));
-        sendCommandArrayParams.push_back(paramName(STEPS_NU));
-        sendCommandArrayParams.push_back(paramName(VELOCITY_NU));
-        sendCommandArrayParams.push_back(paramName(CURRENT_NU));
-
-        QStringList sendCommandArrayForChannelParams;
-        sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
-        sendCommandArrayForChannelParams.push_back(paramName(STEPS));
-        sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
-        sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
-
-        QStringList receiveCommandArrayParams;
-        receiveCommandArrayParams.push_back(paramName(MODE_PSY));
-        receiveCommandArrayParams.push_back(paramName(STEPS_PSY));
-        receiveCommandArrayParams.push_back(paramName(VELOCITY_PSY));
-        receiveCommandArrayParams.push_back(paramName(CURRENT_PSY));
-        receiveCommandArrayParams.push_back(paramName(MODE_NU));
-        receiveCommandArrayParams.push_back(paramName(STEPS_NU));
-        receiveCommandArrayParams.push_back(paramName(VELOCITY_NU));
-        receiveCommandArrayParams.push_back(paramName(CURRENT_NU));
-        receiveCommandArrayParams.push_back(paramName(ANGLE_PSY));
-        receiveCommandArrayParams.push_back(paramName(ANGLE_NU));
-        receiveCommandArrayParams.push_back(paramName(SENSOR_FLAG));
-        receiveCommandArrayParams.push_back(paramName(TEMPERATURE));
-
-        QStringList receiveCommandArrayForChannelParams;
-        sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
-        sendCommandArrayForChannelParams.push_back(paramName(STEPS));
-        sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
-        sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
-
-        inParams[ModuleMKO::SEND_TEST_ARRAY] = sendTestArrayParams;
-        inParams[ModuleMKO::SEND_COMMAND_ARRAY] = sendCommandArrayParams;
-        inParams[ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL] = sendTestArrayForChannelParams;
-        inParams[ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL] = sendCommandArrayForChannelParams;
-        inParams[ModuleMKO::SEND_TO_ANGLE_SENSOR] = enablePowerSupplyForAngleSensorParams;
-
-        outParams[ModuleMKO::RECEIVE_TEST_ARRAY] = receiveTestArrayParams;
-        outParams[ModuleMKO::RECEIVE_COMMAND_ARRAY] = receiveCommandArrayParams;
-        outParams[ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL] = receiveTestArrayForChannelParams;
-        outParams[ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL] = receiveCommandArrayForChannelParams;
-
-        mInParams[ModuleCommands::MKO] = inParams;
-        mOutParams[ModuleCommands::MKO] = outParams;
-    }
-
-    // STM
-    {
-        //QMap<int, QStringList> params;
-        //mInParams[ModuleCommands::STM] = params;
-
-        // STM
-        //addCommand(tr("Включить канал СТМ к БП"), ModuleCommands::POWER_CHANNEL_CTRL);
-        //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
-        //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
-        //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
-        //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
-        //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
-    }
-
-    {
-        QMap<int, QStringList> params;
-        mInParams[ModuleCommands::TECH] = params;
-    }
-
-
-
-    /*
-    GET_MODULE_ADDRESS              = 0x01,
-    GET_STATUS_WORD                 = 0x02,
-    RESET_ERROR                     = 0x03,
-    SOFT_RESET                      = 0x04,
-    //RESERVED_0x05 = 0x05,
-    GET_SOWFTWARE_VER               = 0x06,
-    ECHO                            = 0x07,
-    //RESERVED_0x08 = 0x08,
-    //RESERVED_0x09 = 0x09,
-    //RESERVED_0x0A = 0x0A,
-    POWER_CHANNEL_CTRL              = 0x0B, // Can be sent to STM only
-    GET_PWR_MODULE_FUSE_STATE       = 0x0C, // Can be sent to STM only
-    GET_CHANNEL_TELEMETRY           = 0x0D, // Can be sent to STM only
-    SET_MKO_PWR_CHANNEL_STATE       = 0x0E, // Can be sent to STM only
-    //MATRIX_CMD_CTRL                 = 0x0F, // Can be sent to MKU only
-    SET_PACKET_SIZE_CAN             = 0x10, // Can be sent to TECH only
-    ADD_BYTES_CAN                   = 0x11, // Can be sent to TECH only
-    SEND_PACKET_CAN                 = 0x12, // Can be sent to TECH only
-    CHECK_RECV_DATA_CAN             = 0x13, // Can be sent to TECH only
-    RECV_DATA_CAN                   = 0x14, // Can be sent to TECH only
-    CLEAN_BUFFER_CAN                = 0x15, // Can be sent to TECH only
-    SET_PACKET_SIZE_RS485           = 0x16, // Can be sent to TECH only
-    ADD_BYTES_RS485                 = 0x17, // Can be sent to TECH only
-    SEND_PACKET_RS485               = 0x18, // Can be sent to TECH only
-    CHECK_RECV_DATA_RS485           = 0x19, // Can be sent to TECH only
-    RECV_DATA_RS485                 = 0x1A, // Can be sent to TECH only
-    CLEAN_BUFFER_RS485              = 0x1B, // Can be sent to TECH only
-    GET_TEMPERATURE_PT100           = 0x1C, // Can be sent to OTD only
-    GET_DS1820_COUNT_LINE_1         = 0x1D, // Can be sent to OTD only (Psi)
-    GET_DS1820_COUNT_LINE_2         = 0x1E, // Can be sent to OTD only (Nu)
-    GET_TEMPERATURE_DS1820_LINE_1   = 0x1F, // Can be sent to OTD only (Psi)
-    GET_TEMPERATURE_DS1820_LINE_2   = 0x20, // Can be sent to OTD only (Nu)
-    GET_POWER_MODULE_STATE          = 0x21, // Can be sent to STM only
-    //GET_MKU_MODULE_STATE            = 0x22, // Can be sent to MKU only
-    GET_MKO_MODULE_STATE            = 0x23, // Can be sent to STM only
-    SET_MODE_RS485                  = 0x24, // Can be sent to TECH only
-    SET_SPEED_RS485                 = 0x25, // Can be sent to TECH only
-    RESET_LINE_1                    = 0x26, // Can be sent to OTD only (Psi)
-    RESET_LINE_2                    = 0x27, // Can be sent to OTD only (Nu)
-    START_MEASUREMENT_LINE_1        = 0x28, // Can be sent to OTD only (Psi) 1-2 seconds to perform
-    START_MEASUREMENT_LINE_2        = 0x29, // Can be sent to OTD only (Nu) 1-2 seconds to perform
-    GET_DS1820_ADDR_LINE_1          = 0x2A, // Can be sent to OTD only (Psi)
-    GET_DS1820_ADDR_LINE_2          = 0x2B, // Can be sent to OTD only (Nu)
-    SET_TECH_INTERFACE              = 0x3B, // Can be sent to TECH only
-    GET_TECH_INTERFACE              = 0x3C, // Can be sent to TECH only
-    RECV_DATA_SSI                   = 0x3D, // Can be sent to TECH only
-
-    // Third party modules commands (arbitrary) >>>>
-
-    // Power unit modules commands (0xFF00-started)
-    SET_VOLTAGE_AND_CURRENT         = 0xFF01,
-    SET_MAX_VOLTAGE_AND_CURRENT     = 0xFF02,
-    SET_POWER_STATE                 = 0xFF03,
-    GET_CURRENT_VOLTAGE_AND_CURRENT = 0xFF04,
-    */
-}
-
 void SystemState::createPowerUnitCommandsParams()
 {
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
     QStringList powerParams;
-    powerParams.push_back(paramName(VOLTAGE));
-    powerParams.push_back(paramName(CURRENT));
+    powerParams.append(paramName(VOLTAGE));
+    powerParams.append(paramName(CURRENT));
 
     // commands input params
-    QMap<int, QStringList> params;
-
+    QMap<int, QStringList> inParams;
 
     QStringList powerSetParams;
     powerSetParams.push_back(paramName(VOLTAGE));
-    params[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerSetParams;
-    params[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
-    mInParams[ModuleCommands::POWER_UNIT_BUP] = params;
-    mInParams[ModuleCommands::POWER_UNIT_PNA] = params;
+    inParams[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerSetParams;
+    inParams[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
 
-    params.clear();
-    params[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
-    mOutParams[ModuleCommands::POWER_UNIT_BUP] = params;
-    mOutParams[ModuleCommands::POWER_UNIT_PNA] = params;
+    mInParams[ModuleCommands::POWER_UNIT_BUP] = inParams;
+    mInParams[ModuleCommands::POWER_UNIT_PNA] = inParams;
+
+    // commands output params
+    QMap<int, QStringList> outParams;
+
+    outParams[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    mOutParams[ModuleCommands::POWER_UNIT_BUP] = outParams;
+    mOutParams[ModuleCommands::POWER_UNIT_PNA] = outParams;
+}
+
+void SystemState::createMKOCommandsParams()
+{
+    QMap<int, QStringList> inParams;
+    QMap<int, QStringList> outParams;
+
+    // commands input params
+    QStringList sendTestArrayParams; // hardcoded with 0
+    QStringList receiveTestArrayParams; // hardcoded with 0 checks on receive
+    QStringList sendTestArrayForChannelParams; // hardcoded with 0
+    QStringList receiveTestArrayForChannelParams; // hardcoded with 0 checks on receive
+    QStringList enablePowerSupplyForAngleSensorParams; // auto set params (main of reserve kit)
+
+    QStringList sendCommandArrayParams;
+    sendCommandArrayParams.push_back(paramName(MODE_PSY));
+    sendCommandArrayParams.push_back(paramName(STEPS_PSY));
+    sendCommandArrayParams.push_back(paramName(VELOCITY_PSY));
+    sendCommandArrayParams.push_back(paramName(CURRENT_PSY));
+    sendCommandArrayParams.push_back(paramName(MODE_NU));
+    sendCommandArrayParams.push_back(paramName(STEPS_NU));
+    sendCommandArrayParams.push_back(paramName(VELOCITY_NU));
+    sendCommandArrayParams.push_back(paramName(CURRENT_NU));
+
+    QStringList sendCommandArrayForChannelParams;
+    sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
+    sendCommandArrayForChannelParams.push_back(paramName(STEPS));
+    sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
+    sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
+
+    QStringList receiveCommandArrayParams;
+    receiveCommandArrayParams.push_back(paramName(MODE_PSY));
+    receiveCommandArrayParams.push_back(paramName(STEPS_PSY));
+    receiveCommandArrayParams.push_back(paramName(VELOCITY_PSY));
+    receiveCommandArrayParams.push_back(paramName(CURRENT_PSY));
+    receiveCommandArrayParams.push_back(paramName(MODE_NU));
+    receiveCommandArrayParams.push_back(paramName(STEPS_NU));
+    receiveCommandArrayParams.push_back(paramName(VELOCITY_NU));
+    receiveCommandArrayParams.push_back(paramName(CURRENT_NU));
+    receiveCommandArrayParams.push_back(paramName(ANGLE_PSY));
+    receiveCommandArrayParams.push_back(paramName(ANGLE_NU));
+    receiveCommandArrayParams.push_back(paramName(SENSOR_FLAG));
+    receiveCommandArrayParams.push_back(paramName(TEMPERATURE));
+
+    QStringList receiveCommandArrayForChannelParams;
+    sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
+    sendCommandArrayForChannelParams.push_back(paramName(STEPS));
+    sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
+    sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
+
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
+    inParams[ModuleCommands::SEND_TEST_ARRAY] = sendTestArrayParams;
+    inParams[ModuleCommands::SEND_COMMAND_ARRAY] = sendCommandArrayParams;
+    inParams[ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL] = sendTestArrayForChannelParams;
+    inParams[ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL] = sendCommandArrayForChannelParams;
+    inParams[ModuleCommands::SEND_TO_ANGLE_SENSOR] = enablePowerSupplyForAngleSensorParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+
+    outParams[ModuleCommands::RECEIVE_TEST_ARRAY] = receiveTestArrayParams;
+    outParams[ModuleCommands::RECEIVE_COMMAND_ARRAY] = receiveCommandArrayParams;
+    outParams[ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL] = receiveTestArrayForChannelParams;
+    outParams[ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL] = receiveCommandArrayForChannelParams;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+
+    mInParams[ModuleCommands::MKO] = inParams;
+    mOutParams[ModuleCommands::MKO] = outParams;
 }
 
 void SystemState::createOTDCommandsParams()
 {
-    QMap<int, QStringList> params;
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
+    // input params
+    QMap<int, QStringList> inParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+
+    mInParams[ModuleCommands::OTD] = inParams;
+
+    // output params
+    int TODO; // solve problem with sensors count data
+    QMap<int, QStringList> outParams;
 
     QStringList temperatureParams;
 
@@ -478,32 +440,77 @@ void SystemState::createOTDCommandsParams()
     int ptCount = mOTD->ptCount();
     for (int i = 0; i < ptCount; ++i)
     {
-        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") + */paramName(TEMPERATURE));
+        temperatureParams.push_back(paramName(TEMPERATURE));
     }
 
-    params[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
 
     // DS1820 line 1 params
     temperatureParams.clear();
     int dsCount1 = mOTD->dsCount(ModuleOTD::PSY);
     for (int i = 0; i < dsCount1; ++i)
     {
-        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") +*/ paramName(TEMPERATURE));
+        temperatureParams.push_back(paramName(TEMPERATURE));
     }
 
-    params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
 
     // DS1820 line 2 params
     temperatureParams.clear();
     int dsCount2 = mOTD->dsCount(ModuleOTD::NU);
     for (int i = 0; i < dsCount2; ++i)
     {
-        temperatureParams.push_back(/*QString::number(i + 1) + QString(". ") +*/ paramName(TEMPERATURE));
+        temperatureParams.push_back(paramName(TEMPERATURE));
     }
 
-    params[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
 
-    mOutParams[ModuleCommands::OTD] = params;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    mOutParams[ModuleCommands::OTD] = outParams;
+}
+
+void SystemState::createSTMCommandsParams()
+{
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
+    // input params
+    QMap<int, QStringList> inParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+
+    mInParams[ModuleCommands::STM] = inParams;
+
+    // output params
+    QMap<int, QStringList> outParams;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+
+    mOutParams[ModuleCommands::STM] = outParams;
+}
+
+void SystemState::createTechCommandsParams()
+{
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
+    // input params
+    QMap<int, QStringList> inParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+
+    mInParams[ModuleCommands::TECH] = inParams;
+
+    // output params
+    QMap<int, QStringList> outParams;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+
+    mOutParams[ModuleCommands::TECH] = outParams;
 }
 
 void SystemState::sendCommand(CmdActionModule* command)
@@ -575,11 +582,10 @@ void SystemState::onExecutionFinished(const QString& error)
     {
         QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
         QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
+        QString module = moduleEnum.valueToKey(mCurCommand->module());
+        QString command = commandEnum.valueToKey(mCurCommand->operation());
 
-        LOG_ERROR("Command execution failed. Module:%s, Command:%s, Error:%s",
-                  moduleEnum.valueToKey(mCurCommand->module()),
-                  commandEnum.valueToKey(mCurCommand->operation()),
-                  error);
+        LOG_ERROR(QString("Command execution failed. Module:%1, Command:%2, Error:%3").arg(module).arg(command).arg(error));
     }
 
     mCurCommand = Q_NULLPTR;
@@ -590,7 +596,7 @@ void SystemState::processResponse(const Transaction& response)
 {
     if (!mCurCommand)
     {
-        LOG_ERROR("Unexpected response received");
+        LOG_ERROR(QString("Unexpected response received"));
         return;
     }
 
@@ -638,51 +644,6 @@ SystemState::ParamID SystemState::paramID(const QString& name) const
 {
     return mParamNames.key(name, UNDEFINED);
 }
-
-//void SystemState::onModuleStateChanged(ModuleCommands::ModuleID id, AbstractModule::ModuleState from, AbstractModule::ModuleState to)
-//{
-//    QMetaEnum stateEnum = QMetaEnum::fromType<AbstractModule::ModuleState>();
-//    AbstractModule* module = mModules.value(id);
-
-//    if (from == AbstractModule::INITIALIZING)
-//    {
-//        if (to == AbstractModule::INITIALIZED_OK)
-//        {
-//            LOG_INFO(QString("%1 initializion SUCCESS").arg(module->moduleName()));
-//            if (id == ModuleCommands::OTD)
-//            {
-//                createOTDCommandsParams();
-//            }
-//        }
-//        else if (to == AbstractModule::INITIALIZED_FAILED)
-//        {
-//            LOG_ERROR(QString("%1 initialization FAILED! Error: %2").arg(module->moduleName()).arg(module->errorString()));
-//        }
-//        else
-//        {
-//            LOG_ERROR(QString("Unexpected %1 state changing from %2 to %3").arg(module->moduleName()).arg(stateEnum.valueToKey(from)).arg(stateEnum.valueToKey(to)));
-//        }
-
-//        // check all modules are started
-//        bool allModulesStarted = true;
-//        foreach (AbstractModule* m, mModules.values())
-//        {
-//            if (m->moduleState() == AbstractModule::INITIALIZED_FAILED || m->moduleState() == AbstractModule::INITIALIZED_OK)
-//            {
-//                continue;
-//            }
-
-//            allModulesStarted = false;
-//            break;
-//        }
-
-//        // if all modules are started, set them to default state
-//        if (allModulesStarted)
-//        {
-//            setDefaultState();
-//        }
-//    }
-//}
 
 bool SystemState::isImplicit(const QString &name) const
 {

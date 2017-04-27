@@ -18,25 +18,6 @@ public:
         ALL_KITS = MAIN_KIT | RESERVE_KIT
     };
 
-    enum CommandID
-    {
-        SEND_TEST_ARRAY,
-        RECEIVE_TEST_ARRAY,
-        SEND_COMMAND_ARRAY,
-        RECEIVE_COMMAND_ARRAY,
-        SEND_TEST_ARRAY_FOR_CHANNEL,
-        RECEIVE_TEST_ARRAY_FOR_CHANNEL,
-        SEND_COMMAND_ARRAY_FOR_CHANNEL,
-        RECEIVE_COMMAND_ARRAY_FOR_CHANNEL,
-        SEND_TO_ANGLE_SENSOR,
-
-        // custom
-        START_MKO,
-        STOP_MKO
-    };
-
-    Q_ENUM(CommandID)
-
     enum Subaddress
     {
         ANGLE_SENSOR_SUBADDRESS = 0x06,

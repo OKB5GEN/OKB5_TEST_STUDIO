@@ -110,17 +110,17 @@ void Cyclogram::createDefault()
 
 void Cyclogram::run()
 {
-    LOG_INFO("==================================");
+    LOG_INFO(QString("=================================="));
     if (mIsMainCyclogram)
     {
-        LOG_INFO("Cyclogram started");
+        LOG_INFO(QString("Cyclogram started"));
     }
     else
     {
-        LOG_INFO("Subprogram started");
+        LOG_INFO(QString("Subprogram started"));
     }
 
-    LOG_INFO("==================================");
+    LOG_INFO(QString("=================================="));
 
     if (mState == STOPPED && mFirst != Q_NULLPTR)
     {
@@ -176,16 +176,16 @@ void Cyclogram::onCommandFinished(Command* cmd)
     }
     else
     {
-        LOG_INFO("==================================");
+        LOG_INFO(QString("=================================="));
         if (mIsMainCyclogram)
         {
-            LOG_INFO("Main cyclogram finished");
+            LOG_INFO(QString("Main cyclogram finished"));
         }
         else
         {
-            LOG_INFO("Subprogram finished");
+            LOG_INFO(QString("Subprogram finished"));
         }
-        LOG_INFO("==================================");
+        LOG_INFO(QString("=================================="));
 
         stop();
         emit finished("");
@@ -198,17 +198,17 @@ void Cyclogram::onCriticalError(Command* cmd)
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
 
-    LOG_ERROR("==================================");
+    LOG_ERROR(QString("=================================="));
     if (mIsMainCyclogram)
     {
-        LOG_ERROR("Cyclogram stopped due to critical runtime error");
+        LOG_ERROR(QString("Cyclogram stopped due to critical runtime error"));
     }
     else
     {
-        LOG_ERROR("Subprogram stopped due to critical runtime error");
+        LOG_ERROR(QString("Subprogram stopped due to critical runtime error"));
     }
 
-    LOG_ERROR("==================================");
+    LOG_ERROR(QString("=================================="));
 
     for (auto it = mVarController->variablesData().begin(); it != mVarController->variablesData().end(); ++it)
     {
@@ -466,7 +466,7 @@ void Cyclogram::setState(State state)
 
     QString text(metaEnum.valueToKey(state));
 
-    LOG_DEBUG("Cyclogram state changed to %s", qUtf8Printable(text));
+    LOG_DEBUG(QString("Cyclogram state changed to %1").arg(text));
 
     mState = state;
     emit stateChanged(mState);

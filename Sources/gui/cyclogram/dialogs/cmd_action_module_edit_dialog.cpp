@@ -100,6 +100,10 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     SystemState* sysState = mCommand->systemState();
 
+    // "Abstract" module commands
+    addCommand(tr("Получить статус"), ModuleCommands::GET_MODULE_STATUS);
+    addCommand(tr("Установить логический статус"), ModuleCommands::SET_MODULE_LOGIC_STATUS);
+
     // module changed -> update command list for this module
     switch (index)
     {
@@ -126,10 +130,10 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::MKO:
         {
-            addCommand(tr("Принять тестовый массив"), ModuleMKO::SEND_TEST_ARRAY);
-            addCommand(tr("Выдать тестовый массив"), ModuleMKO::RECEIVE_TEST_ARRAY);
-            addCommand(tr("Принять командный массив"), ModuleMKO::SEND_COMMAND_ARRAY);
-            addCommand(tr("Выдать командный массив"), ModuleMKO::RECEIVE_COMMAND_ARRAY);
+            addCommand(tr("Принять тестовый массив"), ModuleCommands::SEND_TEST_ARRAY);
+            addCommand(tr("Выдать тестовый массив"), ModuleCommands::RECEIVE_TEST_ARRAY);
+            addCommand(tr("Принять командный массив"), ModuleCommands::SEND_COMMAND_ARRAY);
+            addCommand(tr("Выдать командный массив"), ModuleCommands::RECEIVE_COMMAND_ARRAY);
 
             QMap<QString, QVariant> implicitParamsPsy;
             QMap<QString, QVariant> implicitParamsNu;
@@ -137,20 +141,20 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             implicitParamsPsy[paramName] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
             implicitParamsNu[paramName] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
 
-            addCommand(tr("Принять тестовый массив по линии ψ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Принять тестовый массив по линии υ"), ModuleMKO::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Выдать тестовый массив по линии υ"), ModuleMKO::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Принять командный массив по линии ψ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Принять командный массив по линии υ"), ModuleMKO::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Выдать командный массив по линии ψ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Выдать командный массив по линии υ"), ModuleMKO::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Принять тестовый массив по линии ψ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Принять тестовый массив по линии υ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Выдать тестовый массив по линии υ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Принять командный массив по линии ψ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Принять командный массив по линии υ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("Выдать командный массив по линии ψ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("Выдать командный массив по линии υ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
-            addCommand(tr("Подать питание на ДУ"), ModuleMKO::SEND_TO_ANGLE_SENSOR);
+            addCommand(tr("Подать питание на ДУ"), ModuleCommands::SEND_TO_ANGLE_SENSOR);
 
-            // TODO добавить для резервного комплекта
-            addCommand(tr("Старт Осн."), ModuleMKO::START_MKO);
-            addCommand(tr("Стоп Осн."), ModuleMKO::STOP_MKO);
+            // TODO добавить для резервного комплекта (через implicit params видимо)
+            addCommand(tr("Старт Осн."), ModuleCommands::START_MKO);
+            addCommand(tr("Стоп Осн."), ModuleCommands::STOP_MKO);
         }
         break;
 
@@ -220,8 +224,16 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(tr("Выключить подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
-            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
-            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("Включить подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            addCommand(tr("Выключить подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+
 
             int TODO;
             // 1. проверка предохранителей

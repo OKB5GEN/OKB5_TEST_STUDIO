@@ -45,7 +45,8 @@ public:
         CHANNEL_ID,
         POWER_STATE,
 
-        MODULE_STATE, // 0 - inactive, 1 - active
+        STATUS_PHYSICAL, // 0 - inactive, 1 - active
+        STATUS_LOGICAL, // 0 - inactive, 1 - active
 
         UNDEFINED
     };
@@ -83,8 +84,6 @@ signals:
     void sendToPowerUnitPNA(const Transaction& request);
 
 private:
-    void setupCommandsParams();
-
     void onExecutionFinished(const QString& error);
 
     bool sendPowerUnitCommand(CmdActionModule* command);
@@ -94,7 +93,10 @@ private:
     bool sendTechCommand(CmdActionModule* command);
 
     void createPowerUnitCommandsParams();
+    void createMKOCommandsParams();
     void createOTDCommandsParams();
+    void createTechCommandsParams();
+    void createSTMCommandsParams();
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;

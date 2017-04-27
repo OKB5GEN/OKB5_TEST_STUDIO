@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
     initializeLogger();
 
-    LOG_INFO("========== APPLICATION STARTED ==========");
+    LOG_INFO(QString("========== APPLICATION STARTED =========="));
 
     EditorWindow mainWin;
 //    if (!parser.positionalArguments().isEmpty())
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     mainWin.onApplicationStart();
     int result = app.exec();
 
-    LOG_INFO("========== APPLICATION FINISHED ==========");
+    LOG_INFO(QString("========== APPLICATION FINISHED =========="));
 
     return result;
 }

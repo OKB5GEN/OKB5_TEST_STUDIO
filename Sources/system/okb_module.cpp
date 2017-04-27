@@ -99,7 +99,7 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
         return false; // always return some data need to be analyzed
 
     default:
-        LOG_ERROR("Unknown command %i", cmd);
+        LOG_ERROR(QString("Unknown command %1").arg(cmd));
         break;
     }
 
@@ -173,12 +173,12 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
             if (address == ModuleCommands::CURRENT)
             {
                 mCurrentAddress = value;
-                LOG_INFO("Module current address is 0x%x", mCurrentAddress);
+                LOG_INFO(QString("Module current address is 0x%1").arg(QString::number(mCurrentAddress, 16)));
             }
             else if (address == ModuleCommands::DEFAULT)
             {
                 mDefaultAddress = value;
-                LOG_INFO("Module default address is 0x%x", mDefaultAddress);
+                LOG_INFO(QString("Module default address is 0x%1").arg(QString::number(mDefaultAddress, 16)));
             }
 
             // TODO: remove Initialization step 1 finish >>>
@@ -219,17 +219,17 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
 
             if ((y & AFTER_RESET_MASK) > 0)
             {
-                LOG_WARNING("Module 0x%02x, is after RESET", mCurrentAddress);//TODO is it error?
+                LOG_WARNING(QString("Module 0x%1, is after RESET").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
             }
 
             if (x == 0x10)
             {
-                LOG_WARNING("RS485 data byte lost in module 0x%02x due to buffer overflow", mCurrentAddress);//TODO is it error?
+                LOG_WARNING(QString("RS485 data byte lost in module 0x%1 due to buffer overflow").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
             }
 
             if (x == 0x11)
             {
-                LOG_WARNING("UMART data byte lost in module 0x%02x due to buffer overflow", mCurrentAddress);//TODO is it error?
+                LOG_WARNING(QString("UMART data byte lost in module 0x%1 due to buffer overflow").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
             }
 
             // TODO: remove Initialization step 2 finish >>>
@@ -299,7 +299,7 @@ void ModuleOKB::onTransmissionComplete()
 
     if (!response.outputParams.isEmpty() || !response.inputParams.isEmpty())
     {
-        LOG_INFO("Send response to cyclogram");
+        LOG_INFO(QString("Send response to cyclogram"));
         emit commandResult(response);
     }
     else

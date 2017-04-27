@@ -70,19 +70,19 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
     // valid values 1 to 8 //TODO
     if (fuseIndex < 1 || fuseIndex > 8)
     {
-        LOG_ERROR("Invalid fuse index %i", fuseIndex);
+        LOG_ERROR(QString("Invalid fuse index %1").arg(fuseIndex));
         return ModuleSTM::ERROR;
     }
 
     addModuleCmd(ModuleCommands::GET_FUSE_STATE, fuseIndex, 0);
-//        LOG_ERROR("Can not check fuse %i state", fuseIndex);
+//        LOG_ERROR(QString("Can not check fuse %1 state").arg(fuseIndex));
 //        return ModuleSTM::ERROR;
 
     //TODO
     int state = 0; //response[3];
 
     QMetaEnum e = QMetaEnum::fromType<ModuleSTM::FuseStates>();
-    LOG_INFO("Fuse %i state %s", fuseIndex, e.valueToKey(ModuleSTM::FuseStates(state)));
+    LOG_INFO(QString("Fuse %1 state %2").arg(fuseIndex).arg(e.valueToKey(ModuleSTM::FuseStates(state))));
 
     return ModuleSTM::FuseStates(state); //TODO undefined values
 }
@@ -117,7 +117,7 @@ void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& re
         break;
 
     default:
-        LOG_ERROR("Unexpected command %i received by STM module", command);
+        LOG_ERROR(QString("Unexpected command %1 received by STM module").arg(command));
         break;
     }
 
@@ -144,7 +144,7 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
 
             }
 
-            LOG_WARNING("Get channel telemetry processing not implemented");
+            LOG_WARNING(QString("Get channel telemetry processing not implemented"));
             int TODO; //form response
         }
         break;

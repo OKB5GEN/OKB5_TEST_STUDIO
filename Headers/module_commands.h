@@ -11,62 +11,79 @@ public:
     enum CommandID
     {
         // Own modules commands (documented) >>>>>
-        GET_MODULE_ADDRESS              = 0x01,
-        GET_STATUS_WORD                 = 0x02,
-        RESET_ERROR                     = 0x03,
-        SOFT_RESET                      = 0x04,
-        //RESERVED_0x05 = 0x05,
-        GET_SOWFTWARE_VERSION           = 0x06,
-        ECHO                            = 0x07,
-        //RESERVED_0x08 = 0x08,
-        //RESERVED_0x09 = 0x09,
-        //RESERVED_0x0A = 0x0A,
-        SET_POWER_CHANNEL_STATE         = 0x0B, // Can be sent to STM only
-        GET_FUSE_STATE                  = 0x0C, // Can be sent to STM only
-        GET_CHANNEL_TELEMETRY           = 0x0D, // Can be sent to STM only
-        SET_MKO_POWER_CHANNEL_STATE     = 0x0E, // Can be sent to STM only
-        //MATRIX_CMD_CTRL                 = 0x0F, // Can be sent to MKU only
-        SET_PACKET_SIZE_CAN             = 0x10, // Can be sent to TECH only
-        ADD_BYTES_CAN                   = 0x11, // Can be sent to TECH only
-        SEND_PACKET_CAN                 = 0x12, // Can be sent to TECH only
-        CHECK_RECV_DATA_CAN             = 0x13, // Can be sent to TECH only
-        RECV_DATA_CAN                   = 0x14, // Can be sent to TECH only
-        CLEAN_BUFFER_CAN                = 0x15, // Can be sent to TECH only
-        SET_PACKET_SIZE_RS485           = 0x16, // Can be sent to TECH only
-        ADD_BYTES_RS485                 = 0x17, // Can be sent to TECH only
-        SEND_PACKET_RS485               = 0x18, // Can be sent to TECH only
-        CHECK_RECV_DATA_RS485           = 0x19, // Can be sent to TECH only
-        RECV_DATA_RS485                 = 0x1A, // Can be sent to TECH only
-        CLEAN_BUFFER_RS485              = 0x1B, // Can be sent to TECH only
-        GET_TEMPERATURE_PT100           = 0x1C, // Can be sent to OTD only
-        GET_DS1820_COUNT_LINE_1         = 0x1D, // Can be sent to OTD only (Psi)
-        GET_DS1820_COUNT_LINE_2         = 0x1E, // Can be sent to OTD only (Nu)
-        GET_TEMPERATURE_DS1820_LINE_1   = 0x1F, // Can be sent to OTD only (Psi)
-        GET_TEMPERATURE_DS1820_LINE_2   = 0x20, // Can be sent to OTD only (Nu)
-        GET_POWER_CHANNEL_STATE         = 0x21, // Can be sent to STM only
-        //GET_MKU_MODULE_STATE            = 0x22, // Can be sent to MKU only
-        GET_MKO_POWER_CHANNEL_STATE     = 0x23, // Can be sent to STM only
-        SET_MODE_RS485                  = 0x24, // Can be sent to TECH only
-        SET_SPEED_RS485                 = 0x25, // Can be sent to TECH only
-        RESET_LINE_1                    = 0x26, // Can be sent to OTD only (Psi)
-        RESET_LINE_2                    = 0x27, // Can be sent to OTD only (Nu)
-        START_MEASUREMENT_LINE_1        = 0x28, // Can be sent to OTD only (Psi) 1-2 seconds to perform
-        START_MEASUREMENT_LINE_2        = 0x29, // Can be sent to OTD only (Nu) 1-2 seconds to perform
-        GET_DS1820_ADDR_LINE_1          = 0x2A, // Can be sent to OTD only (Psi)
-        GET_DS1820_ADDR_LINE_2          = 0x2B, // Can be sent to OTD only (Nu)
-        SET_TECH_INTERFACE              = 0x3B, // Can be sent to TECH only
-        GET_TECH_INTERFACE              = 0x3C, // Can be sent to TECH only
-        RECV_DATA_SSI                   = 0x3D, // Can be sent to TECH only
+        GET_MODULE_ADDRESS                = 0x01,
+        GET_STATUS_WORD                   = 0x02,
+        RESET_ERROR                       = 0x03,
+        SOFT_RESET                        = 0x04,
+        //RESERVED_0x05                     = 0x05,
+        GET_SOWFTWARE_VERSION             = 0x06,
+        ECHO                              = 0x07,
+        //RESERVED_0x08                     = 0x08,
+        //RESERVED_0x09                     = 0x09,
+        //RESERVED_0x0A                     = 0x0A,
+        SET_POWER_CHANNEL_STATE           = 0x0B, // Can be sent to STM only
+        GET_FUSE_STATE                    = 0x0C, // Can be sent to STM only
+        GET_CHANNEL_TELEMETRY             = 0x0D, // Can be sent to STM only
+        SET_MKO_POWER_CHANNEL_STATE       = 0x0E, // Can be sent to STM only
+        //MATRIX_CMD_CTRL                   = 0x0F, // Can be sent to MKU only
+        SET_PACKET_SIZE_CAN               = 0x10, // Can be sent to TECH only
+        ADD_BYTES_CAN                     = 0x11, // Can be sent to TECH only
+        SEND_PACKET_CAN                   = 0x12, // Can be sent to TECH only
+        CHECK_RECV_DATA_CAN               = 0x13, // Can be sent to TECH only
+        RECV_DATA_CAN                     = 0x14, // Can be sent to TECH only
+        CLEAN_BUFFER_CAN                  = 0x15, // Can be sent to TECH only
+        SET_PACKET_SIZE_RS485             = 0x16, // Can be sent to TECH only
+        ADD_BYTES_RS485                   = 0x17, // Can be sent to TECH only
+        SEND_PACKET_RS485                 = 0x18, // Can be sent to TECH only
+        CHECK_RECV_DATA_RS485             = 0x19, // Can be sent to TECH only
+        RECV_DATA_RS485                   = 0x1A, // Can be sent to TECH only
+        CLEAN_BUFFER_RS485                = 0x1B, // Can be sent to TECH only
+        GET_TEMPERATURE_PT100             = 0x1C, // Can be sent to OTD only
+        GET_DS1820_COUNT_LINE_1           = 0x1D, // Can be sent to OTD only (Psi)
+        GET_DS1820_COUNT_LINE_2           = 0x1E, // Can be sent to OTD only (Nu)
+        GET_TEMPERATURE_DS1820_LINE_1     = 0x1F, // Can be sent to OTD only (Psi)
+        GET_TEMPERATURE_DS1820_LINE_2     = 0x20, // Can be sent to OTD only (Nu)
+        GET_POWER_CHANNEL_STATE           = 0x21, // Can be sent to STM only
+        //GET_MKU_MODULE_STATE              = 0x22, // Can be sent to MKU only
+        GET_MKO_POWER_CHANNEL_STATE       = 0x23, // Can be sent to STM only
+        SET_MODE_RS485                    = 0x24, // Can be sent to TECH only
+        SET_SPEED_RS485                   = 0x25, // Can be sent to TECH only
+        RESET_LINE_1                      = 0x26, // Can be sent to OTD only (Psi)
+        RESET_LINE_2                      = 0x27, // Can be sent to OTD only (Nu)
+        START_MEASUREMENT_LINE_1          = 0x28, // Can be sent to OTD only (Psi) 1-2 seconds to perform
+        START_MEASUREMENT_LINE_2          = 0x29, // Can be sent to OTD only (Nu) 1-2 seconds to perform
+        GET_DS1820_ADDR_LINE_1            = 0x2A, // Can be sent to OTD only (Psi)
+        GET_DS1820_ADDR_LINE_2            = 0x2B, // Can be sent to OTD only (Nu)
+        SET_TECH_INTERFACE                = 0x3B, // Can be sent to TECH only
+        GET_TECH_INTERFACE                = 0x3C, // Can be sent to TECH only
+        RECV_DATA_SSI                     = 0x3D, // Can be sent to TECH only
 
-        // Third party modules commands (arbitrary) >>>>
+        // Third party modules commands (arbitrary codes) >>>>
 
-        // Power unit modules commands (0xFF00-started)
-        SET_VOLTAGE_AND_CURRENT         = 0xFF01,
-        SET_MAX_VOLTAGE_AND_CURRENT     = 0xFF02,
-        SET_POWER_STATE                 = 0xFF03,
-        GET_VOLTAGE_AND_CURRENT         = 0xFF04,
+        // Power unit modules commands
+        SET_VOLTAGE_AND_CURRENT           = 0xFF01,
+        SET_MAX_VOLTAGE_AND_CURRENT       = 0xFF02,
+        SET_POWER_STATE                   = 0xFF03,
+        GET_VOLTAGE_AND_CURRENT           = 0xFF04,
 
-        // MKO module commands (0xFF0000 started)
+        // MKO module commands
+        SEND_TEST_ARRAY                   = 0xFF05,
+        RECEIVE_TEST_ARRAY                = 0xFF06,
+        SEND_COMMAND_ARRAY                = 0xFF07,
+        RECEIVE_COMMAND_ARRAY             = 0xFF08,
+        SEND_TEST_ARRAY_FOR_CHANNEL       = 0xFF09,
+        RECEIVE_TEST_ARRAY_FOR_CHANNEL    = 0xFF0A,
+        SEND_COMMAND_ARRAY_FOR_CHANNEL    = 0xFF0B,
+        RECEIVE_COMMAND_ARRAY_FOR_CHANNEL = 0xFF0C,
+        SEND_TO_ANGLE_SENSOR              = 0xFF0D,
+
+        // custom MKO comands
+        START_MKO                         = 0xFF0E,
+        STOP_MKO                          = 0xFF0F,
+
+        // Logical commands
+        GET_MODULE_STATUS                 = 0xFFF0, // returns two variables for physical and logical state, interaction with module 0 - impossible, 1 - possible
+        SET_MODULE_LOGIC_STATUS           = 0xFFF1  // set module logic state
     };
 
     Q_ENUM(CommandID)

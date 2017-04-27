@@ -248,7 +248,7 @@ void VariableController::saveReport(const QString& fileName)
             QStringList token = mDataTimeline[i].subprogramFlag.split(DELIMITER);
             if (token.size() != 2)
             {
-                LOG_ERROR("Invalid subprogram name");
+                LOG_ERROR(QString("Invalid subprogram name: '%1'").arg(mDataTimeline[i].subprogramFlag));
                 continue;
             }
 

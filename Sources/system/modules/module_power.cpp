@@ -22,7 +22,7 @@ namespace
     {
         if (array.size() != 4)
         {
-            LOG_ERROR("Can not convert byte array to float, incorrect array size");
+            LOG_ERROR(QString("Can not convert byte array to float, incorrect array size"));
             return 0;
         }
 
@@ -113,7 +113,7 @@ void ModulePower::setObjectValue(ObjectID objectID, qreal actualValue, qreal nom
     Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
     if (operation == UNKNOWN_OPERATION)
     {
-        LOG_ERROR("Incorrect object id '%i'", objectID);
+        LOG_ERROR(QString("Incorrect object id '%1'").arg(objectID));
         return;
     }
 
@@ -142,7 +142,7 @@ void ModulePower::getObjectValue(ObjectID objectID)
     Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
     if (operation == UNKNOWN_OPERATION)
     {
-        LOG_ERROR("Incorrect object id '%i'", objectID);
+        LOG_ERROR(QString("Incorrect object id '%1'").arg(objectID));
         return;
     }
 
@@ -172,7 +172,7 @@ void ModulePower::processCommand(const Transaction& params)
 
 //    if (!mIsInitialized)
 //    {
-//        LOG_ERROR("Power module is not initialized");
+//        LOG_ERROR(QString("Power module is not initialized"));
 //        response[SystemState::ERROR_CODE] = QVariant(uint32_t(200)); //TODO define error codes internal or hardware
 //        emit commandResult(response);
 //        return;
@@ -233,11 +233,11 @@ void ModulePower::setVoltageAndCurrent(const Transaction& request)
 {
     // get input params
     qreal voltage = request.inputParams.value(SystemState::VOLTAGE).toDouble();
-    LOG_INFO("Try to set current voltage to : U=%f", voltage);
+    LOG_INFO(QString("Try to set current voltage to : U=%1").arg(voltage));
 
     if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
     {
-        LOG_FATAL("Unsupported voltage values: Umin=%f, OVPThr=%f, Unom=%f", MIN_VOLTAGE, mVoltageThreshold, mNominalVoltage);
+        LOG_FATAL(QString("Unsupported voltage values: Umin=%1, OVPThr=%2, Unom=%3").arg(MIN_VOLTAGE).arg(mVoltageThreshold).arg(mNominalVoltage));
         return;
     }
 
@@ -249,19 +249,19 @@ void ModulePower::setVoltageAndCurrent(const Transaction& request)
     qreal voltageToSet = voltage;
     if (voltageToSet > mNominalVoltage)
     {
-        LOG_WARNING("Set voltage value has limited by nominal power supply unit voltage from %f to %f volts", voltage, mNominalVoltage);
+        LOG_WARNING(QString("Set voltage value has limited by nominal power supply unit voltage from %1 to %2 volts").arg(voltage).arg(mNominalVoltage));
         voltageToSet = mNominalVoltage;
     }
 
     if (voltageToSet > mVoltageThreshold)
     {
-        LOG_WARNING("Set voltage value has limited by max allowed test stand voltage from %f to %f volts", voltageToSet, mVoltageThreshold);
+        LOG_WARNING(QString("Set voltage value has limited by max allowed test stand voltage from %1 to %2 volts").arg(voltageToSet).arg(mVoltageThreshold));
         voltageToSet = mVoltageThreshold;
     }
 
     if (voltageToSet < MIN_VOLTAGE)
     {
-        LOG_WARNING("Set voltage value has limited by min allowed test stand voltage from %f to %f volts", voltageToSet, voltageToSet);
+        LOG_WARNING(QString("Set voltage value has limited by min allowed test stand voltage from %1 to %2 volts").arg(voltageToSet).arg(voltageToSet));
         voltageToSet = voltageToSet;
     }
 
@@ -272,7 +272,7 @@ void ModulePower::setVoltageAndCurrent(const Transaction& request)
     qreal maxCurrentByPower = qMin(mNominalPower * 0.95 / voltageToSet, mNominalCurrent);
     setObjectValue(SET_VALUE_I, maxCurrentByPower, mNominalCurrent);
 
-    LOG_INFO("Actually set power supply params: U=%f I=%f", voltageToSet, maxCurrentByPower);
+    LOG_INFO(QString("Actually set power supply params: U=%1 I=%2").arg(voltageToSet).arg(maxCurrentByPower));
 }
 
 //void ModulePower::setMaxVoltageAndCurrent(const Transaction& request, Transaction& response)
@@ -294,8 +294,8 @@ void ModulePower::setVoltageAndCurrent(const Transaction& request)
 
 //    int TODO; // possibly need to limit current values to new max values
 
-//    LOG_INFO("setMaxVoltageAndCurrent: try to set values U=%f I=%f", voltage, current);
-//    LOG_INFO("setMaxVoltageAndCurrent: actually set values U=%f I=%f", uc, ic);
+//    LOG_INFO(QString("setMaxVoltageAndCurrent: try to set values U=%1 I=%2").arg(voltage).arg(current));
+//    LOG_INFO(QString("setMaxVoltageAndCurrent: actually set values U=%1 I=%2").arg(uc).arg(ic));
 
 //    // fill response
 //    response[SystemState::OUTPUT_PARAMS_COUNT] = QVariant(0);
@@ -333,7 +333,7 @@ void ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
     Operation operation = Operation(operations.value(command, UNKNOWN_OPERATION));
     if (operation == UNKNOWN_OPERATION)
     {
-        LOG_ERROR("Incorrect command id '%i'", command);
+        LOG_ERROR(QString("Incorrect command id '%1'").arg(command));
         return;
     }
 
@@ -392,7 +392,7 @@ void ModulePower::getNominalValue(ObjectID objectID)
     Operation operation = Operation(operations.value(objectID, UNKNOWN_OPERATION));
     if (operation == UNKNOWN_OPERATION)
     {
-        LOG_ERROR("Incorrect object id '%i'", objectID);
+        LOG_ERROR(QString("Incorrect object id '%1'").arg(objectID));
         return;
     }
 
@@ -536,7 +536,7 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
                 break;
 
             default:
-                error = QString("Unknown error: %1").arg(QString::number(mError));
+                error = QString("Unknown error: %1").arg(mError);
                 break;
             }
 
