@@ -36,6 +36,8 @@ public:
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
 
+    bool isPhysicallyActive() const override;
+
     void onApplicationFinish();
 
 public slots:

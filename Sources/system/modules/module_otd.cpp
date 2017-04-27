@@ -267,4 +267,5 @@ void ModuleOTD::createResponse(Transaction& response)
 
 void ModuleOTD::onApplicationFinish()
 {
+    closePort();
 }

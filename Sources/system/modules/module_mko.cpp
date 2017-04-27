@@ -870,4 +870,11 @@ void ModuleMKO::processCommand(const Transaction& params)
 void ModuleMKO::onApplicationFinish()
 {
     int TODO; // check state and write errors/warnings
+    // stopMKO, close hanles etc
+}
+
+bool ModuleMKO::isPhysicallyActive() const
+{
+    int TODO;
+    return false;
 }

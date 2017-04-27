@@ -34,15 +34,12 @@ COMPortModule::~COMPortModule()
     mResponseWaitTimer->stop();
     mSendTimer->stop();
 
-    if (mPort && mPort->isOpen())
-    {
-        mPort->close();
-    }
+    closePort();
 }
 
 bool COMPortModule::sendToPort(const QByteArray& request)
 {
-    if (!isReady())
+    if (!isPhysicallyActive())
     {
         LOG_ERROR(QString("Send data to %1 failed. Module not connected!").arg(moduleName()));
         return false;
@@ -92,12 +89,7 @@ QString COMPortModule::findPortName() const
 QString COMPortModule::createPort(const QString& portName)
 {
     QString error;
-
-    if (mPort)
-    {
-        mPort->close();
-        mPort->deleteLater();
-    }
+    closePort();
 
     mPort = new QSerialPort(portName, this); // TODO is parent really needed?
     if (mPort->open(QIODevice::ReadWrite))
@@ -252,7 +244,7 @@ void COMPortModule::setResponseWaitTime(int msec)
 
 void COMPortModule::softReset() // TODO power modules can be soft resetted?
 {
-    if (!isReady())
+    if (!isPhysicallyActive())
     {
         LOG_WARNING(QString("Trying to soft reset inactive module %1").arg(moduleName()));
         return;
@@ -262,11 +254,24 @@ void COMPortModule::softReset() // TODO power modules can be soft resetted?
 
     disconnect(mPort, SIGNAL(readyRead()), this, SLOT(onResponseReceived()));
     //disconnect(mPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(onErrorOccured(QSerialPort::SerialPortError)));
-    mPort->close();
-    mPort->deleteLater();
-    mPort = Q_NULLPTR;
+    closePort();
 
     mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
+}
+
+void COMPortModule::closePort()
+{
+    if (mPort)
+    {
+        if (mPort->isOpen())
+        {
+            mPort->close();
+        }
+
+        mPort->deleteLater();
+    }
+
+    mPort = Q_NULLPTR;
 }
 
 void COMPortModule::tryCreatePort()
@@ -319,7 +324,7 @@ void COMPortModule::setId(const Identifier& id)
     LOG_INFO(QString("%1 (%2) started!").arg(moduleName(), portName));
 }
 
-bool COMPortModule::isReady() const
+bool COMPortModule::isPhysicallyActive() const
 {
     return (mPort && mPort->isOpen());
 }

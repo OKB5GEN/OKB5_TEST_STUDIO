@@ -417,11 +417,6 @@ void ModulePower::getDeviceClass()
     addRequest(GET_DEVICE_CLASS, request);
 }
 
-//void ModulePower::onApplicationFinish()
-//{
-//    int TODO; // power off on app close
-//}
-
 bool ModulePower::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
     QMetaEnum e = QMetaEnum::fromType<ModulePower::Operation>();
@@ -655,4 +650,6 @@ void ModulePower::onTransmissionComplete()
 void ModulePower::onApplicationFinish()
 {
     int TODO; // check state and write errors/warnings
+
+    closePort();
 }

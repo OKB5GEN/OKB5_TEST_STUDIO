@@ -312,6 +312,7 @@ bool ModuleTech::processCustomResponse(uint32_t operationID, const QByteArray& r
 
 void ModuleTech::onApplicationFinish()
 {
+    closePort();
 }
 
 void ModuleTech::onModuleError()

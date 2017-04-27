@@ -286,4 +286,6 @@ void ModuleSTM::createResponse(Transaction& response)
 void ModuleSTM::onApplicationFinish()
 {
     int TODO; // check state and write errors/warnings
+
+    closePort();
 }

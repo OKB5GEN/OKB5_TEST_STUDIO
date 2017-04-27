@@ -35,12 +35,11 @@ public:
     void setId(const Identifier& id);
     const Identifier& id() const;
 
-    // callback for some actions that must be performed on application finish
-    //virtual void onApplicationFinish() = 0; //TODO
-
-    bool isReady() const;
+    bool isPhysicallyActive() const override;
 
 protected:
+    void closePort();
+
     // return true if processing successful
     // return false if processing failed, and request queue must be resetted
     virtual bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;
