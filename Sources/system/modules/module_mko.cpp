@@ -274,7 +274,7 @@ void ModuleMKO::readResponse()
 
                 switch (type)
                 {
-                case SystemState::MODE:
+                case SystemState::DRIVE_MODE:
                     {
                         int16_t v = buffer[0 + offset];
                         value = v;
@@ -795,7 +795,7 @@ void ModuleMKO::processCommand(const Transaction& params)
 
                 switch (type)
                 {
-                case SystemState::MODE:
+                case SystemState::DRIVE_MODE:
                     data.mode = value;
                     break;
                 case SystemState::STEPS:

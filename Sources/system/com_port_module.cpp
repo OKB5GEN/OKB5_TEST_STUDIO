@@ -42,15 +42,9 @@ COMPortModule::~COMPortModule()
 
 bool COMPortModule::sendToPort(const QByteArray& request)
 {
-    if (!mPort)
+    if (!isReady())
     {
-        LOG_ERROR(QString("Send data to %1 failed. No port created!").arg(moduleName()));
-        return false;
-    }
-
-    if (!mPort->isOpen())
-    {
-        LOG_ERROR(QString("Send data to %1 failed! %2 port is closed").arg(moduleName()).arg(mPort->portName()));
+        LOG_ERROR(QString("Send data to %1 failed. Module not connected!").arg(moduleName()));
         return false;
     }
 
@@ -95,34 +89,17 @@ QString COMPortModule::findPortName() const
     return QString();
 }
 
-//void COMPortModule::onApplicationStart()
-//{
-//    setModuleState(AbstractModule::INITIALIZING);
-
-//    QString portName = findPortName();
-
-//    if (portName.isNull())
-//    {
-//        setModuleState(AbstractModule::INITIALIZED_FAILED, QString("Module %1 configuration error. No COM port module found").arg(moduleName()));
-//        return;
-//    }
-
-//    QString error = createPort(portName);
-
-//    if (!error.isEmpty())
-//    {
-//        setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-//        return;
-//    }
-
-//    initializeCustom();
-//}
-
 QString COMPortModule::createPort(const QString& portName)
 {
     QString error;
 
-    mPort = new QSerialPort(portName);
+    if (mPort)
+    {
+        mPort->close();
+        mPort->deleteLater();
+    }
+
+    mPort = new QSerialPort(portName, this); // TODO is parent really needed?
     if (mPort->open(QIODevice::ReadWrite))
     {
         mPort->setBaudRate(QSerialPort::Baud115200);
@@ -273,9 +250,9 @@ void COMPortModule::setResponseWaitTime(int msec)
     mResponseWaitTime = msec;
 }
 
-void COMPortModule::softReset()
+void COMPortModule::softReset() // TODO power modules can be soft resetted?
 {
-    if (!mPort || !mPort->isOpen() /*|| !mModuleReady*/) //TODO check moduleState(), TODO is module can be soft resetted? (power modules can not be?)
+    if (!isReady())
     {
         LOG_WARNING(QString("Trying to soft reset inactive module %1").arg(moduleName()));
         return;
@@ -288,7 +265,6 @@ void COMPortModule::softReset()
     mPort->close();
     mPort->deleteLater();
     mPort = Q_NULLPTR;
-    //setModuleState(AbstractModule::SOFT_RESETTING);
 
     mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
 }
@@ -312,9 +288,7 @@ void COMPortModule::tryCreatePort()
         return;
     }
 
-    LOG_INFO(QString("%1 (%2) is up after soft reset").arg(moduleName()).arg(mPort->portName()));
-
-    //onApplicationStart();
+    LOG_INFO(QString("%1 (%2) is up after soft reset!").arg(moduleName()).arg(mPort->portName()));
 }
 
 const COMPortModule::Identifier& COMPortModule::id() const
@@ -325,4 +299,27 @@ const COMPortModule::Identifier& COMPortModule::id() const
 void COMPortModule::setId(const Identifier& id)
 {
     mID = id;
+
+    QString portName = findPortName();
+
+    if (portName.isNull())
+    {
+        LOG_ERROR(QString("Module %1 configuration error. No COM port module found").arg(moduleName()));
+        return;
+    }
+
+    QString error = createPort(portName);
+
+    if (!error.isEmpty())
+    {
+        LOG_ERROR(error);
+        return;
+    }
+
+    LOG_INFO(QString("%1 (%2) started!").arg(moduleName(), portName));
+}
+
+bool COMPortModule::isReady() const
+{
+    return (mPort && mPort->isOpen());
 }

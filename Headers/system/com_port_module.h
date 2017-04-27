@@ -18,6 +18,12 @@ public:
         QString serialNumber;
         quint16 vendorId;
         quint16 productId;
+
+        Identifier():
+            vendorId(0),
+            productId(0)
+        {
+        }
     };
 
     COMPortModule(QObject* parent);
@@ -29,10 +35,10 @@ public:
     void setId(const Identifier& id);
     const Identifier& id() const;
 
-    //void onApplicationStart() override;
-
     // callback for some actions that must be performed on application finish
     //virtual void onApplicationFinish() = 0; //TODO
+
+    bool isReady() const;
 
 protected:
     // return true if processing successful
@@ -44,9 +50,6 @@ protected:
 
     // call when all requests in queue are succesfully sent and all responses to them are successfully processed
     virtual void onTransmissionComplete() = 0;
-
-    // inherited class custom initialization. Module state must be set to INITIALIZED_OK/INITIALIZED_FAILED after initialization success/fail
-    //virtual void initializeCustom() = 0;
 
     void addRequest(uint32_t operationID, const QByteArray& request);
     void softReset();

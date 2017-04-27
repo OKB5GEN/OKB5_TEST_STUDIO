@@ -7,8 +7,6 @@
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
-class QSerialPort;
-
 class ModuleMKO;
 class ModuleOTD;
 class ModuleSTM;
@@ -24,30 +22,32 @@ public:
     enum ParamID // command parameters
     {
         // explicit commans params (can be changed by the user)
-        VOLTAGE               = 0x00000006,
-        CURRENT               = 0x00000007,
-        TEMPERATURE           = 0x00000008,
-        MODE_PSY              = 0x00000009,
-        STEPS_PSY             = 0x0000000A,
-        VELOCITY_PSY          = 0x0000000B,
-        CURRENT_PSY           = 0x0000000C,
-        ANGLE_PSY             = 0x0000000D,
-        MODE_NU               = 0x0000000E,
-        STEPS_NU              = 0x0000000F,
-        VELOCITY_NU           = 0x00000010,
-        CURRENT_NU            = 0x00000011,
-        ANGLE_NU              = 0x00000012,
-        SENSOR_FLAG           = 0x00000013,
-        MODE                  = 0x00000014,
-        STEPS                 = 0x00000015,
-        VELOCITY              = 0x00000016,
+        VOLTAGE,
+        CURRENT,
+        TEMPERATURE,
+        MODE_PSY,
+        STEPS_PSY,
+        VELOCITY_PSY,
+        CURRENT_PSY,
+        ANGLE_PSY,
+        MODE_NU,
+        STEPS_NU,
+        VELOCITY_NU,
+        CURRENT_NU,
+        ANGLE_NU,
+        SENSOR_FLAG,
+        DRIVE_MODE,
+        STEPS,
+        VELOCITY,
 
         // implicit command params (can not be changed by the user)
-        SUBADDRESS            = 0x00000017,
-        CHANNEL_ID            = 0x00000018,
-        POWER_STATE           = 0x00000019,
+        SUBADDRESS,
+        CHANNEL_ID,
+        POWER_STATE,
 
-        UNDEFINED             = 0xffffffff
+        MODULE_STATE, // 0 - inactive, 1 - active
+
+        UNDEFINED
     };
 
     Q_ENUM(ParamID)
@@ -56,9 +56,6 @@ public:
     ~SystemState();
 
     void onApplicationStart();
-
-    //void setDefaultState();
-    //void onCyclogramStart(); //TODO remove
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
@@ -73,7 +70,6 @@ public:
 
 private slots:
     void processResponse(const Transaction& response);
-//    void onModuleStateChanged(ModuleCommands::ModuleID moduleID, AbstractModule::ModuleState from, AbstractModule::ModuleState to);
 
 signals:
     void commandFinished(bool success);
@@ -113,7 +109,5 @@ private:
     QMap<ParamID, QString> mParamNames;
     QMap<ParamID, QString> mDefaultVariables;
     QMap<ParamID, QString> mDefaultDescriptions;
-
-//    QMap<ModuleCommands::ModuleID, AbstractModule*> mModules;
 };
 #endif // SYSTEM_STATE_H

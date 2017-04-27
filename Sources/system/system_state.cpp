@@ -126,18 +126,18 @@ namespace
 ///////////////////////////////////////////////////////////////
 SystemState::SystemState(QObject* parent):
     QObject(parent),
-    mCurCommand(Q_NULLPTR),
     mMKO(Q_NULLPTR),
     mOTD(Q_NULLPTR),
     mSTM(Q_NULLPTR),
     mTech(Q_NULLPTR),
     mPowerBUP(Q_NULLPTR),
-    mPowerPNA(Q_NULLPTR)
+    mPowerPNA(Q_NULLPTR),
+    mCurCommand(Q_NULLPTR)
 {
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
     mParamNames[TEMPERATURE] = tr("Temperature, °C");
-    mParamNames[MODE] = tr("Mode");
+    mParamNames[DRIVE_MODE] = tr("Mode");
     mParamNames[STEPS] = tr("Steps");
     mParamNames[VELOCITY] = tr("Velocity");
     mParamNames[MODE_PSY] = tr("Mode (Psy)");
@@ -160,7 +160,7 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
     mDefaultVariables[TEMPERATURE] = "T";
-    mDefaultVariables[MODE] = "M";
+    mDefaultVariables[DRIVE_MODE] = "M";
     mDefaultVariables[STEPS] = "St";
     mDefaultVariables[VELOCITY] = "V";
     mDefaultVariables[MODE_PSY] = "PsyM";
@@ -178,7 +178,7 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
     mDefaultDescriptions[TEMPERATURE] = tr("Temperature, °C");
-    mDefaultDescriptions[MODE] = tr("Mode");
+    mDefaultDescriptions[DRIVE_MODE] = tr("Mode");
     mDefaultDescriptions[STEPS] = tr("Steps");
     mDefaultDescriptions[VELOCITY] = tr("Velocity");
     mDefaultDescriptions[MODE_PSY] = tr("Mode (Psy)");
@@ -205,7 +205,7 @@ void SystemState::onApplicationStart()
     QMap<ModuleCommands::ModuleID, COMPortModule::Identifier> modules;
     loadSystemConfig(modules, emulatorEnabled);
 
-    QString mode = emulatorEnabled ? tr("EMULATOR") : tr("REAL DEVICE");
+    QString mode = emulatorEnabled ? tr("EMULATOR") : tr("DEVICE");
     LOG_INFO(QString("System mode: %1").arg(mode));
 
     // Create modules objects
@@ -214,82 +214,45 @@ void SystemState::onApplicationStart()
     mMKO->setModuleID(ModuleCommands::MKO);
     connect(this, SIGNAL(sendToMKO(const Transaction&)), mMKO, SLOT(processCommand(const Transaction&)));
     connect(mMKO, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mMKO, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mOTD = new ModuleOTD(this);
     mOTD->setEmulator(emulatorEnabled);
-    mOTD->setId(modules.value(ModuleCommands::OTD));
     mOTD->setModuleID(ModuleCommands::OTD);
+    mOTD->setId(modules.value(ModuleCommands::OTD));
     connect(this, SIGNAL(sendToOTD(const Transaction&)), mOTD, SLOT(processCommand(const Transaction&)));
     connect(mOTD, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mOTD, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mSTM = new ModuleSTM(this);
     mSTM->setEmulator(emulatorEnabled);
-    mSTM->setId(modules.value(ModuleCommands::STM));
     mSTM->setModuleID(ModuleCommands::STM);
+    mSTM->setId(modules.value(ModuleCommands::STM));
     connect(this, SIGNAL(sendToSTM(const Transaction&)), mSTM, SLOT(processCommand(const Transaction&)));
     connect(mSTM, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mSTM, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mTech = new ModuleTech(this);
     mTech->setEmulator(emulatorEnabled);
-    mTech->setId(modules.value(ModuleCommands::TECH));
     mTech->setModuleID(ModuleCommands::TECH);
+    mTech->setId(modules.value(ModuleCommands::TECH));
     connect(this, SIGNAL(sendToTech(const Transaction&)), mTech, SLOT(processCommand(const Transaction&)));
     connect(mTech, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mTech, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerBUP = new ModulePower(this);
     mPowerBUP->setEmulator(emulatorEnabled);
-    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
     mPowerBUP->setModuleID(ModuleCommands::POWER_UNIT_BUP);
+    mPowerBUP->setId(modules.value(ModuleCommands::POWER_UNIT_BUP));
     connect(this, SIGNAL(sendToPowerUnitBUP(const Transaction&)), mPowerBUP, SLOT(processCommand(const Transaction&)));
     connect(mPowerBUP, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mPowerBUP, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
 
     mPowerPNA = new ModulePower(this);
     mPowerPNA->setEmulator(emulatorEnabled);
-    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
     mPowerPNA->setModuleID(ModuleCommands::POWER_UNIT_PNA);
+    mPowerPNA->setId(modules.value(ModuleCommands::POWER_UNIT_PNA));
     connect(this, SIGNAL(sendToPowerUnitPNA(const Transaction&)), mPowerPNA, SLOT(processCommand(const Transaction&)));
     connect(mPowerPNA, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
-//    connect(mPowerPNA, SIGNAL(stateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)), this, SLOT(onModuleStateChanged(ModuleCommands::ModuleID, AbstractModule::ModuleState, AbstractModule::ModuleState)));
-
-//    mModules[ModuleCommands::MKO] = mMKO;
-//    mModules[ModuleCommands::OTD] = mOTD;
-//    mModules[ModuleCommands::STM] = mSTM;
-//    mModules[ModuleCommands::TECH] = mTech;
-//    mModules[ModuleCommands::POWER_UNIT_BUP] = mPowerBUP;
-//    mModules[ModuleCommands::POWER_UNIT_PNA] = mPowerPNA;
-
-    // Start modules initialization. They will send 'initializationFinished' signal on initialization finish depending on its internal logic
-    // The entire system will be initialized and ready to execute commands after 'initializationFinished' signal will be receceived from all modules
-    //mPowerBUP->onApplicationStart();
-    //mPowerPNA->onApplicationStart();
-    //mOTD->onApplicationStart();
-    //mSTM->onApplicationStart();
-    //mTech->onApplicationStart();
-    //mMKO->onApplicationStart();
 
     // Create templates for internal protocol commands parameters
     setupCommandsParams();
 }
-
-//void SystemState::setDefaultState()
-//{
-//    LOG_INFO("Setting default system state...");
-
-//    foreach (AbstractModule* module, mModules.values())
-//    {
-//        LOG_INFO(QString("Module %1 state is %2").arg(module->moduleName()).arg(module->moduleState()));
-
-//        if (module->moduleState() == AbstractModule::INITIALIZED_OK)
-//        {
-//            module->setDefaultState();
-//        }
-//    }
-//}
 
 QString SystemState::paramName(int module, int command, int param, bool isInputParam) const
 {
@@ -352,7 +315,7 @@ void SystemState::setupCommandsParams()
         sendCommandArrayParams.push_back(paramName(CURRENT_NU));
 
         QStringList sendCommandArrayForChannelParams;
-        sendCommandArrayForChannelParams.push_back(paramName(MODE));
+        sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
         sendCommandArrayForChannelParams.push_back(paramName(STEPS));
         sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
         sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
@@ -372,7 +335,7 @@ void SystemState::setupCommandsParams()
         receiveCommandArrayParams.push_back(paramName(TEMPERATURE));
 
         QStringList receiveCommandArrayForChannelParams;
-        sendCommandArrayForChannelParams.push_back(paramName(MODE));
+        sendCommandArrayForChannelParams.push_back(paramName(DRIVE_MODE));
         sendCommandArrayForChannelParams.push_back(paramName(STEPS));
         sendCommandArrayForChannelParams.push_back(paramName(VELOCITY));
         sendCommandArrayForChannelParams.push_back(paramName(CURRENT));
