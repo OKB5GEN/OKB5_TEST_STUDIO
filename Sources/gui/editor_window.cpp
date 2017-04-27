@@ -92,6 +92,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     {
         writeSettings();
         runModalCyclogram(APP_FINISH_CYCLOGRAM_FILE, tr("Running application finish cyclogram..."));
+        mSystemState->onApplicationFinish();
         event->accept();
     }
     else

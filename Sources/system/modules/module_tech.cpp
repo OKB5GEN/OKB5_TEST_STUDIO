@@ -310,10 +310,9 @@ bool ModuleTech::processCustomResponse(uint32_t operationID, const QByteArray& r
     int TODO;
 }
 
-//void ModuleTech::onApplicationFinish()
-//{
-//    int TODO;
-//}
+void ModuleTech::onApplicationFinish()
+{
+}
 
 void ModuleTech::onModuleError()
 {

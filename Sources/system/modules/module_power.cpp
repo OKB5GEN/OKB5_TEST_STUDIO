@@ -651,3 +651,8 @@ void ModulePower::onTransmissionComplete()
         emit commandResult(mCurrentTransaction);
     }
 }
+
+void ModulePower::onApplicationFinish()
+{
+    int TODO; // check state and write errors/warnings
+}

@@ -254,6 +254,16 @@ void SystemState::onApplicationStart()
     setupCommandsParams();
 }
 
+void SystemState::onApplicationFinish()
+{
+    mMKO->onApplicationFinish();
+    mOTD->onApplicationFinish();
+    mSTM->onApplicationFinish();
+    mTech->onApplicationFinish();
+    mPowerBUP->onApplicationFinish();
+    mPowerPNA->onApplicationFinish();
+}
+
 QString SystemState::paramName(int module, int command, int param, bool isInputParam) const
 {
     if (module >= 0 && module < ModuleCommands::MODULES_COUNT)

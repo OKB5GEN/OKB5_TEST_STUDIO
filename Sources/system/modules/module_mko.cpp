@@ -850,8 +850,6 @@ void ModuleMKO::processCommand(const Transaction& params)
         break;
     }
 
-
-
     if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
     {
         mCurrentTransaction.error = QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE);
@@ -867,4 +865,9 @@ void ModuleMKO::processCommand(const Transaction& params)
     {
         emit commandResult(mCurrentTransaction);
     }
+}
+
+void ModuleMKO::onApplicationFinish()
+{
+    int TODO; // check state and write errors/warnings
 }

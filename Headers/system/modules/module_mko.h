@@ -10,7 +10,6 @@ class ModuleMKO: public AbstractModule
     Q_OBJECT
 
 public:
-
     enum KitID
     {
         NO_KIT      = 0x00,
@@ -55,6 +54,8 @@ public:
 
     ModuleMKO(QObject* parent);
     ~ModuleMKO();
+
+    void onApplicationFinish();
 
 public slots:
     void processCommand(const Transaction& params) override;

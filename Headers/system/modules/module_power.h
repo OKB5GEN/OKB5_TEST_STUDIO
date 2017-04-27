@@ -41,7 +41,7 @@ public:
 
 public slots:
     void processCommand(const Transaction& params) override;
-    //void onApplicationFinish() override;
+    void onApplicationFinish();
 
 protected:
     bool processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;

@@ -228,11 +228,6 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
     return true;
 }
 
-//void ModuleSTM::onApplicationFinish()
-//{
-//    int TODO;
-//}
-
 void ModuleSTM::onModuleError()
 {
     int TODO; //TODO here will be processing
@@ -287,3 +282,8 @@ void ModuleSTM::createResponse(Transaction& response)
 //    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_OFF); // Hardcode enable MKO power supply (main?) TODO to cyclogram
 //    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_OFF); // enable MKO power supply (reserve?) TODO
 //}
+
+void ModuleSTM::onApplicationFinish()
+{
+    int TODO; // check state and write errors/warnings
+}

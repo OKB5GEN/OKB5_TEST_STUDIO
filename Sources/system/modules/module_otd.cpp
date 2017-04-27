@@ -264,3 +264,7 @@ void ModuleOTD::createResponse(Transaction& response)
     mCurrentTransaction.outputParams = outputParams;
     response = mCurrentTransaction;
 }
+
+void ModuleOTD::onApplicationFinish()
+{
+}

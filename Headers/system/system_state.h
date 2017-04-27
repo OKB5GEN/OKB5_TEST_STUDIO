@@ -56,6 +56,7 @@ public:
     ~SystemState();
 
     void onApplicationStart();
+    void onApplicationFinish();
 
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
