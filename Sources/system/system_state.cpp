@@ -177,8 +177,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[CURRENT_NU] = "NuI";
     mDefaultVariables[ANGLE_NU] = "NuA";
     mDefaultVariables[SENSOR_FLAG] = "TSF";
-    mDefaultVariables[STATUS_PHYSICAL] = tr("Active");
-    mDefaultVariables[STATUS_LOGICAL] = tr("Ready");
+    mDefaultVariables[STATUS_PHYSICAL] = tr("PActive");
+    mDefaultVariables[STATUS_LOGICAL] = tr("LActive");
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -524,7 +524,7 @@ void SystemState::sendCommand(CmdActionModule* command)
 
     Transaction transaction;
     transaction.moduleID = uint32_t(command->module());
-    transaction.commandID = uint32_t(command->operation());
+    transaction.commandID = command->operation();
 
     // input params -> [type, value]
     for (auto it = inputParams.begin(); it != inputParams.end(); ++it)
@@ -549,6 +549,13 @@ void SystemState::sendCommand(CmdActionModule* command)
         transaction.outputParams[type] = it.value();
     }
 
+    if (processLocalCommand(transaction))
+    {
+        mCurCommand = Q_NULLPTR;
+        emit commandFinished(transaction.error.isEmpty());
+        return;
+    }
+
     switch (command->module())
     {
     case ModuleCommands::POWER_UNIT_BUP:
@@ -571,25 +578,88 @@ void SystemState::sendCommand(CmdActionModule* command)
         break;
 
     default:
-        LOG_ERROR(QString("Module not defined"));
+        {
+            LOG_ERROR(QString("Module not defined"));
+            mCurCommand = Q_NULLPTR;
+            emit commandFinished(true);
+            return;
+        }
         break;
     }
+
+    int TODO; // start protection timer (for cases when some module logics is buggy) - 10-20-30 seconds for example
 }
 
-void SystemState::onExecutionFinished(const QString& error)
+bool SystemState::processLocalCommand(Transaction& transaction)
 {
-    if (!error.isEmpty())
-    {
-        QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
-        QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
-        QString module = moduleEnum.valueToKey(mCurCommand->module());
-        QString command = commandEnum.valueToKey(mCurCommand->operation());
+    QString error;
+    AbstractModule* module = Q_NULLPTR;
 
-        LOG_ERROR(QString("Command execution failed. Module:%1, Command:%2, Error:%3").arg(module).arg(command).arg(error));
+    switch (transaction.moduleID)
+    {
+    case ModuleCommands::POWER_UNIT_BUP:
+        module = mPowerBUP;
+        break;
+    case ModuleCommands::POWER_UNIT_PNA:
+        module = mPowerPNA;
+        break;
+    case ModuleCommands::OTD:
+        module = mOTD;
+        break;
+    case ModuleCommands::STM:
+        module = mSTM;
+        break;
+    case ModuleCommands::MKO:
+        module = mMKO;
+        break;
+    case ModuleCommands::TECH:
+        module = mTech;
+        break;
+    default:
+        error = QString("Unknown module id=%1").arg(transaction.moduleID);
+        break;
     }
 
-    mCurCommand = Q_NULLPTR;
-    emit commandFinished(error.isEmpty());
+    switch (transaction.commandID)
+    {
+        case ModuleCommands::GET_MODULE_STATUS:
+        {
+            QString physVar = transaction.outputParams.value(STATUS_PHYSICAL).toString();
+            QString logVar = transaction.outputParams.value(STATUS_LOGICAL).toString();
+            qreal physValue = 0;
+            qreal logValue = 0;
+
+            VariableController* vc = mCurCommand->variableController();
+
+            if (module)
+            {
+                physValue = module->isPhysicallyActive() ? 1 : 0;
+                logValue = module->isLogicallyActive() ? 1 : 0;
+            }
+
+            vc->setCurrentValue(physVar, physValue);
+            vc->setCurrentValue(logVar, logValue);
+        }
+        break;
+
+    case ModuleCommands::SET_MODULE_LOGIC_STATUS:
+        {
+            qint64 logValue = qRound64(transaction.inputParams.value(STATUS_LOGICAL).toDouble());
+
+            if (module)
+            {
+                LOG_INFO(QString("Set module %1 logically %2").arg(module->moduleName()).arg((logValue != 0) ? "ACTIVE" : "INACTIVE"));
+                module->setLogicallyActive(logValue != 0);
+            }
+        }
+        break;
+
+    default:
+        return false;
+        break;
+    }
+
+    return true;
 }
 
 void SystemState::processResponse(const Transaction& response)
@@ -622,7 +692,21 @@ void SystemState::processResponse(const Transaction& response)
         vc->makeDataSnapshot();
     }
 
-    onExecutionFinished(response.error);
+    QString error = response.error;
+    if (!error.isEmpty())
+    {
+        QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+        QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
+        QString module = moduleEnum.valueToKey(mCurCommand->module());
+        QString command = commandEnum.valueToKey(mCurCommand->operation());
+
+        LOG_ERROR(QString("Command execution failed. Module:%1, Command:%2, Error:%3").arg(module).arg(command).arg(error));
+    }
+
+    int TODO; // stop protection timer
+
+    mCurCommand = Q_NULLPTR;
+    emit commandFinished(error.isEmpty());
 }
 
 QString SystemState::paramName(ParamID param) const

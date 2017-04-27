@@ -84,19 +84,13 @@ signals:
     void sendToPowerUnitPNA(const Transaction& request);
 
 private:
-    void onExecutionFinished(const QString& error);
-
-    bool sendPowerUnitCommand(CmdActionModule* command);
-    bool sendOTDCommand(CmdActionModule* command);
-    bool sendSTMCommand(CmdActionModule* command);
-    bool sendMKOCommand(CmdActionModule* command);
-    bool sendTechCommand(CmdActionModule* command);
-
     void createPowerUnitCommandsParams();
     void createMKOCommandsParams();
     void createOTDCommandsParams();
     void createTechCommandsParams();
     void createSTMCommandsParams();
+
+    bool processLocalCommand(Transaction& transaction);
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
