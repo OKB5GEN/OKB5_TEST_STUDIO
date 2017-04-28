@@ -309,21 +309,6 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
         text += tr("ПолНапрТок");
         break;
-    case ModuleCommands::SET_POWER_STATE:
-        {
-            QString paramName = mSystemState->paramName(SystemState::POWER_STATE);
-            int state = mInputParams.value(paramName).toInt();
-            if (state == ModuleCommands::POWER_ON)
-            {
-                text += tr("ВклПит");
-            }
-            else
-            {
-                text += tr("ВыклПит");
-            }
-        }
-        break;
-
     case ModuleCommands::SEND_TEST_ARRAY:
         text += tr("ПТМ");
         break;
@@ -383,10 +368,10 @@ QString CmdActionModule::commandName() const
         text += tr("УстТОтс");
         break;
     case ModuleCommands::SET_SET_VALUE_U:
-        text += tr("УстН");
+        text += tr("УстНапр");
         break;
     case ModuleCommands::SET_SET_VALUE_I:
-        text += tr("УстТ");
+        text += tr("УстТок");
         break;
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
         text += tr("ВклПит");

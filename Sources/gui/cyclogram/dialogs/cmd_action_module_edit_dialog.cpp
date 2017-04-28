@@ -110,26 +110,32 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     case ModuleCommands::POWER_UNIT_BUP:
     case ModuleCommands::POWER_UNIT_PNA:
         {
-            addCommand(tr("Установить текущее значение"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
-            addCommand(tr("Получить текущее значение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
-
-            addCommand(tr("Установить напряжение отсечки"), ModuleCommands::SET_OVP_THRESHOLD);
-            addCommand(tr("Установить ток отсечки"), ModuleCommands::SET_OCP_THRESHOLD);
+            // "getters" (just gathering current device state)
+            addCommand(tr("Получить текущий ток и напряжение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
             addCommand(tr("Получить класс устройства"), ModuleCommands::GET_DEVICE_CLASS);
-            addCommand(tr("Получить номинальный ток"), ModuleCommands::GET_NOMINAL_CURRENT);
             addCommand(tr("Получить номинальное напряжение"), ModuleCommands::GET_NOMINAL_VOLTAGE);
+            addCommand(tr("Получить номинальный ток"), ModuleCommands::GET_NOMINAL_CURRENT);
             addCommand(tr("Получить номинальную мощность"), ModuleCommands::GET_NOMINAL_POWER);
             addCommand(tr("Получить напряжение отсечки"), ModuleCommands::GET_OVP_THRESHOLD);
             addCommand(tr("Получить ток отсечки"), ModuleCommands::GET_OCP_THRESHOLD);
 
-            QMap<QString, QVariant> implicitParams;
-            QString paramName = sysState->paramName(SystemState::POWER_STATE);
-            implicitParams[paramName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить подачу питания"), ModuleCommands::SET_POWER_STATE, implicitParams);
+            // "setters" (changing current device state)
+            addCommand(tr("Установить выходное напряжение (максимальная мощность)"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
+            addCommand(tr("Установить напряжение отсечки"), ModuleCommands::SET_OVP_THRESHOLD);
+            addCommand(tr("Установить ток отсечки"), ModuleCommands::SET_OCP_THRESHOLD);
+            addCommand(tr("Сбросить ошибки"), ModuleCommands::PSC_ACKNOWLEDGE_ALARMS);
+            addCommand(tr("Переключить в режим удаленного управления"), ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL);
+            addCommand(tr("Переключить в режим ручного управления"), ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL);
+            addCommand(tr("Включить подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON);
+            addCommand(tr("Выключить подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF);
 
-            implicitParams.clear();
-            implicitParams[paramName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить подачу питания"), ModuleCommands::SET_POWER_STATE, implicitParams);
+            //TODO These two commands are used to separately set output voltage and current (need to be implemented in PowerUnit class Logic)
+            //addCommand(tr("Установить выходное напряжение"), ModuleCommands::SET_SET_VALUE_U);
+            //addCommand(tr("Установить выходной ток"), ModuleCommands::SET_SET_VALUE_I);
+
+            //TODO These two commands are applicable only for TRIPLE device class
+            //addCommand(tr("Включить трекинг"), ModuleCommands::PSC_TRACKING_ON);
+            //addCommand(tr("Выключить трекинг"), ModuleCommands::PSC_TRACKING_OFF);
         }
         break;
 

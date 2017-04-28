@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="Class" value="0" desc="Device Class"/>
+        <variable name="I" value="0" desc="Current, A"/>
+        <variable name="Inom" value="0" desc=""/>
+        <variable name="Iocp" value="0" desc=""/>
+        <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
+        <variable name="OK" value="0" desc=""/>
+        <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
+        <variable name="Pnom" value="0" desc=""/>
+        <variable name="U" value="0" desc="Voltage, V"/>
+        <variable name="Unom" value="0" desc=""/>
+        <variable name="Uovp" value="0" desc=""/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1493369518680" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493369518682" name="GetNominal"/>
+        <command type="GO_TO_BRANCH" id="1493369518684"/>
+        <command type="BRANCH_BEGIN" id="1493369518686" name="End"/>
+        <command type="TERMINATOR" id="1493369518688" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493369532085" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
+            <input_params/>
+            <output_params>
+                <param name="Logic.status" type="10" value="LActive"/>
+                <param name="Phys.status" type="10" value="PActive"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493369544813" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="PActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493369544819"/>
+        <command type="BRANCH_BEGIN" id="1493374672914" name="GetCurrent"/>
+        <command type="GO_TO_BRANCH" id="1493374672917"/>
+        <command type="BRANCH_BEGIN" id="1493376415842" name="SetCurrent"/>
+        <command type="GO_TO_BRANCH" id="1493376415845"/>
+        <command type="BRANCH_BEGIN" id="1493369571688" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1493369571690"/>
+        <command type="BRANCH_BEGIN" id="1493369580658" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1493369580660"/>
+        <command type="ACTION_MATH" id="1493369592933" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1493369601525" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MODULE" id="1493369642029" module="POWER_UNIT_BUP" command="SET_MODULE_LOGIC_STATUS">
+            <input_params>
+                <param name="Logic.status" type="6" value="1"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493374542245" module="POWER_UNIT_BUP" command="GET_DEVICE_CLASS">
+            <input_params/>
+            <output_params>
+                <param name="Device class" type="10" value="Class"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374606206" module="POWER_UNIT_BUP" command="GET_NOMINAL_VOLTAGE">
+            <input_params/>
+            <output_params>
+                <param name="Voltage, V" type="10" value="Unom"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374618887" module="POWER_UNIT_BUP" command="GET_NOMINAL_CURRENT">
+            <input_params/>
+            <output_params>
+                <param name="Current, A" type="10" value="Inom"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374630849" module="POWER_UNIT_BUP" command="GET_NOMINAL_POWER">
+            <input_params/>
+            <output_params>
+                <param name="Power, W" type="10" value="Pnom"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374718052" module="POWER_UNIT_BUP" command="GET_VOLTAGE_AND_CURRENT">
+            <input_params/>
+            <output_params>
+                <param name="Current, A" type="10" value="I"/>
+                <param name="Voltage, V" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374767469" module="POWER_UNIT_BUP" command="GET_OVP_THRESHOLD">
+            <input_params/>
+            <output_params>
+                <param name="Voltage, V" type="10" value="Uovp"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493374778886" module="POWER_UNIT_BUP" command="GET_OCP_THRESHOLD">
+            <input_params/>
+            <output_params>
+                <param name="Current, A" type="10" value="Iocp"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493376439131" module="POWER_UNIT_BUP" command="SET_OCP_THRESHOLD">
+            <input_params>
+                <param name="Current, A" type="6" value="2"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493376448964" module="POWER_UNIT_BUP" command="SET_OVP_THRESHOLD">
+            <input_params>
+                <param name="Voltage, V" type="6" value="36"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493377240756" module="POWER_UNIT_BUP" command="GET_VOLTAGE_AND_CURRENT">
+            <input_params/>
+            <output_params>
+                <param name="Current, A" type="10" value="I"/>
+                <param name="Voltage, V" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493377703523" module="POWER_UNIT_BUP" command="PSC_ACKNOWLEDGE_ALARMS">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493377771659" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493380141950" module="POWER_UNIT_BUP" command="PSC_SWITCH_TO_REMOTE_CTRL">
+            <input_params/>
+            <output_params/>
+        </command>
+    </commands>
+    <tree>
+        <item id="1493369518680" down="1493369518682" right="-1" under_arrow="-1"/>
+        <item id="1493369518682" down="1493369532085" right="-1" under_arrow="-1"/>
+        <item id="1493369518684" down="1493374672914" right="-1" under_arrow="-1"/>
+        <item id="1493369518686" down="1493369518688" right="-1" under_arrow="-1"/>
+        <item id="1493369518688" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493369532085" down="1493369544813" right="-1" under_arrow="-1"/>
+        <item id="1493369544813" down="1493369642029" right="1493369544819" under_arrow="-1"/>
+        <item id="1493369544819" down="1493369580658" right="-1" under_arrow="-1"/>
+        <item id="1493374672914" down="1493374718052" right="-1" under_arrow="-1"/>
+        <item id="1493374672917" down="1493376415842" right="-1" under_arrow="-1"/>
+        <item id="1493376415842" down="1493380141950" right="-1" under_arrow="-1"/>
+        <item id="1493376415845" down="1493369571688" right="-1" under_arrow="-1"/>
+        <item id="1493369571688" down="1493369592933" right="-1" under_arrow="-1"/>
+        <item id="1493369571690" down="1493369518686" right="-1" under_arrow="-1"/>
+        <item id="1493369580658" down="1493369601525" right="-1" under_arrow="-1"/>
+        <item id="1493369580660" down="1493369518686" right="-1" under_arrow="-1"/>
+        <item id="1493369592933" down="1493369571690" right="-1" under_arrow="-1"/>
+        <item id="1493369601525" down="1493369580660" right="-1" under_arrow="-1"/>
+        <item id="1493369642029" down="1493374542245" right="-1" under_arrow="-1"/>
+        <item id="1493374542245" down="1493374606206" right="-1" under_arrow="-1"/>
+        <item id="1493374606206" down="1493374618887" right="-1" under_arrow="-1"/>
+        <item id="1493374618887" down="1493374630849" right="-1" under_arrow="-1"/>
+        <item id="1493374630849" down="1493369518684" right="-1" under_arrow="-1"/>
+        <item id="1493374718052" down="1493374767469" right="-1" under_arrow="-1"/>
+        <item id="1493374767469" down="1493374778886" right="-1" under_arrow="-1"/>
+        <item id="1493374778886" down="1493374672917" right="-1" under_arrow="-1"/>
+        <item id="1493376439131" down="1493376448964" right="-1" under_arrow="-1"/>
+        <item id="1493376448964" down="1493377240756" right="-1" under_arrow="-1"/>
+        <item id="1493377240756" down="1493376415845" right="-1" under_arrow="-1"/>
+        <item id="1493377703523" down="1493376439131" right="-1" under_arrow="-1"/>
+        <item id="1493377771659" down="1493377703523" right="-1" under_arrow="-1"/>
+        <item id="1493380141950" down="1493377771659" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

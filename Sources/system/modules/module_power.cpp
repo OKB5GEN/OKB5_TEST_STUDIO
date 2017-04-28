@@ -141,19 +141,27 @@ void ModulePower::processCommand(const Transaction& params)
         }
         break;
 
-    case ModuleCommands::RESET_ERROR:
+    case ModuleCommands::PSC_ACKNOWLEDGE_ALARMS:
         sendPowerSupplyControlCommand(ACKNOWLEDGE_ALARMS);
         break;
-
-    case ModuleCommands::SET_POWER_STATE:
-        if (!setPowerState(params))
-        {
-            mCurrentTransaction.error = QString("Malformed request for Power UNIT command");
-            emit commandResult(mCurrentTransaction);
-            return;
-        }
+    case ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL:
+        sendPowerSupplyControlCommand(SWITCH_TO_REMOTE_CTRL);
         break;
-
+    case ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL:
+        sendPowerSupplyControlCommand(SWITCH_TO_MANUAL_CTRL);
+        break;
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
+        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
+        break;
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
+        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF);
+        break;
+    case ModuleCommands::PSC_TRACKING_ON:
+        sendPowerSupplyControlCommand(TRACKING_ON);
+        break;
+    case ModuleCommands::PSC_TRACKING_OFF:
+        sendPowerSupplyControlCommand(TRACKING_OFF);
+        break;
     case ModuleCommands::SET_OVP_THRESHOLD:
         setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
         break;
@@ -231,21 +239,6 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
     setObjectValue(SET_VALUE_I, maxCurrentByPower, mNominalCurrent);
 
     LOG_INFO(QString("Actually set power supply params: U=%1 I=%2").arg(voltageToSet).arg(maxCurrentByPower));
-}
-
-bool ModulePower::setPowerState(const Transaction& request)
-{
-    ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
-    if (state == ModuleCommands::POWER_ON)
-    {
-        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_ON);
-    }
-    else
-    {
-        sendPowerSupplyControlCommand(SWITCH_POWER_OUTPUT_OFF);
-    }
-
-    return true;
 }
 
 void ModulePower::sendPowerSupplyControlCommand(PowerSupplyCommandID command)
@@ -551,9 +544,8 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
 void ModulePower::onTransmissionError(uint32_t operationID)
 {
     QMetaEnum e = QMetaEnum::fromType<ModuleCommands::CommandID>();
-    LOG_ERROR(QString("Operation %1 failed due to transmission error").arg(e.valueToKey(operationID)));
-
-    int TODO; // send error response?
+    mCurrentTransaction.error = QString("Operation %1 failed due to transmission error").arg(e.valueToKey(operationID));
+    emit commandResult(mCurrentTransaction);
 }
 
 void ModulePower::onTransmissionComplete()

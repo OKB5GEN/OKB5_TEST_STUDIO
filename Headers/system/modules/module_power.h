@@ -91,15 +91,8 @@ private:
         SEND_DATA       = 0xc0
     };
 
-    template<typename T>
-    static T limitValue(const T& value, const T& nominal, const T& threshold)
-    {
-        return qMin(qMin(value, nominal), qMin(value, threshold));
-    }
-
     void getCurVoltageAndCurrent();
     void setVoltageAndCurrent(qreal voltage);
-    bool setPowerState(const Transaction& request);
 
     // power units command
     void sendPowerSupplyControlCommand(PowerSupplyCommandID command);
