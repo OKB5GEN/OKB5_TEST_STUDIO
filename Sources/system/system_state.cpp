@@ -151,11 +151,10 @@ SystemState::SystemState(QObject* parent):
     mParamNames[CURRENT_NU] = tr("Max current (Nu)");
     mParamNames[ANGLE_NU] = tr("Angle (Nu)");
     mParamNames[SENSOR_FLAG] = tr("Temp.Sensor Flag");
-
+    mParamNames[DEVICE_CLASS] = tr("Device class");
+    mParamNames[POWER] = tr("Power, W");
     mParamNames[STATUS_PHYSICAL] = tr("Phys.status");
     mParamNames[STATUS_LOGICAL] = tr("Logic.status");
-
-    // implicit params
     mParamNames[SUBADDRESS] = tr("Subaddress");
     mParamNames[POWER_STATE] = tr("Power State");
     mParamNames[CHANNEL_ID] = tr("Channel");
@@ -177,8 +176,10 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[CURRENT_NU] = "NuI";
     mDefaultVariables[ANGLE_NU] = "NuA";
     mDefaultVariables[SENSOR_FLAG] = "TSF";
-    mDefaultVariables[STATUS_PHYSICAL] = tr("PActive");
-    mDefaultVariables[STATUS_LOGICAL] = tr("LActive");
+    mDefaultVariables[STATUS_PHYSICAL] = "PActive";
+    mDefaultVariables[STATUS_LOGICAL] = "LActive";
+    mDefaultVariables[DEVICE_CLASS] = "Class";
+    mDefaultVariables[POWER] = "Pow";
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -199,6 +200,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[SENSOR_FLAG] = tr("Temperature sensor presense flag");
     mDefaultDescriptions[STATUS_PHYSICAL] = tr("Pysical module status. 1 - active, 0 - inactive");
     mDefaultDescriptions[STATUS_LOGICAL] = tr("Logical module status. 1 - enabled, 0 - disabled");
+    mDefaultDescriptions[DEVICE_CLASS] = tr("Device Class");
+    mDefaultDescriptions[POWER] = tr("Power, W");
 }
 
 SystemState::~SystemState()
@@ -324,11 +327,16 @@ void SystemState::createPowerUnitCommandsParams()
     // commands input params
     QMap<int, QStringList> inParams;
 
-    QStringList powerSetParams;
-    powerSetParams.push_back(paramName(VOLTAGE));
-    inParams[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = powerSetParams;
-    inParams[ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT] = powerParams;
+    QStringList voltageSetParams;
+    voltageSetParams.push_back(paramName(VOLTAGE));
+
+    QStringList currentSetParams;
+    currentSetParams.push_back(paramName(CURRENT));
+
+    inParams[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = voltageSetParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+    inParams[ModuleCommands::SET_OVP_THRESHOLD] = voltageSetParams;
+    inParams[ModuleCommands::SET_OCP_THRESHOLD] = currentSetParams;
 
     mInParams[ModuleCommands::POWER_UNIT_BUP] = inParams;
     mInParams[ModuleCommands::POWER_UNIT_PNA] = inParams;
@@ -336,8 +344,21 @@ void SystemState::createPowerUnitCommandsParams()
     // commands output params
     QMap<int, QStringList> outParams;
 
+    QStringList deviceClass;
+    deviceClass.push_back(paramName(DEVICE_CLASS));
+
+    QStringList nomPowerParams;
+    nomPowerParams.push_back(paramName(POWER));
+
     outParams[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_DEVICE_CLASS] = deviceClass;
+    outParams[ModuleCommands::GET_NOMINAL_CURRENT] = currentSetParams;
+    outParams[ModuleCommands::GET_NOMINAL_VOLTAGE] = voltageSetParams;
+    outParams[ModuleCommands::GET_NOMINAL_POWER] = nomPowerParams;
+    outParams[ModuleCommands::GET_OVP_THRESHOLD] = voltageSetParams;
+    outParams[ModuleCommands::GET_OCP_THRESHOLD] = currentSetParams;
+
     mOutParams[ModuleCommands::POWER_UNIT_BUP] = outParams;
     mOutParams[ModuleCommands::POWER_UNIT_PNA] = outParams;
 }

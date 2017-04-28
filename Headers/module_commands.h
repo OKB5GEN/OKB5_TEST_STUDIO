@@ -61,10 +61,29 @@ public:
         // Third party modules commands (arbitrary codes) >>>>
 
         // Power unit modules commands
-        SET_VOLTAGE_AND_CURRENT           = 0xFF01,
-        SET_MAX_VOLTAGE_AND_CURRENT       = 0xFF02,
-        SET_POWER_STATE                   = 0xFF03,
-        GET_VOLTAGE_AND_CURRENT           = 0xFF04,
+        SET_VOLTAGE_AND_CURRENT           = 0xEF01, //TODO check GUI and logic >>>
+        //RESERVED                          = 0xEF02,
+        SET_POWER_STATE                   = 0xEF03,
+        GET_VOLTAGE_AND_CURRENT           = 0xEF04,
+
+        GET_DEVICE_CLASS                  = 0xEF05,
+        GET_NOMINAL_CURRENT               = 0xEF06,
+        GET_NOMINAL_VOLTAGE               = 0xEF07,
+        GET_NOMINAL_POWER                 = 0xEF08,
+        GET_OVP_THRESHOLD                 = 0xEF09,
+        GET_OCP_THRESHOLD                 = 0xEF0A,
+        //RESERVED                          = 0xEF0B,
+        SET_OVP_THRESHOLD                 = 0xEF0C,
+        SET_OCP_THRESHOLD                 = 0xEF0D,
+        SET_SET_VALUE_U                   = 0xEF0E, //TODO internal command?
+        SET_SET_VALUE_I                   = 0xEF0F, //TODO internal command?
+        PSC_SWITCH_POWER_OUTPUT_ON        = 0xEF10,
+        PSC_SWITCH_POWER_OUTPUT_OFF       = 0xEF11,
+        PSC_ACKNOWLEDGE_ALARMS            = 0xEF12,
+        PSC_SWITCH_TO_REMOTE_CTRL         = 0xEF13,
+        PSC_SWITCH_TO_MANUAL_CTRL         = 0xEF14,
+        PSC_TRACKING_ON                   = 0xEF15,
+        PSC_TRACKING_OFF                  = 0xEF16, //TODO check GUI and logic <<<
 
         // MKO module commands
         SEND_TEST_ARRAY                   = 0xFF05,
@@ -83,7 +102,9 @@ public:
 
         // Logical commands
         GET_MODULE_STATUS                 = 0xFFF0, // returns two variables for physical and logical state, interaction with module 0 - impossible, 1 - possible
-        SET_MODULE_LOGIC_STATUS           = 0xFFF1  // set module logic state
+        SET_MODULE_LOGIC_STATUS           = 0xFFF1,  // set module logic state
+
+        UNDEFINED                         = 0xFFFFFFFF
     };
 
     Q_ENUM(CommandID)

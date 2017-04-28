@@ -24,6 +24,7 @@ public:
         // explicit commans params (can be changed by the user)
         VOLTAGE,
         CURRENT,
+        POWER,
         TEMPERATURE,
         MODE_PSY,
         STEPS_PSY,
@@ -39,6 +40,7 @@ public:
         DRIVE_MODE,
         STEPS,
         VELOCITY,
+        DEVICE_CLASS,
 
         // implicit command params (can not be changed by the user)
         SUBADDRESS,
@@ -105,6 +107,7 @@ private:
     QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
 
     CmdActionModule* mCurCommand;
+    //TODO unite strings and data to command params. Commands move to config
     QMap<ParamID, QString> mParamNames;
     QMap<ParamID, QString> mDefaultVariables;
     QMap<ParamID, QString> mDefaultDescriptions;

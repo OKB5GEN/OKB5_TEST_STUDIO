@@ -306,9 +306,6 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
         text += tr("УстНапр");
         break;
-    case ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT:
-        text += tr("УстОгр");
-        break;
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
         text += tr("ПолНапрТок");
         break;
@@ -360,7 +357,58 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::STOP_MKO:
         text += tr("Стоп");
         break;
-
+        // new power module commands
+    case ModuleCommands::GET_DEVICE_CLASS:
+        text += tr("ПолКласс");
+        break;
+    case ModuleCommands::GET_NOMINAL_CURRENT:
+        text += tr("ПолНомТ");
+        break;
+    case ModuleCommands::GET_NOMINAL_VOLTAGE:
+        text += tr("ПолНомН");
+        break;
+    case ModuleCommands::GET_NOMINAL_POWER:
+        text += tr("ПолНомМ");
+        break;
+    case ModuleCommands::GET_OVP_THRESHOLD:
+        text += tr("ПолНОтс");
+        break;
+    case ModuleCommands::GET_OCP_THRESHOLD:
+        text += tr("ПолТОтс");
+        break;
+    case ModuleCommands::SET_OVP_THRESHOLD:
+        text += tr("УстНОтс");
+        break;
+    case ModuleCommands::SET_OCP_THRESHOLD:
+        text += tr("УстТОтс");
+        break;
+    case ModuleCommands::SET_SET_VALUE_U:
+        text += tr("УстН");
+        break;
+    case ModuleCommands::SET_SET_VALUE_I:
+        text += tr("УстТ");
+        break;
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
+        text += tr("ВклПит");
+        break;
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
+        text += tr("ВыклПит");
+        break;
+    case ModuleCommands::PSC_ACKNOWLEDGE_ALARMS:
+        text += tr("СбрОш");
+        break;
+    case ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL:
+        text += tr("ВклУд");
+        break;
+    case ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL:
+        text += tr("ВклЛок");
+        break;
+    case ModuleCommands::PSC_TRACKING_ON:
+        text += tr("ВклТр");
+        break;
+    case ModuleCommands::PSC_TRACKING_OFF:
+        text += tr("ВыклТр");
+        break;
     default:
         {
             QMetaEnum commands = QMetaEnum::fromType<ModuleCommands::CommandID>();

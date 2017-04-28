@@ -113,9 +113,14 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(tr("Установить текущее значение"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
             addCommand(tr("Получить текущее значение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
 
-            //addCommand(tr("Установить ограничение"), ModuleCommands::SET_MAX_VOLTAGE_AND_CURRENT);
-
-            //TODO здесь подключение основного/резервного полукомплекта БУП и относится оно скорее всего к POWER_UNIT_BUP только
+            addCommand(tr("Установить напряжение отсечки"), ModuleCommands::SET_OVP_THRESHOLD);
+            addCommand(tr("Установить ток отсечки"), ModuleCommands::SET_OCP_THRESHOLD);
+            addCommand(tr("Получить класс устройства"), ModuleCommands::GET_DEVICE_CLASS);
+            addCommand(tr("Получить номинальный ток"), ModuleCommands::GET_NOMINAL_CURRENT);
+            addCommand(tr("Получить номинальное напряжение"), ModuleCommands::GET_NOMINAL_VOLTAGE);
+            addCommand(tr("Получить номинальную мощность"), ModuleCommands::GET_NOMINAL_POWER);
+            addCommand(tr("Получить напряжение отсечки"), ModuleCommands::GET_OVP_THRESHOLD);
+            addCommand(tr("Получить ток отсечки"), ModuleCommands::GET_OCP_THRESHOLD);
 
             QMap<QString, QVariant> implicitParams;
             QString paramName = sysState->paramName(SystemState::POWER_STATE);

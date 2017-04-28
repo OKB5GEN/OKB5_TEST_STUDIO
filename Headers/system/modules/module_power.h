@@ -10,32 +10,6 @@ class ModulePower: public COMPortModule
     Q_OBJECT
 
 public:
-    enum Operation
-    {
-        GET_DEVICE_CLASS,
-        GET_NOMINAL_CURRENT,
-        GET_NOMINAL_VOLTAGE,
-        GET_NOMINAL_POWER,
-        GET_OVP_THRESHOLD,
-        GET_OCP_THRESHOLD,
-        GET_CUR_VOLTAGE_AND_CURRENT,
-        SET_OVP_THRESHOLD,
-        SET_OCP_THRESHOLD,
-        SET_SET_VALUE_U,
-        SET_SET_VALUE_I,
-        PSC_SWITCH_POWER_OUTPUT_ON,
-        PSC_SWITCH_POWER_OUTPUT_OFF,
-        PSC_ACKNOWLEDGE_ALARMS,
-        PSC_SWITCH_TO_REMOTE_CTRL,
-        PSC_SWITCH_TO_MANUAL_CTRL,
-        PSC_TRACKING_ON,
-        PSC_TRACKING_OFF,
-
-        UNKNOWN_OPERATION
-    };
-
-    Q_ENUM(Operation)
-
     ModulePower(QObject* parent);
     ~ModulePower();
 
@@ -124,11 +98,7 @@ private:
     }
 
     void getCurVoltageAndCurrent();
-
-    //void setMaxVoltageAndCurrent(const Transaction& request, Transaction& response); // TODO not available to user API, possibly must be
-    void getVoltageAndCurrent(const Transaction& request);
-    void setVoltageAndCurrent(const Transaction& request);
-    void setCurVoltage(qreal voltage);
+    void setVoltageAndCurrent(qreal voltage);
     bool setPowerState(const Transaction& request);
 
     // power units command
@@ -137,6 +107,8 @@ private:
     void getNominalValue(ObjectID objectID);
     void getObjectValue(ObjectID objectID);
     void getDeviceClass();
+
+    void addResponseParam(uint32_t paramID, QVariant value);
 
     // encoding/decoding
     static uint8_t encodeStartDelimiter(TransmissionType trType, uint8_t dataSize);
