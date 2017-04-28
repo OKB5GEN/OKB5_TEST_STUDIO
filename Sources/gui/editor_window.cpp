@@ -568,7 +568,7 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
 void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString& text)
 {
     ModalCyclogramExecutionDialog dialog(Q_NULLPTR);
-    if (dialog.init(shortFileName, text))
+    if (dialog.init(shortFileName, text, mSystemState))
     {
         setEnabled(false);
         dialog.exec();

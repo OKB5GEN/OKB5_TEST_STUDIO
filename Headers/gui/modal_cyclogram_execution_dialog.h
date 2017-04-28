@@ -3,6 +3,7 @@
 
 #include <QDialog>
 
+class SystemState;
 class Cyclogram;
 class QLabel;
 
@@ -14,7 +15,7 @@ public:
     ModalCyclogramExecutionDialog(QWidget * parent);
     ~ModalCyclogramExecutionDialog();
 
-    bool init(const QString& fileName, const QString& text);
+    bool init(const QString& fileName, const QString& text, SystemState* systemState);
 
 private slots:
     void onCyclogramFinish(const QString& error);

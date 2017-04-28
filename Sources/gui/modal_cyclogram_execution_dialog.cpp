@@ -24,7 +24,7 @@ ModalCyclogramExecutionDialog::~ModalCyclogramExecutionDialog()
 
 }
 
-bool ModalCyclogramExecutionDialog::init(const QString& fileName, const QString& text)
+bool ModalCyclogramExecutionDialog::init(const QString& fileName, const QString& text, SystemState* systemState)
 {
     // Execute cyclogram file if exist
     QString fullFileName = Cyclogram::defaultStorePath() + fileName;
@@ -35,6 +35,7 @@ bool ModalCyclogramExecutionDialog::init(const QString& fileName, const QString&
     {
         LOG_INFO(text);
         mText->setText(text);
+        cyclogram->setSystemState(systemState);
 
         mCyclogram = cyclogram;
         connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
