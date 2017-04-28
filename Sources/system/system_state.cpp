@@ -517,6 +517,7 @@ void SystemState::sendCommand(CmdActionModule* command)
 {
     mCurCommand = command;
 
+    // 1. Convert module command data to transaction
     const QMap<QString, QVariant>& inputParams = command->inputParams();
     const QMap<QString, QVariant>& outputParams = command->outputParams();
 
@@ -549,6 +550,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         transaction.outputParams[type] = it.value();
     }
 
+    // 2. Check and process command if it is "local" (does not need any remote interaction with module)
     if (processLocalCommand(transaction))
     {
         mCurCommand = Q_NULLPTR;
@@ -556,6 +558,40 @@ void SystemState::sendCommand(CmdActionModule* command)
         return;
     }
 
+    // 3. If command is not local, check module status.
+    // If module is not ready (physically or logically disconnected), skip command processing with error
+    AbstractModule* module = moduleByID(command->module());
+    if (module)
+    {
+        QString error;
+        if (!module->isPhysicallyActive())
+        {
+            error = QString("physically");
+        }
+
+        if (!module->isLogicallyActive())
+        {
+            if (!error.isEmpty())
+            {
+                error += QString(" and ");
+            }
+
+            error = QString("logically");
+        }
+
+        if (!error.isEmpty())
+        {
+            QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
+            QString cmdName = QString(commandEnum.valueToKey(command->operation()));
+
+            LOG_ERROR(QString("%1 can not process %2 command, because module is %3 INACTIVE").arg(module->moduleName()).arg(cmdName).arg(error));
+            mCurCommand = Q_NULLPTR;
+            emit commandFinished(false);
+            return;
+        }
+    }
+
+    // 4. If module is ready to process commands, send transaction to module
     switch (command->module())
     {
     case ModuleCommands::POWER_UNIT_BUP:
@@ -590,12 +626,11 @@ void SystemState::sendCommand(CmdActionModule* command)
     int TODO; // start protection timer (for cases when some module logics is buggy) - 10-20-30 seconds for example
 }
 
-bool SystemState::processLocalCommand(Transaction& transaction)
+AbstractModule* SystemState::moduleByID(ModuleCommands::ModuleID moduleID) const
 {
-    QString error;
     AbstractModule* module = Q_NULLPTR;
 
-    switch (transaction.moduleID)
+    switch (moduleID)
     {
     case ModuleCommands::POWER_UNIT_BUP:
         module = mPowerBUP;
@@ -616,8 +651,20 @@ bool SystemState::processLocalCommand(Transaction& transaction)
         module = mTech;
         break;
     default:
-        error = QString("Unknown module id=%1").arg(transaction.moduleID);
         break;
+    }
+
+    return module;
+}
+
+bool SystemState::processLocalCommand(Transaction& transaction)
+{
+    QString error;
+    AbstractModule* module = moduleByID(ModuleCommands::ModuleID(transaction.moduleID));
+
+    if (!module)
+    {
+        error = QString("Unknown module id=%1").arg(transaction.moduleID);
     }
 
     switch (transaction.commandID)

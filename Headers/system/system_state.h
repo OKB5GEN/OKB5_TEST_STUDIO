@@ -92,6 +92,8 @@ private:
 
     bool processLocalCommand(Transaction& transaction);
 
+    AbstractModule* moduleByID(ModuleCommands::ModuleID moduleID) const;
+
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
     ModuleSTM* mSTM;
