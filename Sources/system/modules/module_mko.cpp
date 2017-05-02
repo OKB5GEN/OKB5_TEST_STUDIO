@@ -7,6 +7,271 @@
 #include <windows.h>
 #include "Sources/system/WDMTMKv2.cpp"
 
+/*
+
+#include <stdio.h>
+#include <string.h>
+
+#define _TMK1553B_MRT
+#include "wdmtmkv2.cpp"
+
+#ifdef TMK_CONFIGURATION_TABLE
+TTmkConfigData aTmkConfig[MAX_TMK_NUMBER+1];
+#endif
+
+#define TMK_FILE_OPEN_ERROR 21
+#define TMK_FILE_READ_ERROR 22
+#define TMK_FILE_FORMAT_ERROR 23
+#define TMK_UNKNOWN_TYPE 24
+
+int TmkInit(char *pszTMKFileName)
+{
+ int nResult;
+ int hTMK;
+ char achParams[81];
+ FILE *hTMKFile;
+
+#ifdef TMK_CONFIGURATION_TABLE
+ for (hTMK = 0; hTMK <= MAX_TMK_NUMBER; hTMK++)
+ {
+  aTmkConfig[hTMK].nType = -1;
+  aTmkConfig[hTMK].szName[0] = '\0';
+  aTmkConfig[hTMK].wPorts1 = aTmkConfig[hTMK].wPorts2 = 0;
+  aTmkConfig[hTMK].wIrq1 = aTmkConfig[hTMK].wIrq2 = 0;
+ }
+#endif
+// if (TmkOpen())
+//  return TMK_FILE_OPEN_ERROR;
+ if ((hTMKFile = fopen(pszTMKFileName, "r")) == NULL)
+  return TMK_FILE_OPEN_ERROR;
+ while (1)
+ {
+  if (fgets(achParams, 80, hTMKFile) == NULL)
+  {
+   if (feof(hTMKFile))
+    break;
+   else
+   {
+    nResult = TMK_FILE_READ_ERROR;
+    goto ExitTmkInit;
+   }
+  }
+  if (achParams[0] == '*')
+   break;
+  if (sscanf(achParams, "%u", &hTMK) != 1)
+   continue;
+  if (hTMK > tmkgetmaxn())
+  {
+   nResult = TMK_FILE_FORMAT_ERROR;
+   goto ExitTmkInit;
+  }
+  nResult = tmkconfig(hTMK);
+#ifdef TMK_CONFIGURATION_TABLE
+  tmkgetinfo(&(aTmkConfig[hTMK]));
+#endif
+  if (nResult)
+   break;
+ } // endwhile(!feof())
+ ExitTmkInit:
+ fclose(hTMKFile);
+ return nResult;
+}
+
+////////////////////////////////////////////////////////////////////////////
+#include <windows.h>
+#include <stdio.h>
+#include <conio.h>
+#include "tmkinit.c"
+
+#define RT_ADDR 10 // RT address
+
+int i;
+unsigned short awBuf[32];
+
+const int fInstMode = 1;
+HANDLE hBcEvent;
+TTmkEventData tmkEvD;
+
+int nTmk;
+
+TMK_DATA wBase, wMaxBase, wSubAddr, wLen, wState, wStatus;
+unsigned long dwGoodStarts = 0, dwBusyStarts = 0, dwErrStarts = 0, dwStatStarts = 0;
+unsigned long dwStarts = 0L;
+
+// WaitInt returns 0 when it received and processed interrupt
+// or returns 1 when there is an error or an user abort
+
+int WaitInt(TMK_DATA wCtrlCode)
+{
+// Wait for an interrupt
+  switch (WaitForSingleObject(hBcEvent, 1000))
+  {
+  case WAIT_OBJECT_0:
+    ResetEvent(hBcEvent);
+    break;
+  case WAIT_TIMEOUT:
+    printf("Interrupt timeout error\n");
+    return 1;
+  default:
+    printf("Interrupt wait error\n");
+    return 1;
+  }
+
+// Get interrupt data
+// We do not need to check tmkEvD.nInt because bcstartx with CX_NOSIG
+// guarantees us only single interrupt of single type nInt == 3
+  tmkgetevd(&tmkEvD);
+
+  if (tmkEvD.bcx.wResultX & SX_IB_MASK)
+  {
+// We have set bit(s) in Status Word
+    if (((tmkEvD.bcx.wResultX & SX_ERR_MASK) == SX_NOERR) ||
+        ((tmkEvD.bcx.wResultX & SX_ERR_MASK) == SX_TOD))
+    {
+// We have either no errors or Data Time Out (No Data) error
+      wStatus = bcgetansw(wCtrlCode);
+      if (wStatus & BUSY_MASK)
+// We have BUSY bit set
+        ++dwBusyStarts;
+      else
+//We have unknown bit(s) set
+        ++dwStatStarts;
+      if (kbhit())
+        return 1;
+    }
+    else
+    {
+// We have an error
+      ++dwErrStarts;
+      if (kbhit())
+        return 1;
+    }
+  }
+  else if (tmkEvD.bcx.wResultX & SX_ERR_MASK)
+  {
+// We have an error
+    ++dwErrStarts;
+    if (kbhit())
+      return 1;
+  }
+  else
+  {
+// We have a completed message
+    ++dwGoodStarts;
+  }
+
+  if (dwStarts%1000L == 0L)
+  {
+    printf("\rGood: %ld, Busy: %ld, Error: %ld, Status: %ld", dwGoodStarts, dwBusyStarts, dwErrStarts, dwStatStarts);
+  }
+  ++dwStarts;
+//  printf("%ld %04X\n", dwGoodStarts, bcgetw(0));
+//  Sleep(500);
+  return 0;
+}
+
+void main()
+{
+// Open driver
+  if (TmkOpen())
+  {
+    printf("TmkOpen error\n");
+    goto stop;
+  }
+// Read configuration file
+  if (TmkInit("bc.cfg"))
+  {
+    printf("TmkInit error\n");
+    goto stop;
+  }
+// Find first configured device
+  for (nTmk = 0; nTmk <= MAX_TMK_NUMBER; ++nTmk)
+    if (!tmkselect(nTmk))
+      break;
+  if (nTmk > MAX_TMK_NUMBER)
+  {
+    printf("tmkselect error\n");
+    goto stop;
+  }
+// Try to reset in BC mode
+  if (bcreset())
+  {
+    printf("bcreset error\n");
+    goto stop;
+  }
+
+// Define event for interrupts
+  hBcEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (!hBcEvent)
+  {
+    printf("CreateEvent error\n");
+    goto stop;
+  }
+  tmkdefevent(hBcEvent, TRUE);
+
+  wBase = 0;
+  wMaxBase = bcgetmaxbase();
+  srand(1);
+
+  while (!kbhit())
+  {
+// Select base
+    if (wBase > wMaxBase)
+      wBase = 0;
+    bcdefbase(wBase);
+
+// Prepare data to RT
+    wSubAddr = rand() & 0x1F;
+    if (fInstMode)
+      wSubAddr |= 0x10;
+    if (wSubAddr == 0x00 || wSubAddr == 0x1F)
+      continue;
+    wLen = rand() & 0x1F;
+    if (wLen == 0)
+      wLen = 32;
+    for (i = 0; i < wLen; ++i)
+      awBuf[i] = (wSubAddr<<8) | i;
+
+// Try to send data to RT until it answers with Clear Status
+    bcputw(0, CW(RT_ADDR, RT_RECEIVE, wSubAddr, wLen));
+    bcputblk(1, awBuf, wLen);
+    do
+    {
+      bcstartx(wBase, DATA_BC_RT | CX_STOP | CX_BUS_A | CX_NOSIG);
+      if (WaitInt(DATA_BC_RT))
+        goto stop;
+    }
+    while ((tmkEvD.bcx.wResultX & (SX_ERR_MASK | SX_IB_MASK)) != 0);
+
+// Try to receive data from RT until it answers with Clear Status
+    bcputw(0, CW(RT_ADDR, RT_TRANSMIT, wSubAddr, wLen));
+    do
+    {
+      bcstartx(wBase, DATA_RT_BC | CX_STOP | CX_BUS_A | CX_NOSIG);
+      if (WaitInt(DATA_RT_BC))
+        goto stop;
+    }
+    while ((tmkEvD.bcx.wResultX & (SX_ERR_MASK | SX_IB_MASK)) != 0);
+
+// Check data from RT
+    bcgetblk(2, awBuf, wLen);
+    for (i = 0; i < wLen; ++i)
+    {
+      if (awBuf[i] != ((wSubAddr<<8) | i))
+      {
+        printf("\nCW:%04X Data error [%02d]=%04X\n", bcgetw(0), i, awBuf[i]);
+      }
+    }
+  }
+  stop:
+  printf("\nGood: %ld, Busy: %ld, Error: %ld, Status: %ld\n", dwGoodStarts, dwBusyStarts, dwErrStarts, dwStatStarts);
+  bcreset();
+// Close all opened things
+  CloseHandle(hBcEvent);
+  tmkdone(ALL_TMKS);
+  TmkClose();
+}
+*/
 
 HANDLE hEvent, hEvent1; //TODO some internal MKO shit here
 
@@ -512,6 +777,8 @@ void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* d
     {
         LOG_INFO(QString("Data: %1").arg(dataStr));
     }
+
+    //#define CW(ADDR,DIR,SUBADDR,NWORDS) ((TMK_DATA)(((ADDR)<<11)|(DIR)|((SUBADDR)<<5)|((NWORDS)&0x1F)))
 
     uint16_t commandWord = (address << 11) + RT_RECEIVE + (subaddress << 5) + (wordsCount & NWORDS_MASK);
     bcdefbase(0);
