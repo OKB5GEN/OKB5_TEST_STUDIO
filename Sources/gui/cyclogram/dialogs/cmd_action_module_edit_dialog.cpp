@@ -101,8 +101,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     SystemState* sysState = mCommand->systemState();
 
     // "Abstract" module commands
-    addCommand(tr("Получить статус"), ModuleCommands::GET_MODULE_STATUS);
-    addCommand(tr("Установить логический статус"), ModuleCommands::SET_MODULE_LOGIC_STATUS);
+    addCommand(tr("ЗАПРОС: статус"), ModuleCommands::GET_MODULE_STATUS);
+    addCommand(tr("УСТАНОВКА: логический статус"), ModuleCommands::SET_MODULE_LOGIC_STATUS);
 
     // module changed -> update command list for this module
     switch (index)
@@ -111,61 +111,60 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     case ModuleCommands::POWER_UNIT_PNA:
         {
             // "getters" (just gathering current device state)
-            addCommand(tr("Получить текущий ток и напряжение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
-            addCommand(tr("Получить класс устройства"), ModuleCommands::GET_DEVICE_CLASS);
-            addCommand(tr("Получить номинальное напряжение"), ModuleCommands::GET_NOMINAL_VOLTAGE);
-            addCommand(tr("Получить номинальный ток"), ModuleCommands::GET_NOMINAL_CURRENT);
-            addCommand(tr("Получить номинальную мощность"), ModuleCommands::GET_NOMINAL_POWER);
-            addCommand(tr("Получить напряжение отсечки"), ModuleCommands::GET_OVP_THRESHOLD);
-            addCommand(tr("Получить ток отсечки"), ModuleCommands::GET_OCP_THRESHOLD);
+            addCommand(tr("ЗАПРОС: текущий ток и напряжение"), ModuleCommands::GET_VOLTAGE_AND_CURRENT);
+            addCommand(tr("ЗАПРОС: класс устройства"), ModuleCommands::GET_DEVICE_CLASS);
+            addCommand(tr("ЗАПРОС: номинальное напряжение"), ModuleCommands::GET_NOMINAL_VOLTAGE);
+            addCommand(tr("ЗАПРОС: номинальный ток"), ModuleCommands::GET_NOMINAL_CURRENT);
+            addCommand(tr("ЗАПРОС: номинальную мощность"), ModuleCommands::GET_NOMINAL_POWER);
+            addCommand(tr("ЗАПРОС: напряжение отсечки"), ModuleCommands::GET_OVP_THRESHOLD);
+            addCommand(tr("ЗАПРОС: ток отсечки"), ModuleCommands::GET_OCP_THRESHOLD);
 
             // "setters" (changing current device state)
-            addCommand(tr("Установить выходное напряжение (максимальная мощность)"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
-            addCommand(tr("Установить напряжение отсечки"), ModuleCommands::SET_OVP_THRESHOLD);
-            addCommand(tr("Установить ток отсечки"), ModuleCommands::SET_OCP_THRESHOLD);
-            addCommand(tr("Сбросить ошибки"), ModuleCommands::PSC_ACKNOWLEDGE_ALARMS);
-            addCommand(tr("Переключить в режим удаленного управления"), ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL);
-            addCommand(tr("Переключить в режим ручного управления"), ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL);
-            addCommand(tr("Включить подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON);
-            addCommand(tr("Выключить подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF);
+            addCommand(tr("УСТАНОВКА: выходное напряжение (максимальная мощность)"), ModuleCommands::SET_VOLTAGE_AND_CURRENT);
+            addCommand(tr("УСТАНОВКА: напряжение отсечки"), ModuleCommands::SET_OVP_THRESHOLD);
+            addCommand(tr("УСТАНОВКА: ток отсечки"), ModuleCommands::SET_OCP_THRESHOLD);
+            addCommand(tr("СБРОС: ошибки"), ModuleCommands::PSC_ACKNOWLEDGE_ALARMS);
+            addCommand(tr("ВКЛ: режим удаленного управления"), ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL);
+            addCommand(tr("ВКЛ: режим ручного управления"), ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL);
+            addCommand(tr("ВКЛ: подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON);
+            addCommand(tr("ВЫКЛ: подачу питания на выход"), ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF);
 
             //TODO These two commands are used to separately set output voltage and current (need to be implemented in PowerUnit class Logic)
-            //addCommand(tr("Установить выходное напряжение"), ModuleCommands::SET_SET_VALUE_U);
-            //addCommand(tr("Установить выходной ток"), ModuleCommands::SET_SET_VALUE_I);
+            //addCommand(tr("УСТАНОВКА: выходное напряжение"), ModuleCommands::SET_SET_VALUE_U);
+            //addCommand(tr("УСТАНОВКА: выходной ток"), ModuleCommands::SET_SET_VALUE_I);
 
             //TODO These two commands are applicable only for TRIPLE device class
-            //addCommand(tr("Включить трекинг"), ModuleCommands::PSC_TRACKING_ON);
-            //addCommand(tr("Выключить трекинг"), ModuleCommands::PSC_TRACKING_OFF);
+            //addCommand(tr("ВКЛ: трекинг"), ModuleCommands::PSC_TRACKING_ON);
+            //addCommand(tr("ВЫКЛ: трекинг"), ModuleCommands::PSC_TRACKING_OFF);
         }
         break;
 
     case ModuleCommands::MKO:
         {
-            addCommand(tr("Принять тестовый массив"), ModuleCommands::SEND_TEST_ARRAY);
-            addCommand(tr("Выдать тестовый массив"), ModuleCommands::RECEIVE_TEST_ARRAY);
-            addCommand(tr("Принять командный массив"), ModuleCommands::SEND_COMMAND_ARRAY);
-            addCommand(tr("Выдать командный массив"), ModuleCommands::RECEIVE_COMMAND_ARRAY);
-
             QMap<QString, QVariant> implicitParamsPsy;
             QMap<QString, QVariant> implicitParamsNu;
             QString paramName = sysState->paramName(SystemState::SUBADDRESS);
             implicitParamsPsy[paramName] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
             implicitParamsNu[paramName] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
 
-            addCommand(tr("Принять тестовый массив по линии ψ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Принять тестовый массив по линии υ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Выдать тестовый массив по линии ψ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Выдать тестовый массив по линии υ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Принять командный массив по линии ψ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Принять командный массив по линии υ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(tr("Выдать командный массив по линии ψ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(tr("Выдать командный массив по линии υ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("ВКЛ"), ModuleCommands::START_MKO);
+            addCommand(tr("ВЫКЛ"), ModuleCommands::STOP_MKO);
 
-            addCommand(tr("Подать питание на ДУ"), ModuleCommands::SEND_TO_ANGLE_SENSOR);
+            addCommand(tr("ЗАПРОС: командный массив"), ModuleCommands::RECEIVE_COMMAND_ARRAY);
+            addCommand(tr("ЗАПРОС: командный массив по линии ψ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("ЗАПРОС: командный массив по линии υ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("ЗАПРОС: тестовый массив"), ModuleCommands::RECEIVE_TEST_ARRAY);
+            addCommand(tr("ЗАПРОС: тестовый массив по линии ψ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("ЗАПРОС: тестовый массив по линии υ"), ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
-            // TODO добавить для резервного комплекта (через implicit params видимо)
-            addCommand(tr("Старт Осн."), ModuleCommands::START_MKO);
-            addCommand(tr("Стоп Осн."), ModuleCommands::STOP_MKO);
+            addCommand(tr("ОТПРАВКА: командный массив"), ModuleCommands::SEND_COMMAND_ARRAY);
+            addCommand(tr("ОТПРАВКА: командный массив по линии ψ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("ОТПРАВКА: командный массив по линии υ"), ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(tr("ОТПРАВКА: тестовый массив"), ModuleCommands::SEND_TEST_ARRAY);
+            addCommand(tr("ОТПРАВКА: тестовый массив по линии ψ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(tr("ОТПРАВКА: тестовый массив по линии υ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+
+            addCommand(tr("ВКЛ: питание на ДУ"), ModuleCommands::SEND_TO_ANGLE_SENSOR);
         }
         break;
 
@@ -177,93 +176,116 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
+            addCommand(tr("ЗАПРОС: состояние питания основного комплекта БУП"), ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            addCommand(tr("ЗАПРОС: состояние питания резервного комплекта БУП"), ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            addCommand(tr("ЗАПРОС: состояние нагревателей ПНА на линии 1"), ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            addCommand(tr("ЗАПРОС: состояние нагревателей ПНА на линии 2"), ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            addCommand(tr("ЗАПРОС: состояние силового питания"), ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
+            addCommand(tr("ЗАПРОС: состояние питания основного комплекта МКО"), ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
+            addCommand(tr("ЗАПРОС: состояние питания резервного комплекта МКО"), ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВКЛ: основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+
+            implicitParams.clear();
+            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            addCommand(tr("ВКЛ: подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: основной комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: резервный комплект БУП"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: нагреватели ПНА на линии 1"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: нагреватели ПНА на линии 2"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: подачу силового питания"), ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(tr("Включить подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(tr("ВЫКЛ: подачу питания на МКО Осн."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(tr("Выключить подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
-
+            addCommand(tr("ВЫКЛ: подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             int TODO;
             // 1. проверка предохранителей
-            // 2. подключение питания МКО (1, 2) - а нужен ли он выключенный?
-            // 3. получение телеметрии канала
+            // 2. получение телеметрии канала
 
             //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
-            //addCommand(tr("Получить телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
-            //addCommand(tr("Включить канал СТМ к МКО"), ModuleCommands::SET_MKO_PWR_CHANNEL_STATE);
-            //addCommand(tr("Получить состояние канала СТМ к БП"), ModuleCommands::GET_POWER_MODULE_STATE);
-            //addCommand(tr("Получить состояние канала СТМ к МКО"), ModuleCommands::GET_MKO_MODULE_STATE);
+            //addCommand(tr("ПОЛ телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
         }
         break;
 
     case ModuleCommands::OTD:
         {
-            addCommand(tr("Получить температуру с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
-            addCommand(tr("Получить температуру с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
-            addCommand(tr("Получить температуру с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
+            addCommand(tr("ЗАПРОС: температура с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
+            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
         }
         break;
 

@@ -158,6 +158,7 @@ SystemState::SystemState(QObject* parent):
     mParamNames[SUBADDRESS] = tr("Subaddress");
     mParamNames[POWER_STATE] = tr("Power State");
     mParamNames[CHANNEL_ID] = tr("Channel");
+    mParamNames[RELAY_STATE] = tr("Relay state");
 
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
@@ -180,6 +181,7 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[STATUS_LOGICAL] = "LActive";
     mDefaultVariables[DEVICE_CLASS] = "Class";
     mDefaultVariables[POWER] = "Pow";
+    mDefaultVariables[RELAY_STATE] = "IsOn";
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -202,6 +204,7 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[STATUS_LOGICAL] = tr("Logical module status. 1 - enabled, 0 - disabled");
     mDefaultDescriptions[DEVICE_CLASS] = tr("Device Class");
     mDefaultDescriptions[POWER] = tr("Power, W");
+    mDefaultDescriptions[RELAY_STATE] = tr("Relay state. 1 - on, 0 - off");
 }
 
 SystemState::~SystemState()
@@ -499,6 +502,9 @@ void SystemState::createSTMCommandsParams()
     QStringList setStatusParams;
     setStatusParams.append(paramName(STATUS_LOGICAL));
 
+    QStringList relayStateParams;
+    relayStateParams.append(paramName(RELAY_STATE));
+
     // input params
     QMap<int, QStringList> inParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
@@ -508,6 +514,8 @@ void SystemState::createSTMCommandsParams()
     // output params
     QMap<int, QStringList> outParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_POWER_CHANNEL_STATE] = relayStateParams;
+    outParams[ModuleCommands::GET_MKO_POWER_CHANNEL_STATE] = relayStateParams;
 
     mOutParams[ModuleCommands::STM] = outParams;
 }

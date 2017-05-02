@@ -41,6 +41,7 @@ public:
         STEPS,
         VELOCITY,
         DEVICE_CLASS,
+        RELAY_STATE, // 0 - off, 1 - on
 
         // implicit command params (can not be changed by the user)
         SUBADDRESS,

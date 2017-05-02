@@ -394,10 +394,61 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::PSC_TRACKING_OFF:
         text += tr("ВыклТр");
         break;
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+        {
+            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
+            int channel = mInputParams.value(paramName).toInt();
+
+            text += tr("ПС");
+
+            switch (channel)
+            {
+            case ModuleCommands::MKO_1:
+                text += tr("МКООсн");
+                break;
+            case ModuleCommands::MKO_2:
+                text += tr("МКОРез");
+                break;
+            default:
+                text += tr("UNKNOWN");
+                break;
+            }
+        }
+        break;
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+        {
+            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
+            int channel = mInputParams.value(paramName).toInt();
+
+            text += tr("ПС");
+
+            switch (channel)
+            {
+            case ModuleCommands::BUP_MAIN:
+                text += tr("БУПОсн");
+                break;
+            case ModuleCommands::BUP_RESERVE:
+                text += tr("БУПРез");
+                break;
+            case ModuleCommands::HEATER_LINE_1:
+                text += tr("Нагр1");
+                break;
+            case ModuleCommands::HEATER_LINE_2:
+                text += tr("Нагр2");
+                break;
+            case ModuleCommands::DRIVE_CONTROL:
+                text += tr("СилПит");
+                break;
+            default:
+                text += tr("UNKNOWN");
+                break;
+            }
+        }
+        break;
     default:
         {
             QMetaEnum commands = QMetaEnum::fromType<ModuleCommands::CommandID>();
-            LOG_WARNING(QString("CmdActionModule command '%1' text not implemented").arg(commands.valueToKey(mOperation)));
+            LOG_WARNING(QString("Command '%1' GUI text description not implemented").arg(commands.valueToKey(mOperation)));
         }
         break;
     }
