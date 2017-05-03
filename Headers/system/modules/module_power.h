@@ -101,8 +101,6 @@ private:
     void getObjectValue(ObjectID objectID);
     void getDeviceClass();
 
-    void addResponseParam(uint32_t paramID, QVariant value);
-
     // encoding/decoding
     static uint8_t encodeStartDelimiter(TransmissionType trType, uint8_t dataSize);
     static void addCheckSum(QByteArray& data);
