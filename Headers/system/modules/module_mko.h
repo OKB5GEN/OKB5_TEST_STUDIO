@@ -42,6 +42,8 @@ public:
 
 public slots:
     void processCommand(const Transaction& params) override;
+    void onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state);
+    void onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state);
 
 private slots:
     void readResponse();

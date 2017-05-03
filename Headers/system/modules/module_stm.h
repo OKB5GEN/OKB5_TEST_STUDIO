@@ -31,6 +31,10 @@ protected:
     bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
     void createResponse(Transaction& response) override;
 
+signals:
+    void powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state);
+    void powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state);
+
 private:
     void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на БУП и ПНА
     void setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на МКО

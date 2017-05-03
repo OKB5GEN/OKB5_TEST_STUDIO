@@ -1150,3 +1150,13 @@ bool ModuleMKO::isPhysicallyActive() const
     //-не очень понятно к чему лепить tmkconfig, bcreset, bcdefbase и входит ли это в "физическую инициализацию"
     return false;
 }
+
+void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state)
+{
+    int TODO;
+}
+
+void ModuleMKO::onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state)
+{
+    int TODO;
+}

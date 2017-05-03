@@ -222,6 +222,8 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
 
     case ModuleCommands::SOFT_RESET:
         {
+            int TODO;// при софт ресете СТМ все его реле отрубаются поэтому надо софт ресет обрабатывать весьма хитрожопо (пинать МКО например, потому что он перезагрузится по факту)
+
             // TODO: remote module will be reset by watchdog, need to close and reset COM port itself and re-initialize it
             softReset();
         }

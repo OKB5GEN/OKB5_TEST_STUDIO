@@ -98,7 +98,9 @@ void ModuleSTM::processCustomCommand()
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            addModuleCmd(ModuleCommands::SET_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
+
+            //setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
         }
         break;
 
@@ -107,7 +109,23 @@ void ModuleSTM::processCustomCommand()
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            addModuleCmd(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
+
+            //setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+        }
+        break;
+
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+        {
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            addModuleCmd(ModuleCommands::GET_POWER_CHANNEL_STATE, channel, 0);
+        }
+        break;
+
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+        {
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            addModuleCmd(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, channel, 0);
         }
         break;
 
@@ -151,19 +169,19 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("Power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
+                addResponseParam(SystemState::RELAY_STATE, 0 /*ModuleCommands::POWER_OFF*/);
                 //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("Power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
+                addResponseParam(SystemState::RELAY_STATE, 1 /*ModuleCommands::POWER_OFF*/);
                 //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
-                LOG_ERROR(QString("Couldn't get '%1' power supply channel state. Errror occured").arg(e.valueToKey(channel)));
+                mCurrentTransaction.error = QString("Couldn't get '%1' power supply channel state. Error occured").arg(e.valueToKey(channel));
             }
-
-            int TODO; // form response
         }
         break;
     case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
@@ -175,19 +193,19 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
+                addResponseParam(SystemState::RELAY_STATE, 0 /*ModuleCommands::POWER_OFF*/);
                 //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
+                addResponseParam(SystemState::RELAY_STATE, 1 /*ModuleCommands::POWER_OFF*/);
                 //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
-                LOG_ERROR(QString("Couldn't get '%1' MKO power supply channel state. Errror occured").arg(e.valueToKey(channel)));
+                mCurrentTransaction.error = QString("Couldn't get '%1' MKO power supply channel state. Errror occured").arg(e.valueToKey(channel));
             }
-
-            int TODO; // form response
         }
         break;
 
@@ -199,12 +217,18 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
-            int TODO;
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
+
+            emit powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
         }
         break;
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
-            int TODO;
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
+
+            emit powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
         }
         break;
 

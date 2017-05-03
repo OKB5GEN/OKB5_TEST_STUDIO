@@ -247,6 +247,9 @@ void SystemState::onApplicationStart()
     connect(this, SIGNAL(sendToOTD(const Transaction&)), mOTD, SLOT(processCommand(const Transaction&)));
     connect(mOTD, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
 
+    connect(mOTD, SIGNAL(powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState)), mMKO, SLOT(onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState)));
+    connect(mOTD, SIGNAL(powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState)), mMKO, SLOT(onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState)));
+
     mSTM = new ModuleSTM(this);
     mSTM->setEmulator(emulatorEnabled);
     mSTM->setModuleID(ModuleCommands::STM);
@@ -857,7 +860,7 @@ bool SystemState::isImplicit(const QString &name) const
     case SUBADDRESS:
     case CHANNEL_ID:
     case POWER_STATE:
-        return true;
+        return true; //TODO RELAY_STATE?
 
     default:
         break;
