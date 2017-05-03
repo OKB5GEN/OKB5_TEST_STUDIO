@@ -8,12 +8,111 @@
         <command type="GO_TO_BRANCH" id="1493186321936"/>
         <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
         <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1493381028430" name="Stop_Tech" file="on_app_finish_sub/sub_stop_tech.cgr">
+            <input_params>
+                <param name="Sub.AddrC" type="6" value="0"/>
+                <param name="Sub.AddrD" type="6" value="0"/>
+                <param name="Sub.HasErr" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
+                <param name="Sub.IsOn_H1" type="6" value="0"/>
+                <param name="Sub.IsOn_H2" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
+                <param name="Sub.IsOn_POW" type="6" value="0"/>
+                <param name="Sub.IsReady" type="6" value="0"/>
+                <param name="Sub.IsReset" type="6" value="0"/>
+                <param name="Sub.LActive" type="6" value="0"/>
+                <param name="Sub.PActive" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1493381032075" name="Stop_OTD" file="on_app_finish_sub/sub_stop_otd.cgr">
+            <input_params>
+                <param name="Sub.AddrC" type="6" value="0"/>
+                <param name="Sub.AddrD" type="6" value="0"/>
+                <param name="Sub.HasErr" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
+                <param name="Sub.IsOn_H1" type="6" value="0"/>
+                <param name="Sub.IsOn_H2" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
+                <param name="Sub.IsOn_POW" type="6" value="0"/>
+                <param name="Sub.IsReady" type="6" value="0"/>
+                <param name="Sub.IsReset" type="6" value="0"/>
+                <param name="Sub.LActive" type="6" value="0"/>
+                <param name="Sub.PActive" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1493381035921" name="Stop_MKO" file="on_app_finish_sub/sub_stop_mko.cgr">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1493381043352" name="Stop_STM" file="on_app_finish_sub/sub_stop_stm.cgr">
+            <input_params>
+                <param name="Sub.AddrC" type="6" value="0"/>
+                <param name="Sub.AddrD" type="6" value="0"/>
+                <param name="Sub.HasErr" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
+                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
+                <param name="Sub.IsOn_H1" type="6" value="0"/>
+                <param name="Sub.IsOn_H2" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
+                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
+                <param name="Sub.IsOn_POW" type="6" value="0"/>
+                <param name="Sub.IsReady" type="6" value="0"/>
+                <param name="Sub.IsReset" type="6" value="0"/>
+                <param name="Sub.LActive" type="6" value="0"/>
+                <param name="Sub.PActive" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1493381052574" name="Stop_PNA_PU" file="on_app_finish_sub/sub_stop_bp_pna.cgr">
+            <input_params>
+                <param name="Sub.Class" type="6" value="0"/>
+                <param name="Sub.I" type="6" value="0"/>
+                <param name="Sub.Inom" type="6" value="0"/>
+                <param name="Sub.Iocp" type="6" value="0"/>
+                <param name="Sub.LActive" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PActive" type="6" value="0"/>
+                <param name="Sub.Pnom" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="0"/>
+                <param name="Sub.Unom" type="6" value="0"/>
+                <param name="Sub.Uovp" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1493381062843" name="Stop_BUP_PU" file="on_app_finish_sub/sub_stop_bp_bup.cgr">
+            <input_params>
+                <param name="Sub.Class" type="6" value="0"/>
+                <param name="Sub.I" type="6" value="0"/>
+                <param name="Sub.Inom" type="6" value="0"/>
+                <param name="Sub.Iocp" type="6" value="0"/>
+                <param name="Sub.LActive" type="6" value="0"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.PActive" type="6" value="0"/>
+                <param name="Sub.Pnom" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="0"/>
+                <param name="Sub.Unom" type="6" value="0"/>
+                <param name="Sub.Uovp" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
-        <item id="1493186321935" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493186321935" down="1493381028430" right="-1" under_arrow="-1"/>
         <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493381028430" down="1493381032075" right="-1" under_arrow="-1"/>
+        <item id="1493381032075" down="1493381035921" right="-1" under_arrow="-1"/>
+        <item id="1493381035921" down="1493381043352" right="-1" under_arrow="-1"/>
+        <item id="1493381043352" down="1493381052574" right="-1" under_arrow="-1"/>
+        <item id="1493381052574" down="1493381062843" right="-1" under_arrow="-1"/>
+        <item id="1493381062843" down="1493186321936" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

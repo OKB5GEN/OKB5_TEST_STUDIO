@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
+        <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1493186321936"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493803090978" module="MKO" command="STOP_MKO">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493812396708" module="MKO" command="GET_MODULE_STATUS">
+            <input_params/>
+            <output_params>
+                <param name="Logic.status" type="10" value="LActive"/>
+                <param name="Phys.status" type="10" value="PActive"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493812415310" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="PActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493812415314"/>
+        <command type="QUESTION" id="1493812421301" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="LActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493812421304"/>
+    </commands>
+    <tree>
+        <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
+        <item id="1493186321935" down="1493812396708" right="-1" under_arrow="-1"/>
+        <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
+        <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493803090978" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493812396708" down="1493812415310" right="-1" under_arrow="-1"/>
+        <item id="1493812415310" down="1493812421301" right="1493812415314" under_arrow="-1"/>
+        <item id="1493812415314" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1493812421301" down="1493803090978" right="1493812421304" under_arrow="-1"/>
+        <item id="1493812421304" down="1493186321945" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>

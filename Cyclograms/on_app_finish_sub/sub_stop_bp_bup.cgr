@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cyclogram>
+<cyclogram version="1.0">
+    <variables>
+        <variable name="Class" value="0" desc="Device Class"/>
+        <variable name="I" value="0" desc="Current, A"/>
+        <variable name="Inom" value="0" desc=""/>
+        <variable name="Iocp" value="0" desc=""/>
+        <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
+        <variable name="OK" value="0" desc=""/>
+        <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
+        <variable name="Pnom" value="0" desc=""/>
+        <variable name="U" value="0" desc="Voltage, V"/>
+        <variable name="Unom" value="0" desc=""/>
+        <variable name="Uovp" value="0" desc=""/>
+    </variables>
+    <commands>
+        <command type="TERMINATOR" id="1493369518680" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493369518682" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1493369518684"/>
+        <command type="BRANCH_BEGIN" id="1493369518686" name="End"/>
+        <command type="TERMINATOR" id="1493369518688" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493369532085" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
+            <input_params/>
+            <output_params>
+                <param name="Logic.status" type="10" value="LActive"/>
+                <param name="Phys.status" type="10" value="PActive"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493369544813" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="PActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493369544819"/>
+        <command type="BRANCH_BEGIN" id="1493369571688" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1493369571690"/>
+        <command type="BRANCH_BEGIN" id="1493369580658" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1493369580660"/>
+        <command type="ACTION_MATH" id="1493369592933" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1493369601525" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MODULE" id="1493369642029" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493374542245" module="POWER_UNIT_BUP" command="PSC_ACKNOWLEDGE_ALARMS">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="QUESTION" id="1493812193558" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="LActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493812193561"/>
+    </commands>
+    <tree>
+        <item id="1493369518680" down="1493369518682" right="-1" under_arrow="-1"/>
+        <item id="1493369518682" down="1493369532085" right="-1" under_arrow="-1"/>
+        <item id="1493369518684" down="1493369571688" right="-1" under_arrow="-1"/>
+        <item id="1493369518686" down="1493369518688" right="-1" under_arrow="-1"/>
+        <item id="1493369518688" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493369532085" down="1493369544813" right="-1" under_arrow="-1"/>
+        <item id="1493369544813" down="1493812193558" right="1493369544819" under_arrow="-1"/>
+        <item id="1493369544819" down="1493369580658" right="-1" under_arrow="-1"/>
+        <item id="1493369571688" down="1493369592933" right="-1" under_arrow="-1"/>
+        <item id="1493369571690" down="1493369518686" right="-1" under_arrow="-1"/>
+        <item id="1493369580658" down="1493369601525" right="-1" under_arrow="-1"/>
+        <item id="1493369580660" down="1493369518686" right="-1" under_arrow="-1"/>
+        <item id="1493369592933" down="1493369571690" right="-1" under_arrow="-1"/>
+        <item id="1493369601525" down="1493369580660" right="-1" under_arrow="-1"/>
+        <item id="1493369642029" down="1493374542245" right="-1" under_arrow="-1"/>
+        <item id="1493374542245" down="1493369518684" right="-1" under_arrow="-1"/>
+        <item id="1493812193558" down="1493369642029" right="1493812193561" under_arrow="-1"/>
+        <item id="1493812193561" down="1493369580658" right="-1" under_arrow="-1"/>
+    </tree>
+</cyclogram>
