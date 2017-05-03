@@ -61,3 +61,19 @@ void AbstractModule::setLogicallyActive(bool active)
 {
     mIsLogicallyActive = active;
 }
+
+void AbstractModule::addResponseParam(uint32_t paramID, QVariant value)
+{
+    QString var = mCurrentTransaction.outputParams.value(paramID).toString();
+
+    if (var.isEmpty())
+    {
+        LOG_ERROR(QString("No output variable found for paramID=%1").arg(paramID));
+        return;
+    }
+
+    QList<QVariant> list;
+    list.append(QVariant(var));
+    list.append(value);
+    mCurrentTransaction.outputParams[paramID] = list;
+}

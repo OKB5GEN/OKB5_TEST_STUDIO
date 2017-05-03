@@ -20,25 +20,6 @@ ModuleOKB::~ModuleOKB()
 
 }
 
-//void ModuleOKB::initializeCustom()
-//{
-//    // OKB Module initialization process:
-//    //  1. Ask module for its default address
-//    //  2. Ask module for its current address
-//    //  3. Compare module default and current addresses
-//    //  4. If addresses are not equal - send initializationFinished signal with ERROR and abort further initialization
-//    //  5. If addresses are equal - ask module for its status word to check errors
-//    //  6. If module has errors - send initializationFinished signal with ERROR and abort further initialization
-//    //  7. If module has no errors - begin module custom initialization, by calling initializeCustomOKBModule()
-//    //  8. If initializeCustomOKBModule() not overridden it just will send initializationFinished SUCCESS signal without error
-//    //  9. Otherwise initializationFinished signal must be sent from inherited class (SUCCES or ERROR depending on custom logic)
-//    // 10. If some transmission error will happen during initialization, we consider it as critical error and abort initialization
-
-//    // Initialization step 1: Aquire and check module addresses
-//    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::DEFAULT);
-//    addModuleCmd(ModuleCommands::GET_MODULE_ADDRESS, 0, ModuleCommands::CURRENT);
-//}
-
 void ModuleOKB::addModuleCmd(ModuleCommands::CommandID cmd, uint8_t param1, uint8_t param2)
 {
     QByteArray request;
@@ -106,30 +87,41 @@ bool ModuleOKB::canReturnError(ModuleCommands::CommandID cmd) const
     return false;
 }
 
-void ModuleOKB::processCommand(const Transaction& params)
+void ModuleOKB::processCommand(const Transaction& request)
 {
-    Transaction response;
+    mCurrentTransaction.clear();
+    mCurrentTransaction = request;
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.commandID);
-
-    response.moduleID = params.moduleID;
-    response.commandID = command;
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     switch (command)
     {
     case ModuleCommands::GET_MODULE_ADDRESS:
+        {
+            int addressType = mCurrentTransaction.inputParams.value(SystemState::MODULE_ADDRESS).toInt();
+            addModuleCmd(command, 0, addressType);
+        }
+        break;
     case ModuleCommands::GET_STATUS_WORD:
     case ModuleCommands::RESET_ERROR:
-    case ModuleCommands::SOFT_RESET:
-    case ModuleCommands::GET_SOWFTWARE_VERSION:
+    case ModuleCommands::SOFT_RESET: //TODO command not added ti GUI
+    case ModuleCommands::GET_SOWFTWARE_VERSION: //TODO command not added ti GUI
+        {
+            addModuleCmd(command, 0, 0);
+        }
+        break;
+
     case ModuleCommands::ECHO:
         {
-            int TODO; // decode and process common commands here
+            //TODO command is not added to GUI
+            int data1 = mCurrentTransaction.inputParams.value(SystemState::ECHO_DATA_1, 0).toInt();
+            int data2 = mCurrentTransaction.inputParams.value(SystemState::ECHO_DATA_2, 0).toInt();
+            addModuleCmd(command, data1, data2);
         }
         break;
 
     default: // if command is not in "common" commands list, process it by inherited module
-        processCustomCommand(params, response);
+        processCustomCommand();
         break;
     }
 }
@@ -150,16 +142,8 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
 
     if (!error.isEmpty())
     {
-//        if (moduleState() == AbstractModule::INITIALIZING)
-//        {
-//            setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-//        }
-//        else
-        {
-            LOG_ERROR(error);
-            onModuleError();
-        }
-
+        LOG_ERROR(error);
+        onModuleError();
         return false;
     }
 
@@ -181,13 +165,13 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 mDefaultAddress = value;
                 LOG_INFO(QString("Module default address is 0x%1").arg(QString::number(mDefaultAddress, 16)));
             }
+
+            addResponseParam(SystemState::MODULE_ADDRESS, value);
         }
         break;
 
     case ModuleCommands::GET_STATUS_WORD:
         {
-            int TODO; // are all of these values are errors?
-
             QString error;
             uint8_t y = response[2];
             uint8_t x = response[3];
@@ -195,17 +179,31 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
             if ((y & MODULE_READY_MASK) == 0)
             {
                 error = QString("Module 0x%1, is not ready").arg(QString::number(mCurrentAddress, 16));
-                //TODO soft reset module?
+                addResponseParam(SystemState::MODULE_READY, 1);
+            }
+            else
+            {
+                addResponseParam(SystemState::MODULE_READY, 0);
             }
 
             if ((y & HAS_ERRORS_MASK) > 0)
             {
                 error = QString("Module 0x%1, has errors").arg(QString::number(mCurrentAddress, 16));
+                addResponseParam(SystemState::MODULE_HAS_ERRORS, 1);
+            }
+            else
+            {
+                addResponseParam(SystemState::MODULE_HAS_ERRORS, 0);
             }
 
             if ((y & AFTER_RESET_MASK) > 0)
             {
-                LOG_WARNING(QString("Module 0x%1, is after RESET").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
+                LOG_WARNING(QString("Module 0x%1, is after RESET").arg(QString::number(mCurrentAddress, 16)));
+                addResponseParam(SystemState::MODULE_AFTER_RESET, 1);
+            }
+            else
+            {
+                addResponseParam(SystemState::MODULE_AFTER_RESET, 0);
             }
 
             if (x == 0x10)
@@ -218,16 +216,13 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 LOG_WARNING(QString("UMART data byte lost in module 0x%1 due to buffer overflow").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
             }
 
-            if (!error.isEmpty())
-            {
-                LOG_ERROR(error);
-            }
+            mCurrentTransaction.error = error;
         }
         break;
 
     case ModuleCommands::SOFT_RESET:
         {
-            // remote module will be reset by watchdog, need to close and reset COM port itself and re-initialize it
+            // TODO: remote module will be reset by watchdog, need to close and reset COM port itself and re-initialize it
             softReset();
         }
         break;
@@ -268,15 +263,8 @@ void ModuleOKB::onTransmissionComplete()
     Transaction response;
     createResponse(response);
 
-    if (!response.outputParams.isEmpty() || !response.inputParams.isEmpty())
-    {
-        LOG_INFO(QString("Send response to cyclogram"));
-        emit commandResult(response);
-    }
-    else
-    {
-        LOG_ERROR(QString("No output params in response. Result to cyclogram not sent"));
-    }
+    LOG_INFO(QString("Send response to cyclogram"));
+    emit commandResult(response);
 }
 
 void ModuleOKB::createResponse(Transaction& response)

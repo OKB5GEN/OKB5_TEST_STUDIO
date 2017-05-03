@@ -77,32 +77,11 @@ int ModuleOTD::dsCount(LineID line) const
     return mSensorsCntNu;
 }
 
-//void ModuleOTD::initializeCustomOKBModule()
-//{
-//    setDefaultState();
-
-//    // read sensors count on both lines (TODO do not change call order)
-//    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_1, 0, 0);
-//    addModuleCmd(ModuleCommands::GET_DS1820_COUNT_LINE_2, 0, 0);
-//}
-
-//void ModuleOTD::setDefaultState()
-//{
-//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
-
-//    addModuleCmd(ModuleCommands::RESET_LINE_1, 0, 0);
-//    addModuleCmd(ModuleCommands::RESET_LINE_2, 0, 0);
-//}
-
-void ModuleOTD::processCustomCommand(const Transaction& request, Transaction& response)
+void ModuleOTD::processCustomCommand()
 {
     mTemperatureData.clear();
-    mCurrentTransaction.clear();
-    mCurrentTransaction = response;
-    //mCurrentTransaction.inputParams.detach();
-    //mCurrentTransaction.outputParams.detach();
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     switch (command)
     {
@@ -138,13 +117,18 @@ void ModuleOTD::processCustomCommand(const Transaction& request, Transaction& re
         }
         break;
 
+    case ModuleCommands::RESET_LINE_1:
+    case ModuleCommands::RESET_LINE_2:
+        {
+            addModuleCmd(command, 0, 0);
+        }
+        break;
+
     default:
         LOG_ERROR(QString("Unexpected command %1 received by OTD module").arg(command));
         return;
         break;
     }
-
-    mCurrentTransaction.outputParams = request.outputParams;
 }
 
 bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
@@ -164,11 +148,6 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
         {
             mSensorsCntNu = response[2];
             LOG_INFO(QString("DS1820 sensors count at line 2 is %1").arg(mSensorsCntNu));
-
-//            if (moduleState() == AbstractModule::INITIALIZING)
-//            {
-//                setModuleState(AbstractModule::INITIALIZED_OK);
-//            }
         }
         break;
 
@@ -198,34 +177,16 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
 
     case ModuleCommands::START_MEASUREMENT_LINE_1:
-        {
-            int TODO; // check error
-        }
-        break;
-
     case ModuleCommands::START_MEASUREMENT_LINE_2:
-        {
-            int TODO; // check error
-        }
-        break;
-
     case ModuleCommands::RESET_LINE_1:
-        {
-            int TODO; // check error
-        }
-        break;
-
     case ModuleCommands::RESET_LINE_2:
         {
-//            if (moduleState() == AbstractModule::SETTING_TO_SAFE_STATE)
-//            {
-//                setModuleState(AbstractModule::SAFE_STATE);
-//            }
+            int TODO; // check error?
         }
         break;
 
     default:
-        LOG_WARNING(QString("Unexpected command id=0x%1 response received by OTD module:(HEX) %2").arg(QString::number(command, 16)).arg(QString(response.toHex().toStdString().c_str())));
+        LOG_WARNING(QString("Unexpected command id=0x%1 response received by OTD module (HEX): %2").arg(QString::number(command, 16)).arg(QString(response.toHex().toStdString().c_str())));
         return false;
         break;
     }
@@ -254,6 +215,7 @@ void ModuleOTD::createResponse(Transaction& response)
     int i = 0;
     for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
     {
+        //TODO replace by addResponseParam(it.key(), mTemperatureData[i]); // TODO output params malformed packet!
         QList<QVariant> list;
         list.append(it.value());
         list.append(QVariant(mTemperatureData[i]));

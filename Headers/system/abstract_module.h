@@ -54,6 +54,8 @@ public slots:
     virtual void processCommand(const Transaction& request) = 0; // this method must be reimplemented in inherited classes to receive calls from cyclogram commands
 
 protected:
+    void addResponseParam(uint32_t paramID, QVariant value);
+
     Transaction mCurrentTransaction;
 
 signals:

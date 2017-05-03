@@ -515,6 +515,7 @@ void ModuleMKO::readResponse()
                     break;
                 }
 
+                //TODO replace by addResponseParam();
                 QList<QVariant> list;
                 list.append(it.value());
                 list.append(value);
@@ -570,6 +571,7 @@ void ModuleMKO::readResponse()
                     break;
                 }
 
+                //TODO replace by addResponseParam();
                 QList<QVariant> list;
                 list.append(it.value());
                 list.append(value);

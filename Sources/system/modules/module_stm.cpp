@@ -15,17 +15,17 @@ ModuleSTM::ModuleSTM(QObject* parent):
     ModuleOKB(parent),
     mRequestedChannelTelemetry(0)
 {
-    mPowerSupplyRelayStates[ModuleCommands::BUP_MAIN] = ModuleCommands::POWER_OFF;
-    mPowerSupplyRelayStates[ModuleCommands::BUP_RESERVE] = ModuleCommands::POWER_OFF;
-    mPowerSupplyRelayStates[ModuleCommands::UNKNOWN_3] = ModuleCommands::POWER_OFF;
-    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_1] = ModuleCommands::POWER_OFF;
-    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_2] = ModuleCommands::POWER_OFF;
-    mPowerSupplyRelayStates[ModuleCommands::DRIVE_CONTROL] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::BUP_MAIN] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::BUP_RESERVE] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::UNKNOWN_3] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_1] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_2] = ModuleCommands::POWER_OFF;
+//    mPowerSupplyRelayStates[ModuleCommands::DRIVE_CONTROL] = ModuleCommands::POWER_OFF;
 
-    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_1] = ModuleCommands::POWER_OFF;
-    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_2] = ModuleCommands::POWER_OFF;
-    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_3] = ModuleCommands::POWER_OFF;
-    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_4] = ModuleCommands::POWER_OFF;
+//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_1] = ModuleCommands::POWER_OFF;
+//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_2] = ModuleCommands::POWER_OFF;
+//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_3] = ModuleCommands::POWER_OFF;
+//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_4] = ModuleCommands::POWER_OFF;
 }
 
 ModuleSTM::~ModuleSTM()
@@ -43,15 +43,15 @@ void ModuleSTM::setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID 
     addModuleCmd(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
 }
 
-ModuleCommands::PowerState ModuleSTM::getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel)
-{
-    return mPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
-}
+//ModuleCommands::PowerState ModuleSTM::getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel)
+//{
+//    return mPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
+//}
 
-ModuleCommands::PowerState ModuleSTM::getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel)
-{
-    return mMKOPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
-}
+//ModuleCommands::PowerState ModuleSTM::getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel)
+//{
+//    return mMKOPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
+//}
 
 void ModuleSTM::getChannelTelemetry(int channel)
 {
@@ -87,32 +87,27 @@ ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
     return ModuleSTM::FuseStates(state); //TODO undefined values
 }
 
-void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& response)
+void ModuleSTM::processCustomCommand()
 {
-    mCurrentTransaction.clear();
-    mCurrentTransaction = response;
-    //mCurrentTransaction.inputParams.detach();
-    //mCurrentTransaction.outputParams.detach();
-
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     switch (command)
     {
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
-            int channel = request.inputParams.value(SystemState::CHANNEL_ID).toInt();
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), state);
+            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
         }
         break;
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
-            int channel = request.inputParams.value(SystemState::CHANNEL_ID).toInt();
-            ModuleCommands::PowerState state = ModuleCommands::PowerState(request.inputParams.value(SystemState::POWER_STATE).toInt());
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), state);
+            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
         }
         break;
 
@@ -120,8 +115,6 @@ void ModuleSTM::processCustomCommand(const Transaction& request, Transaction& re
         LOG_ERROR(QString("Unexpected command %1 received by STM module").arg(command));
         break;
     }
-
-    mCurrentTransaction.outputParams = request.outputParams;
 }
 
 bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
@@ -158,12 +151,12 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("Power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
-                mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
+                //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("Power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
-                mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
+                //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
@@ -182,12 +175,12 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
-                mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
+                //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
-                mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
+                //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
@@ -230,40 +223,8 @@ void ModuleSTM::onModuleError()
 
 void ModuleSTM::createResponse(Transaction& response)
 {
-    // fill response
     response = mCurrentTransaction;
 }
-
-//void ModuleSTM::setDefaultState()
-//{
-//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
-
-//    int TODO; // for more reliability ask for channel state from module?
-
-//    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
-//    {
-//        ModuleCommands::PowerState state = mPowerSupplyRelayStates.value(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-//        if (state == ModuleCommands::POWER_ON)
-//        {
-//            setPowerChannelState(ModuleCommands::PowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-//        }
-//    }
-
-//    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
-//    {
-//        ModuleCommands::PowerState state = mMKOPowerSupplyRelayStates.value(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-//        if (state == ModuleCommands::POWER_ON)
-//        {
-//            setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(i), ModuleCommands::POWER_OFF);
-//        }
-//    }
-
-//    //setModuleState(AbstractModule::SAFE_STATE);
-
-//    // TODO: possibly give powe supply to MKO?
-//    setMKOPowerChannelState(ModuleCommands::MKO_1, ModuleCommands::POWER_OFF); // Hardcode enable MKO power supply (main?) TODO to cyclogram
-//    setMKOPowerChannelState(ModuleCommands::MKO_2, ModuleCommands::POWER_OFF); // enable MKO power supply (reserve?) TODO
-//}
 
 void ModuleSTM::onApplicationFinish()
 {

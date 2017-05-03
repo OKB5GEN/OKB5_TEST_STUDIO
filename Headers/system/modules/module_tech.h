@@ -17,17 +17,19 @@ public:
     ModuleTech(QObject* parent);
     ~ModuleTech();
 
+    // TODO remove/replce >>>
     int tech_send(int com, int x, int y);
     int tech_read(int x);
     QString tech_read_buf(int x, int len);
 
 public slots:
-    void processCustomCommand(const Transaction& request, Transaction& response) override;
+    void processCustomCommand() override;
     void onApplicationFinish();
 
 protected:
     void onModuleError() override;
     bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) override;
+    void createResponse(Transaction& response) override;
 
 private:
     void statusRS();

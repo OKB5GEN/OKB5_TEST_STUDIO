@@ -19,14 +19,14 @@ public:
     virtual ~ModuleOKB();
 
 public slots:
-    void processCommand(const Transaction& params) override;
+    void processCommand(const Transaction& request) override;
 
 protected:
     void onTransmissionError(uint32_t operationID) override;
     void onTransmissionComplete() override;
 
     virtual void createResponse(Transaction& response);
-    virtual void processCustomCommand(const Transaction& request, Transaction& response) = 0;
+    virtual void processCustomCommand() = 0;
     virtual bool processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response) = 0;
     virtual void onModuleError() = 0;
 

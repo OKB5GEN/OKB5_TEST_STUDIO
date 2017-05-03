@@ -299,15 +299,15 @@ void ModuleTech::send_tech_2()
     }
 }
 
-void ModuleTech::processCustomCommand(const Transaction& request, Transaction& response)
+void ModuleTech::processCustomCommand()
 {
     int TODO; // do not send signals, just execute command and fill response
 }
 
 bool ModuleTech::processCustomResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
-    return true;
     int TODO;
+    return true;
 }
 
 void ModuleTech::onApplicationFinish()
@@ -318,4 +318,9 @@ void ModuleTech::onApplicationFinish()
 void ModuleTech::onModuleError()
 {
     int TODO; //TODO here will be processing
+}
+
+void ModuleTech::createResponse(Transaction& response)
+{
+    response = mCurrentTransaction;
 }

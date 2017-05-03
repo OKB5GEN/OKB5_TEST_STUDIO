@@ -50,6 +50,8 @@ public:
         POWER_STATE,
         STATUS_PHYSICAL, // 0 - inactive, 1 - active
         STATUS_LOGICAL, // 0 - inactive, 1 - active
+        ECHO_DATA_1,
+        ECHO_DATA_2,
 
         UNDEFINED
     };

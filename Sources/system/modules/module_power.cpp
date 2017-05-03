@@ -342,22 +342,6 @@ void ModulePower::getDeviceClass()
     addRequest(ModuleCommands::GET_DEVICE_CLASS, request);
 }
 
-void ModulePower::addResponseParam(uint32_t paramID, QVariant value)
-{
-    QString var = mCurrentTransaction.outputParams.value(paramID).toString();
-
-    if (var.isEmpty())
-    {
-        LOG_ERROR(QString("No output variable found for paramID=%1").arg(paramID));
-        return;
-    }
-
-    QList<QVariant> list;
-    list.append(QVariant(var));
-    list.append(value);
-    mCurrentTransaction.outputParams[paramID] = list;
-}
-
 bool ModulePower::processResponse(uint32_t operationID, const QByteArray& request, const QByteArray& response)
 {
     QMetaEnum e = QMetaEnum::fromType<ModuleCommands::CommandID>();

@@ -23,7 +23,7 @@ public:
     int dsCount(LineID line) const;
 
 public slots:
-    void processCustomCommand(const Transaction& request, Transaction& response) override;
+    void processCustomCommand() override;
     void onApplicationFinish();
 
 protected:
