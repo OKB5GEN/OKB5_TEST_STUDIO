@@ -1,19 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
-    <variables/>
+    <variables>
+        <variable name="AddrC" value="0" desc=""/>
+        <variable name="AddrD" value="0" desc=""/>
+        <variable name="HasErr" value="0" desc="Module error flag. 1 - module has errors, 0 - module has no errors"/>
+        <variable name="IsReady" value="0" desc="Module ready flag. 1 - ready, 0 - not ready"/>
+        <variable name="IsReset" value="0" desc="Module is after reset flag. 1 - after reset, 0 - not after reset"/>
+        <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
+        <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
+    </variables>
     <commands>
         <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" name="GetModState"/>
         <command type="GO_TO_BRANCH" id="1493186321936"/>
         <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
         <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493724109576" module="OTD" command="GET_MODULE_STATUS">
+            <input_params/>
+            <output_params>
+                <param name="Logic.status" type="10" value="LActive"/>
+                <param name="Phys.status" type="10" value="PActive"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493724128025" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="PActive"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493724128031"/>
+        <command type="BRANCH_BEGIN" id="1493724347720" name="SetModState"/>
+        <command type="GO_TO_BRANCH" id="1493724347722"/>
+        <command type="BRANCH_BEGIN" id="1493724349859" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1493724349862"/>
+        <command type="BRANCH_BEGIN" id="1493724351617" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1493724351619"/>
+        <command type="ACTION_MODULE" id="1493724384673" module="OTD" command="SET_MODULE_LOGIC_STATUS">
+            <input_params>
+                <param name="Logic.status" type="6" value="1"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493724432484" module="OTD" command="SET_MODULE_LOGIC_STATUS">
+            <input_params>
+                <param name="Logic.status" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493796620335" module="OTD" command="GET_MODULE_ADDRESS">
+            <input_params>
+                <param name="Module address" type="2" value="1"/>
+            </input_params>
+            <output_params>
+                <param name="Module address" type="10" value="AddrC"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493796667143" module="OTD" command="GET_MODULE_ADDRESS">
+            <input_params>
+                <param name="Module address" type="2" value="2"/>
+            </input_params>
+            <output_params>
+                <param name="Module address" type="10" value="AddrD"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493796692933" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="AddrC"/>
+            <operand id="Right" type="Variable" value="0" variable="AddrD"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493796692937"/>
+        <command type="ACTION_MODULE" id="1493796727119" module="OTD" command="GET_STATUS_WORD">
+            <input_params/>
+            <output_params>
+                <param name="Module after reset flag" type="10" value="IsReset"/>
+                <param name="Module has errors flag" type="10" value="HasErr"/>
+                <param name="Module ready flag" type="10" value="IsReady"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493796761760" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="IsReady"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493796761764"/>
+        <command type="QUESTION" id="1493796844900" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="HasErr"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="ACTION_MODULE" id="1493797510008" module="OTD" command="RESET_ERROR">
+            <input_params/>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
-        <item id="1493186321935" down="1493186321936" right="-1" under_arrow="-1"/>
-        <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1493186321935" down="1493724109576" right="-1" under_arrow="-1"/>
+        <item id="1493186321936" down="1493724347720" right="-1" under_arrow="-1"/>
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493724109576" down="1493724128025" right="-1" under_arrow="-1"/>
+        <item id="1493724128025" down="1493796620335" right="1493724128031" under_arrow="-1"/>
+        <item id="1493724128031" down="1493724351617" right="-1" under_arrow="-1"/>
+        <item id="1493724347720" down="1493724347722" right="-1" under_arrow="-1"/>
+        <item id="1493724347722" down="1493724349859" right="-1" under_arrow="-1"/>
+        <item id="1493724349859" down="1493724384673" right="-1" under_arrow="-1"/>
+        <item id="1493724349862" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1493724351617" down="1493724432484" right="-1" under_arrow="-1"/>
+        <item id="1493724351619" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1493724384673" down="1493724349862" right="-1" under_arrow="-1"/>
+        <item id="1493724432484" down="1493724351619" right="-1" under_arrow="-1"/>
+        <item id="1493796620335" down="1493796667143" right="-1" under_arrow="-1"/>
+        <item id="1493796667143" down="1493796692933" right="-1" under_arrow="-1"/>
+        <item id="1493796692933" down="1493796727119" right="1493796692937" under_arrow="-1"/>
+        <item id="1493796692937" down="1493724351617" right="-1" under_arrow="-1"/>
+        <item id="1493796727119" down="1493796761760" right="-1" under_arrow="-1"/>
+        <item id="1493796761760" down="1493796844900" right="1493796761764" under_arrow="-1"/>
+        <item id="1493796761764" down="1493724351617" right="-1" under_arrow="-1"/>
+        <item id="1493796844900" down="1493797510008" right="1493186321936" under_arrow="1493186321936"/>
+        <item id="1493797510008" down="1493186321936" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

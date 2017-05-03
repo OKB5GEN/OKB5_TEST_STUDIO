@@ -159,6 +159,10 @@ SystemState::SystemState(QObject* parent):
     mParamNames[POWER_STATE] = tr("Power State");
     mParamNames[CHANNEL_ID] = tr("Channel");
     mParamNames[RELAY_STATE] = tr("Relay state");
+    mParamNames[MODULE_ADDRESS] = tr("Module address");
+    mParamNames[MODULE_READY] = tr("Module ready flag");
+    mParamNames[MODULE_AFTER_RESET] = tr("Module after reset flag");
+    mParamNames[MODULE_HAS_ERRORS] = tr("Module has errors flag");
 
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
@@ -182,6 +186,10 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[DEVICE_CLASS] = "Class";
     mDefaultVariables[POWER] = "Pow";
     mDefaultVariables[RELAY_STATE] = "IsOn";
+    mDefaultVariables[MODULE_ADDRESS] = "Addr";
+    mDefaultVariables[MODULE_READY] = tr("IsReady");
+    mDefaultVariables[MODULE_AFTER_RESET] = tr("IsReset");
+    mDefaultVariables[MODULE_HAS_ERRORS] = tr("HasErr");
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -205,6 +213,10 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[DEVICE_CLASS] = tr("Device Class");
     mDefaultDescriptions[POWER] = tr("Power, W");
     mDefaultDescriptions[RELAY_STATE] = tr("Relay state. 1 - on, 0 - off");
+    mDefaultDescriptions[MODULE_ADDRESS] = tr("Module address");
+    mDefaultDescriptions[MODULE_READY] = tr("Module ready flag. 1 - ready, 0 - not ready");
+    mDefaultDescriptions[MODULE_AFTER_RESET] = tr("Module is after reset flag. 1 - after reset, 0 - not after reset");
+    mDefaultDescriptions[MODULE_HAS_ERRORS] = tr("Module error flag. 1 - module has errors, 0 - module has no errors");
 }
 
 SystemState::~SystemState()
@@ -454,6 +466,14 @@ void SystemState::createOTDCommandsParams()
     mInParams[ModuleCommands::OTD] = inParams;
 
     // output params
+    QStringList moduleAddressParams;
+    moduleAddressParams.append(paramName(MODULE_ADDRESS));
+
+    QStringList statusWordParams;
+    statusWordParams.append(paramName(MODULE_READY));
+    statusWordParams.append(paramName(MODULE_AFTER_RESET));
+    statusWordParams.append(paramName(MODULE_HAS_ERRORS));
+
     int TODO; // solve problem with sensors count data
     QMap<int, QStringList> outParams;
 
@@ -488,8 +508,10 @@ void SystemState::createOTDCommandsParams()
     }
 
     outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
-
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
+    outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
+
     mOutParams[ModuleCommands::OTD] = outParams;
 }
 
@@ -511,11 +533,21 @@ void SystemState::createSTMCommandsParams()
 
     mInParams[ModuleCommands::STM] = inParams;
 
+    QStringList moduleAddressParams;
+    moduleAddressParams.append(paramName(MODULE_ADDRESS));
+
+    QStringList statusWordParams;
+    statusWordParams.append(paramName(MODULE_READY));
+    statusWordParams.append(paramName(MODULE_AFTER_RESET));
+    statusWordParams.append(paramName(MODULE_HAS_ERRORS));
+
     // output params
     QMap<int, QStringList> outParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
     outParams[ModuleCommands::GET_POWER_CHANNEL_STATE] = relayStateParams;
     outParams[ModuleCommands::GET_MKO_POWER_CHANNEL_STATE] = relayStateParams;
+    outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
+    outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
 
     mOutParams[ModuleCommands::STM] = outParams;
 }
@@ -535,9 +567,20 @@ void SystemState::createTechCommandsParams()
 
     mInParams[ModuleCommands::TECH] = inParams;
 
+    QStringList moduleAddressParams;
+    moduleAddressParams.append(paramName(MODULE_ADDRESS));
+
+    QStringList statusWordParams;
+    statusWordParams.append(paramName(MODULE_READY));
+    statusWordParams.append(paramName(MODULE_AFTER_RESET));
+    statusWordParams.append(paramName(MODULE_HAS_ERRORS));
+    //statusWordParams.append(paramName(CUSTOM_ERROR)); // Tech module has some custom error codes in status word
+
     // output params
     QMap<int, QStringList> outParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
+    outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
 
     mOutParams[ModuleCommands::TECH] = outParams;
 }

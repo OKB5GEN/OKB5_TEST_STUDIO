@@ -445,6 +445,34 @@ QString CmdActionModule::commandName() const
             }
         }
         break;
+    case ModuleCommands::GET_MODULE_ADDRESS:
+        {
+            QString paramName = mSystemState->paramName(SystemState::MODULE_ADDRESS);
+            int address = mInputParams.value(paramName).toInt();
+
+            text += tr("ПолАдр");
+
+            switch (address)
+            {
+            case ModuleCommands::DEFAULT:
+                text += tr("У");
+                break;
+            case ModuleCommands::CURRENT:
+                text += tr("Т");
+                break;
+            default:
+                text += tr("UNKNOWN");
+                break;
+            }
+        }
+        break;
+
+    case ModuleCommands::GET_STATUS_WORD:
+        text += tr("ПолСС");
+        break;
+    case ModuleCommands::RESET_ERROR:
+        text += tr("СбрОш");
+        break;
     default:
         {
             QMetaEnum commands = QMetaEnum::fromType<ModuleCommands::CommandID>();

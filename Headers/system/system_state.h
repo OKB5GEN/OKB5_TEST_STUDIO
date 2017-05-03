@@ -21,7 +21,6 @@ class SystemState: public QObject
 public:
     enum ParamID // command parameters
     {
-        // explicit commans params (can be changed by the user)
         VOLTAGE,
         CURRENT,
         POWER,
@@ -42,12 +41,13 @@ public:
         VELOCITY,
         DEVICE_CLASS,
         RELAY_STATE, // 0 - off, 1 - on
-
-        // implicit command params (can not be changed by the user)
+        MODULE_ADDRESS,
+        MODULE_READY,
+        MODULE_AFTER_RESET,
+        MODULE_HAS_ERRORS,
         SUBADDRESS,
         CHANNEL_ID,
         POWER_STATE,
-
         STATUS_PHYSICAL, // 0 - inactive, 1 - active
         STATUS_LOGICAL, // 0 - inactive, 1 - active
 

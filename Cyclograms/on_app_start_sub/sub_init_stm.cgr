@@ -2,13 +2,11 @@
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
     <variables>
-        <variable name="IsOn_BUPM" value="0" desc=""/>
-        <variable name="IsOn_BUPR" value="0" desc=""/>
-        <variable name="IsOn_H1" value="0" desc=""/>
-        <variable name="IsOn_H2" value="0" desc=""/>
-        <variable name="IsOn_MKOM" value="0" desc=""/>
-        <variable name="IsOn_MKOR" value="0" desc=""/>
-        <variable name="IsOn_POW" value="0" desc=""/>
+        <variable name="AddrC" value="0" desc=""/>
+        <variable name="AddrD" value="0" desc=""/>
+        <variable name="HasErr" value="0" desc="Module error flag. 1 - module has errors, 0 - module has no errors"/>
+        <variable name="IsReady" value="0" desc="Module ready flag. 1 - ready, 0 - not ready"/>
+        <variable name="IsReset" value="0" desc="Module is after reset flag. 1 - after reset, 0 - not after reset"/>
         <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
         <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
     </variables>
@@ -185,20 +183,62 @@
         </command>
         <command type="ACTION_MODULE" id="1493728392996" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="2" value="1"/>
-                <param name="Power State" type="2" value="0"/>
+                <param name="Channel" type="6" value="1"/>
+                <param name="Power State" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1493728427252" delay="2000"/>
         <command type="ACTION_MODULE" id="1493728440331" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="2" value="2"/>
-                <param name="Power State" type="2" value="0"/>
+                <param name="Channel" type="6" value="2"/>
+                <param name="Power State" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1493728450074" delay="2000"/>
+        <command type="ACTION_MODULE" id="1493796620335" module="STM" command="GET_MODULE_ADDRESS">
+            <input_params>
+                <param name="Module address" type="6" value="1"/>
+            </input_params>
+            <output_params>
+                <param name="Module address" type="10" value="AddrC"/>
+            </output_params>
+        </command>
+        <command type="ACTION_MODULE" id="1493796667143" module="STM" command="GET_MODULE_ADDRESS">
+            <input_params>
+                <param name="Module address" type="6" value="2"/>
+            </input_params>
+            <output_params>
+                <param name="Module address" type="10" value="AddrD"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493796692933" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="AddrC"/>
+            <operand id="Right" type="Variable" value="0" variable="AddrD"/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493796692937"/>
+        <command type="ACTION_MODULE" id="1493796727119" module="STM" command="GET_STATUS_WORD">
+            <input_params/>
+            <output_params>
+                <param name="Module after reset flag" type="10" value="IsReset"/>
+                <param name="Module has errors flag" type="10" value="HasErr"/>
+                <param name="Module ready flag" type="10" value="IsReady"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1493796761760" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="IsReady"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1493796761764"/>
+        <command type="QUESTION" id="1493796844900" operation="Greater" orientation="YesDown" cmd_type="IF">
+            <operand id="Left" type="Variable" value="0" variable="HasErr"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="ACTION_MODULE" id="1493797510008" module="STM" command="RESET_ERROR">
+            <input_params/>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
@@ -207,10 +247,12 @@
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
         <item id="1493724109576" down="1493724128025" right="-1" under_arrow="-1"/>
-        <item id="1493724128025" down="1493726855068" right="1493724128031" under_arrow="-1"/>
+        <item id="1493724128025" down="1493796620335" right="1493724128031" under_arrow="-1"/>
         <item id="1493724128031" down="1493724351617" right="-1" under_arrow="-1"/>
         <item id="1493724347720" down="1493726969692" right="-1" under_arrow="-1"/>
         <item id="1493724347722" down="1493728370330" right="-1" under_arrow="-1"/>
+        <item id="1493728370330" down="1493728392996" right="-1" under_arrow="-1"/>
+        <item id="1493728370333" down="1493724349859" right="-1" under_arrow="-1"/>
         <item id="1493724349859" down="1493724384673" right="-1" under_arrow="-1"/>
         <item id="1493724349862" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493724351617" down="1493724432484" right="-1" under_arrow="-1"/>
@@ -238,11 +280,18 @@
         <item id="1493727168801" down="1493727204823" right="1493724347722" under_arrow="1493724347722"/>
         <item id="1493727202555" down="1493727168801" right="-1" under_arrow="-1"/>
         <item id="1493727204823" down="1493724347722" right="-1" under_arrow="-1"/>
-        <item id="1493728370330" down="1493728392996" right="-1" under_arrow="-1"/>
-        <item id="1493728370333" down="1493724349859" right="-1" under_arrow="-1"/>
         <item id="1493728392996" down="1493728427252" right="-1" under_arrow="-1"/>
         <item id="1493728427252" down="1493728440331" right="-1" under_arrow="-1"/>
         <item id="1493728440331" down="1493728450074" right="-1" under_arrow="-1"/>
         <item id="1493728450074" down="1493728370333" right="-1" under_arrow="-1"/>
+        <item id="1493796620335" down="1493796667143" right="-1" under_arrow="-1"/>
+        <item id="1493796667143" down="1493796692933" right="-1" under_arrow="-1"/>
+        <item id="1493796692933" down="1493796727119" right="1493796692937" under_arrow="-1"/>
+        <item id="1493796692937" down="1493724351617" right="-1" under_arrow="-1"/>
+        <item id="1493796727119" down="1493796761760" right="-1" under_arrow="-1"/>
+        <item id="1493796761760" down="1493796844900" right="1493796761764" under_arrow="-1"/>
+        <item id="1493796761764" down="1493724351617" right="-1" under_arrow="-1"/>
+        <item id="1493796844900" down="1493797510008" right="1493726855068" under_arrow="1493726855068"/>
+        <item id="1493797510008" down="1493726855068" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

@@ -319,10 +319,3 @@ void ModuleTech::onModuleError()
 {
     int TODO; //TODO here will be processing
 }
-
-//void ModuleTech::setDefaultState()
-//{
-//    setModuleState(AbstractModule::SETTING_TO_SAFE_STATE);
-//    setModuleState(AbstractModule::SAFE_STATE);
-//    int TODO;
-//}

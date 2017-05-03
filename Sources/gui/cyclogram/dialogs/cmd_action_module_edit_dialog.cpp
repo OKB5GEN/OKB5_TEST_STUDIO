@@ -170,6 +170,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::STM:
         {
+            addOKBCommonCommands();
+
             QMap<QString, QVariant> implicitParams;
             QString channelIDName = sysState->paramName(SystemState::CHANNEL_ID);
             QString powerStateName = sysState->paramName(SystemState::POWER_STATE);
@@ -283,17 +285,17 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::OTD:
         {
+            addOKBCommonCommands();
+
             addCommand(tr("ЗАПРОС: температура с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
             addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
             addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
         }
         break;
 
-    case ModuleCommands::TECH://TODO
+    case ModuleCommands::TECH:
         {
-            //mCommands->addItem(tr("ТЕХ1"));
-            //mCommands->addItem(tr("ТЕХ2"));
-            //mCommands->addItem(tr("ТЕХ3"));
+            addOKBCommonCommands();
         }
         break;
 
@@ -347,6 +349,25 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     {
         mCommands->setCurrentRow(0);
     }
+}
+
+void CmdActionModuleEditDialog::addOKBCommonCommands()
+{
+    SystemState* sysState = mCommand->systemState();
+
+    QMap<QString, QVariant> implicitParams;
+    QString addressName = sysState->paramName(SystemState::MODULE_ADDRESS);
+
+    implicitParams.clear();
+    implicitParams[addressName] = QVariant(int(ModuleCommands::CURRENT));
+    addCommand(tr("ЗАПРОС: текущий адрес модуля"), ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
+
+    implicitParams.clear();
+    implicitParams[addressName] = QVariant(int(ModuleCommands::DEFAULT));
+    addCommand(tr("ЗАПРОС: адрес модуля по умолчанию"), ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
+
+    addCommand(tr("ЗАПРОС: статусное слово"), ModuleCommands::GET_STATUS_WORD);
+    addCommand(tr("СБРОС: ошибки"), ModuleCommands::RESET_ERROR);
 }
 
 void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID, const QMap<QString, QVariant>& implicitParams)

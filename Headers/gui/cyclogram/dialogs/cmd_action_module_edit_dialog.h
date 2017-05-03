@@ -28,7 +28,7 @@ private slots:
 private:
     void setupUI();
     void addCommand(const QString& text, int commandID, const QMap<QString, QVariant>& implicitParams = QMap<QString,QVariant>());
-
+    void addOKBCommonCommands();
     CmdActionModule* mCommand;
 
     QListWidget * mModules;

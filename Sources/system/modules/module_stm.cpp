@@ -195,11 +195,6 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             }
 
             int TODO; // form response
-
-//            if (moduleState() == AbstractModule::INITIALIZING && channel == ModuleCommands::MKO_4)
-//            {
-//                setModuleState(AbstractModule::INITIALIZED_OK);
-//            }
         }
         break;
 
@@ -238,19 +233,6 @@ void ModuleSTM::createResponse(Transaction& response)
     // fill response
     response = mCurrentTransaction;
 }
-
-//void ModuleSTM::initializeCustomOKBModule()
-//{
-//    for (int i = ModuleCommands::BUP_MAIN; i <= ModuleCommands::DRIVE_CONTROL; ++i)
-//    {
-//        addModuleCmd(ModuleCommands::GET_POWER_CHANNEL_STATE, i, 0);
-//    }
-
-//    for (int i = ModuleCommands::MKO_1; i <= ModuleCommands::MKO_4; ++i)
-//    {
-//        addModuleCmd(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, i, 0);
-//    }
-//}
 
 //void ModuleSTM::setDefaultState()
 //{

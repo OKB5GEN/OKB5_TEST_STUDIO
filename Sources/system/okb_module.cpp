@@ -167,6 +167,7 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
     {
     case ModuleCommands::GET_MODULE_ADDRESS:
         {
+            //TODO QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
             ModuleCommands::ModuleAddress address = ModuleCommands::ModuleAddress(request.at(3));
             uint8_t value = response.at(2);
 
@@ -180,21 +181,6 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 mDefaultAddress = value;
                 LOG_INFO(QString("Module default address is 0x%1").arg(QString::number(mDefaultAddress, 16)));
             }
-
-            // TODO: remove Initialization step 1 finish >>>
-//            if (mCurrentAddress != 0xff && mDefaultAddress != 0xff && moduleState() == AbstractModule::INITIALIZING)
-//            {
-//                if (mCurrentAddress != mDefaultAddress)
-//                {
-//                    QString error = QString("Module is in incorrect slot. Current address=0x%1, Default address=0x%2").arg(QString::number(mCurrentAddress, 16)).arg(QString::number(mDefaultAddress, 16));
-//                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-//                }
-//                else
-//                {
-//                    // Initialization step 2: Check module status word
-//                    addModuleCmd(ModuleCommands::GET_STATUS_WORD, 0, 0);
-//                }
-//            }
         }
         break;
 
@@ -232,24 +218,9 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
                 LOG_WARNING(QString("UMART data byte lost in module 0x%1 due to buffer overflow").arg(QString::number(mCurrentAddress, 16)));//TODO is it error?
             }
 
-            // TODO: remove Initialization step 2 finish >>>
-//            if (moduleState() == AbstractModule::INITIALIZING)
-//            {
-//                if (!error.isEmpty())
-//                {
-//                    setModuleState(AbstractModule::INITIALIZED_FAILED, error);
-//                }
-//                else
-//                {
-//                    initializeCustomOKBModule();
-//                }
-//            }
-//            else
+            if (!error.isEmpty())
             {
-                if (!error.isEmpty())
-                {
-                    LOG_ERROR(error);
-                }
+                LOG_ERROR(error);
             }
         }
         break;
