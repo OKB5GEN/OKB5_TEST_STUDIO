@@ -466,7 +466,12 @@ QString CmdActionModule::commandName() const
             }
         }
         break;
-
+    case ModuleCommands::RESET_LINE_1:
+        text += tr("СбрЛин1");
+        break;
+    case ModuleCommands::RESET_LINE_2:
+        text += tr("СбрЛин2");
+        break;
     case ModuleCommands::GET_STATUS_WORD:
         text += tr("ПолСС");
         break;

@@ -8,12 +8,17 @@
         <command type="GO_TO_BRANCH" id="1493186321936"/>
         <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
         <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493803090978" module="MKO" command="START_MKO">
+            <input_params/>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
-        <item id="1493186321935" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493186321935" down="1493803090978" right="-1" under_arrow="-1"/>
         <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
+        <item id="1493803090978" down="1493186321936" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

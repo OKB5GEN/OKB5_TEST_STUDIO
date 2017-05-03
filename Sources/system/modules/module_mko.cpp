@@ -1142,6 +1142,9 @@ void ModuleMKO::onApplicationFinish()
 
 bool ModuleMKO::isPhysicallyActive() const
 {
-    int TODO;
+    int TODO; // MKO физически активен, если
+    //-на него подали питание
+    //-TmkOpen() сработал
+    //-не очень понятно к чему лепить tmkconfig, bcreset, bcdefbase и входит ли это в "физическую инициализацию"
     return false;
 }

@@ -48,7 +48,7 @@
         </command>
         <command type="ACTION_MODULE" id="1493796620335" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="2" value="1"/>
+                <param name="Module address" type="6" value="1"/>
             </input_params>
             <output_params>
                 <param name="Module address" type="10" value="AddrC"/>
@@ -56,7 +56,7 @@
         </command>
         <command type="ACTION_MODULE" id="1493796667143" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="2" value="2"/>
+                <param name="Module address" type="6" value="2"/>
             </input_params>
             <output_params>
                 <param name="Module address" type="10" value="AddrD"/>
@@ -88,6 +88,14 @@
             <input_params/>
             <output_params/>
         </command>
+        <command type="ACTION_MODULE" id="1493802373630" module="OTD" command="RESET_LINE_1">
+            <input_params/>
+            <output_params/>
+        </command>
+        <command type="ACTION_MODULE" id="1493802382143" module="OTD" command="RESET_LINE_2">
+            <input_params/>
+            <output_params/>
+        </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
@@ -98,7 +106,7 @@
         <item id="1493724109576" down="1493724128025" right="-1" under_arrow="-1"/>
         <item id="1493724128025" down="1493796620335" right="1493724128031" under_arrow="-1"/>
         <item id="1493724128031" down="1493724351617" right="-1" under_arrow="-1"/>
-        <item id="1493724347720" down="1493724347722" right="-1" under_arrow="-1"/>
+        <item id="1493724347720" down="1493802373630" right="-1" under_arrow="-1"/>
         <item id="1493724347722" down="1493724349859" right="-1" under_arrow="-1"/>
         <item id="1493724349859" down="1493724384673" right="-1" under_arrow="-1"/>
         <item id="1493724349862" down="1493186321945" right="-1" under_arrow="-1"/>
@@ -115,5 +123,7 @@
         <item id="1493796761764" down="1493724351617" right="-1" under_arrow="-1"/>
         <item id="1493796844900" down="1493797510008" right="1493186321936" under_arrow="1493186321936"/>
         <item id="1493797510008" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493802373630" down="1493802382143" right="-1" under_arrow="-1"/>
+        <item id="1493802382143" down="1493724347722" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
