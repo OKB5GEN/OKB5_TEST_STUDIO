@@ -10,14 +10,6 @@ class ModuleMKO: public AbstractModule
     Q_OBJECT
 
 public:
-    enum KitID
-    {
-        NO_KIT      = 0x00,
-        MAIN_KIT    = 0x01,
-        RESERVE_KIT = 0x02,
-        ALL_KITS = MAIN_KIT | RESERVE_KIT
-    };
-
     enum Subaddress
     {
         ANGLE_SENSOR_SUBADDRESS = 0x06,
@@ -41,7 +33,7 @@ public:
     void onApplicationFinish();
 
 public slots:
-    void processCommand(const Transaction& params) override;
+    void processCommand(const Transaction& request) override;
     void onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state);
     void onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state);
 
@@ -54,11 +46,8 @@ private slots:
 
     void processResponseWord(uint16_t responseWord, QStringList& errors);
 
-    // TODO refactor
     void startMKO();
-    void startMKO1();
-    void stopMKO();
-    void stopMKO1();
+    void stopMKO(bool onAppFinish);
 
 private:
     struct AxisData
@@ -67,6 +56,21 @@ private:
         int32_t steps;
         int16_t velocity;
         int16_t current;
+    };
+
+    struct KitState
+    {
+        bool isOnBUPKit;
+        bool isOnMKOKit;
+        bool isOnBUPDrives;
+        bool isConfigured;
+        bool isBCMode;
+        bool isSelected;
+        bool isReady;
+        int tmkID;
+        uint16_t address;
+
+        KitState();
     };
 
     // КС - "командное слово" - двухбайтовая "шапка" операции, мы отправляем на БУП
@@ -108,15 +112,17 @@ private:
     //2.1.9 Операция обмена при выдаче из БКУ в ОУ БУП НА массива для подачи питания на ДУ с использованием формата 1. Используется подадрес 06
     void sendAngleSensorData(uint16_t address);
 
-    bool mMainKitEnabled;
-    bool mReserveKitEnabled;
+    QString canSendRequest(const Transaction& request) const;
 
-    //TODO remove
+    void sendLocalMessage(const QString& error = ""); // send response to cyclogram without sending any data to real device
+    void updateMKO(KitState& changedKit, bool isOn, const KitState& otherKit);
+
     uint16_t mWordsToReceive;
     uint16_t mWordsSent;
-    KitID mActiveKits = NO_KIT;
-
     int mRepeatedRequests;
+    bool mTMKOpened;
+    KitState mMainKitState;
+    KitState mReserveKitState;
 };
 
 #endif // MODULE_MKO_H

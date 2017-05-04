@@ -4,276 +4,43 @@
 
 #include <QTimer>
 
-#include <windows.h>
+//#include <windows.h>
 #include "Sources/system/WDMTMKv2.cpp"
 
-/*
-
-#include <stdio.h>
-#include <string.h>
-
-#define _TMK1553B_MRT
-#include "wdmtmkv2.cpp"
-
-#ifdef TMK_CONFIGURATION_TABLE
-TTmkConfigData aTmkConfig[MAX_TMK_NUMBER+1];
-#endif
-
-#define TMK_FILE_OPEN_ERROR 21
-#define TMK_FILE_READ_ERROR 22
-#define TMK_FILE_FORMAT_ERROR 23
-#define TMK_UNKNOWN_TYPE 24
-
-int TmkInit(char *pszTMKFileName)
-{
- int nResult;
- int hTMK;
- char achParams[81];
- FILE *hTMKFile;
-
-#ifdef TMK_CONFIGURATION_TABLE
- for (hTMK = 0; hTMK <= MAX_TMK_NUMBER; hTMK++)
- {
-  aTmkConfig[hTMK].nType = -1;
-  aTmkConfig[hTMK].szName[0] = '\0';
-  aTmkConfig[hTMK].wPorts1 = aTmkConfig[hTMK].wPorts2 = 0;
-  aTmkConfig[hTMK].wIrq1 = aTmkConfig[hTMK].wIrq2 = 0;
- }
-#endif
-// if (TmkOpen())
-//  return TMK_FILE_OPEN_ERROR;
- if ((hTMKFile = fopen(pszTMKFileName, "r")) == NULL)
-  return TMK_FILE_OPEN_ERROR;
- while (1)
- {
-  if (fgets(achParams, 80, hTMKFile) == NULL)
-  {
-   if (feof(hTMKFile))
-    break;
-   else
-   {
-    nResult = TMK_FILE_READ_ERROR;
-    goto ExitTmkInit;
-   }
-  }
-  if (achParams[0] == '*')
-   break;
-  if (sscanf(achParams, "%u", &hTMK) != 1)
-   continue;
-  if (hTMK > tmkgetmaxn())
-  {
-   nResult = TMK_FILE_FORMAT_ERROR;
-   goto ExitTmkInit;
-  }
-  nResult = tmkconfig(hTMK);
-#ifdef TMK_CONFIGURATION_TABLE
-  tmkgetinfo(&(aTmkConfig[hTMK]));
-#endif
-  if (nResult)
-   break;
- } // endwhile(!feof())
- ExitTmkInit:
- fclose(hTMKFile);
- return nResult;
-}
-
-////////////////////////////////////////////////////////////////////////////
-#include <windows.h>
-#include <stdio.h>
-#include <conio.h>
-#include "tmkinit.c"
-
-#define RT_ADDR 10 // RT address
-
-int i;
-unsigned short awBuf[32];
-
-const int fInstMode = 1;
-HANDLE hBcEvent;
-TTmkEventData tmkEvD;
-
-int nTmk;
-
-TMK_DATA wBase, wMaxBase, wSubAddr, wLen, wState, wStatus;
-unsigned long dwGoodStarts = 0, dwBusyStarts = 0, dwErrStarts = 0, dwStatStarts = 0;
-unsigned long dwStarts = 0L;
-
-// WaitInt returns 0 when it received and processed interrupt
-// or returns 1 when there is an error or an user abort
-
-int WaitInt(TMK_DATA wCtrlCode)
-{
-// Wait for an interrupt
-  switch (WaitForSingleObject(hBcEvent, 1000))
-  {
-  case WAIT_OBJECT_0:
-    ResetEvent(hBcEvent);
-    break;
-  case WAIT_TIMEOUT:
-    printf("Interrupt timeout error\n");
-    return 1;
-  default:
-    printf("Interrupt wait error\n");
-    return 1;
-  }
-
-// Get interrupt data
-// We do not need to check tmkEvD.nInt because bcstartx with CX_NOSIG
-// guarantees us only single interrupt of single type nInt == 3
-  tmkgetevd(&tmkEvD);
-
-  if (tmkEvD.bcx.wResultX & SX_IB_MASK)
-  {
-// We have set bit(s) in Status Word
-    if (((tmkEvD.bcx.wResultX & SX_ERR_MASK) == SX_NOERR) ||
-        ((tmkEvD.bcx.wResultX & SX_ERR_MASK) == SX_TOD))
-    {
-// We have either no errors or Data Time Out (No Data) error
-      wStatus = bcgetansw(wCtrlCode);
-      if (wStatus & BUSY_MASK)
-// We have BUSY bit set
-        ++dwBusyStarts;
-      else
-//We have unknown bit(s) set
-        ++dwStatStarts;
-      if (kbhit())
-        return 1;
-    }
-    else
-    {
-// We have an error
-      ++dwErrStarts;
-      if (kbhit())
-        return 1;
-    }
-  }
-  else if (tmkEvD.bcx.wResultX & SX_ERR_MASK)
-  {
-// We have an error
-    ++dwErrStarts;
-    if (kbhit())
-      return 1;
-  }
-  else
-  {
-// We have a completed message
-    ++dwGoodStarts;
-  }
-
-  if (dwStarts%1000L == 0L)
-  {
-    printf("\rGood: %ld, Busy: %ld, Error: %ld, Status: %ld", dwGoodStarts, dwBusyStarts, dwErrStarts, dwStatStarts);
-  }
-  ++dwStarts;
-//  printf("%ld %04X\n", dwGoodStarts, bcgetw(0));
-//  Sleep(500);
-  return 0;
-}
-
-void main()
-{
-// Open driver
-  if (TmkOpen())
-  {
-    printf("TmkOpen error\n");
-    goto stop;
-  }
-// Read configuration file
-  if (TmkInit("bc.cfg"))
-  {
-    printf("TmkInit error\n");
-    goto stop;
-  }
-// Find first configured device
-  for (nTmk = 0; nTmk <= MAX_TMK_NUMBER; ++nTmk)
-    if (!tmkselect(nTmk))
-      break;
-  if (nTmk > MAX_TMK_NUMBER)
-  {
-    printf("tmkselect error\n");
-    goto stop;
-  }
-// Try to reset in BC mode
-  if (bcreset())
-  {
-    printf("bcreset error\n");
-    goto stop;
-  }
-
-// Define event for interrupts
-  hBcEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-  if (!hBcEvent)
-  {
-    printf("CreateEvent error\n");
-    goto stop;
-  }
-  tmkdefevent(hBcEvent, TRUE);
-
-  wBase = 0;
-  wMaxBase = bcgetmaxbase();
-  srand(1);
-
-  while (!kbhit())
-  {
-// Select base
-    if (wBase > wMaxBase)
-      wBase = 0;
-    bcdefbase(wBase);
-
-// Prepare data to RT
-    wSubAddr = rand() & 0x1F;
-    if (fInstMode)
-      wSubAddr |= 0x10;
-    if (wSubAddr == 0x00 || wSubAddr == 0x1F)
-      continue;
-    wLen = rand() & 0x1F;
-    if (wLen == 0)
-      wLen = 32;
-    for (i = 0; i < wLen; ++i)
-      awBuf[i] = (wSubAddr<<8) | i;
-
-// Try to send data to RT until it answers with Clear Status
-    bcputw(0, CW(RT_ADDR, RT_RECEIVE, wSubAddr, wLen));
-    bcputblk(1, awBuf, wLen);
-    do
-    {
-      bcstartx(wBase, DATA_BC_RT | CX_STOP | CX_BUS_A | CX_NOSIG);
-      if (WaitInt(DATA_BC_RT))
-        goto stop;
-    }
-    while ((tmkEvD.bcx.wResultX & (SX_ERR_MASK | SX_IB_MASK)) != 0);
-
-// Try to receive data from RT until it answers with Clear Status
-    bcputw(0, CW(RT_ADDR, RT_TRANSMIT, wSubAddr, wLen));
-    do
-    {
-      bcstartx(wBase, DATA_RT_BC | CX_STOP | CX_BUS_A | CX_NOSIG);
-      if (WaitInt(DATA_RT_BC))
-        goto stop;
-    }
-    while ((tmkEvD.bcx.wResultX & (SX_ERR_MASK | SX_IB_MASK)) != 0);
-
-// Check data from RT
-    bcgetblk(2, awBuf, wLen);
-    for (i = 0; i < wLen; ++i)
-    {
-      if (awBuf[i] != ((wSubAddr<<8) | i))
-      {
-        printf("\nCW:%04X Data error [%02d]=%04X\n", bcgetw(0), i, awBuf[i]);
-      }
-    }
-  }
-  stop:
-  printf("\nGood: %ld, Busy: %ld, Error: %ld, Status: %ld\n", dwGoodStarts, dwBusyStarts, dwErrStarts, dwStatStarts);
-  bcreset();
-// Close all opened things
-  CloseHandle(hBcEvent);
-  tmkdone(ALL_TMKS);
-  TmkClose();
-}
+/* Предполагаемая логика работы комплектов МКО:
+ *
+ * 1. По-нормальному питание на оба комплекта дается один раз на старте приложения и выключается при его завершении.
+ * 2. В пользовательских циклограммах питание МКО дергаться не должно (если дергают - стопаем МКО с ошибкой).
+ * 3. "Физически активным" МКО является в двух случаях:
+ *    - если он не стартован (все команды, кроме startMKO, будут забриваться)
+ *    - если запитаны и сконфигурированы оба комплекта (будут забриваться только если пытаться слать команды на незапитанные комплекты БУПа)
+ * 4. Сообщения всегда шлются через один комплект. Если включено два, то шлется всегда в основной
+ * 5. Можно слать и в оба, но хз как разрешать коллизии и откуда вычитывать ответ.
 */
 
-HANDLE hEvent, hEvent1; //TODO some internal MKO shit here
+ModuleMKO::KitState::KitState():
+    isOnBUPKit(false),
+    isOnMKOKit(false),
+    isOnBUPDrives(false),
+    isConfigured(false),
+    isBCMode(false),
+    isSelected(false),
+    isReady(false),
+    tmkID(0)
+{
+//    int tmkselected()
+
+//    TMK_DATA tmkgetmode()
+
+//    returns:
+//    #define BC_MODE 0x00
+//    #define RT_MODE 0x80
+//    #define MT_MODE 0x100
+//    #define MRT_MODE 0x280
+//    #define UNDEFINED_MODE 0xFFFF
+}
+
+///////////////////////////////////
 
 namespace
 {
@@ -281,6 +48,7 @@ namespace
     static const uint16_t RESERVE_KIT_ADDRESS = 0x1D;
     static const int RECEIVE_DELAY = 100; // msec
     static const int PROTECTION_DELAY = 100; // msec
+    static const int LOCAL_MESSAGE_SEND_DELAY = 10; // (msec) delay for sending response to cyclogram in case of local soft/state errors
     static const int RECEIVE_BUFFER_SIZE = 100; // words
     static const int MAX_REPEAT_REQUESTS = 5; // Макс кол-во перезапросов при получении "Нет возможности обмена"
 
@@ -293,23 +61,25 @@ namespace
 
 ModuleMKO::ModuleMKO(QObject* parent):
     AbstractModule(parent),
-    mMainKitEnabled(false),
-    mReserveKitEnabled(false),
     mWordsToReceive(0),
     mWordsSent(0),
-    mActiveKits(NO_KIT),
-    mRepeatedRequests(0)
+    mRepeatedRequests(0),
+    mTMKOpened(false)
 {
+    mMainKitState.address = MAIN_KIT_ADDRESS;
+    mReserveKitState.address = RESERVE_KIT_ADDRESS;
 }
 
 ModuleMKO::~ModuleMKO()
 {
-    //stopMKO(); // TODO remove
+    if (mTMKOpened)
+    {
+        LOG_ERROR(QString("MKO not stopped!"));
+    }
 }
 
 void ModuleMKO::readResponse()
 {
-    // хитрожопая логика вычитывания: надо вычиывать столько, сколько послал и после этого будут лежать ответное слово + данные (если есть)
     // parsing response word for errors
     uint16_t buffer[RECEIVE_BUFFER_SIZE];
     bcgetblk(mWordsSent, &buffer, mWordsToReceive);
@@ -331,7 +101,7 @@ void ModuleMKO::readResponse()
     {
         for (auto it = errors.begin(); it != errors.end(); ++it)
         {
-            LOG_ERROR(QString("MKO response error: %1").arg(*it));
+            LOG_ERROR(QString("MKO response word error: %1").arg(*it));
         }
 
         if (errors.size() == 1 && errors.at(0) == ERR_RESPONSE_NOT_READY)
@@ -343,6 +113,7 @@ void ModuleMKO::readResponse()
             else
             {
                 ++mRepeatedRequests;
+                LOG_WARNING(QString("Restarting receive timer..."));
                 QTimer::singleShot(RECEIVE_DELAY, this, SLOT(readResponse()));
                 return;
             }
@@ -583,7 +354,7 @@ void ModuleMKO::readResponse()
         break;
 
     default:
-        LOG_ERROR(QString("MKO messages internal error"));
+        LOG_ERROR(QString("MKO unknown command error"));
         break;
     }
 
@@ -595,135 +366,158 @@ void ModuleMKO::sendResponse()
     emit commandResult(mCurrentTransaction);
 }
 
-void ModuleMKO::startMKO1()
+void ModuleMKO::sendLocalMessage(const QString& error)
 {
-    QString data;
-    hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    hEvent1 = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (!hEvent1)
-    {
-        data += "МКО: CreateEvent1() не запустился!\n";
-        LOG_ERROR(QString("CreateEvent() failed!"));
-    }
-
-    if (!hEvent)
-    {
-        data += "МКО: CreateEvent() не запустился!\n";
-        LOG_ERROR(QString("CreateEvent() failed!"));
-    }
-
-    if (TmkOpen())
-    {
-        data += "МКО: Библиотека не запустилась!\n";
-        LOG_ERROR(QString("TmkOpen() failed!"));
-    }
-    else
-    {
-        LOG_INFO(QString("TmkOpen() successful!"));
-    }
-
-    if (tmkconfig(1) != 0)
-    {
-        data += "МКО: Конфигурация МКО 1 не произошла!\n";
-        LOG_ERROR(QString("MKO 1 config failed"));
-    }
-    else
-    {
-        LOG_INFO(QString("tmkconfig1() successful!"));
-    }
-
-    if (tmkconfig(0) != 0)
-    {
-        data += "МКО: Конфигурация МКО 0 не произошла!\n";
-        LOG_ERROR(QString("MKO 0 config failed"));
-    }
-    else
-    {
-        LOG_INFO(QString("tmkconfig0() successful!\n"));
-    }
-
-    if (bcreset() != 0)
-    {
-        data += "МКО: Перезагрузка МКО не произошла!\n";
-        LOG_ERROR(QString("MKO reset failed"));
-    }
+    mCurrentTransaction.error = error;
+    QTimer::singleShot(LOCAL_MESSAGE_SEND_DELAY, this, SLOT(sendResponse()));
 }
 
 void ModuleMKO::startMKO()
 {
-    QString data;
-    hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    if (!hEvent)
+    LOG_INFO(QString("Starting MKO..."));
+
+    // 1. Check MKO kits power supply is on. The must be both enbled
+    if (!mMainKitState.isOnMKOKit)
     {
-        data += "МКО: CreateEvent() не запустился!\n";
-        LOG_ERROR(QString("CreateEvent() failed!"));
+        sendLocalMessage(QString("MKO main kit power supply is off"));
+        return;
     }
 
-    if (TmkOpen())
+    if (!mReserveKitState.isOnMKOKit)
     {
-        data += "МКО: Библиотека МКО не запустилась!\n";
-        LOG_ERROR(QString("TmkOpen() failed!"));
-    }
-    else
-    {
-        LOG_INFO(QString("TmkOpen() successful!"));
+        sendLocalMessage(QString("MKO reserve kit power supply is off"));
+        return;
     }
 
-    if (tmkconfig(0) != 0)
+    // 2.Dynamically load device driver library
+    if (!mTMKOpened && TmkOpen() != 0)
     {
-        data += "МКО: Конфигурация МКО не произошла!\n";
-        LOG_ERROR(QString("MKO config failed"));
-    }
-    else
-    {
-        LOG_INFO(QString("tmkconfig() successful!"));
+        sendLocalMessage(QString("TMK library not loaded"));
+        return;
     }
 
-    if (bcreset() != 0)
+    mTMKOpened = true;
+
+    // 3.Configure MKO main kit (it also selects this kit as "current")
+    if (!mMainKitState.isConfigured && tmkconfig(mMainKitState.tmkID) != 0)
     {
-        data += "МКО: Перезагрузка МКО не произошла!\n";
-        LOG_ERROR(QString("MKO reset failed"));
+        sendLocalMessage(QString("TMK main kit device (%1) configuration failed").arg(mMainKitState.tmkID));
+        return;
     }
 
-    mMainKitEnabled = true;
+    mMainKitState.isConfigured = true;
+
+    // 4.Reset MKO main kit to "channel controller" mode
+    if (!mMainKitState.isBCMode && bcreset() != 0)
+    {
+        sendLocalMessage(QString("TMK main kit device (%1) set to 'channel controller' mode failed").arg(mMainKitState.tmkID));
+        return;
+    }
+
+    mMainKitState.isBCMode = true;
+    mMainKitState.isReady = true; // Main kit is ready to send and receive messages
+
+    // 5.Configure MKO reserve kit (it also selects this kit as "current")
+    if (!mReserveKitState.isConfigured && tmkconfig(mReserveKitState.tmkID) != 0)
+    {
+        sendLocalMessage(QString("TMK reserve kit device (%1) configuration failed").arg(mReserveKitState.tmkID));
+        return;
+    }
+
+    mReserveKitState.isConfigured = true;
+
+    // 6.Reset MKO reserve kit to "channel controller" mode
+    if (!mReserveKitState.isBCMode && bcreset() != 0)
+    {
+        sendLocalMessage(QString("TMK reserve kit device (%1) set to 'channel controller' mode failed").arg(mReserveKitState.tmkID));
+        return;
+    }
+
+    mReserveKitState.isBCMode = true;
+    mReserveKitState.isReady = true; // Reserve kit is ready to send and receive messages
+
+    // 7. Select main kit as current device
+    if (!mMainKitState.isSelected && tmkselect(mMainKitState.tmkID) != 0)
+    {
+        sendLocalMessage(QString("TMK main kit device (%1) not selected").arg(mMainKitState.tmkID));
+        return;
+    }
+
+    mMainKitState.isSelected = true;
+    mReserveKitState.isSelected = false;
+
+    LOG_INFO(QString("MKO started"));
+
+    sendLocalMessage();
 }
 
-void ModuleMKO::stopMKO()
+void ModuleMKO::stopMKO(bool onAppFinish)
 {
-    LOG_INFO(QString("Stopping MKO"));
-    mMainKitEnabled = false; //TODO
-    TmkClose();
-    CloseHandle(hEvent);
-}
+    if (!mTMKOpened)
+    {
+        if (!onAppFinish)
+        {
+            LOG_WARNING(QString("Trying to stop MKO, when it is already stopped"));
+            sendLocalMessage();
+        }
 
-void ModuleMKO::stopMKO1()
-{
-    LOG_INFO(QString("Stopping MKO 1"));
+        return;
+    }
+    else if (onAppFinish)
+    {
+        LOG_WARNING(QString("MKO started, but was not stopped with application finish cyclogram!"));
+    }
+
+    LOG_INFO(QString("Stopping MKO..."));
+
+    if (mMainKitState.isSelected || mReserveKitState.isSelected)
+    {
+        bcreset(); //TODO it was in example, I dont'k know for, maybe for some implicit USB cleanup (in addition to reset to BC mode)
+    }
+
+    // 1. Release all TMK devices
+    tmkdone(ALL_TMKS);
+
+    // 2. Clear devices states
+    mMainKitState.isBCMode = false;
+    mMainKitState.isConfigured = false;
+    mMainKitState.isReady = false;
+    mMainKitState.isSelected = false;
+
+    mReserveKitState.isBCMode = false;
+    mReserveKitState.isConfigured = false;
+    mReserveKitState.isReady = false;
+    mReserveKitState.isSelected = false;
+
+    // 3. Unload device driver library
     TmkClose();
-    CloseHandle(hEvent);
-    CloseHandle(hEvent1);
+
+    mTMKOpened = false;
+
+    LOG_INFO(QString("MKO stopped"));
+
+    sendLocalMessage();
 }
 
 void ModuleMKO::processResponseWord(uint16_t responseWord, QStringList& errors)
 {
     LOG_INFO(QString("Response word is 0x%1").arg(QString::number(responseWord, 16)));
 
-    //TODO use ADDRESS_MASK etc instead of bit shifts
-    uint16_t x;
-
     uint16_t address;
-    if (mMainKitEnabled)
+    if (mMainKitState.isSelected)
     {
-        address = MAIN_KIT_ADDRESS;
+        address = mMainKitState.address;
     }
-    else if (mReserveKitEnabled)
+    else if (mReserveKitState.isSelected)
     {
-        address = RESERVE_KIT_ADDRESS;
+        address = mReserveKitState.address;
     }
     else
     {
         LOG_ERROR(QString("Response received but no enabled BUP kit found"));
     }
+
+    int TODO; // what in case of two kits are enabled simultaneously?
 
     if (responseWord >> 11 != address)
     {
@@ -731,6 +525,8 @@ void ModuleMKO::processResponseWord(uint16_t responseWord, QStringList& errors)
         errors.append(ERR_ADDR_MISMATCH);
     }
 
+    //TODO use ADDRESS_MASK etc instead of bit shifts
+    uint16_t x;
     x = responseWord << 5;
     x = x >> 15;
     if (x == 1)
@@ -780,7 +576,7 @@ void ModuleMKO::sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* d
         LOG_INFO(QString("Data: %1").arg(dataStr));
     }
 
-    //#define CW(ADDR,DIR,SUBADDR,NWORDS) ((TMK_DATA)(((ADDR)<<11)|(DIR)|((SUBADDR)<<5)|((NWORDS)&0x1F)))
+    //Why not use #define CW(ADDR,DIR,SUBADDR,NWORDS) ((TMK_DATA)(((ADDR)<<11)|(DIR)|((SUBADDR)<<5)|((NWORDS)&0x1F))) ?
 
     uint16_t commandWord = (address << 11) + RT_RECEIVE + (subaddress << 5) + (wordsCount & NWORDS_MASK);
     bcdefbase(0);
@@ -933,7 +729,7 @@ void ModuleMKO::sendAngleSensorData(uint16_t address)
     data[0] = 0;
     uint16_t wordsCount = 2;
 
-    if (address == MAIN_KIT_ADDRESS)
+    if (address == mMainKitState.address)
     {
         data[1] = PS_FROM_MAIN_KIT;
     }
@@ -957,27 +753,82 @@ void ModuleMKO::sendAngleSensorData(uint16_t address)
     sendDataToBUP(address, ANGLE_SENSOR_SUBADDRESS, data, wordsCount);
 }
 
-void ModuleMKO::processCommand(const Transaction& params)
+QString ModuleMKO::canSendRequest(const Transaction& request) const
+{
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(request.commandID);
+
+    if (command == ModuleCommands::START_MKO || command == ModuleCommands::STOP_MKO)
+    {
+        return "";
+    }
+
+    // all commands excluding start/stop MKO must pass this check
+    if (!mTMKOpened)
+    {
+        return QString("MKO not started");
+    }
+
+    if (!mMainKitState.isSelected && !mReserveKitState.isSelected)
+    {
+        return QString("No MKO Kit enabled");
+    }
+
+    if (!mMainKitState.isOnBUPDrives || !mReserveKitState.isOnBUPDrives)
+    {
+        return QString("BUP drives power supply is off");
+    }
+
+    if (!mMainKitState.isOnBUPKit && !mReserveKitState.isOnBUPKit)
+    {
+        return QString("No BUP kit enabled");
+    }
+
+    if (mMainKitState.isSelected && !mMainKitState.isOnBUPKit)
+    {
+        return QString("MKO internal main kit logic error 1");
+    }
+
+    if (!mMainKitState.isSelected && mMainKitState.isOnBUPKit)
+    {
+        return QString("MKO internal main kit logic error 2");
+    }
+
+    if (mReserveKitState.isSelected && !mReserveKitState.isOnBUPKit)
+    {
+        return QString("MKO internal reserve kit logic error 1");
+    }
+
+    if (!mReserveKitState.isSelected && mReserveKitState.isOnBUPKit)
+    {
+        return QString("MKO internal reserve kit logic error 2");
+    }
+
+    return "";
+}
+
+void ModuleMKO::processCommand(const Transaction& request)
 {
     mCurrentTransaction.clear();
+    mCurrentTransaction = request;
 
-    uint16_t address = 0;
-    if (mMainKitEnabled)
+    QString error = canSendRequest(request);
+    if (!error.isEmpty())
     {
-        address = MAIN_KIT_ADDRESS;
-    }
-    else if (mReserveKitEnabled)
-    {
-        address = RESERVE_KIT_ADDRESS;
-    }
-    else
-    {
-        mCurrentTransaction.error = QString("No MKO Kit enabled"); //TODO define error codes internal or hardware
-        emit commandResult(mCurrentTransaction);
+        sendLocalMessage(error);
         return;
     }
 
-    ModuleCommands::CommandID command = ModuleCommands::CommandID(params.commandID);
+    uint16_t address = 0;
+    if (mMainKitState.isSelected)
+    {
+        address = mMainKitState.address;
+    }
+    else if (mReserveKitState.isSelected)
+    {
+        address = mReserveKitState.address;
+    }
+
+    ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     switch (command)
     {
@@ -996,7 +847,7 @@ void ModuleMKO::processCommand(const Transaction& params)
             AxisData psy;
             AxisData nu;
 
-            for (auto it = params.inputParams.begin(); it != params.inputParams.end(); ++it)
+            for (auto it = mCurrentTransaction.inputParams.begin(); it != mCurrentTransaction.inputParams.end(); ++it)
             {
                 uint32_t type = it.key();
                 int32_t value = int32_t(it.value().toDouble());
@@ -1037,27 +888,25 @@ void ModuleMKO::processCommand(const Transaction& params)
         break;
     case ModuleCommands::RECEIVE_COMMAND_ARRAY:
         {
-            mCurrentTransaction.outputParams = params.outputParams;
             receiveCommandArray(address);
         }
         break;
     case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
         {
-            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
+            Subaddress subaddress = Subaddress(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
             sendTestArrayForChannel(address, subaddress);
         }
         break;
     case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            mCurrentTransaction.outputParams = params.outputParams;
-            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
+            Subaddress subaddress = Subaddress(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveTestArrayForChannel(address, subaddress);
         }
         break;
     case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
         {
             AxisData data;
-            for (auto it = params.inputParams.begin(); it != params.inputParams.end(); ++it)
+            for (auto it = mCurrentTransaction.inputParams.begin(); it != mCurrentTransaction.inputParams.end(); ++it)
             {
                 uint32_t type = it.key();
                 int32_t value = int32_t(it.value().toDouble());
@@ -1081,14 +930,13 @@ void ModuleMKO::processCommand(const Transaction& params)
                 }
             }
 
-            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
+            Subaddress subaddress = Subaddress(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
             sendCommandArrayForChannel(address, subaddress, data);
         }
         break;
     case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            mCurrentTransaction.outputParams = params.outputParams;
-            Subaddress subaddress = Subaddress(params.inputParams.value(SystemState::SUBADDRESS).toInt());
+            Subaddress subaddress = Subaddress(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
             receiveCommandArrayForChannel(address, subaddress);
         }
         break;
@@ -1106,14 +954,13 @@ void ModuleMKO::processCommand(const Transaction& params)
 
     case ModuleCommands::STOP_MKO:
         {
-            stopMKO();
+            stopMKO(false);
         }
         break;
 
     default:
         {
-            mCurrentTransaction.error = QString("Unknown MKO command id=%1").arg(int(command));
-            emit commandResult(mCurrentTransaction);
+            sendLocalMessage(QString("MKO: Unknown command id=%1").arg(int(command)));
             return;
         }
         break;
@@ -1121,42 +968,175 @@ void ModuleMKO::processCommand(const Transaction& params)
 
     if (mWordsToReceive > RECEIVE_BUFFER_SIZE)
     {
-        mCurrentTransaction.error = QString("Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE);
-        emit commandResult(mCurrentTransaction);
+        sendLocalMessage(QString("MKO: Receive buffer overflow: Requred size=%1, Available size=%2").arg(mWordsToReceive).arg(RECEIVE_BUFFER_SIZE));
         return;
-    }
-
-    mCurrentTransaction.moduleID = params.moduleID;
-    mCurrentTransaction.commandID = command;
-    mCurrentTransaction.error.clear();
-
-    if (command == ModuleCommands::START_MKO || command == ModuleCommands::STOP_MKO)
-    {
-        emit commandResult(mCurrentTransaction);
     }
 }
 
 void ModuleMKO::onApplicationFinish()
 {
-    int TODO; // check state and write errors/warnings
-    // stopMKO, close hanles etc
+    stopMKO(true);
 }
 
 bool ModuleMKO::isPhysicallyActive() const
 {
-    int TODO; // MKO физически активен, если
-    //-на него подали питание
-    //-TmkOpen() сработал
-    //-не очень понятно к чему лепить tmkconfig, bcreset, bcdefbase и входит ли это в "физическую инициализацию"
-    return false;
+    if (mTMKOpened)
+    {
+        return (mMainKitState.isReady && mReserveKitState.isReady);
+    }
+
+    return true; // if startMKO() not called, module is physically active to receive startMKO() calls
 }
 
 void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state)
 {
-    int TODO;
+    switch (channel)
+    {
+    case ModuleCommands::BUP_MAIN:
+        {
+            mMainKitState.isOnBUPKit = (state == ModuleCommands::POWER_ON);
+
+            if (mTMKOpened && isPhysicallyActive())
+            {
+                if (mMainKitState.isOnBUPKit) // if main BUP kit become enabled, switch MKO to it
+                {
+                    if (tmkselect(mMainKitState.tmkID) == 0)
+                    {
+                        mMainKitState.isSelected = true;
+                    }
+                    else
+                    {
+                        LOG_ERROR(QString("MKO main kit not selected"));
+                        mMainKitState.isSelected = false;
+                    }
+
+                    mReserveKitState.isSelected = false;
+                }
+                else if (mReserveKitState.isOnBUPKit)  // if main BUP kit become disabled and BUP reserve kit is still enable
+                {
+                    if (tmkselect(mReserveKitState.tmkID) == 0)
+                    {
+                        mReserveKitState.isSelected = true;
+                    }
+                    else
+                    {
+                        LOG_ERROR(QString("MKO reserve kit not selected 1"));
+                        mReserveKitState.isSelected = false;
+                    }
+
+                    mMainKitState.isSelected = false;
+                }
+            }
+        }
+        break;
+    case ModuleCommands::BUP_RESERVE:
+        {
+            mReserveKitState.isOnBUPKit = (state == ModuleCommands::POWER_ON);
+
+            if (mTMKOpened && isPhysicallyActive())
+            {
+                if (mReserveKitState.isOnBUPKit) // if reserve BUP kit become enabled
+                {
+                    if (!mMainKitState.isOnBUPKit) // if main BUP kit not enabled, switch MKO to reserve kit
+                    {
+                        if (tmkselect(mReserveKitState.tmkID) == 0)
+                        {
+                            mReserveKitState.isSelected = true;
+                        }
+                        else
+                        {
+                            LOG_ERROR(QString("MKO reserve kit not selected 2"));
+                            mReserveKitState.isSelected = false;
+                        }
+                    }
+                    else
+                    {
+                        mReserveKitState.isSelected = false;
+                    }
+                }
+                else
+                {
+                    mReserveKitState.isSelected = false;
+                }
+            }
+        }
+        break;
+    case ModuleCommands::DRIVE_CONTROL:
+        {
+            mMainKitState.isOnBUPDrives = (state == ModuleCommands::POWER_ON);
+            mReserveKitState.isOnBUPDrives = (state == ModuleCommands::POWER_ON);
+            // selecting MKO kits not performs, because these flags affect only to ability to send commands to BUP
+        }
+        break;
+
+    // these relay states changing is not interesting to MKO
+    case ModuleCommands::UNKNOWN_3:
+    case ModuleCommands::HEATER_LINE_1:
+    case ModuleCommands::HEATER_LINE_2:
+        break;
+    default:
+        break;
+    }
+}
+
+void ModuleMKO::updateMKO(KitState& changedKit, bool isOn, const KitState& otherKit)
+{
+    bool wasOn = changedKit.isOnMKOKit;
+    changedKit.isOnMKOKit = isOn;
+
+    QString kitName;
+    if (changedKit.address == MAIN_KIT_ADDRESS)
+    {
+        kitName = "main";
+    }
+    else
+    {
+        kitName = "reserve";
+    }
+
+    if (wasOn && !isOn) // Active MKO kit power supply was switched off
+    {
+        LOG_ERROR(QString("Stopping MKO because MKO %1 kit power supply was off. Both main and reserve MKO kits must be enabled!").arg(kitName));
+        stopMKO(false); // disable entire MKO kits if one of them was disabled
+        return;
+    }
+
+    if (!wasOn && isOn) // Inactive MKO kit power supply was switched on
+    {
+        if (!mTMKOpened) // MKO kit power supply was on before startMKO call
+        {
+            changedKit.tmkID = (otherKit.isOnMKOKit ? 1 : 0);
+        }
+        else // MKO kit was previously power off, try call startMKO one more time
+        {
+            LOG_ERROR(QString("Unexpected MKO state %1 kit was switched off!").arg(kitName));
+        }
+
+        return;
+    }
 }
 
 void ModuleMKO::onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state)
 {
-    int TODO;
+    switch (channel)
+    {
+    case ModuleCommands::MKO_1:
+        {
+            updateMKO(mMainKitState, (state == ModuleCommands::POWER_ON), mReserveKitState);
+        }
+        break;
+
+    case ModuleCommands::MKO_2:
+        {
+            updateMKO(mReserveKitState, (state == ModuleCommands::POWER_ON), mMainKitState);
+        }
+        break;
+
+    // these relay states changing is not interesting to MKO
+    case ModuleCommands::MKO_3:
+    case ModuleCommands::MKO_4:
+        break;
+    default:
+        break;
+    }
 }
