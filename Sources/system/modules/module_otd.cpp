@@ -175,7 +175,6 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
         }
         break;
 
-
     case ModuleCommands::START_MEASUREMENT_LINE_1:
     case ModuleCommands::START_MEASUREMENT_LINE_2:
     case ModuleCommands::RESET_LINE_1:
@@ -201,29 +200,42 @@ void ModuleOTD::onModuleError()
 
 void ModuleOTD::createResponse(Transaction& response)
 {
-    // fill response
-    int paramsCount = mCurrentTransaction.outputParams.size();
-    int valuesCount = mTemperatureData.size();
-
-    if (paramsCount != valuesCount)
+    switch (mCurrentTransaction.commandID)
     {
-        LOG_ERROR(QString("Request output params count (%1) and values count (%2) mismatch").arg(paramsCount).arg(valuesCount));
-        return;
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+    case ModuleCommands::GET_TEMPERATURE_PT100:
+        {
+            // fill response
+            int paramsCount = mCurrentTransaction.outputParams.size();
+            int valuesCount = mTemperatureData.size();
+
+            if (paramsCount != valuesCount)
+            {
+                LOG_ERROR(QString("Request output params count (%1) and values count (%2) mismatch").arg(paramsCount).arg(valuesCount));
+                return;
+            }
+
+            QMap<uint32_t, QVariant> outputParams;
+            int i = 0;
+            for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
+            {
+                //TODO replace by addResponseParam(it.key(), mTemperatureData[i]); // TODO output params malformed packet!
+                QList<QVariant> list;
+                list.append(it.value());
+                list.append(QVariant(mTemperatureData[i]));
+                outputParams[it.key()] = list;
+                ++i;
+            }
+
+            mCurrentTransaction.outputParams = outputParams;
+        }
+        break;
+
+    default: // just give current transaction data
+        break;
     }
 
-    QMap<uint32_t, QVariant> outputParams;
-    int i = 0;
-    for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
-    {
-        //TODO replace by addResponseParam(it.key(), mTemperatureData[i]); // TODO output params malformed packet!
-        QList<QVariant> list;
-        list.append(it.value());
-        list.append(QVariant(mTemperatureData[i]));
-        outputParams[it.key()] = list;
-        ++i;
-    }
-
-    mCurrentTransaction.outputParams = outputParams;
     response = mCurrentTransaction;
 }
 

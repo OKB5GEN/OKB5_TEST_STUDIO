@@ -534,7 +534,7 @@ void ModulePower::onTransmissionError(uint32_t operationID)
 
 void ModulePower::onTransmissionComplete()
 {
-    if (!mCurrentTransaction.outputParams.isEmpty())
+    //if (!mCurrentTransaction.outputParams.isEmpty())
     {
         emit commandResult(mCurrentTransaction);
     }

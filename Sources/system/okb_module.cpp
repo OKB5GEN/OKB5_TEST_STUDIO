@@ -179,11 +179,11 @@ bool ModuleOKB::processResponse(uint32_t operationID, const QByteArray& request,
             if ((y & MODULE_READY_MASK) == 0)
             {
                 error = QString("Module 0x%1, is not ready").arg(QString::number(mCurrentAddress, 16));
-                addResponseParam(SystemState::MODULE_READY, 1);
+                addResponseParam(SystemState::MODULE_READY, 0);
             }
             else
             {
-                addResponseParam(SystemState::MODULE_READY, 0);
+                addResponseParam(SystemState::MODULE_READY, 1);
             }
 
             if ((y & HAS_ERRORS_MASK) > 0)

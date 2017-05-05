@@ -1096,9 +1096,16 @@ void ModuleMKO::updateMKO(KitState& changedKit, bool isOn, const KitState& other
 
     if (wasOn && !isOn) // Active MKO kit power supply was switched off
     {
-        LOG_ERROR(QString("Stopping MKO because MKO %1 kit power supply was off. Both main and reserve MKO kits must be enabled!").arg(kitName));
-        stopMKO(false); // disable entire MKO kits if one of them was disabled
-        return;
+        if (mTMKOpened)
+        {
+            LOG_ERROR(QString("Stopping MKO because MKO %1 kit power supply was off. Both main and reserve MKO kits must be enabled!").arg(kitName));
+            stopMKO(false); // disable entire MKO kits if one of them was disabled
+            return;
+        }
+        else // MKO is stopped before power supply is off, normal situation
+        {
+
+        }
     }
 
     if (!wasOn && isOn) // Inactive MKO kit power supply was switched on
