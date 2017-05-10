@@ -3,6 +3,7 @@
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
+#include <QMetaEnum>
 
 //#include <windows.h>
 #include "Sources/system/WDMTMKv2.cpp"
@@ -50,7 +51,7 @@ namespace
     static const int PROTECTION_DELAY = 100; // msec
     static const int LOCAL_MESSAGE_SEND_DELAY = 10; // (msec) delay for sending response to cyclogram in case of local soft/state errors
     static const int RECEIVE_BUFFER_SIZE = 100; // words
-    static const int MAX_REPEAT_REQUESTS = 5; // Макс кол-во перезапросов при получении "Нет возможности обмена"
+    static const int MAX_REPEAT_REQUESTS = 10; // Макс кол-во перезапросов при получении "Нет возможности обмена"
 
     static const QString ERR_WRONG_INFO = "Wrong info received"; // "Принята недостоверная информация"
     static const QString ERR_RESPONSE_NOT_READY = "Response not ready"; // "Нет возможности обмена"
@@ -114,7 +115,7 @@ void ModuleMKO::readResponse()
             {
                 ++mRepeatedRequests;
                 LOG_WARNING(QString("Restarting receive timer..."));
-                QTimer::singleShot(RECEIVE_DELAY, this, SLOT(readResponse()));
+                QTimer::singleShot(RECEIVE_DELAY, this, SLOT(resendRequest()));
                 return;
             }
         }
@@ -156,8 +157,9 @@ void ModuleMKO::readResponse()
 
     case ModuleCommands::RECEIVE_COMMAND_ARRAY:
         {
-            LOG_DEBUG(QString("Receive command addray"));
             int offset = 1;
+
+            QMetaEnum metaEnum = QMetaEnum::fromType<SystemState::ParamID>();
 
             QMap<uint32_t, QVariant> outputParams;
             for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
@@ -166,16 +168,12 @@ void ModuleMKO::readResponse()
                 QString variable = it.value().toString();
                 qreal value = 0;
 
-                LOG_DEBUG(QString("Param type %1 variable name is %2").arg(type).arg(variable));
-
                 switch (type)
                 {
                 case SystemState::MODE_PSY:
                     {
                         int16_t v = buffer[0 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_PSY").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[0]=%2").arg(v).arg(buffer[0 + offset]));
                     }
                     break;
                 case SystemState::STEPS_PSY:
@@ -183,40 +181,30 @@ void ModuleMKO::readResponse()
                         int16_t v1 = buffer[1 + offset];
                         int32_t v = buffer[2 + offset] + (v1 << 16);
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_PSY").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[1]=%2 buffer[2]=%3").arg(v).arg(buffer[1]).arg(buffer[2 + offset]));
                     }
                     break;
                 case SystemState::VELOCITY_PSY:
                     {
                         int16_t v = buffer[3 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_PSY").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[3]=%2").arg(v).arg(buffer[3 + offset]));
                     }
                     break;
                 case SystemState::CURRENT_PSY:
                     {
                         int16_t v = buffer[4 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_PSY").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[4]=%2").arg(v).arg(buffer[4 + offset]));
                     }
                     break;
                 case SystemState::ANGLE_PSY:
                     {
                         qreal rawData = buffer[10 + offset];
                         value = rawData * 180 / 65536;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_PSY").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[10]=%2").arg(rawData).arg(buffer[10 + offset]));
                     }
                     break;
                 case SystemState::MODE_NU:
                     {
                         int16_t v = buffer[5 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("MODE_NU").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[5]=%2").arg(v).arg(buffer[5 + offset]));
                     }
                     break;
                 case SystemState::STEPS_NU:
@@ -224,32 +212,24 @@ void ModuleMKO::readResponse()
                         int16_t v1 = buffer[6 + offset];
                         int32_t v = buffer[7 + offset] + (v1 << 16);
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("STEPS_NU").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[6]=%2 buffer[7]=%3").arg(v).arg(buffer[6 + offset]).arg(buffer[7 + offset]));
                     }
                     break;
                 case SystemState::VELOCITY_NU:
                     {
                         int16_t v = buffer[8 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("VELOCITY_NU").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[8]=%2").arg(v).arg(buffer[8 + offset]));
                     }
                     break;
                 case SystemState::CURRENT_NU:
                     {
                         int16_t v = buffer[9 + offset];
                         value = v;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("CURRENT_NU").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[9]=%2").arg(v).arg(buffer[9 + offset]));
                     }
                     break;
                 case SystemState::ANGLE_NU:
                     {
                         qreal rawData = buffer[11 + offset];
                         value = rawData * 180 / 65536;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("ANGLE_NU").arg(value));
-                        LOG_DEBUG(QString("v=%1 buffer[11]=%2").arg(rawData).arg(buffer[11 + offset]));
                     }
                     break;
                 case SystemState::SENSOR_FLAG:
@@ -258,7 +238,6 @@ void ModuleMKO::readResponse()
                         tmp = tmp << 3;
                         tmp = tmp >> 15;
                         value = tmp;
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("SENSOR_FLAG").arg(value));
                     }
                     break;
                 case SystemState::TEMPERATURE:
@@ -275,9 +254,6 @@ void ModuleMKO::readResponse()
                         {
                             value = 0xffff;
                         }
-
-                        LOG_DEBUG(QString("Param %1 value is %2").arg("TEMPERATURE").arg(value));
-                        LOG_DEBUG(QString("temper=%1 buffer[19]=%2").arg(buffer[19] & 0x0fff).arg(buffer[19 + offset]));
                     }
                     break;
 
@@ -285,6 +261,8 @@ void ModuleMKO::readResponse()
                     LOG_ERROR(QString("Internal error occured in MKO response parsing"));
                     break;
                 }
+
+                //LOG_DEBUG(QString("%1: %2 = %3").arg(metaEnum.valueToKey(type)).arg(variable).arg(value));
 
                 //TODO replace by addResponseParam();
                 QList<QVariant> list;
@@ -370,6 +348,13 @@ void ModuleMKO::sendLocalMessage(const QString& error)
 {
     mCurrentTransaction.error = error;
     QTimer::singleShot(LOCAL_MESSAGE_SEND_DELAY, this, SLOT(sendResponse()));
+}
+
+void ModuleMKO::resendRequest()
+{
+    LOG_WARNING(QString("Resending request..."));
+    Transaction tmp = mCurrentTransaction;
+    processCommand(tmp);
 }
 
 void ModuleMKO::startMKO()

@@ -163,7 +163,7 @@ void Cyclogram::onCommandFinished(Command* cmd)
     mCurrent->setActive(false);
     disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
-    LogCmd(mCurrent, "finished");
+    //LogCmd(mCurrent, "finished");
 
     if (cmd != Q_NULLPTR)
     {
@@ -248,11 +248,6 @@ void Cyclogram::stop()
 
     mCurrent = mFirst;
     setState(STOPPED);
-
-//    if (mIsMainCyclogram && mSystemState)
-//    {
-//        mSystemState->setDefaultState();
-//    }
 }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE

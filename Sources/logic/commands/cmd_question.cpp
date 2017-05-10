@@ -88,6 +88,8 @@ void CmdQuestion::execute()
     Command* right = nextCommand(ValencyPoint::Right);
     Command* down = nextCommand(ValencyPoint::Down);
 
+    LOG_INFO(QString("Result is: %1").arg(result ? "YES" : "NO"));
+
     if (result)
     {
         cmd = nextCommand((mOrientation == YesDown) ? ValencyPoint::Down : ValencyPoint::Right);

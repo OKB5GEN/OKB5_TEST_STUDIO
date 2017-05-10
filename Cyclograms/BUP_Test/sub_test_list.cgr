@@ -40,7 +40,7 @@
         <command type="BRANCH_BEGIN" id="1491891451414" name="FAIL"/>
         <command type="GO_TO_BRANCH" id="1491891451417"/>
         <command type="QUESTION" id="1491891548089" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891548094"/>
@@ -68,7 +68,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491891686240" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891686244"/>
@@ -109,7 +109,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491891736336" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891736341"/>
@@ -179,7 +179,7 @@
             </output_params>
         </command>
         <command type="ACTION_MATH" id="1491891810046" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Result" type="Variable" value="1" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
@@ -212,7 +212,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491891824978" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891824982"/>
@@ -411,7 +411,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491891920264" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891920268"/>
@@ -436,10 +436,12 @@
         </command>
         <command type="GO_TO_BRANCH" id="1491891945660"/>
         <command type="SUBPROGRAM" id="1491893788257" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
-            <input_params/>
+            <input_params>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="SubOK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -447,7 +449,7 @@
             <input_params>
                 <param name="Sub.Error" type="6" value="0"/>
                 <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mmax" type="6" value="5"/>
@@ -458,7 +460,7 @@
                 <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
                 <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -467,7 +469,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491991186019" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991186025"/>
@@ -496,7 +498,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491991270534" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991270540"/>
@@ -504,7 +506,7 @@
             <input_params>
                 <param name="Sub.Error" type="6" value="0"/>
                 <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mmax" type="6" value="5"/>
@@ -515,7 +517,7 @@
                 <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
                 <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -530,11 +532,20 @@
         <command type="GO_TO_BRANCH" id="1491995683239"/>
         <command type="SUBPROGRAM" id="1491996271432" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -543,7 +554,7 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491996318484" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996318489"/>
@@ -572,17 +583,26 @@
             </output_params>
         </command>
         <command type="QUESTION" id="1491996388558" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996388564"/>
         <command type="SUBPROGRAM" id="1491996983811" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -655,11 +675,20 @@
         <command type="GO_TO_BRANCH" id="1491997141677"/>
         <command type="SUBPROGRAM" id="1491997328827" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
                 <param name="Sub.Mode" type="6" value="5"/>
                 <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -705,7 +734,7 @@
             <input_params>
                 <param name="Sub.Error" type="6" value="0"/>
                 <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mmax" type="6" value="5"/>
@@ -716,7 +745,7 @@
                 <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
                 <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -807,7 +836,7 @@
             <input_params>
                 <param name="Sub.Error" type="6" value="0"/>
                 <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
+                <param name="Sub.Imin" type="6" value="0"/>
                 <param name="Sub.MaxI" type="6" value="0"/>
                 <param name="Sub.MaxV" type="6" value="0"/>
                 <param name="Sub.Mmax" type="6" value="5"/>
@@ -818,7 +847,7 @@
                 <param name="Sub.Smin" type="6" value="-214749000"/>
                 <param name="Sub.Steps" type="6" value="0"/>
                 <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
@@ -860,6 +889,34 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997848288"/>
+        <command type="SUBPROGRAM" id="1494402841563" name="ResetSteps" file="BUP_TEST/sub_send_cmd_array.cgr">
+            <input_params>
+                <param name="Sub.Error" type="6" value="0"/>
+                <param name="Sub.Imax" type="6" value="511"/>
+                <param name="Sub.Imin" type="6" value="0"/>
+                <param name="Sub.MaxI" type="6" value="0"/>
+                <param name="Sub.MaxV" type="6" value="0"/>
+                <param name="Sub.Mmax" type="6" value="5"/>
+                <param name="Sub.Mmin" type="6" value="0"/>
+                <param name="Sub.Mode" type="6" value="5"/>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.Smax" type="6" value="214749000"/>
+                <param name="Sub.Smin" type="6" value="-214749000"/>
+                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="Sub.Vmax" type="6" value="8000"/>
+                <param name="Sub.Vmin" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="U" type="10" value="U"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1494403244418" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="1" variable="SubOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1494403244421"/>
     </commands>
     <tree>
         <item id="1491891253282" down="1491891253283" right="-1" under_arrow="-1"/>
@@ -884,7 +941,7 @@
         <item id="1491891448695" down="1491891253285" right="-1" under_arrow="-1"/>
         <item id="1491891451414" down="1491891813255" right="-1" under_arrow="-1"/>
         <item id="1491891451417" down="1491891253285" right="-1" under_arrow="-1"/>
-        <item id="1491891548089" down="1491891253284" right="1491891548094" under_arrow="-1"/>
+        <item id="1491891548089" down="1494402841563" right="1491891548094" under_arrow="-1"/>
         <item id="1491891548094" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891646132" down="1491891686240" right="-1" under_arrow="-1"/>
         <item id="1491891686240" down="1491891705619" right="1491891686244" under_arrow="-1"/>
@@ -975,5 +1032,8 @@
         <item id="1491997844543" down="1491997848282" right="-1" under_arrow="-1"/>
         <item id="1491997848282" down="1491997762662" right="1491997848288" under_arrow="-1"/>
         <item id="1491997848288" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1494402841563" down="1494403244418" right="-1" under_arrow="-1"/>
+        <item id="1494403244418" down="1491891253284" right="1494403244421" under_arrow="-1"/>
+        <item id="1494403244421" down="1491891451414" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

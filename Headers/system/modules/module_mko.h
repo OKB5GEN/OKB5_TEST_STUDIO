@@ -41,6 +41,8 @@ private slots:
     void readResponse();
     void sendResponse();
 
+    void resendRequest();
+
     void sendDataToBUP(uint16_t address, uint16_t subaddress, uint16_t* data, uint16_t wordsCount);
     void requestDataFromBUP(uint16_t address, uint16_t subaddress, uint16_t expectedWordsInResponse);
 
