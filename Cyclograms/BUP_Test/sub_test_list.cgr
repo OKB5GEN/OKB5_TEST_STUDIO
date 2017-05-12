@@ -35,6 +35,8 @@
         <command type="GO_TO_BRANCH" id="1491891431796"/>
         <command type="BRANCH_BEGIN" id="1491891434147" name="Test6"/>
         <command type="GO_TO_BRANCH" id="1491891434150"/>
+        <command type="BRANCH_BEGIN" id="1491997762659" name="Test7"/>
+        <command type="GO_TO_BRANCH" id="1491997762662"/>
         <command type="BRANCH_BEGIN" id="1491891448692" name="OK"/>
         <command type="GO_TO_BRANCH" id="1491891448695"/>
         <command type="BRANCH_BEGIN" id="1491891451414" name="FAIL"/>
@@ -787,8 +789,6 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997525080"/>
-        <command type="BRANCH_BEGIN" id="1491997762659" name="Test7"/>
-        <command type="GO_TO_BRANCH" id="1491997762662"/>
         <command type="SUBPROGRAM" id="1491997801170" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Sub.Error" type="6" value="0"/>

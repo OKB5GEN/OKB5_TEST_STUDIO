@@ -26,8 +26,6 @@ public:
 
     Q_ENUM(State)
 
-    //bool load(const QString& fileName);
-
     Cyclogram(QObject * parent);
 
     static QString defaultStorePath();
@@ -71,6 +69,8 @@ public:
 
     bool isMainCyclogram() const;
     void setMainCyclogram(bool isMain);
+
+    void moveLastCommand(Command* after);
 
 private slots:
     void onCommandFinished(Command* cmd);

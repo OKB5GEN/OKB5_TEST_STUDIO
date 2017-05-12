@@ -1284,11 +1284,15 @@ ShapeItem* CyclogramWidget::addCommand(DRAKON::IconType type, const ValencyPoint
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 {
     // Create and add BRANCH_BEGIN item
-    Command* newCmd = mCurrentCyclogram.lock()->createCommand(DRAKON::BRANCH_BEGIN);
+    auto cyclogram = mCurrentCyclogram.lock();
+    Command* newCmd = cyclogram->createCommand(DRAKON::BRANCH_BEGIN);
     if (!newCmd)
     {
         return Q_NULLPTR;
     }
+
+    // save branches order by moving the newly added branch start after the branch-owner of the valency point
+    cyclogram->moveLastCommand(item->command());
 
     //generate unique branch name
     CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);

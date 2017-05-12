@@ -618,26 +618,18 @@ QString Cyclogram::defaultStorePath()
     return QDir::currentPath() + QString("/cyclograms/");
 }
 
-//bool Cyclogram::load(const QString& fileName)
-//{
-//    clear();
+void Cyclogram::moveLastCommand(Command *after)
+{
+    if (mCommands.empty())
+    {
+        return;
+    }
 
-//    QFile file(fileName);
-//    FileReader reader(this);
-
-//    if (!file.open(QFile::ReadOnly | QFile::Text))
-//    {
-//        LOG_ERROR(QString("Cannot open file %1: %2").arg(QDir::toNativeSeparators(fileName), file.errorString()));
-//        createDefault();
-//        return false;
-//    }
-
-//    if (!reader.read(&file))
-//    {
-//        LOG_ERROR(QString("Parse error in file %1: %2").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
-//        createDefault();
-//        return false;
-//    }
-
-//    return true;
-//}
+    Command* cmd = mCommands.back();
+    int afterIndex = mCommands.indexOf(after);
+    if (afterIndex != -1)
+    {
+        mCommands.insert(afterIndex + 1, cmd);
+        mCommands.pop_back();
+    }
+}
