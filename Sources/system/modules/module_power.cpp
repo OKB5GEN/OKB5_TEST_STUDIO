@@ -11,7 +11,7 @@ namespace
 
     static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts 27-36
     static const qreal MAX_ALLOWED_CURRENT = 2.0; // ampers <= 2
-    static const qreal MIN_VOLTAGE = 27; // volts
+    static const qreal MIN_VOLTAGE = 0; //27; // volts
 
     // nominal device parameters by default
     static const qreal DEFAULT_NOMINAL_POWER = 160; // watts
@@ -163,10 +163,18 @@ void ModulePower::processCommand(const Transaction& params)
         sendPowerSupplyControlCommand(TRACKING_OFF);
         break;
     case ModuleCommands::SET_OVP_THRESHOLD:
-        setObjectValue(OVP_THRESHOLD, MAX_ALLOWED_VOLTAGE, mNominalVoltage);
+        {
+            qreal voltage = params.inputParams.value(SystemState::VOLTAGE).toDouble();
+            mVoltageThreshold = voltage;
+            setObjectValue(OVP_THRESHOLD, voltage /*MAX_ALLOWED_VOLTAGE*/, mNominalVoltage);
+        }
         break;
     case ModuleCommands::SET_OCP_THRESHOLD:
-        setObjectValue(OCP_THRESHOLD, MAX_ALLOWED_CURRENT, mNominalCurrent);
+        {
+            qreal current = params.inputParams.value(SystemState::CURRENT).toDouble();
+            mCurrentThreshold = current;
+            setObjectValue(OCP_THRESHOLD, current /*MAX_ALLOWED_CURRENT*/, mNominalCurrent);
+        }
         break;
     case ModuleCommands::GET_DEVICE_CLASS:
         getDeviceClass();
@@ -203,7 +211,8 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
 
     if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
     {
-        LOG_FATAL(QString("Unsupported voltage values: Umin=%1, OVPThr=%2, Unom=%3").arg(MIN_VOLTAGE).arg(mVoltageThreshold).arg(mNominalVoltage));
+        mCurrentTransaction.error = QString("Unsupported voltage values: Umin=%1, OVPThr=%2, Unom=%3").arg(MIN_VOLTAGE).arg(mVoltageThreshold).arg(mNominalVoltage);
+        emit commandResult(mCurrentTransaction);
         return;
     }
 
@@ -225,11 +234,11 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
         voltageToSet = mVoltageThreshold;
     }
 
-    if (voltageToSet < MIN_VOLTAGE)
-    {
-        LOG_WARNING(QString("Set voltage value has limited by min allowed test stand voltage from %1 to %2 volts").arg(voltageToSet).arg(voltageToSet));
-        voltageToSet = voltageToSet;
-    }
+//    if (voltageToSet < MIN_VOLTAGE)
+//    {
+//        LOG_WARNING(QString("Set voltage value has limited by min allowed test stand voltage from %1 to %2 volts").arg(voltageToSet).arg(MIN_VOLTAGE));
+//        voltageToSet = MIN_VOLTAGE;
+//    }
 
     setObjectValue(SET_VALUE_U, voltageToSet, mNominalVoltage);
 
@@ -237,6 +246,9 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
     // We always set maximum allowed current by power supply unit nominal power (take 95% of it for safety purposes)
     qreal maxCurrentByPower = qMin(mNominalPower * 0.95 / voltageToSet, mNominalCurrent);
     setObjectValue(SET_VALUE_I, maxCurrentByPower, mNominalCurrent);
+
+    mVoltage = voltageToSet;
+    mCurrent = maxCurrentByPower;
 
     LOG_INFO(QString("Actually set power supply params: U=%1 I=%2").arg(voltageToSet).arg(maxCurrentByPower));
 }
