@@ -1426,7 +1426,7 @@ void ShapeItem::updateFlags()
         {
             if (mValencyPoints[i].role() == ValencyPoint::Down)
             {
-                mValencyPoints[i].setCanBeLanded(true);
+                mValencyPoints[i].setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
                 return;
             }
         }
