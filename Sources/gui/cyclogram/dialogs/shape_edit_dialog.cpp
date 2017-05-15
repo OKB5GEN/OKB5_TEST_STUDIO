@@ -1,5 +1,7 @@
 #include "Headers/gui/cyclogram/dialogs/shape_edit_dialog.h"
 
+#include "Headers/gui/tools/console_text_widget.h"
+
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QLineEdit>
@@ -14,10 +16,12 @@ ShapeEditDialog::ShapeEditDialog(QWidget * parent):
     mLineEdit->setText("Default value");
     layout->addWidget(mLineEdit, 0, 0);
 
+    ConsoleTextWidget* consoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(consoleTextWidget, 1, 0);
     //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 1, 0);
+    layout->addWidget(buttonBox, 2, 0);
 
     setLayout(layout);
     setWindowTitle(tr("Default Edit Dialog"));
@@ -27,26 +31,6 @@ ShapeEditDialog::ShapeEditDialog(QWidget * parent):
 }
 
 ShapeEditDialog::~ShapeEditDialog()
-{
-
-}
-
-void ShapeEditDialog::paintEvent(QPaintEvent *event)
-{
-
-}
-
-void ShapeEditDialog::mousePressEvent(QMouseEvent *event)
-{
-
-}
-
-void ShapeEditDialog::mouseReleaseEvent(QMouseEvent *event)
-{
-
-}
-
-void ShapeEditDialog::mouseMoveEvent(QMouseEvent *event)
 {
 
 }

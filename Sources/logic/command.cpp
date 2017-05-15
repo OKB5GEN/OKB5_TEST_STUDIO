@@ -375,7 +375,6 @@ void Command::read(QXmlStreamReader* reader)
         mOnFinishTextColor = attributes.value("on_finish_text_color").toULong(&ok, 16);
     }
 
-
     readCustomAttributes(reader);
 }
 
@@ -389,7 +388,6 @@ void Command::readCustomAttributes(QXmlStreamReader* reader)
 
 void Command::updateText()
 {
-
 }
 
 qint64 Command::id() const
