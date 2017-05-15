@@ -100,6 +100,8 @@ private:
 
 signals:
     void changed();
+    void commandStarted(Command* cmd);
+    void commandFinished(Command* cmd);
     void finished(const QString& error);
     void stateChanged(int state);
     void deleted(Command* cmd);

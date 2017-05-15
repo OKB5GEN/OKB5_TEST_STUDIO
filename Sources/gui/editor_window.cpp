@@ -6,6 +6,7 @@
 #include "Headers/gui/tools/monitor_auto.h"
 #include "Headers/gui/modal_cyclogram_execution_dialog.h"
 #include "Headers/gui/tools/app_console.h"
+#include "Headers/gui/tools/cyclogram_console.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
@@ -39,6 +40,8 @@ EditorWindow::EditorWindow():
     mSystemState = new SystemState(this);
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setDialogParent(this);
+
+    mCyclogramConsole = new CyclogramConsole(this);
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
     mScrollArea->setWidget(mCyclogramWidget);
@@ -317,13 +320,19 @@ void EditorWindow::createActions()
     monitorToolBar->addAction(addAutoMonitorAct);
 
     // add application console
-    QDockWidget *dock = new QDockWidget(tr("Application console"), this);
-    dock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
-
+    QDockWidget *appConsole = new QDockWidget(tr("Application console"), this);
+    appConsole->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
     AppConsole* console = new AppConsole(this);
-    dock->setWidget(console);
-    addDockWidget(Qt::BottomDockWidgetArea, dock);
-    monitorMenu->addAction(dock->toggleViewAction());
+    appConsole->setWidget(console);
+    addDockWidget(Qt::BottomDockWidgetArea, appConsole);
+    monitorMenu->addAction(appConsole->toggleViewAction());
+
+    // add cyclogram console
+    QDockWidget *cyclogramConsole = new QDockWidget(tr("Cyclogram console"), this);
+    cyclogramConsole->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
+    cyclogramConsole->setWidget(mCyclogramConsole);
+    addDockWidget(Qt::BottomDockWidgetArea, cyclogramConsole);
+    monitorMenu->addAction(cyclogramConsole->toggleViewAction());
 }
 
 void EditorWindow::createStatusBar()
@@ -627,6 +636,9 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinish(const QString&)));
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(documentWasModified()));
+
+    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), mCyclogramConsole, SLOT(onCommandStarted(Command*)));
+    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), mCyclogramConsole, SLOT(onCommandFinished(Command*)));
 
     cyclogram->setSystemState(mSystemState);
 

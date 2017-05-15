@@ -160,6 +160,8 @@ void Cyclogram::run()
 
 void Cyclogram::onCommandFinished(Command* cmd)
 {
+    emit commandFinished(mCurrent);
+
     mCurrent->setActive(false);
     disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
@@ -194,6 +196,8 @@ void Cyclogram::onCommandFinished(Command* cmd)
 
 void Cyclogram::onCriticalError(Command* cmd)
 {
+    emit commandFinished(mCurrent);
+
     disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
     disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
     LogCmd(mCurrent, "critical error: " + cmd->errorDesc());
@@ -227,6 +231,8 @@ void Cyclogram::runCurrentCommand()
         connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
 
         LogCmd(mCurrent, "started");
+
+        emit commandStarted(mCurrent);
         mCurrent->setActive(true);
         mCurrent->run();
     }
@@ -405,6 +411,8 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
     case DRAKON::SUBPROGRAM:
         {
             CmdSubProgram* tmp = new CmdSubProgram(this);
+            connect(tmp, SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
+            connect(tmp, SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
             tmp->setLoaded(true);
             cmd = tmp;
         }

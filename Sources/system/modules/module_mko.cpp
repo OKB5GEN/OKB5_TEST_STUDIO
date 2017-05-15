@@ -136,9 +136,13 @@ void ModuleMKO::readResponse()
     case ModuleCommands::SEND_COMMAND_ARRAY:
     case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
     case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
-    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
             // no special processing needed, just response word on OK/FAIL is enough
+        }
+        break;
+    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
+        {
+            //TODO main and reserve kit enabled!!!!!
         }
         break;
     case ModuleCommands::RECEIVE_TEST_ARRAY:

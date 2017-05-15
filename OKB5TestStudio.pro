@@ -81,7 +81,8 @@ SOURCES += main.cpp\
     Sources/gui/tools/app_console.cpp \
     Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp \
     Sources/logic/cyclogram_manager.cpp \
-    Sources/gui/modal_cyclogram_execution_dialog.cpp
+    Sources/gui/modal_cyclogram_execution_dialog.cpp \
+    Sources/gui/tools/cyclogram_console.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -146,7 +147,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/tools/app_console.h \
     Headers/gui/cyclogram/dialogs/subprogram_dialog.h \
     Headers/logic/cyclogram_manager.h \
-    Headers/gui/modal_cyclogram_execution_dialog.h
+    Headers/gui/modal_cyclogram_execution_dialog.h \
+    Headers/gui/tools/cyclogram_console.h
 
 
 FORMS    +=

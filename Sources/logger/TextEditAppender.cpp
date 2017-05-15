@@ -81,12 +81,7 @@ void TextEditAppender::append(const QDateTime& timeStamp, Logger::LogLevel logLe
     }
 
     mTextEdit->setTextColor(QColor::fromRgba(color));
-    //QPalette p = mTextEdit->palette();
-    //p.setColor(QPalette::WindowText, );
-    //mTextEdit->setPalette(p);
-
     mTextEdit->append(formattedString(timeStamp, logLevel, file, line, function, category, message));
-    //std::cerr << qPrintable(formattedString(timeStamp, logLevel, file, line, function, category, message));
 }
 
 void TextEditAppender::setTextEdit(QTextEdit* textEdit)

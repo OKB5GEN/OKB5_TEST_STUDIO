@@ -48,6 +48,10 @@ private slots:
     void execute();
     void onCyclogramFinished(const QString& error);
 
+signals:
+    void commandStarted(Command* cmd);
+    void commandFinished(Command* cmd);
+
 private:
     bool load();
 

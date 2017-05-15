@@ -29,6 +29,9 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
 
     mCyclogram = cyclogram;
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
+    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
+    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
+
     updateText();
 }
 
@@ -52,6 +55,9 @@ bool CmdSubProgram::load()
     cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
     cyclogram->setSystemState(mSystemState);
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
+    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
+    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
+
     mCyclogram = cyclogram;
 
     if (!ok)

@@ -11,6 +11,7 @@ class QScrollArea;
 
 class CyclogramWidget;
 class Cyclogram;
+class CyclogramConsole;
 class VariablesWindow;
 class SystemState;
 class MonitorAuto;
@@ -86,6 +87,8 @@ private:
 
     QScrollArea * mScrollArea;
     qreal mScaleFactor;
+
+    CyclogramConsole* mCyclogramConsole;
 
     int mSnapshotsCouner; // hack for force data snapshot save
 };

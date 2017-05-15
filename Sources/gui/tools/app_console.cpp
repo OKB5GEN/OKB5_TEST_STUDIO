@@ -9,7 +9,7 @@ AppConsole::AppConsole(QWidget * parent):
 {
     QGridLayout* layout = new QGridLayout(this);
 
-    QPushButton* clearConsoleBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Clear console"), this);
+    QPushButton* clearConsoleBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Clear"), this);
 
     QHBoxLayout* hLayout = new QHBoxLayout();
     layout->addLayout(hLayout, 0, 0);
