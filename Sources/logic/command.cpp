@@ -22,6 +22,8 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mType(type),
     mRole(ValencyPoint::Down),
     mFlags(Command::All),
+    mOnStartTextColor(0xff000000), // black by default
+    mOnFinishTextColor(0xff000000), // black by default
     mHasError(false),
     mExecutionDelay(0),
     mVarCtrl(Q_NULLPTR),
@@ -333,6 +335,10 @@ void Command::write(QXmlStreamWriter* writer)
     // write common commands attributes
     writer->writeAttribute("type", metaEnum.valueToKey(type()));
     writer->writeAttribute("id", QString::number(id()));
+    writer->writeAttribute("on_start_text", mOnStartConsoleText);
+    writer->writeAttribute("on_finish_text", mOnFinishConsoleText);
+    writer->writeAttribute("on_start_text_color", QString::number(mOnStartTextColor, 16));
+    writer->writeAttribute("on_finish_text_color", QString::number(mOnFinishTextColor, 16));
 
     writeCustomAttributes(writer);
 
@@ -347,6 +353,28 @@ void Command::read(QXmlStreamReader* reader)
     {
         mID = attributes.value("id").toString().toLongLong();
     }
+
+    if (attributes.hasAttribute("on_start_text"))
+    {
+        mOnStartConsoleText = attributes.value("on_start_text").toString();
+    }
+
+    if (attributes.hasAttribute("on_finish_text"))
+    {
+        mOnFinishConsoleText = attributes.value("on_finish_text").toString();
+    }
+
+    bool ok;
+    if (attributes.hasAttribute("on_start_text_color"))
+    {
+        mOnStartTextColor = attributes.value("on_start_text_color").toULong(&ok, 16);
+    }
+
+    if (attributes.hasAttribute("on_finish_text_color"))
+    {
+        mOnFinishTextColor = attributes.value("on_finish_text_color").toULong(&ok, 16);
+    }
+
 
     readCustomAttributes(reader);
 }
@@ -367,4 +395,44 @@ void Command::updateText()
 qint64 Command::id() const
 {
     return mID;
+}
+
+const QString& Command::onStartConsoleText() const
+{
+    return mOnStartConsoleText;
+}
+
+const QString& Command::onFinishConsoleText() const
+{
+    return mOnFinishConsoleText;
+}
+
+void Command::setOnStartConsoleText(const QString& text)
+{
+    mOnStartConsoleText = text;
+}
+
+void Command::setOnFinishConsoleText(const QString& text)
+{
+    mOnFinishConsoleText = text;
+}
+
+void Command::setOnStartConsoleTextColor(uint32_t argb)
+{
+    mOnStartTextColor = argb;
+}
+
+void Command::setOnFinishConsoleTextColor(uint32_t argb)
+{
+    mOnFinishTextColor = argb;
+}
+
+QColor Command::onStartConsoleTextColor() const
+{
+    return QColor::fromRgba(mOnStartTextColor);
+}
+
+QColor Command::onFinishConsoleTextColor() const
+{
+    return QColor::fromRgba(mOnFinishTextColor);
 }

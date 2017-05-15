@@ -319,6 +319,13 @@ void EditorWindow::createActions()
     monitorMenu->addAction(addAutoMonitorAct);
     monitorToolBar->addAction(addAutoMonitorAct);
 
+    // add cyclogram console
+    QDockWidget *cyclogramConsole = new QDockWidget(tr("Cyclogram console"), this);
+    cyclogramConsole->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
+    cyclogramConsole->setWidget(mCyclogramConsole);
+    addDockWidget(Qt::BottomDockWidgetArea, cyclogramConsole);
+    monitorMenu->addAction(cyclogramConsole->toggleViewAction());
+
     // add application console
     QDockWidget *appConsole = new QDockWidget(tr("Application console"), this);
     appConsole->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
@@ -326,13 +333,6 @@ void EditorWindow::createActions()
     appConsole->setWidget(console);
     addDockWidget(Qt::BottomDockWidgetArea, appConsole);
     monitorMenu->addAction(appConsole->toggleViewAction());
-
-    // add cyclogram console
-    QDockWidget *cyclogramConsole = new QDockWidget(tr("Cyclogram console"), this);
-    cyclogramConsole->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
-    cyclogramConsole->setWidget(mCyclogramConsole);
-    addDockWidget(Qt::BottomDockWidgetArea, cyclogramConsole);
-    monitorMenu->addAction(cyclogramConsole->toggleViewAction());
 }
 
 void EditorWindow::createStatusBar()
