@@ -1,7 +1,8 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h"
 #include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     QDialog(parent),
@@ -18,8 +19,11 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     mSSpin = addItem(layout, tr("Seconds"), 2, 59, SLOT(onSecondsChanged(int)));
     mMSSpin = addItem(layout, tr("Milliseconds"), 3, 999, SLOT(onMilliSecondsChanged(int)));
 
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 4, 0, 1, 3);
+
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 4, 2);
+    layout->addWidget(buttonBox, 5, 2);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -29,7 +33,6 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
 
     adjustSize();
     setFixedSize(sizeHint());
-    //setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 CmdDelayEditDialog::~CmdDelayEditDialog()
@@ -56,6 +59,8 @@ void CmdDelayEditDialog::setCommand(CmdDelay* command)
         mMSpin->setValue(mMinutes);
         mSSpin->setValue(mSeconds);
         mMSSpin->setValue(mMSeconds);
+
+        mConsoleTextWidget->setCommand(mCommand);
     }
 }
 
@@ -112,6 +117,7 @@ void CmdDelayEditDialog::onAccept()
     if (mCommand)
     {
         mCommand->setDelay(mHours, mMinutes, mSeconds, mMSeconds);
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

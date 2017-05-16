@@ -3,12 +3,11 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QComboBox;
-QT_END_NAMESPACE
 
 class CmdSetState;
 class Command;
+class ConsoleTextWidget;
 
 class CmdSetStateEditDialog : public QDialog
 {
@@ -28,6 +27,7 @@ private:
     QComboBox* mComboBox;
     CmdSetState* mCommand;
     QList<Command*> mBranches;
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_SET_STATE_EDIT_DIALOG_H

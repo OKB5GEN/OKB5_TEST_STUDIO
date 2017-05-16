@@ -10,6 +10,7 @@ class QTableWidget;
 
 class CmdSubProgram;
 class Cyclogram;
+class ConsoleTextWidget;
 
 class CmdSubProgramEditDialog : public QDialog
 {
@@ -39,6 +40,8 @@ private:
 
     QTableWidget* mInParams;
     QTableWidget* mOutParams;
+
+    ConsoleTextWidget* mConsoleTextWidget;
 
     QWeakPointer<Cyclogram> mCallingCyclogram;
 };

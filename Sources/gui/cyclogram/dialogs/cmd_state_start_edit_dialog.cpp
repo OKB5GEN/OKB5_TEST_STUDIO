@@ -1,8 +1,9 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h"
 #include "Headers/logic/commands/cmd_state_start.h"
 #include "Headers/logic/cyclogram.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     QDialog(parent)
@@ -13,8 +14,11 @@ CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     mLineEdit->setText("TEXT");
     layout->addWidget(mLineEdit, 0, 0);
 
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 1, 0);
+
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 1, 0);
+    layout->addWidget(buttonBox, 2, 0);
 
     setLayout(layout);
     setWindowTitle(tr("Set Branch Name"));
@@ -22,7 +26,7 @@ CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    setFixedSize(sizeHint());
+    //setFixedSize(sizeHint());
 }
 
 CmdStateStartEditDialog::~CmdStateStartEditDialog()
@@ -35,6 +39,7 @@ void CmdStateStartEditDialog::setCommands(CmdStateStart * command, const QList<C
     mOtherBranches = otherBranches;
     mCommand = command;
     mLineEdit->setText(command->text());
+    mConsoleTextWidget->setCommand(mCommand);
 }
 
 void CmdStateStartEditDialog::onAccept()
@@ -51,6 +56,7 @@ void CmdStateStartEditDialog::onAccept()
         }
 
         mCommand->setText(mLineEdit->text());
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

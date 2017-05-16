@@ -1,8 +1,9 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.h"
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
     QDialog(parent),
@@ -22,6 +23,8 @@ CmdActionMathEditDialog::~CmdActionMathEditDialog()
 
 void CmdActionMathEditDialog::setupUI()
 {
+    // TODO: убрать нафиг row/column span'ы у виджетов
+
     QGridLayout * layout = new QGridLayout(this);
 
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -100,9 +103,13 @@ void CmdActionMathEditDialog::setupUI()
 
     layout->addWidget(mOperand2Box, 0, 7, 2, 2);
 
+    // Console text widget >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 3, 0, 2, 8);
+
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 3, 7, 1, 2);
+    layout->addWidget(buttonBox, 5, 2, 1, 2);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -147,6 +154,8 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
         updateComponent(CmdActionMath::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
         updateComponent(CmdActionMath::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
         updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
+
+        mConsoleTextWidget->setCommand(mCommand);
     }
 }
 
@@ -238,6 +247,8 @@ void CmdActionMathEditDialog::onAccept()
             qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
             mCommand->setOperand(CmdActionMath::Operand1, oper1Val);
         }
+
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

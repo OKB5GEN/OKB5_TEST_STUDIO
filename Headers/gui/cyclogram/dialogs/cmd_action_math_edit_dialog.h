@@ -11,6 +11,7 @@ class QGroupBox;
 class QDoubleValidator;
 
 class CmdActionMath;
+class ConsoleTextWidget;
 
 class CmdActionMathEditDialog : public QDialog
 {
@@ -56,6 +57,8 @@ private:
     QGroupBox* mOperand2Box;
 
     QDoubleValidator* mValidator;
+
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_ACTION_MATH_EDIT_DIALOG_H

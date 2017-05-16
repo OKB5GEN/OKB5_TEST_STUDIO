@@ -6,8 +6,10 @@
 
 class QListWidget;
 class QTableWidget;
-class CmdActionModule;
 class QDoubleValidator;
+
+class CmdActionModule;
+class ConsoleTextWidget;
 
 class CmdActionModuleEditDialog : public QDialog
 {
@@ -40,6 +42,8 @@ private:
     int mCommandID;
 
     QDoubleValidator* mValidator;
+
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_ACTION_MODULE_EDIT_DIALOG_H

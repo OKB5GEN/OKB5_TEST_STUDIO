@@ -1,5 +1,3 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 #include "Headers/logic/cyclogram_manager.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
@@ -7,6 +5,9 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
 #include "Headers/file_reader.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
     QDialog(parent),
@@ -15,8 +16,10 @@ CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
     setupUI();
     setWindowTitle(tr("Edit sub program"));
 
-    adjustSize();
+    //adjustSize();
     //setFixedSize(sizeHint());
+
+    setMinimumSize(QSize(850, 500));
 }
 
 CmdSubProgramEditDialog::~CmdSubProgramEditDialog()
@@ -83,9 +86,13 @@ void CmdSubProgramEditDialog::setupUI()
     layout->addWidget(inputGroupBox, 1, 0);
     layout->addWidget(outputGroupBox, 1, 1);
 
+    // Console text widget >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 2, 0, 1, 2);
+
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 2, 1);
+    layout->addWidget(buttonBox, 3, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -103,6 +110,8 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<
         mSubprogramNameStr->setText(mCommand->name());
         mFileNameStr->setText(mCommand->filePath());
         updateUI();
+
+        mConsoleTextWidget->setCommand(mCommand);
     }
 }
 
@@ -176,6 +185,7 @@ void CmdSubProgramEditDialog::onAccept()
         }
 
         mCommand->setParams(input, output);
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

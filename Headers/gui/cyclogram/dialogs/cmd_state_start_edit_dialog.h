@@ -3,12 +3,11 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QLineEdit;
-QT_END_NAMESPACE
 
 class CmdStateStart;
 class Command;
+class ConsoleTextWidget;
 
 class CmdStateStartEditDialog : public QDialog
 {
@@ -27,6 +26,7 @@ private:
     QList<Command*> mOtherBranches;
     QLineEdit* mLineEdit;
     CmdStateStart* mCommand;
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_STATE_START_EDIT_DIALOG_H

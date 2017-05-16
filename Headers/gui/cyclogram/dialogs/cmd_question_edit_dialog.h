@@ -3,17 +3,15 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QComboBox;
 class QCheckBox;
 class QRadioButton;
 class QLineEdit;
 class QGroupBox;
 class QDoubleValidator;
-QT_END_NAMESPACE
-
 
 class CmdQuestion;
+class ConsoleTextWidget;
 
 class CmdQuestionEditDialog : public QDialog
 {
@@ -59,6 +57,8 @@ private:
     QGroupBox* mOperand2Box;
 
     QDoubleValidator* mValidator;
+
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_QUESTION_EDIT_DIALOG_H

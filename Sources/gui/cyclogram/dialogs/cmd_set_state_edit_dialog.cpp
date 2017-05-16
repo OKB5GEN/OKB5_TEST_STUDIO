@@ -1,7 +1,7 @@
-
 #include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
 #include "Headers/logic/commands/cmd_set_state.h"
 #include "Headers/logic/cyclogram.h"
+#include "Headers/gui/tools/console_text_widget.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
@@ -17,8 +17,11 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     mComboBox = new QComboBox(this);
     layout->addWidget(mComboBox, 0, 0);
 
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 1, 0);
+
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 1, 0);
+    layout->addWidget(buttonBox, 2, 0);
 
     setLayout(layout);
     setWindowTitle(tr("Set Next Branch"));
@@ -26,7 +29,7 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    setFixedSize(sizeHint());
+    //setFixedSize(sizeHint());
 }
 
 CmdSetStateEditDialog::~CmdSetStateEditDialog()
@@ -65,6 +68,7 @@ void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Comma
     }
 
     mComboBox->setCurrentIndex(mCurrentIndex);
+    mConsoleTextWidget->setCommand(mCommand);
 }
 
 void CmdSetStateEditDialog::onAccept()
@@ -78,6 +82,8 @@ void CmdSetStateEditDialog::onAccept()
             mCommand->replaceCommand(mBranches[index]);
             mCommand->setText(mBranches[index]->text());
         }
+
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

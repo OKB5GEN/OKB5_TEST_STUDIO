@@ -3,12 +3,11 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QGridLayout;
 class QSpinBox;
-QT_END_NAMESPACE
 
 class CmdDelay;
+class ConsoleTextWidget;
 
 class CmdDelayEditDialog : public QDialog
 {
@@ -41,6 +40,8 @@ private:
     QSpinBox* mMSpin;
     QSpinBox* mSSpin;
     QSpinBox* mMSSpin;
+
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_DELAY_EDIT_DIALOG_H

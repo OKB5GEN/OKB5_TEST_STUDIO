@@ -1,11 +1,12 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.h"
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/system/system_state.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     QDialog(parent),
@@ -17,7 +18,7 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     //adjustSize();
     //setFixedSize(sizeHint());
 
-    setFixedSize(QSize(800, 400));
+    setMinimumSize(QSize(1200, 500));
 }
 
 CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
@@ -38,14 +39,10 @@ void CmdActionModuleEditDialog::setupUI()
     mModules->addItem(tr("ОТД"));
     mModules->addItem(tr("Технологический"));
 
-    //layout->addWidget(mModules, 0, 0, 10, 4);
     layout->addWidget(mModules, 0, 0);
-    //mModules->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mCommands = new QListWidget(this);
-    //layout->addWidget(mCommands, 0, 4, 10, 4);
     layout->addWidget(mCommands, 0, 1);
-    //mCommands->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mInParams = new QTableWidget(this);
     QStringList headers;
@@ -56,9 +53,7 @@ void CmdActionModuleEditDialog::setupUI()
     headers.append(tr("Значение"));
     mInParams->setColumnCount(headers.size());
     mInParams->setHorizontalHeaderLabels(headers);
-    //layout->addWidget(mInParams, 0, 8, 5, 4);
     layout->addWidget(mInParams, 0, 2);
-    //mInParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     mOutParams = new QTableWidget(this);
     QStringList outHeaders;
@@ -66,13 +61,13 @@ void CmdActionModuleEditDialog::setupUI()
     outHeaders.append(tr("Переменная"));
     mOutParams->setColumnCount(outHeaders.size());
     mOutParams->setHorizontalHeaderLabels(outHeaders);
-    //layout->addWidget(mOutParams, 5, 8, 5, 4);
     layout->addWidget(mOutParams, 0, 3);
-    //mOutParams->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 1, 0, 1, 4);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    //layout->addWidget(buttonBox, 11, 5, 1, 2);
-    layout->addWidget(buttonBox, 1, 1);
+    layout->addWidget(buttonBox, 2, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -90,6 +85,7 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
     if (mCommand)
     {
         mModules->setCurrentRow(mCommand->module());
+        mConsoleTextWidget->setCommand(mCommand);
     }
 }
 
@@ -602,6 +598,7 @@ void CmdActionModuleEditDialog::onAccept()
         }
 
         mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();

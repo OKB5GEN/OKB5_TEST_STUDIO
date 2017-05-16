@@ -1,8 +1,9 @@
-#include <QtWidgets>
-
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/gui/tools/console_text_widget.h"
+
+#include <QtWidgets>
 
 CmdQuestionEditDialog::CmdQuestionEditDialog(QWidget * parent):
     QDialog(parent),
@@ -22,6 +23,8 @@ CmdQuestionEditDialog::~CmdQuestionEditDialog()
 
 void CmdQuestionEditDialog::setupUI()
 {
+    // TODO: убрать нафиг row/column span'ы у виджетов
+
     QGridLayout * layout = new QGridLayout(this);
 
     mValidator = new QDoubleValidator(this);
@@ -90,9 +93,13 @@ void CmdQuestionEditDialog::setupUI()
 
     layout->addWidget(mOperand2Box, 0, 4, 2, 2);
 
+    // Console text widget >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 3, 0, 1, 6);
+
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 3, 4, 1, 2);
+    layout->addWidget(buttonBox, 4, 4, 1, 2);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -136,6 +143,8 @@ void CmdQuestionEditDialog::setCommand(CmdQuestion* command)
 
         updateComponent(CmdQuestion::Left, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
         updateComponent(CmdQuestion::Right, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
+
+        mConsoleTextWidget->setCommand(mCommand);
     }
 }
 
@@ -212,6 +221,8 @@ void CmdQuestionEditDialog::onAccept()
         {
             mCommand->setOrientation(CmdQuestion::YesRight);
         }
+
+        mConsoleTextWidget->saveCommand();
     }
 
     accept();
