@@ -11,6 +11,8 @@
 #include "Headers/logic/commands/cmd_action.h"
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/commands/cmd_action_module.h"
+#include "Headers/logic/commands/cmd_parallel_process.h"
+#include "Headers/logic/commands/cmd_output.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
 
@@ -433,6 +435,16 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
     case DRAKON::ACTION_MODULE:
         {
             cmd = new CmdActionModule(this);
+        }
+        break;
+    case DRAKON::OUTPUT:
+        {
+            cmd = new CmdOutput(this);
+        }
+        break;
+    case DRAKON::PARALLEL_PROCESS:
+        {
+            cmd = new CmdParallelProcess(this);
         }
         break;
 

@@ -18,17 +18,17 @@ public:
         QUESTION,
         ACTION_MODULE,
         SUBPROGRAM,
+        OUTPUT,
+        PARALLEL_PROCESS,
 
         // NOT IMPLEMENTED (NOT PLANNED YET)
 //        SWITCH,
 //        CASE,
 //        FOR_BEGIN,
 //        FOR_END,
-//        OUTPUT,
 //        INPUT,
 //        START_TIMER,
 //        SYNCHRONIZER,
-//        PARALLEL_PROCESS,
 //        SHELF,
 
         SHAPES_COUNT // always must be last

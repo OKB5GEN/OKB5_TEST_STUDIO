@@ -55,6 +55,8 @@ void ShapeAddDialog::setValencyPoint(const ValencyPoint& point)
     case DRAKON::ACTION_MODULE:
     case DRAKON::QUESTION:
     case DRAKON::SUBPROGRAM:
+    case DRAKON::OUTPUT:
+    case DRAKON::PARALLEL_PROCESS:
         {
             setDefaultList();
 
@@ -126,6 +128,8 @@ void ShapeAddDialog::onCurrentIndexChanged(int index)
      mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
      mComboBox->addItem(tr("Question"), QVariant(int(DRAKON::QUESTION)));
      mComboBox->addItem(tr("Subprogram"), QVariant(int(DRAKON::SUBPROGRAM)));
+     //mComboBox->addItem(tr("Output"), QVariant(int(DRAKON::OUTPUT)));
+     //mComboBox->addItem(tr("Parallel process"), QVariant(int(DRAKON::PARALLEL_PROCESS)));
 
      //mComboBox->addItem(tr("Cycle"), QVariant(int(DRAKON::QUESTION))); // temporarily remove cycles
 

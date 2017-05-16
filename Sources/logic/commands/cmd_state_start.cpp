@@ -2,7 +2,6 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-
 CmdStateStart::CmdStateStart(QObject * parent):
     Command(DRAKON::BRANCH_BEGIN, 1, parent)
 {

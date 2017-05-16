@@ -1,14 +1,16 @@
-#ifndef CMD_PARALLEL_PROCESS_H
-#define CMD_PARALLEL_PROCESS_H
+#ifndef CMD_OUTPUT_H
+#define CMD_OUTPUT_H
 
 #include "Headers/logic/command.h"
 
-class CmdParallelProcess: public Command
+//class QTimer;
+
+class CmdOutput: public Command
 {
     Q_OBJECT
 
 public:
-    CmdParallelProcess(QObject* parent);
+    CmdOutput(QObject* parent);
 
     void run() override;
     void stop() override;
@@ -34,6 +36,4 @@ private:
 //    int mDelay; // msec
 //    int mTimeLeft;
 };
-
-#endif // CMD_PARALLEL_PROCESS_H
-
+#endif // CMD_DELAY_H

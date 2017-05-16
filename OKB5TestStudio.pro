@@ -84,7 +84,10 @@ SOURCES += main.cpp\
     Sources/gui/modal_cyclogram_execution_dialog.cpp \
     Sources/gui/tools/cyclogram_console.cpp \
     Sources/gui/tools/console_text_widget.cpp \
-    Sources/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.cpp
+    Sources/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.cpp \
+    Sources/gui/cyclogram/dialogs/cmd_output_edit_dialog.cpp \
+    Sources/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.cpp \
+    Sources/logic/commands/cmd_output.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -152,7 +155,10 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/modal_cyclogram_execution_dialog.h \
     Headers/gui/tools/cyclogram_console.h \
     Headers/gui/tools/console_text_widget.h \
-    Headers/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.h
+    Headers/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.h \
+    Headers/gui/cyclogram/dialogs/cmd_output_edit_dialog.h \
+    Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h \
+    Headers/logic/commands/cmd_output.h
 
 
 FORMS    +=

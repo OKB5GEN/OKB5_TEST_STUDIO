@@ -477,6 +477,20 @@ void ShapeItem::createPath()
         }
         break;
 
+    case DRAKON::OUTPUT:
+        {
+            int TODO;
+            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+        }
+        break;
+
+    case DRAKON::PARALLEL_PROCESS:
+        {
+            int TODO;
+            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+        }
+        break;
+
     case DRAKON::QUESTION:
         {
             CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());
@@ -1368,6 +1382,8 @@ void ShapeItem::createValencyPoints(Command* cmd)
     case DRAKON::ACTION_MODULE:
     case DRAKON::DELAY:
     case DRAKON::SUBPROGRAM:
+    case DRAKON::OUTPUT:
+    case DRAKON::PARALLEL_PROCESS:
         {
             ValencyPoint point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
             mValencyPoints.push_back(point);

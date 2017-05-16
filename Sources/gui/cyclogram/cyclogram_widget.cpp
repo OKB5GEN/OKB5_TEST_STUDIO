@@ -14,6 +14,8 @@
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logic/commands/cmd_output.h"
+#include "Headers/logic/commands/cmd_parallel_process.h"
 #include "Headers/logic/commands/cmd_state_start.h"
 #include "Headers/logic/commands/cmd_set_state.h"
 #include "Headers/logic/commands/cmd_question.h"
@@ -27,6 +29,8 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_output_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
 #include "Headers/gui/tools/monitor_auto.h"
 
@@ -910,6 +914,22 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdTerminatorEditDialog* d = new CmdTerminatorEditDialog(this);
             d->setCommand(qobject_cast<CmdTitle*>(command));
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::OUTPUT:
+        {
+            CmdOutputEditDialog* d = new CmdOutputEditDialog(this);
+            d->setCommand(qobject_cast<CmdOutput*>(command));
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::PARALLEL_PROCESS:
+        {
+            CmdParallelProcessEditDialog* d = new CmdParallelProcessEditDialog(this);
+            d->setCommand(qobject_cast<CmdParallelProcess*>(command));
             dialog = d;
         }
         break;

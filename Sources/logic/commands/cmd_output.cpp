@@ -1,11 +1,11 @@
-#include "Headers/logic/commands/cmd_parallel_process.h"
+#include "Headers/logic/commands/cmd_output.h"
 //#include <QTimer>
 //#include <QTime>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-CmdParallelProcess::CmdParallelProcess(QObject* parent):
-    Command(DRAKON::PARALLEL_PROCESS, 1, parent)
+CmdOutput::CmdOutput(QObject* parent):
+    Command(DRAKON::OUTPUT, 1, parent)
   //,   mTimeLeft(0)
 {
 //    mTimer = new QTimer(this);
@@ -15,7 +15,7 @@ CmdParallelProcess::CmdParallelProcess(QObject* parent):
 //    setDelay(0, 0, 0, 0);
 }
 
-void CmdParallelProcess::run()
+void CmdOutput::run()
 {
 //    if (mTimer->remainingTime() > 0)
 //    {
@@ -39,38 +39,38 @@ void CmdParallelProcess::run()
 //    }
 }
 
-void CmdParallelProcess::stop()
+void CmdOutput::stop()
 {
 //    mTimeLeft = 0;
 //    mTimer->stop();
 }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
-void CmdParallelProcess::pause()
+void CmdOutput::pause()
 {
     int timeLeft = mTimer->remainingTime();
     stop();
     mTimeLeft = timeLeft;
 }
 
-void CmdParallelProcess::resume()
+void CmdOutput::resume()
 {
     run();
 }
 #endif
 
-void CmdParallelProcess::finish()
+void CmdOutput::finish()
 {
     stop();
     emit finished(nextCommand());
 }
 
-//int CmdParallelProcess::delay() const
+//int CmdOutput::delay() const
 //{
 //    return mDelay;
 //}
 
-//void CmdParallelProcess::setDelay(int hours, int minutes, int seconds, int msec)
+//void CmdOutput::setDelay(int hours, int minutes, int seconds, int msec)
 //{
 //     mDelay = (hours * 3600 + minutes * 60 + seconds) * 1000 + msec;
 //     mText = tr("Wait:");
@@ -121,12 +121,12 @@ void CmdParallelProcess::finish()
 //     emit textChanged(mText);
 //}
 
-void CmdParallelProcess::writeCustomAttributes(QXmlStreamWriter* writer)
+void CmdOutput::writeCustomAttributes(QXmlStreamWriter* writer)
 {
 //    writer->writeAttribute("delay", QString::number(mDelay));
 }
 
-void CmdParallelProcess::readCustomAttributes(QXmlStreamReader* reader)
+void CmdOutput::readCustomAttributes(QXmlStreamReader* reader)
 {
 //    QXmlStreamAttributes attributes = reader->attributes();
 //    int delay = 0;
