@@ -43,10 +43,10 @@ public:
     void write(QXmlStreamWriter* writer);
     void read(QXmlStreamReader* reader);
 
-    void setOnStartConsoleText(const QString& text);
-    void setOnFinishConsoleText(const QString& text);
-    void setOnStartConsoleTextColor(uint32_t argb);
-    void setOnFinishConsoleTextColor(uint32_t argb);
+    void setOnStartConsoleText(const QString& text, bool sendChanged = true);
+    void setOnFinishConsoleText(const QString& text, bool sendChanged = true);
+    void setOnStartConsoleTextColor(uint32_t argb, bool sendChanged = true);
+    void setOnFinishConsoleTextColor(uint32_t argb, bool sendChanged = true);
 
     const QString& text() const;
     const QString& errorDesc() const;

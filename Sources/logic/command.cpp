@@ -405,24 +405,40 @@ const QString& Command::onFinishConsoleText() const
     return mOnFinishConsoleText;
 }
 
-void Command::setOnStartConsoleText(const QString& text)
+void Command::setOnStartConsoleText(const QString& text, bool sendChanged)
 {
     mOnStartConsoleText = text;
+    if (sendChanged)
+    {
+        emit textChanged(mText);
+    }
 }
 
-void Command::setOnFinishConsoleText(const QString& text)
+void Command::setOnFinishConsoleText(const QString& text, bool sendChanged)
 {
     mOnFinishConsoleText = text;
+    if (sendChanged)
+    {
+        emit textChanged(mText);
+    }
 }
 
-void Command::setOnStartConsoleTextColor(uint32_t argb)
+void Command::setOnStartConsoleTextColor(uint32_t argb, bool sendChanged)
 {
     mOnStartTextColor = argb;
+    if (sendChanged)
+    {
+        emit textChanged(mText);
+    }
 }
 
-void Command::setOnFinishConsoleTextColor(uint32_t argb)
+void Command::setOnFinishConsoleTextColor(uint32_t argb, bool sendChanged)
 {
     mOnFinishTextColor = argb;
+    if (sendChanged)
+    {
+        emit textChanged(mText);
+    }
 }
 
 QColor Command::onStartConsoleTextColor() const

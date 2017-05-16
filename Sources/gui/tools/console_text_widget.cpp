@@ -5,7 +5,8 @@
 #include <QtWidgets>
 
 ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
-    QWidget(parent)
+    QWidget(parent),
+    mCommand(Q_NULLPTR)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout();
 
@@ -13,10 +14,10 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
     box->setTitle(tr("Console text"));
     QGridLayout* boxLayout = new QGridLayout(box);
 
-    QComboBox* mStartColor = new QComboBox(this);
-    QComboBox* mFinishColor = new QComboBox(this);
-    QLineEdit* mStartEdit = new QLineEdit(this);
-    QLineEdit* mFinishEdit = new QLineEdit(this);
+    mStartColor = new QComboBox(this);
+    mFinishColor = new QComboBox(this);
+    mStartEdit = new QLineEdit(this);
+    mFinishEdit = new QLineEdit(this);
 
     int row = 0;
     boxLayout->addWidget(new QLabel(tr("Before"), box), row, 0);
@@ -71,12 +72,52 @@ void ConsoleTextWidget::setColors(QComboBox *box)
         pixmap.fill(color);
         QIcon icon(pixmap);
 
-        box->addItem(icon, "", QVariant(color));
-
-        // inverse conversion
-//        QVariant variant;
-//        QColor color = variant.value<QColor>();
+        box->addItem(icon, "", QVariant(color.rgba()));
     }
+}
+
+void ConsoleTextWidget::setCommand(Command* command)
+{
+    mCommand = command;
+
+    if (!mCommand)
+    {
+        return;
+    }
+
+    QColor startColor = mCommand->onStartConsoleTextColor();
+    QColor finishColor = mCommand->onFinishConsoleTextColor();
+    int startIndex = mStartColor->findData(QVariant(startColor.rgba()));
+    int finishIndex = mFinishColor->findData(QVariant(finishColor.rgba()));
+
+    mStartEdit->setText(mCommand->onStartConsoleText());
+    mFinishEdit->setText(mCommand->onFinishConsoleText());
+
+    if (startIndex != -1)
+    {
+        mStartColor->setCurrentIndex(startIndex);
+    }
+
+    if (finishIndex != -1)
+    {
+        mFinishColor->setCurrentIndex(finishIndex);
+    }
+}
+
+void ConsoleTextWidget::saveCommand()
+{
+    if (!mCommand)
+    {
+        return;
+    }
+
+    QColor startColor = QColor::fromRgba(mStartColor->itemData(mStartColor->currentIndex()).toUInt());
+    QColor finishColor = QColor::fromRgba(mFinishColor->itemData(mFinishColor->currentIndex()).toUInt());
+
+    mCommand->setOnStartConsoleText(mStartEdit->text(), false);
+    mCommand->setOnFinishConsoleText(mFinishEdit->text(), false);
+    mCommand->setOnStartConsoleTextColor(startColor.rgba(), false);
+    mCommand->setOnFinishConsoleTextColor(finishColor.rgba(), true);
 }
 
 // Full SVG color list returning by Qt

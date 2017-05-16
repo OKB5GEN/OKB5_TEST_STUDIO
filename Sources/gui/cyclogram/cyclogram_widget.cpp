@@ -26,6 +26,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_set_state_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
 #include "Headers/gui/tools/monitor_auto.h"
 
@@ -901,6 +902,14 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
             d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram.lock());
+            dialog = d;
+        }
+        break;
+
+    case DRAKON::TERMINATOR:
+        {
+            CmdTerminatorEditDialog* d = new CmdTerminatorEditDialog(this);
+            d->setCommand(qobject_cast<CmdTitle*>(command));
             dialog = d;
         }
         break;

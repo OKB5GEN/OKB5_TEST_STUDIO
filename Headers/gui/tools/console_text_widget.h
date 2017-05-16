@@ -6,6 +6,8 @@
 class QComboBox;
 class QLineEdit;
 
+class Command;
+
 class ConsoleTextWidget: public QWidget
 {
     Q_OBJECT
@@ -13,6 +15,9 @@ class ConsoleTextWidget: public QWidget
 public:
     ConsoleTextWidget(QWidget * parent);
     ~ConsoleTextWidget();
+
+    void setCommand(Command* command);
+    void saveCommand();
 
 public slots:
 private slots:
@@ -24,6 +29,8 @@ private:
     QComboBox* mFinishColor;
     QLineEdit* mStartEdit;
     QLineEdit* mFinishEdit;
+
+    Command* mCommand;
 };
 
 #endif // CONSOLE_TEXT_WIDGET_H

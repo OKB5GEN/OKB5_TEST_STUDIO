@@ -3,15 +3,12 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QComboBox;
 class QCheckBox;
 class QRadioButton;
 class QLineEdit;
 class QGroupBox;
 class QDoubleValidator;
-QT_END_NAMESPACE
-
 
 class CmdActionMath;
 

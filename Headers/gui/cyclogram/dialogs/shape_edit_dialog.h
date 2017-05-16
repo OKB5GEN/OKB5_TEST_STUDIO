@@ -1,5 +1,5 @@
-#ifndef SHAPEEDITDIALOG_H
-#define SHAPEEDITDIALOG_H
+#ifndef SHAPE_EDIT_DIALOG_H
+#define SHAPE_EDIT_DIALOG_H
 
 #include <QDialog>
 
@@ -22,4 +22,4 @@ private slots:
 private:
 };
 
-#endif // SHAPEEDITDIALOG_H
+#endif // SHAPE_EDIT_DIALOG_H
