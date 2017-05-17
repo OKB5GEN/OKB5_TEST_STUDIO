@@ -16,11 +16,10 @@ public:
     ConsoleTextWidget(QWidget * parent);
     ~ConsoleTextWidget();
 
+    static const QStringList& colorsList();
+
     void setCommand(Command* command);
     void saveCommand();
-
-public slots:
-private slots:
 
 private:
     void setColors(QComboBox* box);

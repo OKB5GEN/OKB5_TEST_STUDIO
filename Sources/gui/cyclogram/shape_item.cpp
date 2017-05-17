@@ -476,21 +476,38 @@ void ShapeItem::createPath()
             path.lineTo(w, h);
         }
         break;
-
     case DRAKON::OUTPUT:
         {
-            int TODO;
-            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+            path.moveTo(w, h + h / 2);
+            path.lineTo(w, H - h);
+            path.lineTo(W - w - w / 2, H - h);
+            path.lineTo(W - w - w / 2, h + h / 2);
+            path.lineTo(w, h + h / 2);
+
+            path.moveTo(w + w / 2, h + h / 2);
+            path.lineTo(w + w / 2, h);
+            path.lineTo(W - w - w / 2, h);
+            path.lineTo(W - w, (h + (H - h - h / 2)) / 2);
+            path.lineTo(W - w - w / 2, H - h - h / 2);
+            path.lineTo(W - w - w / 2, h + h / 2);
         }
         break;
-
     case DRAKON::PARALLEL_PROCESS:
         {
-            int TODO;
-            path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+            path.moveTo(w, h + h / 2);
+            path.lineTo(w, H - h);
+            path.lineTo(W - w - w / 2, H - h);
+            path.lineTo(W - w - w / 2, h + h / 2);
+            path.lineTo(w, h + h / 2);
+
+            path.moveTo(w + w / 2, h + h / 2);
+            path.lineTo(w + w / 2, h);
+            path.lineTo(W - w, h);
+            path.lineTo(W - w, H - h - h / 2);
+            path.lineTo(W - w - w / 2, H - h - h / 2);
+            path.lineTo(W - w - w / 2, h + h / 2);
         }
         break;
-
     case DRAKON::QUESTION:
         {
             CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());

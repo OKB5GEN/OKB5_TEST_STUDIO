@@ -2,6 +2,8 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/logic/command.h"
 
+//#include "Headers/gui/tools/console_text_widget.h"
+
 #include <QtWidgets>
 
 CyclogramConsole::CyclogramConsole(QWidget * parent):
@@ -30,82 +32,34 @@ CyclogramConsole::~CyclogramConsole()
 
 void CyclogramConsole::onCommandStarted(Command* command)
 {
-//    uint32_t color;
-
-//    uint32_t logLevel = Logger::Debug;
-//    switch (logLevel)
-//    {
-//    case Logger::Trace:   // Trace level. Can be used for mostly unneeded records used for internal code tracing.
-//        color = 0xff00b3d6; // light blue
-//        break;
-//    case Logger::Debug:   // Debug level. Useful for non-necessary records used for the debugging of the software.
-//        color = 0xff47d600; // green
-//        break;
-//    case Logger::Info:    // Info level. Can be used for informational records, which may be interesting for not only developers.
-//        color = 0xff000000; // black
-//        break;
-//    case Logger::Warning: // Warning. May be used to log some non-fatal warnings detected by your application.
-//        color = 0xffff6633; // orange
-//        break;
-//    case Logger::Error:   // Error. May be used for a big problems making your application work wrong but not crashing.
-//        color = 0xfff5003d; // red
-//        break;
-//    case Logger::Fatal:
-//        color = 0xffcc33ff; // magenta
-//        break;
-//    default:
-//        color = 0xff000000; // black by default
-//        break;
-//    }
-
     if (command->onStartConsoleText().isEmpty())
     {
         return;
     }
 
     QString message = command->onStartConsoleText();
-    //TODO parse text to find variable links
+    //TODO parse text to find variable links/macroses etc
 
     addMessage(command->onStartConsoleTextColor(), message);
+
+//    QStringList colors = ConsoleTextWidget::colorsList();
+
+//    foreach (QString colorName, colors)
+//    {
+//        QColor color(colorName);
+//        addMessage(color, colorName);
+//    }
 }
 
 void CyclogramConsole::onCommandFinished(Command* command)
 {
-//    uint32_t color;
-
-//    uint32_t logLevel = Logger::Error;
-//    switch (logLevel)
-//    {
-//    case Logger::Trace:   // Trace level. Can be used for mostly unneeded records used for internal code tracing.
-//        color = 0xff00b3d6; // light blue
-//        break;
-//    case Logger::Debug:   // Debug level. Useful for non-necessary records used for the debugging of the software.
-//        color = 0xff47d600; // green
-//        break;
-//    case Logger::Info:    // Info level. Can be used for informational records, which may be interesting for not only developers.
-//        color = 0xff000000; // black
-//        break;
-//    case Logger::Warning: // Warning. May be used to log some non-fatal warnings detected by your application.
-//        color = 0xffff6633; // orange
-//        break;
-//    case Logger::Error:   // Error. May be used for a big problems making your application work wrong but not crashing.
-//        color = 0xfff5003d; // red
-//        break;
-//    case Logger::Fatal:
-//        color = 0xffcc33ff; // magenta
-//        break;
-//    default:
-//        color = 0xff000000; // black by default
-//        break;
-//    }
-
     if (command->onFinishConsoleText().isEmpty())
     {
         return;
     }
 
     QString message = command->onFinishConsoleText();
-    //TODO parse text to find variable links
+    //TODO parse text to find variable links/ьфскщыуы
 
     addMessage(command->onFinishConsoleTextColor(), message);
 }

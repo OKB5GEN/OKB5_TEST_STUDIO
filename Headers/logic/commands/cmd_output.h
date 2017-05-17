@@ -3,8 +3,6 @@
 
 #include "Headers/logic/command.h"
 
-//class QTimer;
-
 class CmdOutput: public Command
 {
     Q_OBJECT
@@ -14,13 +12,6 @@ public:
 
     void run() override;
     void stop() override;
-#ifdef ENABLE_CYCLOGRAM_PAUSE
-    void pause() override;
-    void resume() override;
-#endif
-
-//    void setDelay(int hours, int minutes, int seconds, int msec);
-//    int delay() const; // milliseconds
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
@@ -30,10 +21,5 @@ private slots:
     void finish();
 
 private:
-    void setDelay(int msec);
-
-//    QTimer* mTimer;
-//    int mDelay; // msec
-//    int mTimeLeft;
 };
 #endif // CMD_DELAY_H

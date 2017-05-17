@@ -4,29 +4,23 @@
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
-#include <QLineEdit>
 
 CmdOutputEditDialog::CmdOutputEditDialog(QWidget * parent):
-    QDialog(parent)
+    QDialog(parent),
+    mCommand(Q_NULLPTR)
 {
     QGridLayout * layout = new QGridLayout(this);
 
-    int TODO; // remove line edit its just for testing
-    QLineEdit* mLineEdit = new QLineEdit(this);
-    mLineEdit->setText("Default value");
-    layout->addWidget(mLineEdit, 0, 0);
-
-    ConsoleTextWidget* consoleTextWidget = new ConsoleTextWidget(this);
-    layout->addWidget(consoleTextWidget, 1, 0);
-    //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+    mConsoleTextWidget = new ConsoleTextWidget(this);
+    layout->addWidget(mConsoleTextWidget, 0, 0);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 2, 0);
+    layout->addWidget(buttonBox, 1, 0);
 
     setLayout(layout);
-    setWindowTitle(tr("Output Command Edit Dialog"));
+    setWindowTitle(tr("Message Command Edit Dialog"));
 
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
@@ -37,5 +31,16 @@ CmdOutputEditDialog::~CmdOutputEditDialog()
 
 void CmdOutputEditDialog::setCommand(Command* command)
 {
-    int TODO; // create GUI for command params editing
+    mCommand = command;
+    mConsoleTextWidget->setCommand(mCommand);
+}
+
+void CmdOutputEditDialog::onAccept()
+{
+    if (mCommand)
+    {
+        mConsoleTextWidget->saveCommand();
+    }
+
+    accept();
 }

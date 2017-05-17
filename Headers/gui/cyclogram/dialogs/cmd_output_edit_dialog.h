@@ -4,6 +4,7 @@
 #include <QDialog>
 
 class Command;
+class ConsoleTextWidget;
 
 class CmdOutputEditDialog : public QDialog
 {
@@ -15,11 +16,12 @@ public:
 
     void setCommand(Command* command);
 
-protected:
-
 private slots:
+    void onAccept();
 
 private:
+    Command* mCommand;
+    ConsoleTextWidget* mConsoleTextWidget;
 };
 
 #endif // CMD_OUTPUT_EDIT_DIALOG_H

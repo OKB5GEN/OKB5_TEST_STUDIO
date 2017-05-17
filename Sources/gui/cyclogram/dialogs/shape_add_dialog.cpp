@@ -123,13 +123,13 @@ void ShapeAddDialog::onCurrentIndexChanged(int index)
 
  void ShapeAddDialog::setDefaultList()
  {
-     mComboBox->addItem(tr("Action (Module)"), QVariant(int(DRAKON::ACTION_MODULE)));
-     mComboBox->addItem(tr("Action (Math)"), QVariant(int(DRAKON::ACTION_MATH)));
+     mComboBox->addItem(tr("Module command"), QVariant(int(DRAKON::ACTION_MODULE)));
+     mComboBox->addItem(tr("Math command"), QVariant(int(DRAKON::ACTION_MATH)));
      mComboBox->addItem(tr("Delay"), QVariant(int(DRAKON::DELAY)));
      mComboBox->addItem(tr("Question"), QVariant(int(DRAKON::QUESTION)));
      mComboBox->addItem(tr("Subprogram"), QVariant(int(DRAKON::SUBPROGRAM)));
-     //mComboBox->addItem(tr("Output"), QVariant(int(DRAKON::OUTPUT)));
-     //mComboBox->addItem(tr("Parallel process"), QVariant(int(DRAKON::PARALLEL_PROCESS)));
+     mComboBox->addItem(tr("Message"), QVariant(int(DRAKON::OUTPUT)));
+     mComboBox->addItem(tr("Parallel process"), QVariant(int(DRAKON::PARALLEL_PROCESS)));
 
      //mComboBox->addItem(tr("Cycle"), QVariant(int(DRAKON::QUESTION))); // temporarily remove cycles
 
