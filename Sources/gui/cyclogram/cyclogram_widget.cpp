@@ -40,12 +40,21 @@
 
 #include "Headers/file_reader.h"
 
+namespace
+{
+    static const qreal MAX_SCALE = 1.0;
+    static const qreal DEFAULT_SCALE = 1.0;
+    static const qreal MIN_SCALE = 0.2;
+    static const qreal SCALE_CHANGE_STEP = 0.025;
+}
+
 CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
-    mDialogParent(Q_NULLPTR)
+    mDialogParent(Q_NULLPTR),
+    mScale(DEFAULT_SCALE)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -116,6 +125,30 @@ bool CyclogramWidget::event(QEvent *event)
 
 void CyclogramWidget::resizeEvent(QResizeEvent * /* event */)
 {
+}
+
+void CyclogramWidget::wheelEvent(QWheelEvent *event)
+{
+    if (QApplication::keyboardModifiers() && Qt::ControlModifier)
+    {
+        int numDegrees = event->delta() / 8;
+        int numSteps = numDegrees / 15;
+
+        mScale += numSteps * SCALE_CHANGE_STEP;
+
+        if (mScale > MAX_SCALE)
+        {
+            mScale = MAX_SCALE;
+        }
+
+        if (mScale < MIN_SCALE)
+        {
+            mScale = MIN_SCALE;
+        }
+
+        event->accept();
+        onNeedUpdate();
+    }
 }
 
 void CyclogramWidget::deleteSelectedItem()
@@ -195,6 +228,7 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.scale(mScale, mScale);
 
     QList<ShapeItem*> sihlouetteItems;
     sihlouetteItems.push_back(mSihlouetteLine);
@@ -440,7 +474,7 @@ int CyclogramWidget::commandAt(const QPoint &pos)
     for (int i = mCommands.size() - 1; i >= 0; --i)
     {
         ShapeItem* item = mCommands[i];
-        if (item->path().contains(pos - item->position()))
+        if (item->path().contains((pos / mScale) - item->position()))
         {
             return i;
         }
@@ -456,7 +490,7 @@ bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
         const QList<ValencyPoint>& points = mCommands[i]->valencyPoints();
         for (int j = 0, sz = points.size(); j < sz; ++j)
         {
-            if (points[j].path().contains(pos - mCommands[i]->position()))
+            if (points[j].path().contains((pos / mScale) - mCommands[i]->position()))
             {
                 point = points[j];
                 return true;
@@ -559,6 +593,8 @@ void CyclogramWidget::drawSilhouette()
 
 void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
 {
+    mScale = DEFAULT_SCALE;
+
     clear();
 
     if (cyclogram.isNull())
@@ -729,6 +765,10 @@ void CyclogramWidget::onNeedUpdate()
 
     int width = W * mRootShape->rect().width() + ShapeItem::origin().x() + w;
     int height = H * mRootShape->rect().height() + ShapeItem::origin().y() + h;
+
+    width *= mScale;
+    height *= mScale;
+
     resize(width, height);
 
     drawSilhouette();

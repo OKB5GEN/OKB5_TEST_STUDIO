@@ -45,6 +45,7 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
     void onCyclogramStateChanged(int state);
@@ -101,6 +102,8 @@ private:
 
     QWidget* mDialogParent;
     QString mParentTitle;
+
+    qreal mScale;
 };
 
 #endif //CYCLOGRAM_WIDGET_H
