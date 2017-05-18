@@ -334,7 +334,19 @@ QString CmdActionModule::commandName() const
         text += tr("ВКМК");
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
-        text += tr("ВклПитДУ");
+        {
+            QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
+            int source = mInputParams.value(paramName).toInt();
+
+            if (source == ModuleMKO::PS_FROM_MAIN_KIT)
+            {
+                text += tr("ПитДУОсн");
+            }
+            else if (source == ModuleMKO::PS_FROM_RESERVE_KIT)
+            {
+                text += tr("ПитДУРез");
+            }
+        }
         break;
     case ModuleCommands::START_MKO:
         text += tr("Старт");
