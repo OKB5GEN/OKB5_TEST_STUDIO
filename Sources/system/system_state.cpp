@@ -134,6 +134,7 @@ SystemState::SystemState(QObject* parent):
     mPowerPNA(Q_NULLPTR),
     mCurCommand(Q_NULLPTR)
 {
+    // TODO create some command configuration
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
     mParamNames[TEMPERATURE] = tr("Temperature, °C");
