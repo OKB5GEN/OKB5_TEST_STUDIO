@@ -65,7 +65,8 @@ ModuleMKO::ModuleMKO(QObject* parent):
     mWordsToReceive(0),
     mWordsSent(0),
     mRepeatedRequests(0),
-    mTMKOpened(false)
+    mTMKOpened(false),
+    mSwitchToMainKitAfterResponse(false)
 {
     mMainKitState.address = MAIN_KIT_ADDRESS;
     mReserveKitState.address = RESERVE_KIT_ADDRESS;
@@ -142,7 +143,19 @@ void ModuleMKO::readResponse()
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
-            //TODO main and reserve kit enabled!!!!!
+            if (mSwitchToMainKitAfterResponse)
+            {
+                mSwitchToMainKitAfterResponse = false;
+                if (tmkselect(mMainKitState.tmkID) == 0)
+                {
+                    mMainKitState.isSelected = true;
+                    mReserveKitState.isSelected = false;
+                }
+                else
+                {
+                    mCurrentTransaction.error = QString("Main MKO kit not selected after angle sensor power on via the reserve kit");
+                }
+            }
         }
         break;
     case ModuleCommands::RECEIVE_TEST_ARRAY:
@@ -163,13 +176,13 @@ void ModuleMKO::readResponse()
         {
             int offset = 1;
 
-            QMetaEnum metaEnum = QMetaEnum::fromType<SystemState::ParamID>();
+            //QMetaEnum metaEnum = QMetaEnum::fromType<SystemState::ParamID>();
 
             QMap<uint32_t, QVariant> outputParams;
             for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
             {
                 uint32_t type = it.key();
-                QString variable = it.value().toString();
+                //QString variable = it.value().toString();
                 qreal value = 0;
 
                 switch (type)
@@ -712,20 +725,79 @@ void ModuleMKO::receiveCommandArrayForChannel(uint16_t address, Subaddress chann
     requestDataFromBUP(address, RECEIVE_SUBADDRESS, mWordsToReceive);
 }
 
-void ModuleMKO::sendAngleSensorData(uint16_t address)
+QString ModuleMKO::prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerSupplySource source)
 {
-    uint16_t data[3];
-    data[0] = 0;
-    uint16_t wordsCount = 2;
-
-    if (address == mMainKitState.address)
+    if (source == PS_FROM_MAIN_KIT)
     {
-        data[1] = PS_FROM_MAIN_KIT;
+        address = mMainKitState.address;
+
+        if (mMainKitState.isSelected) // main kit selected, no special preparation needed
+        {
+            return "";
+        }
+
+        if (!mReserveKitState.isSelected)
+        {
+            return QString("No MKO kit selected. Can not send angle sensor power supply command via main MKO kit");
+        }
+
+        if (!mMainKitState.isOnBUPKit)
+        {
+            return QString("Trying to send angle sensor power supply command to deenergized main kit");
+        }
+
+        if (tmkselect(mMainKitState.tmkID) != 0)
+        {
+            return QString("Could not select main MKO kit");
+        }
+
+        // main MKO kit selected, now we can send command
+        mMainKitState.isSelected = true;
+        mReserveKitState.isSelected = false;
+    }
+    else if (source == PS_FROM_RESERVE_KIT)
+    {
+        address = mReserveKitState.address;
+
+        if (mReserveKitState.isSelected)
+        {
+            return ""; // reserve kit selected, no special preparation needed
+        }
+
+        if (!mMainKitState.isSelected)
+        {
+            return QString("No MKO kit selected. Can not send angle sensor power supply command via reserve MKO kit");
+        }
+
+        if (!mReserveKitState.isOnBUPKit)
+        {
+            return QString("Trying to send angle sensor power supply command to deenergized reserve kit");
+        }
+
+        if (tmkselect(mReserveKitState.tmkID) != 0)
+        {
+            return QString("Could not select reserve MKO kit");
+        }
+
+        mMainKitState.isSelected = false;
+        mReserveKitState.isSelected = true;
+        mSwitchToMainKitAfterResponse = true; // set flag that we need to switch back to main MKO kit after response receive
     }
     else
     {
-        data[1] = PS_FROM_RESERVE_KIT;
+        return QString("Unknow power supply source for angle sensor");
     }
+
+    return "";
+}
+
+void ModuleMKO::sendAngleSensorData(uint16_t address, AngleSensorPowerSupplySource source)
+{
+    uint16_t wordsCount = 2;
+
+    uint16_t data[3];
+    data[0] = 0;
+    data[1] = source;
 
     // add checksum
     uint16_t checkSum = 0;
@@ -931,7 +1003,18 @@ void ModuleMKO::processCommand(const Transaction& request)
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
-            sendAngleSensorData(address);
+            AngleSensorPowerSupplySource source = AngleSensorPowerSupplySource(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
+
+            QString error = prepareSendToAngleSensor(address, source);
+            if (error.isEmpty())
+            {
+                sendAngleSensorData(address, source);
+            }
+            else
+            {
+                sendLocalMessage(error);
+                return;
+            }
         }
         break;
 

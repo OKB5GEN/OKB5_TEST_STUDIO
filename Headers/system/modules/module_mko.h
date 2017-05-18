@@ -112,9 +112,10 @@ private:
     void receiveCommandArrayForChannel(uint16_t address, Subaddress channel); // Почти то же самое, что receiveCommandArray(), только для одной оси (ψ или υ): туда КС, оттуда ОС + 5 слов + контрольная сумма
 
     //2.1.9 Операция обмена при выдаче из БКУ в ОУ БУП НА массива для подачи питания на ДУ с использованием формата 1. Используется подадрес 06
-    void sendAngleSensorData(uint16_t address);
+    void sendAngleSensorData(uint16_t address, AngleSensorPowerSupplySource source);
 
     QString canSendRequest(const Transaction& request) const;
+    QString prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerSupplySource source);
 
     void sendLocalMessage(const QString& error = ""); // send response to cyclogram without sending any data to real device
     void updateMKO(KitState& changedKit, bool isOn, const KitState& otherKit);
@@ -125,6 +126,8 @@ private:
     bool mTMKOpened;
     KitState mMainKitState;
     KitState mReserveKitState;
+
+    bool mSwitchToMainKitAfterResponse;
 };
 
 #endif // MODULE_MKO_H

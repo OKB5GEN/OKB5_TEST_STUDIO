@@ -139,12 +139,16 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         {
             QMap<QString, QVariant> implicitParamsPsy;
             QMap<QString, QVariant> implicitParamsNu;
+            QMap<QString, QVariant> implicitParamsAngleSensorMain;
+            QMap<QString, QVariant> implicitParamsAngleSensorReserve;
             QString paramName = sysState->paramName(SystemState::SUBADDRESS);
             implicitParamsPsy[paramName] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
             implicitParamsNu[paramName] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
+            implicitParamsAngleSensorMain[paramName] = QVariant(int(ModuleMKO::PS_FROM_MAIN_KIT));
+            implicitParamsAngleSensorReserve[paramName] = QVariant(int(ModuleMKO::PS_FROM_RESERVE_KIT));
 
-            addCommand(tr("ВКЛ"), ModuleCommands::START_MKO);
-            addCommand(tr("ВЫКЛ"), ModuleCommands::STOP_MKO);
+            addCommand(tr("СТАРТ модуля"), ModuleCommands::START_MKO);
+            addCommand(tr("СТОП модуля"), ModuleCommands::STOP_MKO);
 
             addCommand(tr("ЗАПРОС: командный массив"), ModuleCommands::RECEIVE_COMMAND_ARRAY);
             addCommand(tr("ЗАПРОС: командный массив по линии ψ"), ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
@@ -160,7 +164,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(tr("ОТПРАВКА: тестовый массив по линии ψ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
             addCommand(tr("ОТПРАВКА: тестовый массив по линии υ"), ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
-            addCommand(tr("ВКЛ: питание на ДУ"), ModuleCommands::SEND_TO_ANGLE_SENSOR);
+            addCommand(tr("ОТПРАВКА: подача питания на ДУ (осн. комплект)"), ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorMain);
+            addCommand(tr("ОТПРАВКА: подача питания на ДУ (рез. комплект)"), ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorReserve);
         }
         break;
 
