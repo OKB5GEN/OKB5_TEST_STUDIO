@@ -12,7 +12,7 @@ class QAction;
 class QPoint;
 class QToolButton;
 class QDialog;
-
+class QScrollArea;
 
 class Cyclogram;
 class Command;
@@ -30,6 +30,7 @@ public:
     void clear(bool onDestroy = false);
     void setDialogParent(QWidget* widget);
     void setParentTitle(const QString& title);
+    void setParentScrollArea(QScrollArea* scroll);
 
 public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
@@ -104,6 +105,8 @@ private:
     QString mParentTitle;
 
     qreal mScale;
+
+    QScrollArea* mParentScrollArea;
 };
 
 #endif //CYCLOGRAM_WIDGET_H

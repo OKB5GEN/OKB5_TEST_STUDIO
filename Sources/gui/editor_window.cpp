@@ -41,6 +41,8 @@ EditorWindow::EditorWindow():
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setDialogParent(this);
 
+    mCyclogramWidget->setParentScrollArea(mScrollArea);
+
     mCyclogramConsole = new CyclogramConsole(this);
 
     mScrollArea->setBackgroundRole(QPalette::Dark);

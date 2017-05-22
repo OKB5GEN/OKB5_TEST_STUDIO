@@ -54,7 +54,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
     mDialogParent(Q_NULLPTR),
-    mScale(DEFAULT_SCALE)
+    mScale(DEFAULT_SCALE),
+    mParentScrollArea(Q_NULLPTR)
 {
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
@@ -129,7 +130,7 @@ void CyclogramWidget::resizeEvent(QResizeEvent * /* event */)
 
 void CyclogramWidget::wheelEvent(QWheelEvent *event)
 {
-    if (QApplication::keyboardModifiers() && Qt::ControlModifier)
+    if (QApplication::keyboardModifiers() & Qt::ControlModifier)
     {
         int numDegrees = event->delta() / 8;
         int numSteps = numDegrees / 15;
@@ -148,6 +149,83 @@ void CyclogramWidget::wheelEvent(QWheelEvent *event)
 
         event->accept();
         onNeedUpdate();
+
+        if (mParentScrollArea)
+        {
+            int vValue = mParentScrollArea->verticalScrollBar()->value();
+            int hValue = mParentScrollArea->horizontalScrollBar()->value();
+
+            // max V value = widgetHeigth - viewportHeight
+            // max H value = widgetWidth - viewportWidth
+            mParentScrollArea->verticalScrollBar()->setValue(vValue);
+            mParentScrollArea->horizontalScrollBar()->setValue(hValue);
+
+//            qreal dx = event->pos().x() * (mScale - 1) / mScale;
+//            qreal dy = event->pos().y() * (mScale - 1) / mScale;
+
+//            move(pos() + QPoint(dx, dy));
+//            update();
+        }
+
+        // Для фокуса по идее достаточно сделать setValue для скроллбаров
+        // при этом надо сделать так, чтобы курсор в "скейленных координатах виджета" оставаля в том же месте
+        //mParentScrollArea->verticalScrollBar()->setValue();
+        //mParentScrollArea->horizontalScrollBar()->setValue();
+    }
+
+    /* Логика сохранения позиции
+     * 1. У QScrollArea есть viewport - прямоугольник области видимости со своим viewportSize
+     * 2. В него вставлены мы, CyclogramWidget, со своим widgetSize
+     * 3. Есть точка курсора cursorPos, которая по идее в пределах viewport должна оставаться на своем месте
+     * 4. QScrollArea при скроллинге двигает встроенный в нее виджет (CyclogramWisget) в пределах от (0;0) до (-widgetSize + viewportSize)
+     * 5. Это если widgetSize > viewportSize
+     * 6. По идее value у QScrollBar при этом как раз в пределах возможных пределов скроллинга
+*/
+    if (QApplication::keyboardModifiers() & Qt::AltModifier)
+    {
+        if (mParentScrollArea)
+        {
+            int vMin = mParentScrollArea->verticalScrollBar()->minimum();
+            int vCur = mParentScrollArea->verticalScrollBar()->value();
+            int vMax = mParentScrollArea->verticalScrollBar()->maximum();
+            int hMin = mParentScrollArea->horizontalScrollBar()->minimum();
+            int hCur = mParentScrollArea->horizontalScrollBar()->value();
+            int hMax = mParentScrollArea->horizontalScrollBar()->maximum();
+            QSize widgetSize = this->size();
+            QSize viewportSize = mParentScrollArea->viewport()->size();
+            LOG_INFO(QString("Scale=%1").arg(mScale));
+            LOG_INFO(QString("Cursor pos (viewport)(x=%1, y=%2)").arg(event->pos().x()).arg(event->pos().y()));
+            LOG_INFO(QString("Cursor pos (widget)  (x=%1, y=%2)").arg(event->pos().x() / mScale).arg(event->pos().y() / mScale));
+            LOG_INFO(QString("Vertical (min=%1, cur=%2, max=%3)").arg(vMin).arg(vCur).arg(vMax));
+            LOG_INFO(QString("Horizontal (min=%1, cur=%2, max=%3)").arg(hMin).arg(hCur).arg(hMax));
+            LOG_INFO(QString("Widget size (w=%1, h=%2)").arg(widgetSize.width()).arg(widgetSize.height()));
+            LOG_INFO(QString("Viewport size (w=%1, h=%2)").arg(viewportSize.width()).arg(viewportSize.height()));
+            LOG_INFO(QString("============================="));
+            event->accept();
+        }
+    }
+
+    if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        if (mParentScrollArea)
+        {
+            int vMin = mParentScrollArea->verticalScrollBar()->minimum();
+            int vMax = mParentScrollArea->verticalScrollBar()->maximum();
+            int hMin = mParentScrollArea->horizontalScrollBar()->minimum();
+            int hMax = mParentScrollArea->horizontalScrollBar()->maximum();
+
+            if (event->delta() > 0)
+            {
+                mParentScrollArea->verticalScrollBar()->setValue(vMin);
+                mParentScrollArea->horizontalScrollBar()->setValue(hMin);
+            }
+            else if (event->delta() < 0)
+            {
+                mParentScrollArea->verticalScrollBar()->setValue(vMax);
+                mParentScrollArea->horizontalScrollBar()->setValue(hMax);
+            }
+        }
+
     }
 }
 
@@ -1462,4 +1540,9 @@ void CyclogramWidget::setDialogParent(QWidget* widget)
 void CyclogramWidget::setParentTitle(const QString& title)
 {
     mParentTitle = title;
+}
+
+void CyclogramWidget::setParentScrollArea(QScrollArea* scroll)
+{
+    mParentScrollArea = scroll;
 }
