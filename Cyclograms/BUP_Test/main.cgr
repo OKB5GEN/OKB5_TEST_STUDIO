@@ -79,14 +79,38 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491892580762"/>
+        <command type="SUBPROGRAM" id="1492600298438" name="MKO_On" file="BUP_TEST/sub_mko_on.cgr">
+            <input_params>
+                <param name="Sub.OK" type="6" value="0"/>
+                <param name="Sub.U" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
+            </output_params>
+        </command>
+        <command type="SUBPROGRAM" id="1492600327609" name="MKO_Off" file="BUP_TEST/sub_mko_off.cgr">
+            <input_params>
+                <param name="Sub.OK" type="6" value="0"/>
+            </input_params>
+            <output_params>
+                <param name="OK" type="10" value="OK"/>
+                <param name="SubOK" type="10" value="Sub.OK"/>
+            </output_params>
+        </command>
+        <command type="QUESTION" id="1492600574115" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
+            <operand id="Right" type="Number" value="0" variable=""/>
+        </command>
+        <command type="GO_TO_BRANCH" id="1492600574118"/>
     </commands>
     <tree>
-        <item id="1492600080069" down="1492600080072" right="-1" under_arrow="-1"/>
+        <item id="1492600080069" down="1492600298438" right="-1" under_arrow="-1"/>
         <item id="1492600080072" down="1491892365459" right="-1" under_arrow="-1"/>
         <item id="1491892365458" down="1492600080069" right="-1" under_arrow="-1"/>
         <item id="1491892365459" down="1491892387211" right="-1" under_arrow="-1"/>
         <item id="1491892365460" down="1491892427913" right="-1" under_arrow="-1"/>
-        <item id="1491892365462" down="1491892365463" right="-1" under_arrow="-1"/>
+        <item id="1491892365462" down="1492600327609" right="-1" under_arrow="-1"/>
         <item id="1491892365463" down="-1" right="-1" under_arrow="-1"/>
         <item id="1491892387211" down="1491892491479" right="-1" under_arrow="-1"/>
         <item id="1491892427913" down="1491892451940" right="-1" under_arrow="-1"/>
@@ -103,5 +127,9 @@
         <item id="1491892556392" down="1491892580758" right="-1" under_arrow="-1"/>
         <item id="1491892580758" down="1491892365460" right="1491892580762" under_arrow="-1"/>
         <item id="1491892580762" down="1491892429602" right="-1" under_arrow="-1"/>
+        <item id="1492600298438" down="1492600574115" right="-1" under_arrow="-1"/>
+        <item id="1492600327609" down="1491892365463" right="-1" under_arrow="-1"/>
+        <item id="1492600574115" down="1492600080072" right="1492600574118" under_arrow="-1"/>
+        <item id="1492600574118" down="1491892429602" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

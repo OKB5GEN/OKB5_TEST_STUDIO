@@ -5,35 +5,35 @@
         <variable name="OK" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1491893961471" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491893961473" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1491893961474"/>
-        <command type="BRANCH_BEGIN" id="1491893961475" name="End"/>
-        <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1492076328367" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="TERMINATOR" id="1491893961471" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491893961473" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491893961474" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491893961475" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491893961476" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1492076328367" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="Channel" type="6" value="6"/>
                 <param name="Power State" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076330202" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1492076330202" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="Channel" type="6" value="1"/>
                 <param name="Power State" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MATH" id="1492076365886" operation="Assign">
+        <command type="ACTION_MATH" id="1492076365886" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1492076572761" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+        <command type="ACTION_MODULE" id="1492076572761" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1492076574706" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+        <command type="ACTION_MODULE" id="1492076574706" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
             <input_params/>
             <output_params/>
         </command>
