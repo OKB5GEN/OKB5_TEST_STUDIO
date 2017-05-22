@@ -60,6 +60,7 @@ private:
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
     QString updateWindowTitle(QWidget* dialog);
+    void updateScale(const QPoint& cursorPos, int numSteps);
 
     void drawCyclogram(ShapeItem* item);
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
@@ -105,7 +106,6 @@ private:
     QString mParentTitle;
 
     qreal mScale;
-
     QScrollArea* mParentScrollArea;
 };
 

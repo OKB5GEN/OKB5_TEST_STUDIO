@@ -21,6 +21,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
 
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setDialogParent(parent);
+    mCyclogramWidget->setParentScrollArea(mScrollArea);
     mCyclogramWidget->load(mCommand->cyclogram());
 
     connect(mCommand->cyclogram().data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
