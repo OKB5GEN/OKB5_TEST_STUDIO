@@ -502,8 +502,9 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         }
         else
         {
+
             QString defaultParamName = system->paramDefaultVarName(system->paramID(name));
-            QString tmp = mCommand->moduleName() + "_" + defaultParamName;
+            QString tmp = CmdActionModule::moduleName(mModuleID) + "_" + defaultParamName;
 
             int index = 1;
             while (generatedVariableNames.contains(tmp))

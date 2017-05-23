@@ -23,6 +23,7 @@ public:
     const QMap<QString, QVariant>& outputParams() const;
 
     QString moduleName() const;
+    static QString moduleName(int moduleId);
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;

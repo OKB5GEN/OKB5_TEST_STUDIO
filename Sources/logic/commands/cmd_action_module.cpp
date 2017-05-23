@@ -182,8 +182,13 @@ void CmdActionModule::onVariableRemoved(const QString& name)
 
 QString CmdActionModule::moduleName() const
 {
+    return moduleName(mModule);
+}
+
+QString CmdActionModule::moduleName(int moduleId)
+{
     QString text;
-    switch (mModule)
+    switch (moduleId)
     {
     case ModuleCommands::POWER_UNIT_BUP:
         text = tr("БП1");
