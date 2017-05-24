@@ -17,6 +17,7 @@ public:
     ~CyclogramConsole();
 
 public slots:
+    void clear();
     void onCommandStarted(Command* command);
     void onCommandFinished(Command* command);
 

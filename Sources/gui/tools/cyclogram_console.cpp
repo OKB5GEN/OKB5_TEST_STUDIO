@@ -81,3 +81,8 @@ void CyclogramConsole::addMessage(const QColor& color, const QString& message)
 
     mTextEdit->append(msg);
 }
+
+void CyclogramConsole::clear()
+{
+    mTextEdit->clear();
+}

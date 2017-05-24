@@ -629,6 +629,8 @@ void EditorWindow::commitData(QSessionManager &manager)
 
 void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
+    mCyclogramConsole->clear();
+
     mCyclogram = cyclogram;
 
     mCyclogramWidget->clear();

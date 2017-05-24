@@ -5,14 +5,11 @@
 #include <QtWidgets>
 
 ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
-    QWidget(parent),
+    QGroupBox(parent),
     mCommand(Q_NULLPTR)
 {
-    QVBoxLayout* mainLayout = new QVBoxLayout();
-
-    QGroupBox* box = new QGroupBox(this);
-    box->setTitle(tr("Console text"));
-    QGridLayout* boxLayout = new QGridLayout(box);
+    setTitle(tr("Console text"));
+    QGridLayout* boxLayout = new QGridLayout(this);
 
     mStartColor = new QComboBox(this);
     mFinishColor = new QComboBox(this);
@@ -22,19 +19,16 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
     mFinishEdit = new QLineEdit(this);
 
     int row = 0;
-    boxLayout->addWidget(new QLabel(tr("Before"), box), row, 0);
+    boxLayout->addWidget(new QLabel(tr("Before"), this), row, 0);
     boxLayout->addWidget(mStartEdit, row, 1);
     boxLayout->addWidget(mStartColor, row, 2);
 
     ++row;
-    boxLayout->addWidget(new QLabel(tr("After"), box), row, 0);
+    boxLayout->addWidget(new QLabel(tr("After"), this), row, 0);
     boxLayout->addWidget(mFinishEdit, row, 1);
     boxLayout->addWidget(mFinishColor, row, 2);
 
-    box->setLayout(boxLayout);
-
-    mainLayout->addWidget(box);
-    setLayout(mainLayout);
+    setLayout(boxLayout);
 
     colorsList(); // just for colors list creation
 

@@ -1,14 +1,14 @@
 #ifndef CONSOLE_TEXT_WIDGET_H
 #define CONSOLE_TEXT_WIDGET_H
 
-#include <QWidget>
+#include <QGroupBox>
 
 class QComboBox;
 class QLineEdit;
 
 class Command;
 
-class ConsoleTextWidget: public QWidget
+class ConsoleTextWidget: public QGroupBox
 {
     Q_OBJECT
 
