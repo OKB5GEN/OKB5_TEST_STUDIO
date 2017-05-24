@@ -9,6 +9,7 @@
 
 class ModuleMKO;
 class ModuleOTD;
+class ModuleDriveSimulator;
 class ModuleSTM;
 class ModuleTech;
 class ModulePower;
@@ -83,6 +84,7 @@ signals:
 
     void sendToSTM(const Transaction& request);
     void sendToOTD(const Transaction& request);
+    void sendToDS(const Transaction& request);
     void sendToTech(const Transaction& request);
     void sendToMKO(const Transaction& request);
     void sendToPowerUnitBUP(const Transaction& request);
@@ -92,6 +94,7 @@ private:
     void createPowerUnitCommandsParams();
     void createMKOCommandsParams();
     void createOTDCommandsParams();
+    void createDSCommandsParams();
     void createTechCommandsParams();
     void createSTMCommandsParams();
 
@@ -101,6 +104,7 @@ private:
 
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
+    ModuleDriveSimulator* mDS;
     ModuleSTM* mSTM;
     ModuleTech* mTech;
     ModulePower* mPowerBUP;

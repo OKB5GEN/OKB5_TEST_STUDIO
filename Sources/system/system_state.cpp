@@ -1,6 +1,7 @@
 #include "Headers/system/system_state.h"
 #include "Headers/logic/commands/cmd_action_module.h"
 #include "Headers/system/modules/module_otd.h"
+#include "Headers/system/modules/module_drive_simulator.h"
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/system/modules/module_power.h"
 #include "Headers/system/modules/module_stm.h"
@@ -128,6 +129,7 @@ SystemState::SystemState(QObject* parent):
     QObject(parent),
     mMKO(Q_NULLPTR),
     mOTD(Q_NULLPTR),
+    mDS(Q_NULLPTR),
     mSTM(Q_NULLPTR),
     mTech(Q_NULLPTR),
     mPowerBUP(Q_NULLPTR),
@@ -248,6 +250,13 @@ void SystemState::onApplicationStart()
     connect(this, SIGNAL(sendToOTD(const Transaction&)), mOTD, SLOT(processCommand(const Transaction&)));
     connect(mOTD, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
 
+    mDS = new ModuleDriveSimulator(this);
+    mDS->setEmulator(emulatorEnabled);
+    mDS->setModuleID(ModuleCommands::DRIVE_SIMULATOR);
+    mDS->setId(modules.value(ModuleCommands::DRIVE_SIMULATOR));
+    connect(this, SIGNAL(sendToDS(const Transaction&)), mDS, SLOT(processCommand(const Transaction&)));
+    connect(mDS, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
+
     mSTM = new ModuleSTM(this);
     mSTM->setEmulator(emulatorEnabled);
     mSTM->setModuleID(ModuleCommands::STM);
@@ -283,6 +292,7 @@ void SystemState::onApplicationStart()
     createPowerUnitCommandsParams();
     createMKOCommandsParams();
     createOTDCommandsParams();
+    createDSCommandsParams();
     createTechCommandsParams();
     createSTMCommandsParams();
 }
@@ -519,6 +529,71 @@ void SystemState::createOTDCommandsParams()
     mOutParams[ModuleCommands::OTD] = outParams;
 }
 
+void SystemState::createDSCommandsParams()
+{
+    QStringList getStatusParams;
+    getStatusParams.append(paramName(STATUS_PHYSICAL));
+    getStatusParams.append(paramName(STATUS_LOGICAL));
+
+    QStringList setStatusParams;
+    setStatusParams.append(paramName(STATUS_LOGICAL));
+
+    // input params
+    QMap<int, QStringList> inParams;
+    inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+
+    mInParams[ModuleCommands::DRIVE_SIMULATOR] = inParams;
+
+    // output params
+    QStringList moduleAddressParams;
+    moduleAddressParams.append(paramName(MODULE_ADDRESS));
+
+    QStringList statusWordParams;
+    statusWordParams.append(paramName(MODULE_READY));
+    statusWordParams.append(paramName(MODULE_AFTER_RESET));
+    statusWordParams.append(paramName(MODULE_HAS_ERRORS));
+
+    int TODO; // solve problem with sensors count data
+    QMap<int, QStringList> outParams;
+
+    QStringList temperatureParams;
+
+    // PT-100 params
+    temperatureParams.clear();
+    int ptCount = mDS->ptCount();
+    for (int i = 0; i < ptCount; ++i)
+    {
+        temperatureParams.push_back(paramName(TEMPERATURE));
+    }
+
+    outParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
+
+    // DS1820 line 1 params
+    temperatureParams.clear();
+    int dsCount1 = mDS->dsCount(ModuleDriveSimulator::PSY);
+    for (int i = 0; i < dsCount1; ++i)
+    {
+        temperatureParams.push_back(paramName(TEMPERATURE));
+    }
+
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
+
+    // DS1820 line 2 params
+    temperatureParams.clear();
+    int dsCount2 = mDS->dsCount(ModuleDriveSimulator::NU);
+    for (int i = 0; i < dsCount2; ++i)
+    {
+        temperatureParams.push_back(paramName(TEMPERATURE));
+    }
+
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
+    outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
+    outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
+
+    mOutParams[ModuleCommands::DRIVE_SIMULATOR] = outParams;
+}
+
 void SystemState::createSTMCommandsParams()
 {
     QStringList getStatusParams;
@@ -679,6 +754,9 @@ void SystemState::sendCommand(CmdActionModule* command)
     case ModuleCommands::OTD:
         emit sendToOTD(transaction);
         break;
+    case ModuleCommands::DRIVE_SIMULATOR:
+        emit sendToDS(transaction);
+        break;
     case ModuleCommands::STM:
         emit sendToSTM(transaction);
         break;
@@ -716,6 +794,9 @@ AbstractModule* SystemState::moduleByID(ModuleCommands::ModuleID moduleID) const
         break;
     case ModuleCommands::OTD:
         module = mOTD;
+        break;
+    case ModuleCommands::DRIVE_SIMULATOR:
+        module = mDS;
         break;
     case ModuleCommands::STM:
         module = mSTM;

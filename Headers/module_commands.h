@@ -157,6 +157,7 @@ public:
         STM,
         OTD,
         TECH,
+        DRIVE_SIMULATOR,
 
         MODULES_COUNT
     };

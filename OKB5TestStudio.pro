@@ -87,7 +87,8 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_output_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.cpp \
-    Sources/logic/commands/cmd_output.cpp
+    Sources/logic/commands/cmd_output.cpp \
+    Sources/system/modules/module_drive_simulator.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -158,7 +159,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/dialogs/cmd_terminator_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/cmd_output_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h \
-    Headers/logic/commands/cmd_output.h
+    Headers/logic/commands/cmd_output.h \
+    Headers/system/modules/module_drive_simulator.h
 
 
 FORMS    +=

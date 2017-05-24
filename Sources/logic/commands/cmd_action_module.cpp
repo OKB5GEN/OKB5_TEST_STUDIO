@@ -205,6 +205,9 @@ QString CmdActionModule::moduleName(int moduleId)
     case ModuleCommands::OTD:
         text = tr("ОТД");
         break;
+    case ModuleCommands::DRIVE_SIMULATOR:
+        text = tr("ИП");
+        break;
     case ModuleCommands::TECH:
         text = tr("ТЕХ");
         break;
