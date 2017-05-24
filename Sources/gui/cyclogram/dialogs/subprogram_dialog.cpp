@@ -8,7 +8,7 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/file_reader.h"
 #include "Headers/file_writer.h"
-#include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
@@ -102,7 +102,7 @@ void SubProgramDialog::onVariablesClick()
 
 void SubProgramDialog::onChartClick()
 {
-    MonitorAuto* dialog = new MonitorAuto(parentWidget());
+    CyclogramChartDialog* dialog = new CyclogramChartDialog(parentWidget());
     dialog->setWindowTitle(windowTitle());
     dialog->setCyclogram(mCommand->cyclogram());
     dialog->setAttribute(Qt::WA_DeleteOnClose);

@@ -435,6 +435,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         // variable selector
         QComboBox* comboBox = new QComboBox(mInParams);
+        comboBox->installEventFilter(this);
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variablesData().keys());
         mInParams->setCellWidget(i, 2, comboBox);
@@ -493,6 +494,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         mOutParams->setCellWidget(i, 0, text);
 
         QComboBox* comboBox = new QComboBox(mOutParams);
+        comboBox->installEventFilter(this);
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variablesData().keys());
         mOutParams->setCellWidget(i, 1, comboBox);
@@ -662,5 +664,17 @@ void CmdActionModuleEditDialog::onCheckBoxStateChanged(int state)
             valueSelectBox->blockSignals(false);
             break;
         }
+    }
+}
+
+bool CmdActionModuleEditDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
     }
 }

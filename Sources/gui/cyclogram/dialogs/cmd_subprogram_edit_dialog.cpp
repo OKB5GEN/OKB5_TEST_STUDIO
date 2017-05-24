@@ -283,6 +283,7 @@ void CmdSubProgramEditDialog::updateUI()
 
         // variable selector
         QComboBox* comboBox = new QComboBox(mInParams);
+        comboBox->installEventFilter(this);
         comboBox->addItems(callingCyclogramVariables.keys());
         mInParams->setCellWidget(i, 2, comboBox);
 
@@ -346,6 +347,7 @@ void CmdSubProgramEditDialog::updateUI()
 
         // variable selector
         QComboBox* comboBox = new QComboBox(mOutParams);
+        comboBox->installEventFilter(this);
         for (auto iter = subprogramVariables.begin(); iter != subprogramVariables.end(); ++iter)
         {
             QString subName = mCommand->subprogramPrefix() + iter.key();
@@ -488,4 +490,16 @@ void CmdSubProgramEditDialog::onOutputCheckBoxStateChanged(int state)
     }
 
     updateTable(mOutParams, changedBox, state);
+}
+
+bool CmdSubProgramEditDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
 }

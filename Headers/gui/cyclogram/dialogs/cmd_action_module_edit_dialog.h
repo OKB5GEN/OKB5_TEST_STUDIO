@@ -31,6 +31,8 @@ private:
     void setupUI();
     void addCommand(const QString& text, int commandID, const QMap<QString, QVariant>& implicitParams = QMap<QString,QVariant>());
     void addOKBCommonCommands();
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
     CmdActionModule* mCommand;
 
     QListWidget * mModules;

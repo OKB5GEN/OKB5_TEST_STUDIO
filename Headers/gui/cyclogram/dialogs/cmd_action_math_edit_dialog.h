@@ -36,6 +36,8 @@ private:
     void setupUI();
     void updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn);
 
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
     CmdActionMath* mCommand;
 
     QComboBox* mResultBox;

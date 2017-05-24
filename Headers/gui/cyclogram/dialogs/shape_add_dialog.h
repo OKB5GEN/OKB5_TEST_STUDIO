@@ -30,6 +30,7 @@ private slots:
 
 private:
     void setDefaultList();
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     DRAKON::IconType mShapeType;
 

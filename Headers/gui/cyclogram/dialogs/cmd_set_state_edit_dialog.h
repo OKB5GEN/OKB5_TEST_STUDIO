@@ -23,6 +23,8 @@ private slots:
     void onAccept();
 
 private:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
     int mCurrentIndex;
     QComboBox* mComboBox;
     CmdSetState* mCommand;

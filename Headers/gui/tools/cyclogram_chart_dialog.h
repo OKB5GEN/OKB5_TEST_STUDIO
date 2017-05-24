@@ -3,20 +3,19 @@
 
 #include <QDialog>
 #include <QMap>
-//#include "Headers/logic/variable_controller.h" //TODO possibly not needed
 
 class QCheckBox;
 class QListWidget;
 class QCustomPlot;
 class Cyclogram;
 
-class MonitorAuto : public QDialog
+class CyclogramChartDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    MonitorAuto(QWidget * parent);
-    ~MonitorAuto();
+    CyclogramChartDialog(QWidget * parent);
+    ~CyclogramChartDialog();
 
     void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 

@@ -37,6 +37,7 @@ void CmdQuestionEditDialog::setupUI()
     mOper1VarBtn = new QRadioButton(this);
     mOper1NumBtn = new QRadioButton(this);
     mOper1Box = new QComboBox(this);
+    mOper1Box->installEventFilter(this);
     mOper1Num = new QLineEdit(this);
     mOper1Num->setValidator(mValidator);
 
@@ -53,6 +54,7 @@ void CmdQuestionEditDialog::setupUI()
     operationBox->setTitle(tr("Operation"));
     QVBoxLayout* box3layout = new QVBoxLayout(operationBox);
     mOperationBox = new QComboBox(this);
+    mOperationBox->installEventFilter(this);
     mOperationBox->addItem(">", QVariant(int(CmdQuestion::Greater)));
     mOperationBox->addItem("<", QVariant(int(CmdQuestion::Less)));
     mOperationBox->addItem("==", QVariant(int(CmdQuestion::Equal)));
@@ -81,6 +83,7 @@ void CmdQuestionEditDialog::setupUI()
     mOper2VarBtn = new QRadioButton(this);
     mOper2NumBtn = new QRadioButton(this);
     mOper2Box = new QComboBox(this);
+    mOper2Box->installEventFilter(this);
     mOper2Num = new QLineEdit(this);
     mOper2Num->setValidator(mValidator);
 
@@ -288,5 +291,14 @@ void CmdQuestionEditDialog::onYesRightBtnStateChanged(bool toggled)
     }
 }
 
-
-
+bool CmdQuestionEditDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
+}

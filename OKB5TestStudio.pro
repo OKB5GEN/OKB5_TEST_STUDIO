@@ -34,8 +34,6 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/shape_item.cpp \
     Sources/gui/cyclogram/valency_point.cpp \
     Sources/gui/cyclogram/variables_window.cpp \
-    Sources/gui/tools/monitor_auto.cpp \
-    Sources/gui/tools/monitor_manual.cpp \
     Sources/gui/editor_window.cpp \
     Sources/logic/commands/cmd_action.cpp \
     Sources/logic/commands/cmd_action_math.cpp \
@@ -88,7 +86,8 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/cmd_output_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.cpp \
     Sources/logic/commands/cmd_output.cpp \
-    Sources/system/modules/module_drive_simulator.cpp
+    Sources/system/modules/module_drive_simulator.cpp \
+    Sources/gui/tools/cyclogram_chart_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -96,8 +95,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/shape_item.h \
     Headers/gui/cyclogram/valency_point.h \
     Headers/gui/cyclogram/variables_window.h \
-    Headers/gui/tools/monitor_auto.h \
-    Headers/gui/tools/monitor_manual.h \
     Headers/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/cmd_question_edit_dialog.h \
@@ -160,7 +157,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/dialogs/cmd_output_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h \
     Headers/logic/commands/cmd_output.h \
-    Headers/system/modules/module_drive_simulator.h
+    Headers/system/modules/module_drive_simulator.h \
+    Headers/gui/tools/cyclogram_chart_dialog.h
 
 
 FORMS    +=

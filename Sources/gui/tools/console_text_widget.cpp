@@ -16,6 +16,8 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
 
     mStartColor = new QComboBox(this);
     mFinishColor = new QComboBox(this);
+    mStartColor->installEventFilter(this);
+    mFinishColor->installEventFilter(this);
     mStartEdit = new QLineEdit(this);
     mFinishEdit = new QLineEdit(this);
 
@@ -57,14 +59,7 @@ void ConsoleTextWidget::setColors(QComboBox *box)
         pixmap.fill(color);
         QIcon icon(pixmap);
 
-//        if (useFullList)
-//        {
-//            box->addItem(icon, colorName, QVariant(color.rgba()));
-//        }
-//        else
-        {
-            box->addItem(icon, "", QVariant(color.rgba()));
-        }
+        box->addItem(icon, "" /*colorName*/, QVariant(color.rgba()));
     }
 }
 
@@ -110,6 +105,18 @@ void ConsoleTextWidget::saveCommand()
     mCommand->setOnFinishConsoleText(mFinishEdit->text(), false);
     mCommand->setOnStartConsoleTextColor(startColor.rgba(), false);
     mCommand->setOnFinishConsoleTextColor(finishColor.rgba(), true);
+}
+
+bool ConsoleTextWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
 }
 
 const QStringList& ConsoleTextWidget::colorsList()

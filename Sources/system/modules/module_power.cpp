@@ -230,8 +230,8 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
 
     if (voltageToSet > mVoltageThreshold)
     {
-        LOG_WARNING(QString("Set voltage value has limited by max allowed test stand voltage from %1 to %2 volts").arg(voltageToSet).arg(mVoltageThreshold));
-        voltageToSet = mVoltageThreshold;
+        LOG_WARNING(QString("Set voltage (%1 volts) is greater than OVP voltage (%2 volts)").arg(voltageToSet).arg(mVoltageThreshold));
+        //voltageToSet = mVoltageThreshold;
     }
 
 //    if (voltageToSet < MIN_VOLTAGE)

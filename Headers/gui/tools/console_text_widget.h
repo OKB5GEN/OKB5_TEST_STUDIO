@@ -22,6 +22,8 @@ public:
     void saveCommand();
 
 private:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
     void setColors(QComboBox* box);
 
     QComboBox* mStartColor;

@@ -3,9 +3,7 @@
 #include "Headers/logic/cyclogram.h"
 #include "Headers/gui/tools/console_text_widget.h"
 
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QComboBox>
+#include <QtWidgets>
 
 CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     QDialog(parent),
@@ -15,6 +13,7 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
     QGridLayout * layout = new QGridLayout(this);
 
     mComboBox = new QComboBox(this);
+    mComboBox->installEventFilter(this);
     layout->addWidget(mComboBox, 0, 0);
 
     mConsoleTextWidget = new ConsoleTextWidget(this);
@@ -87,4 +86,16 @@ void CmdSetStateEditDialog::onAccept()
     }
 
     accept();
+}
+
+bool CmdSetStateEditDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
 }

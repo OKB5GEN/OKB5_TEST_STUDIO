@@ -36,6 +36,7 @@ private slots:
 private:
     void setupUI();
     void updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     CmdQuestion* mCommand;
 

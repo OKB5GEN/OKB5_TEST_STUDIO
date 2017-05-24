@@ -2,8 +2,7 @@
 
 #include "Headers/gui/editor_window.h"
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
-#include "Headers/gui/tools/monitor_manual.h"
-#include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/modal_cyclogram_execution_dialog.h"
 #include "Headers/gui/tools/app_console.h"
 #include "Headers/gui/tools/cyclogram_console.h"
@@ -549,7 +548,7 @@ void EditorWindow::makeDataSnapshot()
 
 void EditorWindow::addChartWidget()
 {
-    MonitorAuto* dialog = new MonitorAuto(this);
+    CyclogramChartDialog* dialog = new CyclogramChartDialog(this);
 
     dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);

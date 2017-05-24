@@ -1,4 +1,4 @@
-#include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/qcustomplot.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logger/Logger.h"
@@ -26,7 +26,7 @@ namespace
     }
 }
 
-MonitorAuto::MonitorAuto(QWidget * parent):
+CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     QDialog(parent)
 {
     QHBoxLayout* hLayout = new QHBoxLayout(this);
@@ -46,12 +46,12 @@ MonitorAuto::MonitorAuto(QWidget * parent):
     setWindowTitle(tr("Main cyclogram")); // TODO write cyclogram path / subprogram name
 }
 
-MonitorAuto::~MonitorAuto()
+CyclogramChartDialog::~CyclogramChartDialog()
 {
 
 }
 
-void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
+void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
     if (cyclogram.isNull())
     {
@@ -98,7 +98,7 @@ void MonitorAuto::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     }
 }
 
-void MonitorAuto::onVariableSelectionChanged(bool toggled)
+void CyclogramChartDialog::onVariableSelectionChanged(bool toggled)
 {
     QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
     if (changedBox && !toggled)
@@ -119,7 +119,7 @@ void MonitorAuto::onVariableSelectionChanged(bool toggled)
     }
 }
 
-void MonitorAuto::onVariableValueChanged(const QString& name, qreal value)
+void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal value)
 {
     int count = mPlot->graphCount();
     QCPGraph* graph = Q_NULLPTR;
@@ -228,7 +228,7 @@ void MonitorAuto::onVariableValueChanged(const QString& name, qreal value)
     mPlot->replot();
 }*/
 
-void MonitorAuto::onCyclogramStateChanged(int state)
+void CyclogramChartDialog::onCyclogramStateChanged(int state)
 {
     /*red,
     green,

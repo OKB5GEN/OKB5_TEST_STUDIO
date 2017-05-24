@@ -32,7 +32,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_output_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
-#include "Headers/gui/tools/monitor_auto.h"
+#include "Headers/gui/tools/cyclogram_chart_dialog.h"
 
 #include "Headers/gui/cyclogram/shape_item.h"
 
@@ -477,7 +477,7 @@ void CyclogramWidget::showSubprogramChart()
     }
 
     Q_ASSERT(mDialogParent);
-    MonitorAuto* dialog = new MonitorAuto(mDialogParent);
+    CyclogramChartDialog* dialog = new CyclogramChartDialog(mDialogParent);
     updateWindowTitle(dialog);
 
     dialog->setCyclogram(mCurSubprogram->cyclogram());

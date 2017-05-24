@@ -32,6 +32,7 @@ void CmdActionMathEditDialog::setupUI()
     resultBox->setTitle(tr("Result"));
     QVBoxLayout* box4layout = new QVBoxLayout(resultBox);
     mResultBox = new QComboBox(this);
+    mResultBox->installEventFilter(this);
 
     box4layout->addWidget(mResultBox);
     box4layout->addStretch();
@@ -53,6 +54,7 @@ void CmdActionMathEditDialog::setupUI()
     mOper1VarBtn = new QRadioButton(this);
     mOper1NumBtn = new QRadioButton(this);
     mOper1Box = new QComboBox(this);
+    mOper1Box->installEventFilter(this);
     mOper1Num = new QLineEdit(this);
     mOper1Num->setValidator(mValidator);
 
@@ -69,6 +71,7 @@ void CmdActionMathEditDialog::setupUI()
     operationBox->setTitle(tr("Operation"));
     QVBoxLayout* box3layout = new QVBoxLayout(operationBox);
     mOperationBox = new QComboBox(this);
+    mOperationBox->installEventFilter(this);
     mOperationBox->addItem("+", QVariant(int(CmdActionMath::Add)));
     mOperationBox->addItem("-", QVariant(int(CmdActionMath::Subtract)));
     mOperationBox->addItem("*", QVariant(int(CmdActionMath::Multiply)));
@@ -91,6 +94,7 @@ void CmdActionMathEditDialog::setupUI()
     mOper2VarBtn = new QRadioButton(this);
     mOper2NumBtn = new QRadioButton(this);
     mOper2Box = new QComboBox(this);
+    mOper2Box->installEventFilter(this);
     mOper2Num = new QLineEdit(this);
     mOper2Num->setValidator(mValidator);
 
@@ -121,6 +125,18 @@ void CmdActionMathEditDialog::setupUI()
     connect(mOper1NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper1NumBtnStateChanged(bool)));
     connect(mOper2VarBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2VarBtnStateChanged(bool)));
     connect(mOper2NumBtn, SIGNAL(toggled(bool)), this, SLOT(onOper2NumBtnStateChanged(bool)));
+}
+
+bool CmdActionMathEditDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
 }
 
 void CmdActionMathEditDialog::setCommand(CmdActionMath* command)

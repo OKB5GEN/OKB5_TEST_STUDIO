@@ -14,7 +14,7 @@ class Cyclogram;
 class CyclogramConsole;
 class VariablesWindow;
 class SystemState;
-class MonitorAuto;
+class CyclogramChartDialog;
 
 class EditorWindow : public QMainWindow
 {

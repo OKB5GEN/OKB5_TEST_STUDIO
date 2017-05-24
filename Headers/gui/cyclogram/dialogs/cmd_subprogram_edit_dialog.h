@@ -32,6 +32,7 @@ private:
     void setupUI();
     void updateUI();
     void updateTable(QTableWidget* widget, QCheckBox* changedBox, int state);
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
     CmdSubProgram* mCommand;
 

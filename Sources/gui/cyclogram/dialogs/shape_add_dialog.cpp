@@ -3,9 +3,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/gui/cyclogram/shape_item.h"
 
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QComboBox>
+#include <QtWidgets>
 
 ShapeAddDialog::ShapeAddDialog(QWidget * parent):
     QDialog(parent),
@@ -14,6 +12,7 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
     QGridLayout * layout = new QGridLayout(this);
 
     mComboBox = new QComboBox(this);
+    mComboBox->installEventFilter(this);
     layout->addWidget(mComboBox, 0, 0);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
@@ -33,6 +32,18 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
 ShapeAddDialog::~ShapeAddDialog()
 {
 
+}
+
+bool ShapeAddDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+    {
+        return true; // do not process wheel events if combo box is not "expanded/opened"
+    }
+    else
+    {
+        return QObject::eventFilter(obj, event); // standard event processing
+    }
 }
 
 DRAKON::IconType ShapeAddDialog::shapeType() const
