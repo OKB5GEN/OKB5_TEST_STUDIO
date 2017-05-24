@@ -10,17 +10,10 @@ class ModuleDriveSimulator: public ModuleOKB
     Q_OBJECT
 
 public:
-    enum LineID
-    {
-        PSY = 1, // line 1
-        NU  = 2  // line 2
-    };
-
     ModuleDriveSimulator(QObject* parent);
     ~ModuleDriveSimulator();
 
-    int ptCount() const;
-    int dsCount(LineID line) const;
+    int sensorsCount() const;
 
 public slots:
     void processCustomCommand() override;
@@ -32,8 +25,7 @@ protected:
     void onModuleError() override;
 
 private:
-    int mSensorsCntPsy = 0;
-    int mSensorsCntNu = 0;
+    int mSensorsCnt;
 
     QList<qreal> mTemperatureData;
 };

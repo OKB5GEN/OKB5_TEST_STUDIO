@@ -18,6 +18,9 @@ public:
     ModuleOKB(QObject* parent);
     virtual ~ModuleOKB();
 
+    static double getDS1820Temp(const QByteArray& response);
+    static double getPT100Temp(const QByteArray& response);
+
 public slots:
     void processCommand(const Transaction& request) override;
 

@@ -301,11 +301,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         {
             addOKBCommonCommands();
 
-//            addCommand(tr("СБРОС: датчиков на линии 1"), ModuleCommands::RESET_LINE_1);
-//            addCommand(tr("СБРОС: датчиков на линии 2"), ModuleCommands::RESET_LINE_2);
-//            addCommand(tr("ЗАПРОС: температура с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
-//            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
-//            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
+            addCommand(tr("СБРОС: датчиков на линии"), ModuleCommands::RESET_LINE_1);
+            addCommand(tr("ЗАПРОС: температура с датчиков DS1820"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
         }
         break;
 

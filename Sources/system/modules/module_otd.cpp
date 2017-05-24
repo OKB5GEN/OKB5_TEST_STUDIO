@@ -7,47 +7,6 @@ namespace
     static const uint8_t OTD_DEFAULT_ADDR = 0x44;
     static const int SERIAL_NUMBER_BYTES_COUNT = 8;
     static const int MAX_PT100_COUNT = 2;
-
-    double getDS1820Temp(const QByteArray& response)
-    {
-        uint8_t uu1, uu2, z;
-        uu1 = response[2];
-        uu2 = response[3];
-        double uu = (uu1 << 8) | uu2;
-        uint8_t x = response[2];
-        z = x << 4;
-        z = z >> 7;
-        if (z == 0) // знаковый бит, положительная температура
-        {
-            uu = uu / 16;
-        }
-
-        if (z == 1) // знаковый бит, отрицательная температура
-        {
-            uu = (uu - 4096) / 16;
-        }
-
-        return uu;
-    }
-
-    double getPT100Temp(const QByteArray& response)
-    {
-        uint8_t uu1, uu2;
-        uu1 = response[2];
-        uu2 = response[3];
-        double uu = (uu1 << 8) | uu2;
-        uu = uu / 32 - 256;
-
-        int TODO; // parse error
-        //x = x / 100;
-        //y = y / 100;
-        //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-        //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
-        //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-        //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
-
-        return uu;
-    }
 }
 
 ModuleOTD::ModuleOTD(QObject* parent):
@@ -153,7 +112,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
-            double uu = getDS1820Temp(response);
+            double uu = ModuleOKB::getDS1820Temp(response);
             LOG_INFO(QString("Sensor #%1 at line 1 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
             mTemperatureData.push_back(uu);
         }
@@ -161,7 +120,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
-            double uu = getDS1820Temp(response);
+            double uu = ModuleOKB::getDS1820Temp(response);
             LOG_INFO(QString("Sensor #%1 at line 2 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
             mTemperatureData.push_back(uu);
         }
@@ -169,7 +128,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
 
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
-            double uu = getPT100Temp(response);
+            double uu = ModuleOKB::getPT100Temp(response);
             LOG_INFO(QString("PT100 sensor %1 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
             mTemperatureData.push_back(uu);
         }

@@ -271,6 +271,46 @@ void ModuleOKB::onTransmissionComplete()
 
 void ModuleOKB::createResponse(Transaction& response)
 {
-    LOG_WARNING(QString("ModuleOKB::createResponse not reimplemented"));
-    int TODO; // do nothing?
+    LOG_WARNING(QString("ModuleOKB::createResponse not reimplemented for %1 module").arg(moduleName()));
+}
+
+double ModuleOKB::getDS1820Temp(const QByteArray& response)
+{
+    uint8_t uu1, uu2, z;
+    uu1 = response[2];
+    uu2 = response[3];
+    double uu = (uu1 << 8) | uu2;
+    uint8_t x = response[2];
+    z = x << 4;
+    z = z >> 7;
+    if (z == 0) // знаковый бит, положительная температура
+    {
+        uu = uu / 16;
+    }
+
+    if (z == 1) // знаковый бит, отрицательная температура
+    {
+        uu = (uu - 4096) / 16;
+    }
+
+    return uu;
+}
+
+double ModuleOKB::getPT100Temp(const QByteArray& response)
+{
+    uint8_t uu1, uu2;
+    uu1 = response[2];
+    uu2 = response[3];
+    double uu = (uu1 << 8) | uu2;
+    uu = uu / 32 - 256;
+
+    int TODO; // parse error
+    //x = x / 100;
+    //y = y / 100;
+    //if(x == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    //if(y == -256) ui->OTDerror->setText("Ошибка измерения датчика");
+    //if(x > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+    //if(y > 1790) ui->OTDerror->setText("Ошибка обращения к модулю датчика");
+
+    return uu;
 }

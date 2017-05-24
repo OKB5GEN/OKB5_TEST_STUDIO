@@ -558,35 +558,15 @@ void SystemState::createDSCommandsParams()
 
     QStringList temperatureParams;
 
-    // PT-100 params
-    temperatureParams.clear();
-    int ptCount = mDS->ptCount();
-    for (int i = 0; i < ptCount; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
-
-    // DS1820 line 1 params
-    temperatureParams.clear();
-    int dsCount1 = mDS->dsCount(ModuleDriveSimulator::PSY);
-    for (int i = 0; i < dsCount1; ++i)
+    // DS1820 params
+    int count = mDS->sensorsCount();
+    for (int i = 0; i < count; ++i)
     {
         temperatureParams.push_back(paramName(TEMPERATURE));
     }
 
     outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
 
-    // DS1820 line 2 params
-    temperatureParams.clear();
-    int dsCount2 = mDS->dsCount(ModuleDriveSimulator::NU);
-    for (int i = 0; i < dsCount2; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
     outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
     outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
