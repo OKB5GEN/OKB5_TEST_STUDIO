@@ -114,7 +114,9 @@ void CmdActionModule::updateText()
         isValid = false;
     }
 
-    mText += commandName();
+    mText += moduleName();
+    mText += ".";
+    mText += commandName(mOperation, mInputParams);
 
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
@@ -218,12 +220,11 @@ QString CmdActionModule::moduleName(int moduleId)
     return text;
 }
 
-QString CmdActionModule::commandName() const
+QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams)
 {
-    QString text = moduleName();
-    text += tr(".");
+    QString text;
 
-    switch (mOperation)
+    switch (commandID)
     {
     case ModuleCommands::GET_MODULE_STATUS:
         text += tr("ПолСтат");
@@ -235,8 +236,8 @@ QString CmdActionModule::commandName() const
         {
             QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
             QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
-            int channel = mInputParams.value(paramName1).toInt();
-            int state = mInputParams.value(paramName2).toInt();
+            int channel = inputParams.value(paramName1).toInt();
+            int state = inputParams.value(paramName2).toInt();
 
             if (state == ModuleCommands::POWER_ON)
             {
@@ -274,8 +275,8 @@ QString CmdActionModule::commandName() const
         {
             QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
             QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
-            int channel = mInputParams.value(paramName1).toInt();
-            int state = mInputParams.value(paramName2).toInt();
+            int channel = inputParams.value(paramName1).toInt();
+            int state = inputParams.value(paramName2).toInt();
 
             if (state == ModuleCommands::POWER_ON)
             {
@@ -344,7 +345,7 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
             QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
-            int source = mInputParams.value(paramName).toInt();
+            int source = inputParams.value(paramName).toInt();
 
             if (source == ModuleMKO::PS_FROM_MAIN_KIT)
             {
@@ -417,7 +418,7 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         {
             QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = mInputParams.value(paramName).toInt();
+            int channel = inputParams.value(paramName).toInt();
 
             text += tr("ПС");
 
@@ -438,7 +439,7 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::GET_POWER_CHANNEL_STATE:
         {
             QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = mInputParams.value(paramName).toInt();
+            int channel = inputParams.value(paramName).toInt();
 
             text += tr("ПС");
 
@@ -468,7 +469,7 @@ QString CmdActionModule::commandName() const
     case ModuleCommands::GET_MODULE_ADDRESS:
         {
             QString paramName = mSystemState->paramName(SystemState::MODULE_ADDRESS);
-            int address = mInputParams.value(paramName).toInt();
+            int address = inputParams.value(paramName).toInt();
 
             text += tr("ПолАдр");
 
@@ -500,8 +501,9 @@ QString CmdActionModule::commandName() const
         break;
     default:
         {
+            text += tr("UNKNOWN");
             QMetaEnum commands = QMetaEnum::fromType<ModuleCommands::CommandID>();
-            LOG_WARNING(QString("Command '%1' GUI text description not implemented").arg(commands.valueToKey(mOperation)));
+            LOG_WARNING(QString("Command '%1' GUI text description not implemented").arg(commands.valueToKey(commandID)));
         }
         break;
     }

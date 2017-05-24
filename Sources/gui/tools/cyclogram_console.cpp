@@ -20,6 +20,12 @@ CyclogramConsole::CyclogramConsole(QWidget * parent):
 
     mTextEdit = new QTextEdit(this);
     mTextEdit->setReadOnly(true);
+
+    QFont font;
+    font.setPointSize(10);
+    font.setFamily("Verdana");
+    mTextEdit->setFont(font);
+
     layout->addWidget(mTextEdit, 1, 0);
 
     connect(clearConsoleBtn, SIGNAL(clicked()), mTextEdit, SLOT(clear()));

@@ -24,6 +24,7 @@ public:
 
     QString moduleName() const;
     static QString moduleName(int moduleId);
+    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams);
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
@@ -36,9 +37,6 @@ private:
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
-
-
-    QString commandName() const;
 
     ModuleCommands::ModuleID mModule;
     uint32_t mOperation;

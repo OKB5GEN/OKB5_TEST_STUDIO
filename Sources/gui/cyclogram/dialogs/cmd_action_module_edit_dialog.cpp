@@ -385,8 +385,13 @@ void CmdActionModuleEditDialog::addOKBCommonCommands()
 
 void CmdActionModuleEditDialog::addCommand(const QString& text, int commandID, const QMap<QString, QVariant>& implicitParams)
 {
+    QString fullText = text;
+    fullText += " (";
+    fullText += mCommand->commandName(commandID, implicitParams);
+    fullText += ")";
+
     QListWidgetItem* item = new QListWidgetItem();
-    item->setText(text);
+    item->setText(fullText);
     item->setData(Qt::UserRole, QVariant(commandID));
 
     if (!implicitParams.isEmpty())
