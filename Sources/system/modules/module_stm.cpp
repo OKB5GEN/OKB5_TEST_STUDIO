@@ -12,8 +12,7 @@ namespace
 }
 
 ModuleSTM::ModuleSTM(QObject* parent):
-    ModuleOKB(parent),
-    mRequestedChannelTelemetry(0)
+    ModuleOKB(parent)
 {
 //    mPowerSupplyRelayStates[ModuleCommands::BUP_MAIN] = ModuleCommands::POWER_OFF;
 //    mPowerSupplyRelayStates[ModuleCommands::BUP_RESERVE] = ModuleCommands::POWER_OFF;
@@ -52,40 +51,6 @@ void ModuleSTM::setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID 
 //{
 //    return mMKOPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
 //}
-
-void ModuleSTM::getChannelTelemetry(int channel)
-{
-    if (channel < 0 || channel >= TELEMETRY_CHANNELS_COUNT)
-    {
-        LOG_ERROR(QString("Invalid channel id=%1 for getting telemetry").arg(channel));
-        return;
-    }
-
-    mRequestedChannelTelemetry = channel;
-    addModuleCmd(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0);
-}
-
-ModuleSTM::FuseStates ModuleSTM::fuseState(int fuseIndex)
-{
-    // valid values 1 to 8 //TODO
-    if (fuseIndex < 1 || fuseIndex > 8)
-    {
-        LOG_ERROR(QString("Invalid fuse index %1").arg(fuseIndex));
-        return ModuleSTM::ERROR;
-    }
-
-    addModuleCmd(ModuleCommands::GET_FUSE_STATE, fuseIndex, 0);
-//        LOG_ERROR(QString("Can not check fuse %1 state").arg(fuseIndex));
-//        return ModuleSTM::ERROR;
-
-    //TODO
-    int state = 0; //response[3];
-
-    QMetaEnum e = QMetaEnum::fromType<ModuleSTM::FuseStates>();
-    LOG_INFO(QString("Fuse %1 state %2").arg(fuseIndex).arg(e.valueToKey(ModuleSTM::FuseStates(state))));
-
-    return ModuleSTM::FuseStates(state); //TODO undefined values
-}
 
 void ModuleSTM::processCustomCommand()
 {
@@ -129,6 +94,36 @@ void ModuleSTM::processCustomCommand()
         }
         break;
 
+    case ModuleCommands::GET_CHANNEL_TELEMETRY:
+        {
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+
+            if (channel < 0 || channel >= TELEMETRY_CHANNELS_COUNT)
+            {
+                mCurrentTransaction.error = QString("Invalid channel id=%1 for getting telemetry").arg(channel);
+                emit commandResult(mCurrentTransaction);
+                return;
+            }
+
+            addModuleCmd(ModuleCommands::GET_CHANNEL_TELEMETRY, channel, 0);
+        }
+        break;
+
+    case ModuleCommands::GET_FUSE_STATE:
+        {
+            int fuseIndex = mCurrentTransaction.inputParams.value(SystemState::FUSE_ID).toInt();
+
+            if (fuseIndex < 1 || fuseIndex > 8)
+            {
+                mCurrentTransaction.error = QString("Invalid fuse index %1").arg(fuseIndex);
+                emit commandResult(mCurrentTransaction);
+                return;
+            }
+
+            addModuleCmd(ModuleCommands::GET_FUSE_STATE, fuseIndex, 0);
+        }
+        break;
+
     default:
         LOG_ERROR(QString("Unexpected command %1 received by STM module").arg(command));
         break;
@@ -143,20 +138,21 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
     {
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
         {
+            int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
+
             uint8_t uu1, uu2;
             uu1 = response[2];
             uu2 = response[3];
             qreal voltage = qreal((uu1 << 8) | uu2) / 10000;
 
-            LOG_INFO(QString("Telemetry channel %1 voltage=%2").arg(mRequestedChannelTelemetry).arg(voltage));
+            LOG_INFO(QString("Telemetry channel %1 voltage=%2").arg(channel).arg(voltage));
 
-            if (voltage >= CHANNEL_CONNECTED_BORDER)
-            {
+//            if (voltage >= CHANNEL_CONNECTED_BORDER)
+//            {
 
-            }
+//            }
 
-            LOG_WARNING(QString("Get channel telemetry processing not implemented"));
-            int TODO; //form response
+            addResponseParam(SystemState::VOLTAGE, voltage);
         }
         break;
 
@@ -204,14 +200,32 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
-                mCurrentTransaction.error = QString("Couldn't get '%1' MKO power supply channel state. Errror occured").arg(e.valueToKey(channel));
+                mCurrentTransaction.error = QString("Couldn't get '%1' MKO power supply channel state. Error occured").arg(e.valueToKey(channel));
             }
         }
         break;
 
     case ModuleCommands::GET_FUSE_STATE:
         {
-            int TODO;
+            uint8_t fuse = response[2];
+            uint8_t state = response[3];
+
+            if (state == 0) // TODO move constants to encoder/decoder
+            {
+                LOG_INFO(QString("Fuse '%1' state is OK").arg(fuse));
+                addResponseParam(SystemState::FUSE_STATE, 0);
+            }
+            else if (state == 1)
+            {
+                LOG_INFO(QString("Fuse '%1' state is FAILURE").arg(fuse));
+                addResponseParam(SystemState::FUSE_STATE, 1);
+            }
+            else if (state == 2) //TODO error is possibly be detected earlier
+            {
+                mCurrentTransaction.error = QString("Couldn't get '%1' fuse state. Error occured").arg(fuse);
+            }
+
+            addResponseParam(SystemState::FUSE_STATE, state);
         }
         break;
 

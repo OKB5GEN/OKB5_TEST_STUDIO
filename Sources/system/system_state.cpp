@@ -166,6 +166,8 @@ SystemState::SystemState(QObject* parent):
     mParamNames[MODULE_READY] = tr("Module ready flag");
     mParamNames[MODULE_AFTER_RESET] = tr("Module after reset flag");
     mParamNames[MODULE_HAS_ERRORS] = tr("Module has errors flag");
+    mParamNames[FUSE_ID] = tr("Fuse id");
+    mParamNames[FUSE_STATE] = tr("Fuse state");
 
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
@@ -190,9 +192,12 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[POWER] = "Pow";
     mDefaultVariables[RELAY_STATE] = "IsOn";
     mDefaultVariables[MODULE_ADDRESS] = "Addr";
-    mDefaultVariables[MODULE_READY] = tr("IsReady");
-    mDefaultVariables[MODULE_AFTER_RESET] = tr("IsReset");
-    mDefaultVariables[MODULE_HAS_ERRORS] = tr("HasErr");
+    mDefaultVariables[MODULE_READY] = "IsReady";
+    mDefaultVariables[MODULE_AFTER_RESET] = "IsReset";
+    mDefaultVariables[MODULE_HAS_ERRORS] = "HasErr";
+    mDefaultVariables[FUSE_ID] = "Fuse";
+    mDefaultVariables[FUSE_STATE] = "FuSt";
+    mDefaultVariables[CHANNEL_ID] = "Ch";
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -220,6 +225,9 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[MODULE_READY] = tr("Module ready flag. 1 - ready, 0 - not ready");
     mDefaultDescriptions[MODULE_AFTER_RESET] = tr("Module is after reset flag. 1 - after reset, 0 - not after reset");
     mDefaultDescriptions[MODULE_HAS_ERRORS] = tr("Module error flag. 1 - module has errors, 0 - module has no errors");
+    mDefaultDescriptions[FUSE_ID] = tr("Fuse index");
+    mDefaultDescriptions[FUSE_STATE] = tr("Fuse state: 0 - fuse OK, 1 - fuse malfunction");
+    mDefaultDescriptions[CHANNEL_ID] = tr("Telemetry channel index");
 }
 
 SystemState::~SystemState()
@@ -586,9 +594,17 @@ void SystemState::createSTMCommandsParams()
     QStringList relayStateParams;
     relayStateParams.append(paramName(RELAY_STATE));
 
+    QStringList getFuseInParams;
+    getFuseInParams.append(paramName(FUSE_ID));
+
+    QStringList getTelemetryInParams;
+    getTelemetryInParams.append(paramName(CHANNEL_ID));
+
     // input params
     QMap<int, QStringList> inParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+    inParams[ModuleCommands::GET_FUSE_STATE] = getFuseInParams;
+    inParams[ModuleCommands::GET_CHANNEL_TELEMETRY] = getTelemetryInParams;
 
     mInParams[ModuleCommands::STM] = inParams;
 
@@ -600,6 +616,12 @@ void SystemState::createSTMCommandsParams()
     statusWordParams.append(paramName(MODULE_AFTER_RESET));
     statusWordParams.append(paramName(MODULE_HAS_ERRORS));
 
+    QStringList getFuseOutParams;
+    getFuseOutParams.append(paramName(FUSE_STATE));
+
+    QStringList getTelemetryOutParams;
+    getTelemetryOutParams.append(paramName(VOLTAGE));
+
     // output params
     QMap<int, QStringList> outParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
@@ -607,6 +629,8 @@ void SystemState::createSTMCommandsParams()
     outParams[ModuleCommands::GET_MKO_POWER_CHANNEL_STATE] = relayStateParams;
     outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
     outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
+    outParams[ModuleCommands::GET_FUSE_STATE] = getFuseOutParams;
+    outParams[ModuleCommands::GET_CHANNEL_TELEMETRY] = getTelemetryOutParams;
 
     mOutParams[ModuleCommands::STM] = outParams;
 }

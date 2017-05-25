@@ -276,12 +276,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(tr("ВЫКЛ: подачу питания на МКО Рез."), ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
-            int TODO;
-            // 1. проверка предохранителей
-            // 2. получение телеметрии канала
-
-            //addCommand(tr("Проверить предохранители"), ModuleCommands::GET_PWR_MODULE_FUSE_STATE);
-            //addCommand(tr("ПОЛ телеметрию канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
+            addCommand(tr("ЗАПРОС: состояние предохранителя"), ModuleCommands::GET_FUSE_STATE);
+            addCommand(tr("ЗАПРОС: телеметрия канала"), ModuleCommands::GET_CHANNEL_TELEMETRY);
         }
         break;
 

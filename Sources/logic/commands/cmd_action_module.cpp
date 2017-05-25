@@ -300,6 +300,9 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
             }
         }
         break;
+    case ModuleCommands::GET_FUSE_STATE:
+        text += tr("ПолСостПр");
+        break;
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
         text = tr("ПолТелем");
         break;

@@ -53,6 +53,8 @@ public:
         STATUS_LOGICAL, // 0 - inactive, 1 - active
         ECHO_DATA_1,
         ECHO_DATA_2,
+        FUSE_ID,
+        FUSE_STATE,
 
         UNDEFINED
     };
