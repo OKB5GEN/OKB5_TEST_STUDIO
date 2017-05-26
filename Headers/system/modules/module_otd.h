@@ -3,24 +3,13 @@
 
 #include "Headers/system/okb_module.h"
 
-#include <QList>
-
 class ModuleOTD: public ModuleOKB
 {
     Q_OBJECT
 
 public:
-    enum LineID
-    {
-        PSY = 1, // line 1
-        NU  = 2  // line 2
-    };
-
     ModuleOTD(QObject* parent);
     ~ModuleOTD();
-
-    int ptCount() const;
-    int dsCount(LineID line) const;
 
 public slots:
     void processCustomCommand() override;
@@ -32,10 +21,8 @@ protected:
     void onModuleError() override;
 
 private:
-    int mSensorsCntPsy = 0;
-    int mSensorsCntNu = 0;
-
-    QList<qreal> mTemperatureData;
+    int mSensorsCntPsy;
+    int mSensorsCntNu;
 };
 
 #endif // MODULE_OTD_H

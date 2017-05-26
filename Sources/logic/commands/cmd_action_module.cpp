@@ -304,16 +304,28 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         text += tr("ПолСостПр");
         break;
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
-        text = tr("ПолТелем");
+        text += tr("ПолТелем");
         break;
     case ModuleCommands::GET_TEMPERATURE_PT100:
-        text = tr("ПолТемпПТ");
+        text += tr("ПолТемпПТ");
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-        text = tr("ПолТемпDS1");
+        text += tr("ПолТемпDS1");
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
-        text = tr("ПолТемпDS2");
+        text += tr("ПолТемпDS2");
+        break;
+    case ModuleCommands::GET_DS1820_COUNT_LINE_1:
+        text += tr("ПолЧислоDS1");
+        break;
+    case ModuleCommands::GET_DS1820_COUNT_LINE_2:
+        text += tr("ПолЧислоDS2");
+        break;
+    case ModuleCommands::START_MEASUREMENT_LINE_1:
+        text += tr("ЗапускИзм1");
+        break;
+    case ModuleCommands::START_MEASUREMENT_LINE_2:
+        text += tr("ЗапускИзм2");
         break;
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
         text += tr("УстНапр");

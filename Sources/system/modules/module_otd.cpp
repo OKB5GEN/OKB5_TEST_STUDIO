@@ -21,71 +21,36 @@ ModuleOTD::~ModuleOTD()
 
 }
 
-int ModuleOTD::ptCount() const
-{
-    return MAX_PT100_COUNT;
-}
-
-int ModuleOTD::dsCount(LineID line) const
-{
-    if (line == PSY)
-    {
-        return mSensorsCntPsy;
-    }
-
-    return mSensorsCntNu;
-}
-
 void ModuleOTD::processCustomCommand()
 {
-    mTemperatureData.clear();
-
     ModuleCommands::CommandID command = ModuleCommands::CommandID(mCurrentTransaction.commandID);
 
     switch (command)
     {
     case ModuleCommands::GET_TEMPERATURE_PT100:
-        {
-            LOG_INFO(QString("Start temperature measurement with PT100 sensors"));
-            for (int i = 0; i < MAX_PT100_COUNT; ++i)
-            {
-                addModuleCmd(ModuleCommands::GET_TEMPERATURE_PT100, i + 1, 0);
-            }
-        }
-        break;
-
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-        {
-            LOG_INFO(QString("Start temperature measurement at line 1"));
-            addModuleCmd(ModuleCommands::START_MEASUREMENT_LINE_1, 0, 0);
-            for(int i = 0; i < mSensorsCntPsy; ++i)
-            {
-                addModuleCmd(command, i + 1, 0);
-            }
-        }
-        break;
-
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
-            LOG_INFO(QString("Start temperature measurement at line 2"));
-            addModuleCmd(ModuleCommands::START_MEASUREMENT_LINE_2, 0, 0);
-            for(int i = 0; i < mSensorsCntNu; ++i)
-            {
-                addModuleCmd(command, i + 1, 0);
-            }
+            int sensorNumber = mCurrentTransaction.inputParams.value(SystemState::SENSOR_NUMBER).toInt();
+            addModuleCmd(command, sensorNumber, 0);
         }
         break;
 
     case ModuleCommands::RESET_LINE_1:
     case ModuleCommands::RESET_LINE_2:
+    case ModuleCommands::START_MEASUREMENT_LINE_1:
+    case ModuleCommands::START_MEASUREMENT_LINE_2:
         {
             addModuleCmd(command, 0, 0);
         }
         break;
 
     default:
-        LOG_ERROR(QString("Unexpected command %1 received by OTD module").arg(command));
-        return;
+        {
+            mCurrentTransaction.error = QString("Unexpected command %1 received by OTD module").arg(command);
+            emit commandResult(mCurrentTransaction);
+            return;
+        }
         break;
     }
 }
@@ -99,38 +64,48 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
     case ModuleCommands::GET_DS1820_COUNT_LINE_1:
         {
             mSensorsCntPsy = response[2];
+
             LOG_INFO(QString("DS1820 sensors count at line 1 is %1").arg(mSensorsCntPsy));
+            addResponseParam(SystemState::SENSORS_COUNT, mSensorsCntPsy);
         }
         break;
 
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
         {
             mSensorsCntNu = response[2];
+
             LOG_INFO(QString("DS1820 sensors count at line 2 is %1").arg(mSensorsCntNu));
+            addResponseParam(SystemState::SENSORS_COUNT, mSensorsCntNu);
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         {
-            double uu = ModuleOKB::getDS1820Temp(response);
-            LOG_INFO(QString("Sensor #%1 at line 1 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
-            mTemperatureData.push_back(uu);
+            int sensorNumber = mCurrentTransaction.inputParams.value(SystemState::SENSOR_NUMBER).toInt();
+            double temperature = ModuleOKB::getDS1820Temp(response);
+
+            LOG_INFO(QString("Sensor #%1 at line 1 temperature is %2").arg(sensorNumber).arg(temperature));
+            addResponseParam(SystemState::TEMPERATURE, temperature);
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
         {
-            double uu = ModuleOKB::getDS1820Temp(response);
-            LOG_INFO(QString("Sensor #%1 at line 2 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
-            mTemperatureData.push_back(uu);
+            int sensorNumber = mCurrentTransaction.inputParams.value(SystemState::SENSOR_NUMBER).toInt();
+            double temperature = ModuleOKB::getDS1820Temp(response);
+
+            LOG_INFO(QString("Sensor #%1 at line 2 temperature is %2").arg(sensorNumber).arg(temperature));
+            addResponseParam(SystemState::TEMPERATURE, temperature);
         }
         break;
 
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
-            double uu = ModuleOKB::getPT100Temp(response);
-            LOG_INFO(QString("PT100 sensor %1 temperature is %2").arg(mTemperatureData.size() + 1).arg(uu));
-            mTemperatureData.push_back(uu);
+            int sensorNumber = mCurrentTransaction.inputParams.value(SystemState::SENSOR_NUMBER).toInt();
+            double temperature = ModuleOKB::getPT100Temp(response);
+
+            LOG_INFO(QString("PT100 sensor %1 temperature is %2").arg(sensorNumber).arg(temperature));
+            addResponseParam(SystemState::TEMPERATURE, temperature);
         }
         break;
 
@@ -139,7 +114,7 @@ bool ModuleOTD::processCustomResponse(uint32_t operationID, const QByteArray& re
     case ModuleCommands::RESET_LINE_1:
     case ModuleCommands::RESET_LINE_2:
         {
-            int TODO; // check error?
+            // do nothing
         }
         break;
 
@@ -159,42 +134,6 @@ void ModuleOTD::onModuleError()
 
 void ModuleOTD::createResponse(Transaction& response)
 {
-    switch (mCurrentTransaction.commandID)
-    {
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
-    case ModuleCommands::GET_TEMPERATURE_PT100:
-        {
-            // fill response
-            int paramsCount = mCurrentTransaction.outputParams.size();
-            int valuesCount = mTemperatureData.size();
-
-            if (paramsCount != valuesCount)
-            {
-                LOG_ERROR(QString("Request output params count (%1) and values count (%2) mismatch").arg(paramsCount).arg(valuesCount));
-                return;
-            }
-
-            QMap<uint32_t, QVariant> outputParams;
-            int i = 0;
-            for (auto it = mCurrentTransaction.outputParams.begin(); it != mCurrentTransaction.outputParams.end(); ++it)
-            {
-                //TODO replace by addResponseParam(it.key(), mTemperatureData[i]); // TODO output params malformed packet!
-                QList<QVariant> list;
-                list.append(it.value());
-                list.append(QVariant(mTemperatureData[i]));
-                outputParams[it.key()] = list;
-                ++i;
-            }
-
-            mCurrentTransaction.outputParams = outputParams;
-        }
-        break;
-
-    default: // just give current transaction data
-        break;
-    }
-
     response = mCurrentTransaction;
 }
 

@@ -287,9 +287,16 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
             addCommand(tr("СБРОС: датчиков на линии 1"), ModuleCommands::RESET_LINE_1);
             addCommand(tr("СБРОС: датчиков на линии 2"), ModuleCommands::RESET_LINE_2);
+            addCommand(tr("ЗАПРОС: количество датчиков DS1820 на линии 1"), ModuleCommands::GET_DS1820_COUNT_LINE_1);
+            addCommand(tr("ЗАПРОС: количество датчиков DS1820 на линии 2"), ModuleCommands::GET_DS1820_COUNT_LINE_2);
+            addCommand(tr("ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 1"), ModuleCommands::START_MEASUREMENT_LINE_1);
+            addCommand(tr("ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 2"), ModuleCommands::START_MEASUREMENT_LINE_2);
             addCommand(tr("ЗАПРОС: температура с датчиков ПТ-100"), ModuleCommands::GET_TEMPERATURE_PT100);
-            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
-            addCommand(tr("ЗАПРОС: температура с датчиков DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
+            addCommand(tr("ЗАПРОС: температура с датчика DS1820 линия 1"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(tr("ЗАПРОС: температура с датчика DS1820 линия 2"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
+
+            //3. Чтение адресов на линии 1 (ОТД) //TODO
+            //4. Чтение адресов на линии 2 (ОТД) //TODO
         }
         break;
 
@@ -298,7 +305,11 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addOKBCommonCommands();
 
             addCommand(tr("СБРОС: датчиков на линии"), ModuleCommands::RESET_LINE_1);
-            addCommand(tr("ЗАПРОС: температура с датчиков DS1820"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(tr("ЗАПРОС: количество датчиков DS1820"), ModuleCommands::GET_DS1820_COUNT_LINE_1);
+            addCommand(tr("ЗАПРОС: запуск измерений температуры датчиками DS1820"), ModuleCommands::START_MEASUREMENT_LINE_1);
+            addCommand(tr("ЗАПРОС: температура с датчика DS1820"), ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+
+            //10. Чтение адресов на линии (ИП) //TODO
         }
         break;
 

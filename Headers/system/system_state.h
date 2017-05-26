@@ -55,6 +55,8 @@ public:
         ECHO_DATA_2,
         FUSE_ID,
         FUSE_STATE,
+        SENSOR_NUMBER,
+        SENSORS_COUNT,
 
         UNDEFINED
     };

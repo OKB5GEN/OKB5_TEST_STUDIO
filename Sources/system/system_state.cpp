@@ -168,6 +168,8 @@ SystemState::SystemState(QObject* parent):
     mParamNames[MODULE_HAS_ERRORS] = tr("Module has errors flag");
     mParamNames[FUSE_ID] = tr("Fuse id");
     mParamNames[FUSE_STATE] = tr("Fuse state");
+    mParamNames[SENSOR_NUMBER] = tr("Sensor number");
+    mParamNames[SENSORS_COUNT] = tr("Sensors count");
 
     mDefaultVariables[VOLTAGE] = "U";
     mDefaultVariables[CURRENT] = "I";
@@ -198,6 +200,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultVariables[FUSE_ID] = "Fuse";
     mDefaultVariables[FUSE_STATE] = "FuSt";
     mDefaultVariables[CHANNEL_ID] = "Ch";
+    mDefaultVariables[SENSOR_NUMBER] = "SN";
+    mDefaultVariables[SENSORS_COUNT] = "SCnt";
 
     mDefaultDescriptions[VOLTAGE] = tr("Voltage, V");
     mDefaultDescriptions[CURRENT] = tr("Current, A");
@@ -228,6 +232,8 @@ SystemState::SystemState(QObject* parent):
     mDefaultDescriptions[FUSE_ID] = tr("Fuse index");
     mDefaultDescriptions[FUSE_STATE] = tr("Fuse state: 0 - fuse OK, 1 - fuse malfunction");
     mDefaultDescriptions[CHANNEL_ID] = tr("Telemetry channel index");
+    mDefaultDescriptions[SENSOR_NUMBER] = tr("DS1820 sensor number in the line");
+    mDefaultDescriptions[SENSORS_COUNT] = tr("DS1820 sensors count at the line");
 }
 
 SystemState::~SystemState()
@@ -481,9 +487,15 @@ void SystemState::createOTDCommandsParams()
     QStringList setStatusParams;
     setStatusParams.append(paramName(STATUS_LOGICAL));
 
+    QStringList temperatureInParams;
+    temperatureInParams.push_back(paramName(SENSOR_NUMBER));
+
     // input params
     QMap<int, QStringList> inParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+    inParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureInParams;
+    inParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureInParams;
+    inParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureInParams;
 
     mInParams[ModuleCommands::OTD] = inParams;
 
@@ -496,43 +508,22 @@ void SystemState::createOTDCommandsParams()
     statusWordParams.append(paramName(MODULE_AFTER_RESET));
     statusWordParams.append(paramName(MODULE_HAS_ERRORS));
 
-    int TODO; // solve problem with sensors count data
+    QStringList temperatureOutParams;
+    temperatureOutParams.push_back(paramName(TEMPERATURE));
+
+    QStringList getSensorsCountParams;
+    getSensorsCountParams.push_back(paramName(SENSORS_COUNT));
+
     QMap<int, QStringList> outParams;
 
-    QStringList temperatureParams;
-
-    // PT-100 params
-    temperatureParams.clear();
-    int ptCount = mOTD->ptCount();
-    for (int i = 0; i < ptCount; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureParams;
-
-    // DS1820 line 1 params
-    temperatureParams.clear();
-    int dsCount1 = mOTD->dsCount(ModuleOTD::PSY);
-    for (int i = 0; i < dsCount1; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
-
-    // DS1820 line 2 params
-    temperatureParams.clear();
-    int dsCount2 = mOTD->dsCount(ModuleOTD::NU);
-    for (int i = 0; i < dsCount2; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureOutParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureOutParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureOutParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
     outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
     outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
+    outParams[ModuleCommands::GET_DS1820_COUNT_LINE_1] = getSensorsCountParams;
+    outParams[ModuleCommands::GET_DS1820_COUNT_LINE_2] = getSensorsCountParams;
 
     mOutParams[ModuleCommands::OTD] = outParams;
 }
@@ -546,9 +537,13 @@ void SystemState::createDSCommandsParams()
     QStringList setStatusParams;
     setStatusParams.append(paramName(STATUS_LOGICAL));
 
+    QStringList temperatureInParams;
+    temperatureInParams.push_back(paramName(SENSOR_NUMBER));
+
     // input params
     QMap<int, QStringList> inParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
+    inParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureInParams;
 
     mInParams[ModuleCommands::DRIVE_SIMULATOR] = inParams;
 
@@ -561,23 +556,19 @@ void SystemState::createDSCommandsParams()
     statusWordParams.append(paramName(MODULE_AFTER_RESET));
     statusWordParams.append(paramName(MODULE_HAS_ERRORS));
 
-    int TODO; // solve problem with sensors count data
+    QStringList getSensorsCountParams;
+    getSensorsCountParams.push_back(paramName(SENSORS_COUNT));
+
     QMap<int, QStringList> outParams;
 
-    QStringList temperatureParams;
-
-    // DS1820 params
-    int count = mDS->sensorsCount();
-    for (int i = 0; i < count; ++i)
-    {
-        temperatureParams.push_back(paramName(TEMPERATURE));
-    }
-
-    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureParams;
+    QStringList temperatureOutParams;
+    temperatureOutParams.push_back(paramName(TEMPERATURE));
 
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
     outParams[ModuleCommands::GET_MODULE_ADDRESS] = moduleAddressParams;
     outParams[ModuleCommands::GET_STATUS_WORD] = statusWordParams;
+    outParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureOutParams;
+    outParams[ModuleCommands::GET_DS1820_COUNT_LINE_1] = getSensorsCountParams;
 
     mOutParams[ModuleCommands::DRIVE_SIMULATOR] = outParams;
 }

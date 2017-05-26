@@ -3,8 +3,6 @@
 
 #include "Headers/system/okb_module.h"
 
-#include <QList>
-
 class ModuleDriveSimulator: public ModuleOKB
 {
     Q_OBJECT
@@ -13,7 +11,6 @@ public:
     ModuleDriveSimulator(QObject* parent);
     ~ModuleDriveSimulator();
 
-    int sensorsCount() const;
 
 public slots:
     void processCustomCommand() override;
@@ -26,8 +23,6 @@ protected:
 
 private:
     int mSensorsCnt;
-
-    QList<qreal> mTemperatureData;
 };
 
 #endif // MODULE_DRIVE_SIMULATOR_H
