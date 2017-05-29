@@ -440,7 +440,7 @@ void ShapeItem::updateToolTip()
         {
             CmdActionModule* cmd = qobject_cast<CmdActionModule*>(mCommand);
             mToolTip = tr("Module command") + "\n";
-            mToolTip += tr("Module: %1").arg(cmd->moduleName()) + "\n";
+            mToolTip += tr("Module: %1").arg(cmd->moduleName(true)) + "\n";
             mToolTip += tr("Command: %1").arg(cmd->commandName(cmd->operation(), cmd->inputParams(), true));
         }
         break;

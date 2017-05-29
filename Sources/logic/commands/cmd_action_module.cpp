@@ -114,7 +114,7 @@ void CmdActionModule::updateText()
         isValid = false;
     }
 
-    mText += moduleName();
+    mText += moduleNameImpl();
     mText += ".";
     mText += commandName(mOperation, mInputParams);
 
@@ -140,6 +140,81 @@ void CmdActionModule::updateText()
     emit textChanged(mText);
 }
 
+QString CmdActionModule::moduleNameImpl() const
+{
+    QString text;
+
+    switch (mOperation)
+    {
+    case ModuleCommands::SET_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_POWER_CHANNEL_STATE:
+        {
+            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
+            int channel = mInputParams.value(paramName).toInt();
+
+            switch (channel)
+            {
+            case ModuleCommands::BUP_MAIN:
+            case ModuleCommands::BUP_RESERVE:
+            case ModuleCommands::RESERVED_RELAY_3:
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
+                break;
+            default:
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
+                break;
+            }
+        }
+        break;
+    case ModuleCommands::GET_FUSE_STATE:
+        {
+            QString paramName = mSystemState->paramName(SystemState::FUSE_ID);
+            int fuse = mInputParams.value(paramName).toInt();
+
+            if (fuse >= 1 && fuse <= 4)
+            {
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
+            }
+            else if (fuse > 4 && fuse <= 8)
+            {
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
+            }
+            else
+            {
+                LOG_ERROR(QString("Incorrect fuse id=%1 in command").arg(fuse));
+            }
+        }
+        break;
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+    case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+        {
+            text += CmdActionModule::moduleName(ModuleCommands::MKO, false);
+        }
+        break;
+
+        {
+            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
+            int channel = mInputParams.value(paramName).toInt();
+
+            switch (channel)
+            {
+            case ModuleCommands::BUP_MAIN:
+            case ModuleCommands::BUP_RESERVE:
+            case ModuleCommands::RESERVED_RELAY_3:
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
+                break;
+            default:
+                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
+                break;
+            }
+        }
+        break;
+    default:
+        text += moduleName(false);
+        break;
+    }
+
+    return text;
+}
 void CmdActionModule::onNameChanged(const QString& newName, const QString& oldName)
 {
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
@@ -182,36 +257,36 @@ void CmdActionModule::onVariableRemoved(const QString& name)
     updateText();
 }
 
-QString CmdActionModule::moduleName() const
+QString CmdActionModule::moduleName(bool isFullName) const
 {
-    return moduleName(mModule);
+    return moduleName(mModule, isFullName);
 }
 
-QString CmdActionModule::moduleName(int moduleId)
+QString CmdActionModule::moduleName(int moduleId, bool isFullName)
 {
     QString text;
     switch (moduleId)
     {
     case ModuleCommands::POWER_UNIT_BUP:
-        text = tr("БП1");
+        text = isFullName ? tr("Модуль питания блока управления приводом") : tr("БП1");
         break;
     case ModuleCommands::POWER_UNIT_PNA:
-        text = tr("БП2");
+        text = isFullName ? tr("Модуль питания привода направленной антенны") : tr("БП2");
         break;
     case ModuleCommands::MKO:
-        text = tr("МКО");
+        text = isFullName ? tr("Модуль мультиплексного канала обмена") : tr("МКО");
         break;
     case ModuleCommands::STM:
-        text = tr("СТМ");
+        text = isFullName ? tr("Модуль сигнальной телеметрии") : tr("СТМ");
         break;
     case ModuleCommands::OTD:
-        text = tr("ОТД");
+        text = isFullName ? tr("Модуль опроса температурных датчиков") : tr("ОТД");
         break;
     case ModuleCommands::DRIVE_SIMULATOR:
-        text = tr("ИП");
+        text = isFullName ? tr("Модуль имитатора привода") : tr("ИП");
         break;
     case ModuleCommands::TECH:
-        text = tr("ТЕХ");
+        text = isFullName ? tr("Модуль технологический") : tr("ТЕХ");
         break;
     default:
         break;

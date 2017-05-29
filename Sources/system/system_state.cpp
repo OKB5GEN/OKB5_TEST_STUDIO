@@ -367,19 +367,26 @@ void SystemState::createPowerUnitCommandsParams()
     powerParams.append(paramName(VOLTAGE));
     powerParams.append(paramName(CURRENT));
 
-    // commands input params
-    QMap<int, QStringList> inParams;
-
     QStringList voltageSetParams;
     voltageSetParams.push_back(paramName(VOLTAGE));
 
     QStringList currentSetParams;
     currentSetParams.push_back(paramName(CURRENT));
 
+    QStringList relayStateParams;
+    relayStateParams.append(paramName(RELAY_STATE));
+
+    QStringList getFuseInParams;
+    getFuseInParams.append(paramName(FUSE_ID));
+
+    // commands input params
+    QMap<int, QStringList> inParams;
+
     inParams[ModuleCommands::SET_VOLTAGE_AND_CURRENT] = voltageSetParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
     inParams[ModuleCommands::SET_OVP_THRESHOLD] = voltageSetParams;
     inParams[ModuleCommands::SET_OCP_THRESHOLD] = currentSetParams;
+    inParams[ModuleCommands::GET_FUSE_STATE] = getFuseInParams;
 
     mInParams[ModuleCommands::POWER_UNIT_BUP] = inParams;
     mInParams[ModuleCommands::POWER_UNIT_PNA] = inParams;
@@ -393,6 +400,9 @@ void SystemState::createPowerUnitCommandsParams()
     QStringList nomPowerParams;
     nomPowerParams.push_back(paramName(POWER));
 
+    QStringList getFuseOutParams;
+    getFuseOutParams.append(paramName(FUSE_STATE));
+
     outParams[ModuleCommands::GET_VOLTAGE_AND_CURRENT] = powerParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
     outParams[ModuleCommands::GET_DEVICE_CLASS] = deviceClass;
@@ -401,6 +411,9 @@ void SystemState::createPowerUnitCommandsParams()
     outParams[ModuleCommands::GET_NOMINAL_POWER] = nomPowerParams;
     outParams[ModuleCommands::GET_OVP_THRESHOLD] = voltageSetParams;
     outParams[ModuleCommands::GET_OCP_THRESHOLD] = currentSetParams;
+    outParams[ModuleCommands::GET_POWER_CHANNEL_STATE] = relayStateParams;
+    outParams[ModuleCommands::GET_MKO_POWER_CHANNEL_STATE] = relayStateParams;
+    outParams[ModuleCommands::GET_FUSE_STATE] = getFuseOutParams;
 
     mOutParams[ModuleCommands::POWER_UNIT_BUP] = outParams;
     mOutParams[ModuleCommands::POWER_UNIT_PNA] = outParams;
@@ -461,6 +474,9 @@ void SystemState::createMKOCommandsParams()
     QStringList setStatusParams;
     setStatusParams.append(paramName(STATUS_LOGICAL));
 
+    QStringList relayStateParams;
+    relayStateParams.append(paramName(RELAY_STATE));
+
     inParams[ModuleCommands::SEND_TEST_ARRAY] = sendTestArrayParams;
     inParams[ModuleCommands::SEND_COMMAND_ARRAY] = sendCommandArrayParams;
     inParams[ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL] = sendTestArrayForChannelParams;
@@ -473,6 +489,7 @@ void SystemState::createMKOCommandsParams()
     outParams[ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL] = receiveTestArrayForChannelParams;
     outParams[ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL] = receiveCommandArrayForChannelParams;
     outParams[ModuleCommands::GET_MODULE_STATUS] = getStatusParams;
+    outParams[ModuleCommands::GET_MKO_POWER_CHANNEL_STATE] = relayStateParams;
 
     mInParams[ModuleCommands::MKO] = inParams;
     mOutParams[ModuleCommands::MKO] = outParams;
@@ -741,10 +758,36 @@ void SystemState::sendCommand(CmdActionModule* command)
     switch (command->module())
     {
     case ModuleCommands::POWER_UNIT_BUP:
-        emit sendToPowerUnitBUP(transaction);
+        {
+            switch (command->operation()) // hack for moving STM commands to Power Unit/MKO commands
+            {
+            case ModuleCommands::SET_POWER_CHANNEL_STATE:
+            case ModuleCommands::GET_POWER_CHANNEL_STATE:
+            case ModuleCommands::GET_FUSE_STATE:
+                emit sendToSTM(transaction);
+                break;
+
+            default: // by default send command to power unit
+                emit sendToPowerUnitBUP(transaction);
+                break;
+            }
+        }
         break;
     case ModuleCommands::POWER_UNIT_PNA:
-        emit sendToPowerUnitPNA(transaction);
+        {
+            switch (command->operation()) // hack for moving STM commands to Power Unit/MKO commands
+            {
+            case ModuleCommands::SET_POWER_CHANNEL_STATE:
+            case ModuleCommands::GET_POWER_CHANNEL_STATE:
+            case ModuleCommands::GET_FUSE_STATE:
+                emit sendToSTM(transaction);
+                break;
+
+            default: // by default send command to power unit
+                emit sendToPowerUnitPNA(transaction);
+                break;
+            }
+        }
         break;
     case ModuleCommands::OTD:
         emit sendToOTD(transaction);
@@ -756,7 +799,19 @@ void SystemState::sendCommand(CmdActionModule* command)
         emit sendToSTM(transaction);
         break;
     case ModuleCommands::MKO:
-        emit sendToMKO(transaction);
+        {
+            switch (command->operation()) // hack for moving STM commands to Power Unit/MKO commands
+            {
+            case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+            case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+                emit sendToSTM(transaction);
+                break;
+
+            default: // by default send command to MKO
+                emit sendToMKO(transaction);
+                break;
+            }
+        }
         break;
     case ModuleCommands::TECH:
         emit sendToTech(transaction);

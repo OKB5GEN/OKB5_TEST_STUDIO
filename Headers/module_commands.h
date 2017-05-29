@@ -129,12 +129,12 @@ public:
 
     enum PowerSupplyChannelID
     {
-        BUP_MAIN      = 1,
-        BUP_RESERVE   = 2,
-        UNKNOWN_3     = 3, // reserved
-        HEATER_LINE_1 = 4,
-        HEATER_LINE_2 = 5,
-        DRIVE_CONTROL = 6,
+        BUP_MAIN         = 1,
+        BUP_RESERVE      = 2,
+        RESERVED_RELAY_3 = 3, // reserved
+        HEATER_LINE_1    = 4,
+        HEATER_LINE_2    = 5,
+        DRIVE_CONTROL    = 6,
     };
 
     Q_ENUM(PowerSupplyChannelID)

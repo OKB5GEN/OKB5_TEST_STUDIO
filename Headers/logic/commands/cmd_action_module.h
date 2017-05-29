@@ -22,8 +22,8 @@ public:
     const QMap<QString, QVariant>& inputParams() const;
     const QMap<QString, QVariant>& outputParams() const;
 
-    QString moduleName() const;
-    static QString moduleName(int moduleId);
+    QString moduleName(bool isFullName) const;
+    static QString moduleName(int moduleId, bool isFullName);
 
     QString commandFullName(uint32_t commandID) const;
     QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams, bool isFullName = false) const;
@@ -36,6 +36,7 @@ private slots:
 
 private:
     void updateText() override;
+    QString moduleNameImpl() const;
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;

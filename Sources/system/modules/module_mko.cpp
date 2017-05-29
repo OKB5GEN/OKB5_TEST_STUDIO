@@ -1142,7 +1142,7 @@ void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID ch
         break;
 
     // these relay states changing is not interesting to MKO
-    case ModuleCommands::UNKNOWN_3:
+    case ModuleCommands::RESERVED_RELAY_3:
     case ModuleCommands::HEATER_LINE_1:
     case ModuleCommands::HEATER_LINE_2:
         break;
