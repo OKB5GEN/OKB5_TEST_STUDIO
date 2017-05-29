@@ -5,6 +5,15 @@
 
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_question.h"
+#include "Headers/logic/commands/cmd_action_math.h"
+#include "Headers/logic/commands/cmd_action_module.h"
+#include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logic/commands/cmd_output.h"
+#include "Headers/logic/commands/cmd_parallel_process.h"
+#include "Headers/logic/commands/cmd_set_state.h"
+#include "Headers/logic/commands/cmd_state_start.h"
+#include "Headers/logic/commands/cmd_title.h"
+#include "Headers/logic/commands/cmd_sub_program.h"
 
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logger/Logger.h"
@@ -90,6 +99,11 @@ QColor ShapeItem::additionalColor() const
 
 QString ShapeItem::toolTip() const
 {
+    if (mCommand->hasError())
+    {
+        return tr("Invalid command");
+    }
+
     return mToolTip;
 }
 
@@ -338,31 +352,123 @@ void ShapeItem::onTextChanged(const QString& text)
     textPath.addText(x, y, mFont, text);
     mTextPath = textPath;
 
-    if (mCommand && mCommand->type() == DRAKON::QUESTION)
+    if (mCommand)
     {
-        CmdQuestion* cmd = qobject_cast<CmdQuestion*>(command());
-        if (cmd)
+        updateToolTip();
+
+        switch (mCommand->type())
         {
-            bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
+        case DRAKON::QUESTION:
+            {
+                CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+                bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
 
-            QPainterPath additionalText;
-            QFont font;
-            font.setPointSize(8);
-            font.setFamily("Verdana");
+                QPainterPath additionalText;
+                QFont font;
+                font.setPointSize(8);
+                font.setFamily("Verdana");
 
-            qreal x1 = itemSize().width() - cellSize().width();
-            qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1; // TODO magic
-            additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
+                qreal x1 = itemSize().width() - cellSize().width();
+                qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1; // TODO magic
+                additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
 
-            qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
-            qreal y2 = itemSize().height() - cellSize().height() * 0.5; // TODO magic
-            additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
+                qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
+                qreal y2 = itemSize().height() - cellSize().height() * 0.5; // TODO magic
+                additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
 
-            mTextPath.addPath(additionalText);
+                mTextPath.addPath(additionalText);
+            }
+            break;
+        default:
+            break;
         }
     }
 
     emit changed();
+}
+
+void ShapeItem::updateToolTip()
+{
+    switch (mCommand->type())
+    {
+    case DRAKON::TERMINATOR:
+        {
+            CmdTitle* cmd = qobject_cast<CmdTitle*>(mCommand);
+            if (cmd->titleType() == CmdTitle::BEGIN)
+            {
+                mToolTip = tr("Cyclogram first command") + "\n";
+                mToolTip += tr("Next command will be the branch below");
+            }
+            else
+            {
+                mToolTip = tr("Cyclogram last command") + "\n";
+            }
+        }
+        break;
+    case DRAKON::BRANCH_BEGIN:
+        {
+            CmdStateStart* cmd = qobject_cast<CmdStateStart*>(mCommand);
+            mToolTip = tr("Branch '%1' begin").arg(cmd->text()) + "\n";
+        }
+        break;
+    case DRAKON::GO_TO_BRANCH:
+        {
+            CmdSetState* cmd = qobject_cast<CmdSetState*>(mCommand);
+            mToolTip = tr("Go to branch '%1' command.").arg(cmd->text()) + "\n";
+            mToolTip = tr("Cyclgram furter execution will be moved to '%1' branch").arg(cmd->text());
+        }
+        break;
+    case DRAKON::ACTION_MATH:
+        {
+            CmdActionMath* cmd = qobject_cast<CmdActionMath*>(mCommand);
+            mToolTip = tr("Mathematical command");
+        }
+        break;
+    case DRAKON::DELAY:
+        {
+            CmdDelay* cmd = qobject_cast<CmdDelay*>(mCommand);
+            mToolTip = tr("Time delay (%1 ms).").arg(cmd->delay()) + "\n";
+        }
+        break;
+    case DRAKON::QUESTION:
+        {
+            CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+            mToolTip = tr("Question (condition check)") + "\n";
+        }
+        break;
+    case DRAKON::ACTION_MODULE:
+        {
+            CmdActionModule* cmd = qobject_cast<CmdActionModule*>(mCommand);
+            mToolTip = tr("Module command") + "\n";
+            mToolTip += tr("Module: %1").arg(cmd->moduleName()) + "\n";
+            mToolTip += tr("Command: %1").arg(cmd->commandName(cmd->operation(), cmd->inputParams(), true));
+        }
+        break;
+    case DRAKON::SUBPROGRAM:
+        {
+            CmdSubProgram* cmd = qobject_cast<CmdSubProgram*>(mCommand);
+            mToolTip = tr("Subprogram (embedded another cyclogram call.") + "\n";
+            mToolTip += tr("Description: ") + "\n";
+            mToolTip += "TODO get cyclogram description from settings";
+        }
+        break;
+    case DRAKON::OUTPUT:
+        {
+            CmdOutput* cmd = qobject_cast<CmdOutput*>(mCommand);
+            mToolTip = tr("Cyclogram console message.") + "\n";
+            mToolTip += tr("Before execution message: ") + cmd->onStartConsoleText() + "\n";
+            mToolTip += tr("After execution message: ") + cmd->onFinishConsoleText();
+        }
+        break;
+    case DRAKON::PARALLEL_PROCESS:
+        {
+            CmdParallelProcess* cmd = qobject_cast<CmdParallelProcess*>(mCommand);
+            mToolTip = tr("Parallel process"); //TODO
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 void ShapeItem::onErrorStatusChanged(bool status)

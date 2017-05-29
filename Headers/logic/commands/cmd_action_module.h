@@ -24,7 +24,9 @@ public:
 
     QString moduleName() const;
     static QString moduleName(int moduleId);
-    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams);
+
+    QString commandFullName(uint32_t commandID) const;
+    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams, bool isFullName = false) const;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;

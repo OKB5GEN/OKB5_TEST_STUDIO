@@ -82,6 +82,8 @@ private:
     bool canSetRect(const QRect& rect) const;
     int minHeight() const;
 
+    void updateToolTip();
+
     QPainterPath mPath;             // shape path
     QPainterPath mTextPath;         // path for text iside shape
     QPainterPath mAdditionalPath;   // path for some not-interactive display (arrow line)

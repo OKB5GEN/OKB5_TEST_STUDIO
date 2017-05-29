@@ -220,17 +220,22 @@ QString CmdActionModule::moduleName(int moduleId)
     return text;
 }
 
-QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams)
+QString CmdActionModule::commandFullName(uint32_t commandID) const
+{
+    return commandName(commandID, QMap<QString, QVariant>(), true);
+}
+
+QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams, bool isFullName /* = false*/) const
 {
     QString text;
 
     switch (commandID)
     {
     case ModuleCommands::GET_MODULE_STATUS:
-        text += tr("ПолСтат");
+        text += isFullName ? tr("ЗАПРОС: статус") : tr("ПолСтат");
         break;
     case ModuleCommands::SET_MODULE_LOGIC_STATUS:
-        text += tr("УстСтат");
+        text += isFullName ? tr("УСТАНОВКА: логический статус") : tr("УстСтат");
         break;
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
@@ -241,29 +246,29 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text += tr("Вкл");
+                text += isFullName ? tr("ВКЛ: ") : tr("Вкл");
             }
             else
             {
-                text += tr("Выкл");
+                text += isFullName ? tr("ВЫКЛ: ") : tr("Выкл");
             }
 
             switch (channel)
             {
             case ModuleCommands::BUP_MAIN:
-                text += tr("БУПОсн");
+                text += isFullName ? tr("основной комплект БУП") : tr("БУПОсн");
                 break;
             case ModuleCommands::BUP_RESERVE:
-                text += tr("БУПРез");
+                text += isFullName ? tr("резервный комплект БУП") : tr("БУПРез");
                 break;
             case ModuleCommands::HEATER_LINE_1:
-                text += tr("Нагр1");
+                text += isFullName ? tr("нагреватели ПНА на линии 1") : tr("Нагр1");
                 break;
             case ModuleCommands::HEATER_LINE_2:
-                text += tr("Нагр2");
+                text += isFullName ? tr("нагреватели ПНА на линии 2") : tr("Нагр2");
                 break;
             case ModuleCommands::DRIVE_CONTROL:
-                text += tr("СилПит");
+                text += isFullName ? tr("подачу силового питания") : tr("СилПит");
                 break;
             default:
                 break;
@@ -280,20 +285,20 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text += tr("Вкл");
+                text += isFullName ? tr("ВКЛ: ") : tr("Вкл");
             }
             else
             {
-                text += tr("Выкл");
+                text += isFullName ? tr("ВЫКЛ: ") : tr("Выкл");
             }
 
             switch (channel)
             {
             case ModuleCommands::MKO_1:
-                text += tr("MKOОсн");
+                text += isFullName ? tr("подачу питания на МКО Осн.") : tr("MKOОсн");
                 break;
             case ModuleCommands::MKO_2:
-                text += tr("MKOРез");
+                text += isFullName ? tr("подачу питания на МКО Рез.") : tr("MKOРез");
                 break;
             default:
                 break;
@@ -301,61 +306,127 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         }
         break;
     case ModuleCommands::GET_FUSE_STATE:
-        text += tr("ПолСостПр");
+        text += isFullName ? tr("ЗАПРОС: состояние предохранителя") : tr("ПолСостПр");
         break;
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
-        text += tr("ПолТелем");
+        text += isFullName ? tr("ЗАПРОС: телеметрия канала") : tr("ПолТелем");
         break;
     case ModuleCommands::GET_TEMPERATURE_PT100:
-        text += tr("ПолТемпПТ");
+        text += isFullName ? tr("ЗАПРОС: температура с датчиков ПТ-100") : tr("ПолТемпПТ");
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-        text += tr("ПолТемпDS1");
+        text += isFullName ? tr("ЗАПРОС: температура с датчика DS1820 линия 1") : tr("ПолТемпDS1");
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
-        text += tr("ПолТемпDS2");
+        text += isFullName ? tr("ЗАПРОС: температура с датчика DS1820 линия 2") : tr("ПолТемпDS2");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_1:
-        text += tr("ПолЧислоDS1");
+        text += isFullName ? tr("ЗАПРОС: количество датчиков DS1820 на линии 1") : tr("ПолЧислоDS1");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
-        text += tr("ПолЧислоDS2");
+        text += isFullName ? tr("ЗАПРОС: количество датчиков DS1820 на линии 2") : tr("ПолЧислоDS2");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_1:
-        text += tr("ЗапускИзм1");
+        text += isFullName ? tr("ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 1") : tr("ЗапускИзм1");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_2:
-        text += tr("ЗапускИзм2");
+        text += isFullName ? tr("ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 2") : tr("ЗапускИзм2");
         break;
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-        text += tr("УстНапр");
+        text += isFullName ? tr("УСТАНОВКА: выходное напряжение (максимальная мощность)") : tr("УстНапр");
         break;
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-        text += tr("ПолНапрТок");
+        text += isFullName ? tr("ЗАПРОС: текущий ток и напряжение") : tr("ПолНапрТок");
         break;
     case ModuleCommands::SEND_TEST_ARRAY:
-        text += tr("ПТМ");
+        text += isFullName ? tr("ОТПРАВКА: тестовый массив") : tr("ПТМ");
         break;
     case ModuleCommands::RECEIVE_TEST_ARRAY:
-        text += tr("ВТМ");
+        text += isFullName ? tr("ЗАПРОС: тестовый массив") : tr("ВТМ");
         break;
     case ModuleCommands::SEND_COMMAND_ARRAY:
-        text += tr("ПКМ");
+        text += isFullName ? tr("ОТПРАВКА: командный массив") : tr("ПКМ");
         break;
     case ModuleCommands::RECEIVE_COMMAND_ARRAY:
-        text += tr("ВКМ");
+        text += isFullName ? tr("ЗАПРОС: командный массив") : tr("ВКМ");
         break;
     case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
-        text += tr("ПТМК");
+        {
+            text += isFullName ? tr("ОТПРАВКА: тестовый массив по линии ") : tr("ПТМК");
+
+            if (isFullName)
+            {
+                QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
+                int channel = inputParams.value(paramName).toInt();
+                if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
+                {
+                    text += QString("ψ");
+                }
+                else
+                {
+                    text += QString("υ");
+                }
+            }
+
+            text += tr("");
+        }
         break;
     case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
-        text += tr("ВТМК");
+        {
+            text += isFullName ? tr("ЗАПРОС: тестовый массив по линии ") : tr("ВТМК");
+
+            if (isFullName)
+            {
+                QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
+                int channel = inputParams.value(paramName).toInt();
+                if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
+                {
+                    text += QString("ψ");
+                }
+                else
+                {
+                    text += QString("υ");
+                }
+            }
+        }
         break;
     case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
-        text += tr("ПКМК");
+        {
+            text += isFullName ? tr("ОТПРАВКА: командный массив по линии ") : tr("ПКМК");
+
+            if (isFullName)
+            {
+                QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
+                int channel = inputParams.value(paramName).toInt();
+                if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
+                {
+                    text += QString("ψ");
+                }
+                else
+                {
+                    text += QString("υ");
+                }
+            }
+        }
         break;
     case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
-        text += tr("ВКМК");
+        {
+            text += isFullName ? tr("ЗАПРОС: командный массив по линии ") : tr("ВКМК");
+
+            if (isFullName)
+            {
+                QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
+                int channel = inputParams.value(paramName).toInt();
+                if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
+                {
+                    text += QString("ψ");
+                }
+                else
+                {
+                    text += QString("υ");
+                }
+            }
+        }
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
@@ -364,86 +435,88 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
             if (source == ModuleMKO::PS_FROM_MAIN_KIT)
             {
-                text += tr("ПитДУОсн");
+                text += isFullName ? tr("ОТПРАВКА: подача питания на ДУ (осн. комплект)") : tr("ПитДУОсн");
             }
             else if (source == ModuleMKO::PS_FROM_RESERVE_KIT)
             {
-                text += tr("ПитДУРез");
+                text += isFullName ? tr("ОТПРАВКА: подача питания на ДУ (рез. комплект)") : tr("ПитДУРез");
             }
         }
         break;
     case ModuleCommands::START_MKO:
-        text += tr("Старт");
+        text += isFullName ? tr("СТАРТ модуля") : tr("Старт");
         break;
     case ModuleCommands::STOP_MKO:
-        text += tr("Стоп");
+        text += isFullName ? tr("СТОП модуля") : tr("Стоп");
         break;
-        // new power module commands
     case ModuleCommands::GET_DEVICE_CLASS:
-        text += tr("ПолКласс");
+        text += isFullName ? tr("ЗАПРОС: класс устройства") : tr("ПолКласс");
         break;
     case ModuleCommands::GET_NOMINAL_CURRENT:
-        text += tr("ПолНомТ");
+        text += isFullName ? tr("ЗАПРОС: номинальный ток") : tr("ПолНомТ");
         break;
     case ModuleCommands::GET_NOMINAL_VOLTAGE:
-        text += tr("ПолНомН");
+        text += isFullName ? tr("ЗАПРОС: номинальное напряжение") : tr("ПолНомН");
         break;
     case ModuleCommands::GET_NOMINAL_POWER:
-        text += tr("ПолНомМ");
+        text += isFullName ? tr("ЗАПРОС: номинальную мощность") : tr("ПолНомМ");
         break;
     case ModuleCommands::GET_OVP_THRESHOLD:
-        text += tr("ПолНОтс");
+        text += isFullName ? tr("ЗАПРОС: напряжение отсечки") : tr("ПолНОтс");
         break;
     case ModuleCommands::GET_OCP_THRESHOLD:
-        text += tr("ПолТОтс");
+        text += isFullName ? tr("ЗАПРОС: ток отсечки") : tr("ПолТОтс");
         break;
     case ModuleCommands::SET_OVP_THRESHOLD:
-        text += tr("УстНОтс");
+        text += isFullName ? tr("УСТАНОВКА: напряжение отсечки") : tr("УстНОтс");
         break;
     case ModuleCommands::SET_OCP_THRESHOLD:
-        text += tr("УстТОтс");
+        text += isFullName ? tr("УСТАНОВКА: ток отсечки") : tr("УстТОтс");
         break;
     case ModuleCommands::SET_SET_VALUE_U:
-        text += tr("УстНапр");
+        text += isFullName ? tr("УСТАНОВКА: выходное напряжение") : tr("УстНапр");
         break;
     case ModuleCommands::SET_SET_VALUE_I:
-        text += tr("УстТок");
+        text += isFullName ? tr("УСТАНОВКА: выходной ток") : tr("УстТок");
         break;
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
-        text += tr("ВклПит");
+        text += isFullName ? tr("ВКЛ: подачу питания на выход") : tr("ВклПит");
         break;
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
-        text += tr("ВыклПит");
+        text += isFullName ? tr("ВЫКЛ: подачу питания на выход") : tr("ВыклПит");
         break;
     case ModuleCommands::PSC_ACKNOWLEDGE_ALARMS:
-        text += tr("СбрОш");
+        text += isFullName ? tr("СБРОС: ошибки") : tr("СбрОш");
         break;
     case ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL:
-        text += tr("ВклУд");
+        text += isFullName ? tr("ВКЛ: режим удаленного управления") : tr("ВклУд");
         break;
     case ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL:
-        text += tr("ВклЛок");
+        text += isFullName ? tr("ВКЛ: режим ручного управления") : tr("ВклЛок");
         break;
     case ModuleCommands::PSC_TRACKING_ON:
-        text += tr("ВклТр");
+        text += isFullName ? tr("ВКЛ: трекинг") : tr("ВклТр");
         break;
     case ModuleCommands::PSC_TRACKING_OFF:
-        text += tr("ВыклТр");
+        text += isFullName ? tr("ВЫКЛ: трекинг") : tr("ВыклТр");
         break;
     case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         {
             QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
             int channel = inputParams.value(paramName).toInt();
 
-            text += tr("ПС");
+            if (!isFullName)
+            {
+                text += tr("ПС");
+            }
 
             switch (channel)
             {
             case ModuleCommands::MKO_1:
-                text += tr("МКООсн");
+                text += isFullName ? tr("ЗАПРОС: состояние питания основного комплекта МКО") : tr("МКООсн");
                 break;
             case ModuleCommands::MKO_2:
-                text += tr("МКОРез");
+                text += isFullName ? tr("ЗАПРОС: состояние питания резервного комплекта МКО") : tr("МКОРез");
                 break;
             default:
                 text += tr("UNKNOWN");
@@ -456,24 +529,27 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
             QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
             int channel = inputParams.value(paramName).toInt();
 
-            text += tr("ПС");
+            if (!isFullName)
+            {
+                text += tr("ПС");
+            }
 
             switch (channel)
             {
             case ModuleCommands::BUP_MAIN:
-                text += tr("БУПОсн");
+                text += isFullName ? tr("ЗАПРОС: состояние питания основного комплекта БУП") : tr("БУПОсн");
                 break;
             case ModuleCommands::BUP_RESERVE:
-                text += tr("БУПРез");
+                text += isFullName ? tr("ЗАПРОС: состояние питания резервного комплекта БУП") : tr("БУПРез");
                 break;
             case ModuleCommands::HEATER_LINE_1:
-                text += tr("Нагр1");
+                text += isFullName ? tr("ЗАПРОС: состояние нагревателей ПНА на линии 1") : tr("Нагр1");
                 break;
             case ModuleCommands::HEATER_LINE_2:
-                text += tr("Нагр2");
+                text += isFullName ? tr("ЗАПРОС: состояние нагревателей ПНА на линии 2") : tr("Нагр2");
                 break;
             case ModuleCommands::DRIVE_CONTROL:
-                text += tr("СилПит");
+                text += isFullName ? tr("ЗАПРОС: состояние силового питания") : tr("СилПит");
                 break;
             default:
                 text += tr("UNKNOWN");
@@ -486,15 +562,18 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
             QString paramName = mSystemState->paramName(SystemState::MODULE_ADDRESS);
             int address = inputParams.value(paramName).toInt();
 
-            text += tr("ПолАдр");
+            if (!isFullName)
+            {
+                text += tr("ПолАдр");
+            }
 
             switch (address)
             {
             case ModuleCommands::DEFAULT:
-                text += tr("У");
+                text += isFullName ? tr("ЗАПРОС: адрес модуля по умолчанию") : tr("У");
                 break;
             case ModuleCommands::CURRENT:
-                text += tr("Т");
+                text += isFullName ? tr("ЗАПРОС: текущий адрес модуля") : tr("Т");
                 break;
             default:
                 text += tr("UNKNOWN");
@@ -503,16 +582,16 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         }
         break;
     case ModuleCommands::RESET_LINE_1:
-        text += tr("СбрЛин1");
+        text += isFullName ? tr("СБРОС: датчиков на линии 1") : tr("СбрЛин1");
         break;
     case ModuleCommands::RESET_LINE_2:
-        text += tr("СбрЛин2");
+        text += isFullName ? tr("СБРОС: датчиков на линии 2"): tr("СбрЛин2");
         break;
     case ModuleCommands::GET_STATUS_WORD:
-        text += tr("ПолСС");
+        text += isFullName ? tr("ЗАПРОС: статусное слово") : tr("ПолСС");
         break;
     case ModuleCommands::RESET_ERROR:
-        text += tr("СбрОш");
+        text += isFullName ? tr("СБРОС: ошибки") : tr("СбрОш");
         break;
     default:
         {

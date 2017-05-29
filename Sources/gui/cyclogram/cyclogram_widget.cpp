@@ -99,23 +99,21 @@ bool CyclogramWidget::event(QEvent *event)
     if (event->type() == QEvent::ToolTip)
     {
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+
+        ValencyPoint point;
         int index = commandAt(helpEvent->pos());
         if (index != -1)
         {
             QToolTip::showText(helpEvent->globalPos(), mCommands[index]->toolTip());
         }
+        else if (hasValencyPointAt(helpEvent->pos(), point))
+        {
+            QToolTip::showText(helpEvent->globalPos(), tr("Click to add command"));
+        }
         else
         {
-            ValencyPoint point;
-            if (hasValencyPointAt(helpEvent->pos(), point))
-            {
-                QToolTip::showText(helpEvent->globalPos(), tr("Click to add command"));
-            }
-            else
-            {
-                QToolTip::hideText();
-                event->ignore();
-            }
+            QToolTip::hideText();
+            event->ignore();
         }
 
         return true;
@@ -595,7 +593,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
 {
     ShapeItem* shapeItem = new ShapeItem(this);
     shapeItem->setCommand(cmd);
-    shapeItem->setToolTip(tr("Tooltip"));
+    //shapeItem->setToolTip(tr("Tooltip\n next row"));
     shapeItem->setCell(cell);
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
