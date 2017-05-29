@@ -7,6 +7,8 @@
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
 
+class QTimer;
+
 class ModuleMKO;
 class ModuleOTD;
 class ModuleDriveSimulator;
@@ -79,9 +81,11 @@ public:
     QString paramDefaultDesc(ParamID param) const;
 
     void sendCommand(CmdActionModule* command);
+    void stop();
 
 private slots:
     void processResponse(const Transaction& response);
+    void onResponseTimeout();
 
 signals:
     void commandFinished(bool success);
@@ -122,5 +126,7 @@ private:
     QMap<ParamID, QString> mParamNames;
     QMap<ParamID, QString> mDefaultVariables;
     QMap<ParamID, QString> mDefaultDescriptions;
+
+    QTimer* mProtectionTimer; //TODO parallel process (сейчас SystemState не может обрабатывать команды параллельно!)
 };
 #endif // SYSTEM_STATE_H

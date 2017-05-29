@@ -252,6 +252,8 @@ void Cyclogram::stop()
         disconnect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
         disconnect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
         mCurrent->stop();
+
+        mSystemState->stop();
     }
 
     mCurrent = mFirst;

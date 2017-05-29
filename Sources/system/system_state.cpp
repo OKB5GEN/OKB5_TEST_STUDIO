@@ -11,11 +11,12 @@
 
 #include <QMetaEnum>
 #include <QtSerialPort>
-#include <windows.h>
-#include "qapplication.h"
+#include <QTimer>
 
 namespace
 {
+    static const int PROTECTION_TIMEOUT = 20000; //ms
+
     bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules, bool& emulatorEnabled)
     {
         modules.clear();
@@ -136,6 +137,10 @@ SystemState::SystemState(QObject* parent):
     mPowerPNA(Q_NULLPTR),
     mCurCommand(Q_NULLPTR)
 {
+    mProtectionTimer = new QTimer(this);
+    mProtectionTimer->setSingleShot(true);
+    connect(mProtectionTimer, SIGNAL(timeout()), this, SLOT(onResponseTimeout()));
+
     // TODO create some command configuration
     mParamNames[VOLTAGE] = tr("Voltage, V");
     mParamNames[CURRENT] = tr("Current, A");
@@ -315,6 +320,7 @@ void SystemState::onApplicationFinish()
 {
     mMKO->onApplicationFinish();
     mOTD->onApplicationFinish();
+    mDS->onApplicationFinish();
     mSTM->onApplicationFinish();
     mTech->onApplicationFinish();
     mPowerBUP->onApplicationFinish();
@@ -827,7 +833,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         break;
     }
 
-    int TODO; // start protection timer (for cases when some module logics is buggy) - 10-20-30 seconds for example
+    mProtectionTimer->start(PROTECTION_TIMEOUT);
 }
 
 AbstractModule* SystemState::moduleByID(ModuleCommands::ModuleID moduleID) const
@@ -916,8 +922,18 @@ bool SystemState::processLocalCommand(Transaction& transaction)
     return true;
 }
 
+void SystemState::stop()
+{
+    LOG_INFO("System state stopped");
+
+    mProtectionTimer->stop();
+    mCurCommand = Q_NULLPTR;
+}
+
 void SystemState::processResponse(const Transaction& response)
 {
+    mProtectionTimer->stop();
+
     if (!mCurCommand)
     {
         LOG_ERROR(QString("Unexpected response received"));
@@ -957,10 +973,26 @@ void SystemState::processResponse(const Transaction& response)
         LOG_ERROR(QString("Command execution failed. Module:%1, Command:%2, Error:%3").arg(module).arg(command).arg(error));
     }
 
-    int TODO; // stop protection timer
-
     mCurCommand = Q_NULLPTR;
     emit commandFinished(error.isEmpty());
+}
+
+void SystemState::onResponseTimeout()
+{
+    if (!mCurCommand)
+    {
+        LOG_ERROR(QString("No command send but protection timer timeout occured"));
+        return;
+    }
+
+    QMetaEnum moduleEnum = QMetaEnum::fromType<ModuleCommands::ModuleID>();
+    QMetaEnum commandEnum = QMetaEnum::fromType<ModuleCommands::CommandID>();
+    QString module = moduleEnum.valueToKey(mCurCommand->module());
+    QString command = commandEnum.valueToKey(mCurCommand->operation());
+
+    mCurCommand->stop();
+    LOG_ERROR(QString("Command execution failed. Module:%1, Command:%2. Response timeout").arg(module).arg(command));
+    emit commandFinished(false);
 }
 
 QString SystemState::paramName(ParamID param) const
