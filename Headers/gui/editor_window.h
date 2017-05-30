@@ -39,6 +39,7 @@ private slots:
 
     void runCyclogram();
     void stopCyclogram();
+    void showCyclogramSettings();
 
     void addVariablesMonitor();
     void makeDataSnapshot();
@@ -75,6 +76,7 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
+    QAction* mSettingsAct;
 
     QAction* mOpenAct;
     QAction* mNewAct;

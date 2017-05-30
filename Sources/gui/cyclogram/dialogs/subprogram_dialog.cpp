@@ -10,6 +10,8 @@
 #include "Headers/file_writer.h"
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
+#include "Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h"
+
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     QDialog(parent),
@@ -34,16 +36,19 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     QPushButton* variablesBtn = new QPushButton(QIcon(":/images/variable"), tr("Variables"), this);
     QPushButton* chartBtn = new QPushButton(QIcon(":/images/monitor_auto"), tr("Chart"), this);
     QPushButton* deleteBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Delete"), this);
+    QPushButton* settingsBtn = new QPushButton(QIcon(":/images/settings"), tr("Settings"), this);
 
     connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
     connect(chartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
     connect(deleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
+    connect(settingsBtn, SIGNAL(clicked(bool)), this, SLOT(onSettingsClick()));
 
     buttonLayout->addWidget(saveBtn);
     buttonLayout->addWidget(variablesBtn);
     buttonLayout->addWidget(chartBtn);
     buttonLayout->addWidget(deleteBtn);
+    buttonLayout->addWidget(settingsBtn);
     buttonLayout->addStretch();
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
@@ -107,6 +112,13 @@ void SubProgramDialog::onChartClick()
     dialog->setCyclogram(mCommand->cyclogram());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+void SubProgramDialog::onSettingsClick()
+{
+    CyclogramSettingsDialog dialog(Q_NULLPTR);
+    dialog.setCyclogram(mCommand->cyclogram());
+    dialog.exec();
 }
 
 CyclogramWidget* SubProgramDialog::cyclogramWidget() const

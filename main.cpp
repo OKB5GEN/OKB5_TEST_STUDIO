@@ -70,6 +70,14 @@ void createDirs()
 //    }
 //}
 
+//    QTranslator qtTranslator;
+//    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+//    app.installTranslator(&qtTranslator);
+
+//    QTranslator myappTranslator;
+//    myappTranslator.load("myapp_" + QLocale::system().name());
+//    app.installTranslator(&myappTranslator);
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(application);
@@ -91,17 +99,9 @@ int main(int argc, char *argv[])
 
     initializeLogger();
 
-    QTranslator translator;
-    translator.load("OKB5TestStudio_ru", ":/translations");
-    app.installTranslator(&translator);
-
-//    QTranslator qtTranslator;
-//    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-//    app.installTranslator(&qtTranslator);
-
-//    QTranslator myappTranslator;
-//    myappTranslator.load("myapp_" + QLocale::system().name());
-//    app.installTranslator(&myappTranslator);
+//    QTranslator translator;
+//    translator.load("OKB5TestStudio_ru", ":/translations");
+//    app.installTranslator(&translator);
 
     LOG_INFO(QString("========== APPLICATION STARTED =========="));
 

@@ -27,16 +27,14 @@ private slots:
     void onSaveClick();
     void onVariablesClick();
     void onChartClick();
+    void onSettingsClick();
 
 private:
-
     CmdSubProgram* mCommand;
     CyclogramWidget* mCyclogramWidget;
     VariablesWindow* mVariablesWindow;
 
     QScrollArea * mScrollArea;
-
-//    Cyclogram* mCallingCyclogram;
 };
 
 #endif // SUBPROGRAM_DIALOG_H
