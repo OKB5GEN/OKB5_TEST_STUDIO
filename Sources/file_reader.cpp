@@ -54,7 +54,11 @@ void FileReader::readCyclogram()
         {
             QString name = mXML.name().toString();
 
-            if (name == "variables")
+            if (name == "settings")
+            {
+                readSettings();
+            }
+            else if (name == "variables")
             {
                 readVariables();
             }
@@ -67,6 +71,38 @@ void FileReader::readCyclogram()
                 readCommandsLinks();
             }
         }
+    }
+}
+
+void FileReader::readSettings()
+{
+    auto cyclogram = mCyclogram.lock();
+
+    while (!(mXML.tokenType() == QXmlStreamReader::EndElement && mXML.name() == "settings"))
+    {
+        if (mXML.tokenType() == QXmlStreamReader::StartElement && mXML.name() == "setting")
+        {
+            QXmlStreamAttributes attributes = mXML.attributes();
+            QString name;
+            QString value;
+
+            if (attributes.hasAttribute("name"))
+            {
+                name = attributes.value("name").toString();
+            }
+
+            if (attributes.hasAttribute("value"))
+            {
+                value = attributes.value("value").toString();
+            }
+
+            if (!name.isEmpty() && !value.isEmpty())
+            {
+                cyclogram->setSetting(name, value, false);
+            }
+        }
+
+        mXML.readNext();
     }
 }
 

@@ -3,6 +3,7 @@
 #include "Headers/logic/cyclogram.h"
 
 #include <QtWidgets>
+#include <QVariant>
 
 CyclogramSettingsDialog::CyclogramSettingsDialog(QWidget * parent):
     QDialog(parent)
@@ -11,7 +12,13 @@ CyclogramSettingsDialog::CyclogramSettingsDialog(QWidget * parent):
 
     mCyclogramDescription = new QTextEdit(this);
     mCyclogramDescription->setText(tr("Type cyclogram description here"));
-    layout->addWidget(mCyclogramDescription, 0, 0);
+
+    QGroupBox* descriptionGroupBox = new QGroupBox(tr("Description"), this);
+    QVBoxLayout* boxLayout = new QVBoxLayout();
+    boxLayout->addWidget(mCyclogramDescription);
+    descriptionGroupBox->setLayout(boxLayout);
+
+    layout->addWidget(descriptionGroupBox, 0, 0);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     layout->addWidget(buttonBox, 1, 0);
@@ -31,13 +38,13 @@ CyclogramSettingsDialog::~CyclogramSettingsDialog()
 void CyclogramSettingsDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
     mCyclogram = cyclogram;
-
-    int TODO; // load GUI state from cyclogram
+    mCyclogramDescription->setPlainText(cyclogram->setting(Cyclogram::SETTING_DESCRIPTION).toString());
 }
 
 void CyclogramSettingsDialog::onAccept()
 {
-    int TODO; // save settings to cyclogram file
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->setSetting(Cyclogram::SETTING_DESCRIPTION, mCyclogramDescription->toPlainText());
 
     accept();
 }

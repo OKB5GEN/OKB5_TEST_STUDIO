@@ -13,6 +13,7 @@ public:
     bool writeFile(QIODevice *device);
 
 private:
+    void writeSettings();
     void writeVariables();
     void writeCommands();
     void writeCommandTree();

@@ -22,6 +22,8 @@
 #include "Headers/system/system_state.h"
 #include "Headers/file_reader.h"
 
+const QString Cyclogram::SETTING_DESCRIPTION = "description";
+
 namespace
 {
     static const int COMMAND_RUN_INTERVAL = 10; // msec
@@ -107,7 +109,7 @@ void Cyclogram::createDefault()
 
     mCurrent = Q_NULLPTR;
 
-    emit changed();
+    emit modified();
 }
 
 void Cyclogram::run()
@@ -654,4 +656,27 @@ void Cyclogram::moveLastCommand(Command *after)
         mCommands.insert(afterIndex + 1, cmd);
         mCommands.pop_back();
     }
+}
+
+QVariant Cyclogram::setting(const QString& name) const
+{
+    return mSettings.value(name, QVariant());
+}
+
+void Cyclogram::setSetting(const QString& key, const QVariant& value, bool sendSignal)
+{
+    if (key.isEmpty())
+    {
+        LOG_ERROR(QString("Trying to set setting with empty name"));
+        return;
+    }
+
+    mSettings[key] = value;
+
+    setModified(sendSignal, sendSignal);
+}
+
+const QMap<QString, QVariant>& Cyclogram::settings() const
+{
+    return mSettings;
 }

@@ -18,12 +18,30 @@ bool FileWriter::writeFile(QIODevice *device)
     mXML.writeStartElement("cyclogram");
     mXML.writeAttribute("version", "1.0");
 
+    writeSettings();
     writeVariables();
     writeCommands();
     writeCommandTree();
 
     mXML.writeEndDocument();
     return true;
+}
+
+void FileWriter::writeSettings()
+{
+    auto cyclogram = mCyclogram.lock();
+
+    mXML.writeStartElement("settings");
+
+    for (auto it = cyclogram->settings().begin(); it != cyclogram->settings().end(); ++it)
+    {
+        mXML.writeStartElement("setting");
+        mXML.writeAttribute("name", it.key());
+        mXML.writeAttribute("value", it.value().toString());
+        mXML.writeEndElement();
+    }
+
+    mXML.writeEndElement();
 }
 
 void FileWriter::writeVariables()

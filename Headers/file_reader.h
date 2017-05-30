@@ -18,6 +18,7 @@ public:
 
 private:
     void readCyclogram();
+    void readSettings();
     void readVariables();
     void readCommands();
     void readCommandsLinks();

@@ -1,8 +1,7 @@
 #ifndef CYCLOGRAM_H
 #define CYCLOGRAM_H
 
-#include <QObject>
-#include <QList>
+#include <QVariant>
 
 #include "Headers/shape_types.h"
 
@@ -15,6 +14,8 @@ class Cyclogram: public QObject
     Q_OBJECT
 
 public:
+    static const QString SETTING_DESCRIPTION;
+
     enum State
     {
         STOPPED,
@@ -72,6 +73,12 @@ public:
 
     void moveLastCommand(Command* after);
 
+    // cyclogram settings
+    QVariant setting(const QString& name) const;
+    void setSetting(const QString& key, const QVariant& value, bool sendSignal = true);
+
+    const QMap<QString, QVariant>& settings() const;
+
 private slots:
     void onCommandFinished(Command* cmd);
     void onCriticalError(Command* cmd);
@@ -98,14 +105,15 @@ private:
     bool mIsMainCyclogram;
     bool mModified;
 
+    QMap<QString, QVariant> mSettings;
+
 signals:
-    void changed();
     void commandStarted(Command* cmd);
     void commandFinished(Command* cmd);
     void finished(const QString& error);
     void stateChanged(int state);
     void deleted(Command* cmd);
 
-    void modified(); //TODO send signal + vs "changed" signal
+    void modified();
 };
 #endif // CYCLOGRAM_H
