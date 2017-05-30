@@ -20,5 +20,6 @@
     <file>images/contents-256.png</file>
     <file>images/variable.png</file>
     <file>images/delete_all.png</file>
+    <file>translations/OKB5TestStudio_ru.qm</file>
 </qresource>
 </RCC>

@@ -26,7 +26,7 @@ ShapeAddDialog::ShapeAddDialog(QWidget * parent):
 
     connect(mComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 
-    setFixedSize(sizeHint());
+    //setFixedSize(sizeHint());
 }
 
 ShapeAddDialog::~ShapeAddDialog()

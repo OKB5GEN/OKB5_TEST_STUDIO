@@ -160,6 +160,7 @@ HEADERS  += Headers/shape_types.h \
     Headers/system/modules/module_drive_simulator.h \
     Headers/gui/tools/cyclogram_chart_dialog.h
 
+TRANSLATIONS += OKB5TestStudio_ru.ts
 
 FORMS    +=
 

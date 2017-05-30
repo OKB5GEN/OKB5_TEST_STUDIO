@@ -5,6 +5,7 @@
 
 #include <QDateTime>
 #include <QDir>
+#include <QTranslator>
 
 #include "Headers/gui/editor_window.h"
 
@@ -55,6 +56,20 @@ void createDirs()
     }
 }
 
+//void MyWidget::changeEvent(QEvent *event)
+//{
+//    if (event->type() == QEvent::LanguageChange)
+//    {
+//        titleLabel->setText(tr("Document Title"));
+//        ...
+//        okPushButton->setText(tr("&OK"));
+//    }
+//    else
+//    {
+//        QWidget::changeEvent(event);
+//    }
+//}
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(application);
@@ -75,6 +90,18 @@ int main(int argc, char *argv[])
     QLocale::setDefault(QLocale::c());
 
     initializeLogger();
+
+    QTranslator translator;
+    translator.load("OKB5TestStudio_ru", ":/translations");
+    app.installTranslator(&translator);
+
+//    QTranslator qtTranslator;
+//    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+//    app.installTranslator(&qtTranslator);
+
+//    QTranslator myappTranslator;
+//    myappTranslator.load("myapp_" + QLocale::system().name());
+//    app.installTranslator(&myappTranslator);
 
     LOG_INFO(QString("========== APPLICATION STARTED =========="));
 
