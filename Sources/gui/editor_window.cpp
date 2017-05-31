@@ -5,6 +5,8 @@
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/modal_cyclogram_execution_dialog.h"
 #include "Headers/gui/tools/app_console.h"
+#include "Headers/gui/tools/app_settings_dialog.h"
+#include "Headers/app_settings.h"
 #include "Headers/gui/tools/cyclogram_console.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
@@ -342,6 +344,11 @@ void EditorWindow::createActions()
     appConsole->setWidget(console);
     addDockWidget(Qt::BottomDockWidgetArea, appConsole);
     monitorMenu->addAction(appConsole->toggleViewAction());
+
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+
+    QAction *settingsAct = toolsMenu->addAction(tr("Settings"), this, &EditorWindow::onSettings);
+    settingsAct->setStatusTip(tr("Application settings"));
 }
 
 void EditorWindow::createStatusBar()
@@ -661,4 +668,10 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     cyclogram->setSystemState(mSystemState);
 
     mCyclogramWidget->load(cyclogram);
+}
+
+void EditorWindow::onSettings()
+{
+    AppSettingsDialog dialog(Q_NULLPTR);
+    dialog.exec();
 }

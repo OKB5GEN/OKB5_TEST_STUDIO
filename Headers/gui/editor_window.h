@@ -2,7 +2,7 @@
 #define EDITOR_WINDOW_H
 
 #include <QMainWindow>
-#include <QSet>
+#include <QVariant>
 
 class QAction;
 class QMenu;
@@ -34,6 +34,7 @@ private slots:
     void openFile();
     bool save();
     bool saveAs();
+    void onSettings();
     void about();
     void documentWasModified();
 

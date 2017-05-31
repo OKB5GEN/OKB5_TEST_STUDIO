@@ -639,7 +639,7 @@ void Cyclogram::setMainCyclogram(bool isMain)
 
 QString Cyclogram::defaultStorePath()
 {
-    return QDir::currentPath() + QString("/cyclograms/");
+    return QDir::currentPath() + QString("/cyclograms/"); //TODO replace by application settings usage
 }
 
 void Cyclogram::moveLastCommand(Command *after)

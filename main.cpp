@@ -8,6 +8,7 @@
 #include <QTranslator>
 
 #include "Headers/gui/editor_window.h"
+#include "Headers/app_settings.h"
 
 #include "Headers/logger/Logger.h"
 #include "Headers/logger/FileAppender.h"
@@ -56,7 +57,7 @@ void createDirs()
     }
 }
 
-//void MyWidget::changeEvent(QEvent *event)
+//void MyWidget::changeEvent(QEvent *event) //TODO GUI update after locale changed
 //{
 //    if (event->type() == QEvent::LanguageChange)
 //    {
@@ -70,14 +71,6 @@ void createDirs()
 //    }
 //}
 
-//    QTranslator qtTranslator;
-//    qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-//    app.installTranslator(&qtTranslator);
-
-//    QTranslator myappTranslator;
-//    myappTranslator.load("myapp_" + QLocale::system().name());
-//    app.installTranslator(&myappTranslator);
-
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(application);
@@ -90,7 +83,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument("file", "The file to open.");
+    parser.addPositionalArgument("file", "The file to open."); // TODO use this
     parser.process(app);
 
     createDirs();
@@ -99,6 +92,9 @@ int main(int argc, char *argv[])
 
     initializeLogger();
 
+    AppSettings::instance().load();
+
+    //TODO localization on (maybe from command line) as "-l ru -f file_name" for example, guess parser.addPositionalArgument() must be used
 //    QTranslator translator;
 //    translator.load("OKB5TestStudio_ru", ":/translations");
 //    app.installTranslator(&translator);
@@ -114,6 +110,8 @@ int main(int argc, char *argv[])
     mainWin.show();
     mainWin.onApplicationStart();
     int result = app.exec();
+
+    AppSettings::instance().save();
 
     LOG_INFO(QString("========== APPLICATION FINISHED =========="));
 

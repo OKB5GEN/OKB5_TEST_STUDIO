@@ -88,7 +88,9 @@ SOURCES += main.cpp\
     Sources/logic/commands/cmd_output.cpp \
     Sources/system/modules/module_drive_simulator.cpp \
     Sources/gui/tools/cyclogram_chart_dialog.cpp \
-    Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp
+    Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp \
+    Sources/app_settings.cpp \
+    Sources/gui/tools/app_settings_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -160,7 +162,9 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_output.h \
     Headers/system/modules/module_drive_simulator.h \
     Headers/gui/tools/cyclogram_chart_dialog.h \
-    Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h
+    Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h \
+    Headers/app_settings.h \
+    Headers/gui/tools/app_settings_dialog.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 
