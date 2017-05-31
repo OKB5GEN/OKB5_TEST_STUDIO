@@ -1,21 +1,19 @@
 #include "Headers/system/com_port_module.h"
+#include "Headers/app_settings.h"
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
 
 namespace
 {
-    static const int DEFAULT_RESPONSE_WAIT_TIME = 10000;  // msec, TODO move to config file
-    static const int DEFAULT_SEND_REQUEST_INTERVAL = 100; // msec, TODO move to config file
-    static const int SOFT_RESET_UPDATE_TIME = 500;        // msec, TODO move to config file
 }
 
 COMPortModule::COMPortModule(QObject* parent):
     AbstractModule(parent),
-    mPort(Q_NULLPTR),
-    mResponseWaitTime(DEFAULT_RESPONSE_WAIT_TIME),
-    mSendInterval(DEFAULT_SEND_REQUEST_INTERVAL)
+    mPort(Q_NULLPTR)
 {
+    onAppSettingsChanged();
+
     mResponseWaitTimer = new QTimer(this);
     mResponseWaitTimer->setSingleShot(true);
     connect(mResponseWaitTimer, SIGNAL(timeout()), this, SLOT(onResponseTimeout()));
@@ -27,6 +25,8 @@ COMPortModule::COMPortModule(QObject* parent):
     mSoftResetTimer = new QTimer(this);
     mSoftResetTimer->setSingleShot(true);
     connect(mSoftResetTimer, SIGNAL(timeout()), this, SLOT(tryCreatePort()));
+
+    connect(&AppSettings::instance(), SIGNAL(settingsChanged()), this, SLOT(onAppSettingsChanged()));
 }
 
 COMPortModule::~COMPortModule()
@@ -35,6 +35,12 @@ COMPortModule::~COMPortModule()
     mSendTimer->stop();
 
     closePort();
+}
+
+void COMPortModule::onAppSettingsChanged()
+{
+    mResponseWaitTime = AppSettings::instance().setting(AppSettings::DEFAULT_RESPONSE_WAIT_TIME).toInt();
+    mSendInterval = AppSettings::instance().setting(AppSettings::DEFAULT_SEND_REQUEST_INTERVAL).toInt();
 }
 
 bool COMPortModule::sendToPort(const QByteArray& request)
@@ -256,7 +262,8 @@ void COMPortModule::softReset() // TODO power modules can be soft resetted?
     //disconnect(mPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(onErrorOccured(QSerialPort::SerialPortError)));
     closePort();
 
-    mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
+    int timerValue = AppSettings::instance().setting(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
+    mSoftResetTimer->start(timerValue);
 }
 
 void COMPortModule::closePort()
@@ -281,7 +288,8 @@ void COMPortModule::tryCreatePort()
     if (portName.isNull())
     {
         LOG_INFO(QString("Module %1 still not active. Restarting update timer ...").arg(moduleName()));
-        mSoftResetTimer->start(SOFT_RESET_UPDATE_TIME);
+        int timerValue = AppSettings::instance().setting(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
+        mSoftResetTimer->start(timerValue);
         return;
     }
 

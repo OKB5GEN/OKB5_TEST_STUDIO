@@ -9,10 +9,10 @@
 #include "Headers/logger/Logger.h"
 #include "Headers/logic/commands/cmd_question.h" // TODO remove
 #include "Headers/gui/cyclogram/valency_point.h"
+#include "Headers/app_settings.h"
 
 namespace
 {
-    static const int EXECUTION_DELAY = 50;
 }
 
 qint64 Command::smCounter = 0;
@@ -29,7 +29,7 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mVarCtrl(Q_NULLPTR),
     mSystemState(Q_NULLPTR)
 {
-    setExecutionDelay(EXECUTION_DELAY);
+    setExecutionDelay(AppSettings::instance().setting(AppSettings::COMMAND_EXECUTION_DELAY).toInt());
 
     for (int i = 0; i < childCmdCnt; ++i)
     {

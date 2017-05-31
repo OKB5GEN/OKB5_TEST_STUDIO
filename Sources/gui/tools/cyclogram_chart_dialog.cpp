@@ -14,11 +14,6 @@ namespace
     static const qreal HEIGHT = 300;
     static const qreal X_AXIS_ADD = 30;
 
-    static const qreal BTN_SIZE = 50;
-
-    static const int MIN_UPDATE_INTERVAL = 1; // each second
-    static const int MAX_UPDATE_INTERVAL = INT_MAX;
-
     double fRand(double fMin, double fMax)
     {
         double f = (double)rand() / RAND_MAX;

@@ -18,7 +18,7 @@
 
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
-
+#include "Headers/app_settings.h"
 #include "Headers/system/system_state.h"
 #include "Headers/file_reader.h"
 
@@ -26,7 +26,7 @@ const QString Cyclogram::SETTING_DESCRIPTION = "description";
 
 namespace
 {
-    static const int COMMAND_RUN_INTERVAL = 10; // msec
+    static const int COMMAND_RUN_INTERVAL = 10; // msec (TODO maybe try to reduce to 1 ms?)
 
     void LogCmd(Command* cmd, const QString& state)
     {
@@ -63,6 +63,8 @@ Cyclogram::Cyclogram(QObject * parent):
     connect(mVarController, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(variableCurrentValueChanged(const QString&, qreal)));
     connect(mVarController, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
     connect(mVarController, SIGNAL(descriptionChanged(const QString&, const QString&)), this, SLOT(variablesChanged()));
+
+    connect(&AppSettings::instance(), SIGNAL(settingsChanged()), this, SLOT(onAppSettingsChanged()));
 }
 
 void Cyclogram::createDefault()
@@ -679,4 +681,14 @@ void Cyclogram::setSetting(const QString& key, const QVariant& value, bool sendS
 const QMap<QString, QVariant>& Cyclogram::settings() const
 {
     return mSettings;
+}
+
+void Cyclogram::onAppSettingsChanged()
+{
+    int commandExecutionDelay = AppSettings::instance().setting(AppSettings::COMMAND_EXECUTION_DELAY).toInt();
+
+    foreach (Command* command, mCommands)
+    {
+        command->setExecutionDelay(commandExecutionDelay);
+    }
 }

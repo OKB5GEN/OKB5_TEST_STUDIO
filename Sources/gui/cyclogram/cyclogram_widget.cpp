@@ -6,6 +6,7 @@
 #include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/shape_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/command_error_dialog.h"
+#include "Headers/app_settings.h"
 
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/command.h"
@@ -42,10 +43,6 @@
 
 namespace
 {
-    static const qreal MAX_SCALE = 1.0;
-    static const qreal DEFAULT_SCALE = 1.0;
-    static const qreal MIN_SCALE = 0.2;
-    static const qreal SCALE_CHANGE_STEP = 0.025;
 }
 
 CyclogramWidget::CyclogramWidget(QWidget* parent):
@@ -54,9 +51,14 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
     mDialogParent(Q_NULLPTR),
-    mScale(DEFAULT_SCALE),
     mParentScrollArea(Q_NULLPTR)
 {
+    onAppSettingsChanged();
+
+    mScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
+
+    connect(&AppSettings::instance(), SIGNAL(settingsChanged()), this, SLOT(onAppSettingsChanged()));
+
     setMouseTracking(true);
     setBackgroundRole(QPalette::Base);
 
@@ -168,16 +170,20 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
     }
 
     qreal scaleBefore = mScale;
-    mScale += numSteps * SCALE_CHANGE_STEP;
+    qreal scaleChangeStep = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_STEP).toDouble();
+    qreal maxScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_MAX).toDouble();
+    qreal minScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_MIN).toDouble();
 
-    if (mScale > MAX_SCALE)
+    mScale += numSteps * scaleChangeStep;
+
+    if (mScale > maxScale)
     {
-        mScale = MAX_SCALE;
+        mScale = maxScale;
     }
 
-    if (mScale < MIN_SCALE)
+    if (mScale < minScale)
     {
-        mScale = MIN_SCALE;
+        mScale = minScale;
     }
 
     // save necessary data before scaling
@@ -673,7 +679,7 @@ void CyclogramWidget::drawSilhouette()
 
 void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
 {
-    mScale = DEFAULT_SCALE;
+    mScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
 
     clear();
 
@@ -1549,4 +1555,11 @@ void CyclogramWidget::setParentTitle(const QString& title)
 void CyclogramWidget::setParentScrollArea(QScrollArea* scroll)
 {
     mParentScrollArea = scroll;
+}
+
+void CyclogramWidget::onAppSettingsChanged()
+{
+    ShapeItem::itemSize(true);
+    ShapeItem::cellSize(true);
+    ShapeItem::origin(true);
 }

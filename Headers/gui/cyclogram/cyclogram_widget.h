@@ -55,6 +55,7 @@ private slots:
     void onNeedToDelete(ShapeItem* shape);
     void showSubprogramWidget();
     void showSubprogramChart();
+    void onAppSettingsChanged();
 
 private:
     void drawSilhouette();

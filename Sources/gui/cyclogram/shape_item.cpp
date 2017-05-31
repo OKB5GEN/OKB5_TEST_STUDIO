@@ -2,7 +2,7 @@
 
 #include "Headers/gui/cyclogram/shape_item.h"
 #include "Headers/logic/command.h"
-
+#include "Headers/app_settings.h"
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_action_math.h"
@@ -35,10 +35,6 @@
 
 namespace
 {
-    static const int CELL_WIDTH = 22;
-    static const int CELL_HEIGHT = 22;
-    static const int CELLS_PER_ITEM_V = 4;
-    static const int CELLS_PER_ITEM_H = 8;
 }
 
 ShapeItem::ShapeItem(QObject* parent):
@@ -476,22 +472,47 @@ void ShapeItem::onErrorStatusChanged(bool status)
     setColor(status ? QColor::fromRgba(0xffff0000) : QColor::fromRgba(0xffffffff));
 }
 
-const QSizeF& ShapeItem::itemSize()
+const QSizeF& ShapeItem::itemSize(bool needUpdate)
 {
-    static QSizeF ITEM_SIZE(CELL_WIDTH * CELLS_PER_ITEM_H, CELL_HEIGHT * CELLS_PER_ITEM_V);
-    return ITEM_SIZE;
+    static QSizeF itemSz;
+    if (itemSz.isEmpty() || needUpdate)
+    {
+        qreal cellWidth = AppSettings::instance().setting(AppSettings::CELL_WIDTH).toDouble();
+        qreal cellsPerItemHorizontal = AppSettings::instance().setting(AppSettings::CELLS_PER_ITEM_H).toDouble();
+        qreal cellHeight = AppSettings::instance().setting(AppSettings::CELL_HEIGHT).toDouble();
+        qreal cellsPerItemVeritical = AppSettings::instance().setting(AppSettings::CELLS_PER_ITEM_V).toDouble();
+
+        itemSz.setWidth(cellWidth * cellsPerItemHorizontal);
+        itemSz.setHeight(cellHeight * cellsPerItemVeritical);
+    }
+
+    return itemSz;
 }
 
-const QSizeF& ShapeItem::cellSize()
+const QSizeF& ShapeItem::cellSize(bool needUpdate)
 {
-    static QSizeF CELL(CELL_WIDTH, CELL_HEIGHT);
-    return CELL;
+    static QSizeF cellSz;
+    if (cellSz.isEmpty() || needUpdate)
+    {
+        qreal cellWidth = AppSettings::instance().setting(AppSettings::CELL_WIDTH).toDouble();
+        qreal cellHeight = AppSettings::instance().setting(AppSettings::CELL_HEIGHT).toDouble();
+        cellSz.setWidth(cellWidth);
+        cellSz.setHeight(cellHeight);
+    }
+
+    return cellSz;
 }
 
-const QPointF& ShapeItem::origin()
+const QPointF& ShapeItem::origin(bool needUpdate)
 {
-    static QPointF ORIGIN(itemSize().width() / 4, 0);
-    return ORIGIN;
+    static QPointF origin;
+    if (origin.isNull() || needUpdate)
+    {
+        origin.setX(itemSize().width() / 4);
+        origin.setY(0);
+    }
+
+    return origin;
 }
 
 void ShapeItem::setActive(bool active)

@@ -52,9 +52,9 @@ public:
     ShapeItem* parentShape() const;
     ShapeItem* childShape(int index) const;
 
-    static const QSizeF& itemSize();
-    static const QSizeF& cellSize();
-    static const QPointF& origin();
+    static const QSizeF& itemSize(bool needUpdate = false);
+    static const QSizeF& cellSize(bool needUpdate = false);
+    static const QPointF& origin(bool needUpdate = false);
 
     void pushDown();
     void pullUp();

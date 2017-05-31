@@ -1,6 +1,7 @@
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/system/system_state.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/app_settings.h"
 
 #include <QTimer>
 #include <QMetaEnum>
@@ -51,7 +52,6 @@ namespace
     static const int PROTECTION_DELAY = 100; // msec
     static const int LOCAL_MESSAGE_SEND_DELAY = 10; // (msec) delay for sending response to cyclogram in case of local soft/state errors
     static const int RECEIVE_BUFFER_SIZE = 100; // words
-    static const int MAX_REPEAT_REQUESTS = 10; // Макс кол-во перезапросов при получении "Нет возможности обмена"
 
     static const QString ERR_WRONG_INFO = "Wrong info received"; // "Принята недостоверная информация"
     static const QString ERR_RESPONSE_NOT_READY = "Response not ready"; // "Нет возможности обмена"
@@ -108,9 +108,10 @@ void ModuleMKO::readResponse()
 
         if (errors.size() == 1 && errors.at(0) == ERR_RESPONSE_NOT_READY)
         {
-            if (mRepeatedRequests > MAX_REPEAT_REQUESTS)
+            int maxRepeatRequests = AppSettings::instance().setting(AppSettings::MAX_MKO_REPEAT_REQUESTS).toInt();
+            if (mRepeatedRequests > maxRepeatRequests)
             {
-                mCurrentTransaction.error = QString("Max repeat count of %1 exceeded! Error: %2").arg(MAX_REPEAT_REQUESTS).arg(ERR_RESPONSE_NOT_READY);
+                mCurrentTransaction.error = QString("Max repeat count of %1 exceeded! Error: %2").arg(maxRepeatRequests).arg(ERR_RESPONSE_NOT_READY);
             }
             else
             {

@@ -59,6 +59,7 @@ private slots:
     void sendRequest();
     void tryCreatePort();
     void onErrorOccured(QSerialPort::SerialPortError error);
+    void onAppSettingsChanged();
 
 private:
     struct Request

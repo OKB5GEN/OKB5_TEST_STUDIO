@@ -1,6 +1,7 @@
 #include "Headers/system/modules/module_power.h"
 #include "Headers/system/system_state.h"
 #include "Headers/logger/Logger.h"
+#include "Headers/app_settings.h"
 
 #include <QTimer>
 #include <QMetaEnum>
@@ -9,8 +10,6 @@ namespace
 {
     static const uint32_t STEPS_COUNT = 25600; // hardware steps count to set/get voltage/current value
 
-    static const qreal MAX_ALLOWED_VOLTAGE = 36; // volts 27-36
-    static const qreal MAX_ALLOWED_CURRENT = 2.0; // ampers <= 2
     static const qreal MIN_VOLTAGE = 0; //27; // volts
 
     // nominal device parameters by default
@@ -37,8 +36,6 @@ namespace
 ModulePower::ModulePower(QObject* parent):
     COMPortModule(parent),
     mState(ModuleCommands::POWER_OFF),
-    mVoltageThreshold(MAX_ALLOWED_VOLTAGE),
-    mCurrentThreshold(MAX_ALLOWED_CURRENT),
     mVoltage(0),
     mCurrent(0),
     mNominalVoltage(DEFAULT_NOMINAL_VOLTAGE),
@@ -47,6 +44,8 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
+    mVoltageThreshold = AppSettings::instance().setting(AppSettings::MAX_BUP_ALLOWED_VOLTAGE).toDouble();
+    mCurrentThreshold = AppSettings::instance().setting(AppSettings::MAX_BUP_ALLOWED_CURRENT).toDouble();
 }
 
 ModulePower::~ModulePower()
@@ -166,14 +165,14 @@ void ModulePower::processCommand(const Transaction& params)
         {
             qreal voltage = params.inputParams.value(SystemState::VOLTAGE).toDouble();
             mVoltageThreshold = voltage;
-            setObjectValue(OVP_THRESHOLD, voltage /*MAX_ALLOWED_VOLTAGE*/, mNominalVoltage);
+            setObjectValue(OVP_THRESHOLD, voltage, mNominalVoltage);
         }
         break;
     case ModuleCommands::SET_OCP_THRESHOLD:
         {
             qreal current = params.inputParams.value(SystemState::CURRENT).toDouble();
             mCurrentThreshold = current;
-            setObjectValue(OCP_THRESHOLD, current /*MAX_ALLOWED_CURRENT*/, mNominalCurrent);
+            setObjectValue(OCP_THRESHOLD, current, mNominalCurrent);
         }
         break;
     case ModuleCommands::GET_DEVICE_CLASS:
@@ -209,12 +208,12 @@ void ModulePower::setVoltageAndCurrent(qreal voltage)
 {
     LOG_INFO(QString("Try to set current voltage to : U=%1").arg(voltage));
 
-    if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
-    {
-        mCurrentTransaction.error = QString("Unsupported voltage values: Umin=%1, OVPThr=%2, Unom=%3").arg(MIN_VOLTAGE).arg(mVoltageThreshold).arg(mNominalVoltage);
-        emit commandResult(mCurrentTransaction);
-        return;
-    }
+//    if (MIN_VOLTAGE > mVoltageThreshold || MIN_VOLTAGE > mNominalVoltage)
+//    {
+//        mCurrentTransaction.error = QString("Unsupported voltage values: Umin=%1, OVPThr=%2, Unom=%3").arg(MIN_VOLTAGE).arg(mVoltageThreshold).arg(mNominalVoltage);
+//        emit commandResult(mCurrentTransaction);
+//        return;
+//    }
 
     // Set voltage value
     // It must be:

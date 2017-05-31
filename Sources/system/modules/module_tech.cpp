@@ -3,7 +3,6 @@
 namespace
 {
     static const uint8_t TECH_DEFAULT_ADDR = 0x56;
-    static const int WAIT_FOR_RESPONSE_TIME = 100; // msec
 }
 
 ModuleTech::ModuleTech(QObject* parent):

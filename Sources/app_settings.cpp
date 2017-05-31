@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QDir>
 
+#include <QMetaEnum>
+
 namespace
 {
     static const QString SETTINGS_FILE_NAME = "app_settings.xml";
@@ -21,20 +23,48 @@ AppSettings& AppSettings::instance()
     return settings;
 }
 
-QVariant AppSettings::setting(const QString& key) const
+QVariant AppSettings::setting(SettingID id) const
 {
-    return mSettings.value(key, QVariant());
+    return mSettings.value(id, QVariant());
 }
 
-void AppSettings::setSetting(const QString& key, const QVariant& value)
+QVariant AppSettings::setting(const QString& key) const
 {
-    if (key.isEmpty())
+    QMetaEnum metaEnum = QMetaEnum::fromType<AppSettings::SettingID>();
+    bool ok = false;
+    int id = metaEnum.keyToValue(qPrintable(key), &ok);
+
+    if (!ok)
     {
-        LOG_ERROR(QString("Try to set application setting with empty key"));
+        LOG_WARNING(QString("Application setting '%1' not found").arg(key));
+        return QVariant();
+    }
+
+    return mSettings.value(AppSettings::SettingID(id), QVariant());
+}
+
+void AppSettings::setSetting(SettingID id, const QVariant& value, bool sendSignal)
+{
+    mSettings[id] = value;
+    if (sendSignal)
+    {
+        emit settingsChanged();
+    }
+}
+
+void AppSettings::setSetting(const QString& key, const QVariant& value, bool sendSignal)
+{
+    QMetaEnum metaEnum = QMetaEnum::fromType<AppSettings::SettingID>();
+    bool ok = false;
+    int id = metaEnum.keyToValue(qPrintable(key), &ok);
+
+    if (!ok)
+    {
+        LOG_WARNING(QString("Trying to set application setting '%1' that does not exist").arg(key));
         return;
     }
 
-    mSettings[key] = value;
+    setSetting(SettingID(id), value, sendSignal);
 }
 
 void AppSettings::load()
@@ -54,6 +84,8 @@ void AppSettings::load()
     // 2. Read settings file
     QXmlStreamReader xml;
     xml.setDevice(&file);
+
+    QMetaEnum metaEnum = QMetaEnum::fromType<AppSettings::SettingID>();
 
     if (xml.readNextStartElement())
     {
@@ -85,7 +117,17 @@ void AppSettings::load()
 
                         if (!key.isEmpty() && !value.isEmpty())
                         {
-                            mSettings[key] = value;
+                            bool ok = false;
+                            int id = metaEnum.keyToValue(qPrintable(key), &ok);
+
+                            if (ok)
+                            {
+                                mSettings[SettingID(id)] = value;
+                            }
+                            else
+                            {
+                                LOG_WARNING(QString("Unknown setting '%1' found").arg(key));
+                            }
                         }
                     }
                 }
@@ -102,6 +144,8 @@ void AppSettings::load()
         LOG_FATAL(QString("%1\nLine %2, column %3").arg(xml.errorString()).arg(xml.lineNumber()).arg(xml.columnNumber()));
         return;
     }
+
+    emit settingsChanged();
 }
 
 void AppSettings::save()
@@ -116,6 +160,7 @@ void AppSettings::save()
     }
 
     QXmlStreamWriter xml;
+    QMetaEnum metaEnum = QMetaEnum::fromType<AppSettings::SettingID>();
 
     xml.setAutoFormatting(true);
     xml.setDevice(&file);
@@ -128,7 +173,7 @@ void AppSettings::save()
     for (auto it = mSettings.begin(); it != mSettings.end(); ++it)
     {
         xml.writeStartElement("setting");
-        xml.writeAttribute("name", it.key());
+        xml.writeAttribute("name", metaEnum.key(it.key()));
         xml.writeAttribute("value", it.value().toString());
         xml.writeEndElement();
     }

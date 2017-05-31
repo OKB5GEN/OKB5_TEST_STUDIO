@@ -7,6 +7,7 @@
 #include "Headers/system/modules/module_stm.h"
 #include "Headers/system/modules/module_tech.h"
 #include "Headers/logic/variable_controller.h"
+#include "Headers/app_settings.h"
 #include "Headers/logger/Logger.h"
 
 #include <QMetaEnum>
@@ -15,8 +16,6 @@
 
 namespace
 {
-    static const int PROTECTION_TIMEOUT = 20000; //ms
-
     bool loadSystemConfig(QMap<ModuleCommands::ModuleID, COMPortModule::Identifier>& modules, bool& emulatorEnabled)
     {
         modules.clear();
@@ -833,7 +832,8 @@ void SystemState::sendCommand(CmdActionModule* command)
         break;
     }
 
-    mProtectionTimer->start(PROTECTION_TIMEOUT);
+    int protectionTimeout = AppSettings::instance().setting(AppSettings::MODULE_RESPONSE_WAIT_TIMEOUT).toInt();
+    mProtectionTimer->start(protectionTimeout);
 }
 
 AbstractModule* SystemState::moduleByID(ModuleCommands::ModuleID moduleID) const
