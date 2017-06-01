@@ -32,11 +32,11 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     layout->addLayout(buttonLayout);
 
-    QPushButton* saveBtn = new QPushButton(QIcon(":/images/save"), tr("Save"), this);
-    QPushButton* variablesBtn = new QPushButton(QIcon(":/images/variable"), tr("Variables"), this);
-    QPushButton* chartBtn = new QPushButton(QIcon(":/images/monitor_auto"), tr("Chart"), this);
-    QPushButton* deleteBtn = new QPushButton(QIcon(":/images/delete_all"), tr("Delete"), this);
-    QPushButton* settingsBtn = new QPushButton(QIcon(":/images/settings"), tr("Settings"), this);
+    QPushButton* saveBtn = new QPushButton(QIcon(":/resources/images/save"), tr("Save"), this);
+    QPushButton* variablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
+    QPushButton* chartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
+    QPushButton* deleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
+    QPushButton* settingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Settings"), this);
 
     connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));

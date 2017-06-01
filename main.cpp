@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
     //TODO localization on (maybe from command line) as "-l ru -f file_name" for example, guess parser.addPositionalArgument() must be used
 //    QTranslator translator;
-//    translator.load("OKB5TestStudio_ru", ":/translations");
+//    translator.load("OKB5TestStudio_ru", ":/resources/translations");
 //    app.installTranslator(&translator);
 
     LOG_INFO(QString("========== APPLICATION STARTED =========="));

@@ -216,7 +216,7 @@ void EditorWindow::createActions()
     QToolBar *fileToolBar = addToolBar(tr("File"));
     fileToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-    QIcon newIcon = QIcon(":/images/new");
+    QIcon newIcon = QIcon(":/resources/images/new");
     mNewAct = new QAction(newIcon, tr("&New"), this);
     mNewAct->setShortcuts(QKeySequence::New);
     mNewAct->setStatusTip(tr("Create a new cyclogram"));
@@ -224,7 +224,7 @@ void EditorWindow::createActions()
     fileMenu->addAction(mNewAct);
     fileToolBar->addAction(mNewAct);
 
-    QIcon openIcon = QIcon(":/images/open");
+    QIcon openIcon = QIcon(":/resources/images/open");
     mOpenAct = new QAction(openIcon, tr("&Open..."), this);
     mOpenAct->setShortcuts(QKeySequence::Open);
     mOpenAct->setStatusTip(tr("Open an existing file"));
@@ -232,7 +232,7 @@ void EditorWindow::createActions()
     fileMenu->addAction(mOpenAct);
     fileToolBar->addAction(mOpenAct);
 
-    QIcon saveIcon = QIcon(":/images/save");
+    QIcon saveIcon = QIcon(":/resources/images/save");
     mSaveAct = new QAction(saveIcon, tr("&Save"), this);
     mSaveAct->setShortcuts(QKeySequence::Save);
     mSaveAct->setStatusTip(tr("Save the document to disk"));
@@ -269,13 +269,13 @@ void EditorWindow::createActions()
     runToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
-    mPlayIcon = QIcon(":/images/play");
-    mPauseIcon = QIcon(":/images/pause");
+    mPlayIcon = QIcon(":/resources/images/play");
+    mPauseIcon = QIcon(":/resources/images/pause");
 
 
     mRunAct = new QAction(mPlayIcon, tr("Run"), this);
 #else
-    mRunAct = new QAction(QIcon(":/images/play"), tr("Run"), this);
+    mRunAct = new QAction(QIcon(":/resources/images/play"), tr("Run"), this);
 #endif
 
     //mRunAct->setShortcuts(QKeySequence::New);
@@ -284,7 +284,7 @@ void EditorWindow::createActions()
     runMenu->addAction(mRunAct);
     runToolBar->addAction(mRunAct);
 
-    QIcon stopIcon = QIcon(":/images/stop");
+    QIcon stopIcon = QIcon(":/resources/images/stop");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
     mStopAct->setStatusTip(tr("Stop cyclogram execution"));
@@ -292,7 +292,7 @@ void EditorWindow::createActions()
     runMenu->addAction(mStopAct);
     runToolBar->addAction(mStopAct);
 
-    QIcon settingsIcon = QIcon(":/images/settings");
+    QIcon settingsIcon = QIcon(":/resources/images/settings");
     mSettingsAct = new QAction(settingsIcon, tr("Cyclogram settings"), this);
     mSettingsAct->setStatusTip(tr("Cyclogram settings"));
     connect(mSettingsAct, &QAction::triggered, this, &EditorWindow::showCyclogramSettings);
@@ -305,21 +305,21 @@ void EditorWindow::createActions()
     QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
     monitorToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
-    const QIcon addVariablesIcon = QIcon(":/images/variable");
+    const QIcon addVariablesIcon = QIcon(":/resources/images/variable");
     QAction *addVariablesAct = new QAction(addVariablesIcon, tr("Add variable monitor"), this);
     addVariablesAct->setStatusTip(tr("Add variables monitor"));
     connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
     monitorMenu->addAction(addVariablesAct);
     monitorToolBar->addAction(addVariablesAct);
 
-    const QIcon addManualMonitorIcon = QIcon(":/images/monitor_manual");
+    const QIcon addManualMonitorIcon = QIcon(":/resources/images/monitor_manual");
     QAction *addManualMonitorAct = new QAction(addManualMonitorIcon, tr("Make data snapshot"), this);
     addManualMonitorAct->setStatusTip(tr("Make data snapshot"));
     connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::makeDataSnapshot);
     monitorMenu->addAction(addManualMonitorAct);
     monitorToolBar->addAction(addManualMonitorAct);
 
-    const QIcon addAutoMonitorIcon = QIcon(":/images/monitor_auto");
+    const QIcon addAutoMonitorIcon = QIcon(":/resources/images/monitor_auto");
     QAction *addAutoMonitorAct = new QAction(addAutoMonitorIcon, tr("Add auto monitor"), this);
     addAutoMonitorAct->setStatusTip(tr("Add auto parameter monitor"));
     connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addChartWidget);

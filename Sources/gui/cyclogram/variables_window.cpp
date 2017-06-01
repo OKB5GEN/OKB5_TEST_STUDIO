@@ -42,7 +42,7 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     // add button
     QToolButton* addBtn = new QToolButton(this);
     addBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-    addBtn->setIcon(QIcon(":/images/edit_add.png"));
+    addBtn->setIcon(QIcon(":/resources/images/edit_add.png"));
     addBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
     connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
     layout->addWidget(addBtn, 0, 5, 1, 1);
@@ -50,7 +50,7 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     // remove button
     mRemoveBtn = new QToolButton(this);
     mRemoveBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-    mRemoveBtn->setIcon(QIcon(":/images/edit_remove.png"));
+    mRemoveBtn->setIcon(QIcon(":/resources/images/edit_remove.png"));
     mRemoveBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
     mRemoveBtn->setEnabled(false);
     connect(mRemoveBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
