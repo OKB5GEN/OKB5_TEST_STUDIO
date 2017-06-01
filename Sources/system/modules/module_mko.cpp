@@ -108,7 +108,7 @@ void ModuleMKO::readResponse()
 
         if (errors.size() == 1 && errors.at(0) == ERR_RESPONSE_NOT_READY)
         {
-            int maxRepeatRequests = AppSettings::instance().setting(AppSettings::MAX_MKO_REPEAT_REQUESTS).toInt();
+            int maxRepeatRequests = AppSettings::instance().settingValue(AppSettings::MAX_MKO_REPEAT_REQUESTS).toInt();
             if (mRepeatedRequests > maxRepeatRequests)
             {
                 mCurrentTransaction.error = QString("Max repeat count of %1 exceeded! Error: %2").arg(maxRepeatRequests).arg(ERR_RESPONSE_NOT_READY);

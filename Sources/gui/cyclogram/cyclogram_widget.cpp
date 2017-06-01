@@ -55,7 +55,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
 {
     onAppSettingsChanged();
 
-    mScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
+    mScale = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
 
     connect(&AppSettings::instance(), SIGNAL(settingsChanged()), this, SLOT(onAppSettingsChanged()));
 
@@ -170,9 +170,9 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
     }
 
     qreal scaleBefore = mScale;
-    qreal scaleChangeStep = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_STEP).toDouble();
-    qreal maxScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_MAX).toDouble();
-    qreal minScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_MIN).toDouble();
+    qreal scaleChangeStep = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_WIDGET_SCALE_STEP).toDouble();
+    qreal maxScale = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_WIDGET_SCALE_MAX).toDouble();
+    qreal minScale = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_WIDGET_SCALE_MIN).toDouble();
 
     mScale += numSteps * scaleChangeStep;
 
@@ -679,7 +679,7 @@ void CyclogramWidget::drawSilhouette()
 
 void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
 {
-    mScale = AppSettings::instance().setting(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
+    mScale = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_WIDGET_SCALE_DEFAULT).toDouble();
 
     clear();
 

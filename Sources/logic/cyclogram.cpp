@@ -685,7 +685,7 @@ const QMap<QString, QVariant>& Cyclogram::settings() const
 
 void Cyclogram::onAppSettingsChanged()
 {
-    int commandExecutionDelay = AppSettings::instance().setting(AppSettings::COMMAND_EXECUTION_DELAY).toInt();
+    int commandExecutionDelay = AppSettings::instance().settingValue(AppSettings::COMMAND_EXECUTION_DELAY).toInt();
 
     foreach (Command* command, mCommands)
     {

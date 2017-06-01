@@ -44,8 +44,8 @@ ModulePower::ModulePower(QObject* parent):
     mDeviceClass(0),
     mError(0)
 {
-    mVoltageThreshold = AppSettings::instance().setting(AppSettings::MAX_BUP_ALLOWED_VOLTAGE).toDouble();
-    mCurrentThreshold = AppSettings::instance().setting(AppSettings::MAX_BUP_ALLOWED_CURRENT).toDouble();
+    mVoltageThreshold = AppSettings::instance().settingValue(AppSettings::MAX_BUP_ALLOWED_VOLTAGE).toDouble();
+    mCurrentThreshold = AppSettings::instance().settingValue(AppSettings::MAX_BUP_ALLOWED_CURRENT).toDouble();
 }
 
 ModulePower::~ModulePower()

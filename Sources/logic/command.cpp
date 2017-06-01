@@ -29,7 +29,7 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mVarCtrl(Q_NULLPTR),
     mSystemState(Q_NULLPTR)
 {
-    setExecutionDelay(AppSettings::instance().setting(AppSettings::COMMAND_EXECUTION_DELAY).toInt());
+    setExecutionDelay(AppSettings::instance().settingValue(AppSettings::COMMAND_EXECUTION_DELAY).toInt());
 
     for (int i = 0; i < childCmdCnt; ++i)
     {

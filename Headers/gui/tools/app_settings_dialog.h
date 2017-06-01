@@ -4,6 +4,7 @@
 #include <QDialog>
 
 class QTextEdit;
+class QTableWidget;
 
 class AppSettingsDialog : public QDialog
 {
@@ -20,6 +21,7 @@ private slots:
 
 private:
     QTextEdit* mDescription;
+    QTableWidget* mSettingsTable;
 };
 
 #endif // APP_SETTINGS_DIALOG_H

@@ -62,7 +62,7 @@ EditorWindow::EditorWindow():
 void EditorWindow::onApplicationStart()
 {
     mSystemState->onApplicationStart();
-    QString fileName = AppSettings::instance().setting(AppSettings::APP_START_CYCLOGRAM_FILE).toString();
+    QString fileName = AppSettings::instance().settingValue(AppSettings::APP_START_CYCLOGRAM_FILE).toString();
     runModalCyclogram(fileName, tr("Running application start cyclogram..."));
 }
 
@@ -93,7 +93,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     if (maybeSave())
     {
         writeSettings();
-        QString fileName = AppSettings::instance().setting(AppSettings::APP_FINISH_CYCLOGRAM_FILE).toString();
+        QString fileName = AppSettings::instance().settingValue(AppSettings::APP_FINISH_CYCLOGRAM_FILE).toString();
         runModalCyclogram(fileName, tr("Running application finish cyclogram..."));
         mSystemState->onApplicationFinish();
         event->accept();
@@ -487,7 +487,7 @@ void EditorWindow::runCyclogram()
         return;
     }
 
-    QString fileName = AppSettings::instance().setting(AppSettings::CYCLOGRAM_START_CYCLOGRAM_FILE).toString();
+    QString fileName = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_START_CYCLOGRAM_FILE).toString();
     runModalCyclogram(fileName, tr("Running pre-execution cyclogram..."));
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
@@ -622,7 +622,7 @@ void EditorWindow::onCyclogramStateChanged(int state)
 
     if (state == Cyclogram::STOPPED)
     {
-        QString fileName = AppSettings::instance().setting(AppSettings::CYCLOGRAM_FINISH_CYCLOGRAM_FILE).toString();
+        QString fileName = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FINISH_CYCLOGRAM_FILE).toString();
         runModalCyclogram(fileName, tr("Running post-execution cyclogram..."));
     }
 }

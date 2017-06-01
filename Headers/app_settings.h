@@ -37,8 +37,11 @@ public:
 
     static AppSettings& instance();
 
-    QVariant setting(SettingID id) const;
-    QVariant setting(const QString& key) const;
+    QVariant settingValue(SettingID id) const;
+    QVariant settingValue(const QString& key) const;
+
+    QString settingName(SettingID id) const;
+    QString settingComment(SettingID id) const;
 
     void setSetting(const QString& key, const QVariant& value, bool sendSignal = true);
     void setSetting(SettingID id, const QVariant& value, bool sendSignal = true);
@@ -52,7 +55,12 @@ signals:
 private:
     AppSettings();
 
+    void loadTexts();
+
     QMap<SettingID, QVariant> mSettings;
+
+    QMap<SettingID, QString> mSettingsNames;
+    QMap<SettingID, QString> mSettingsComments;
 };
 
 #endif // APP_SETTINGS_H

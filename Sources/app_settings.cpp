@@ -23,12 +23,12 @@ AppSettings& AppSettings::instance()
     return settings;
 }
 
-QVariant AppSettings::setting(SettingID id) const
+QVariant AppSettings::settingValue(SettingID id) const
 {
     return mSettings.value(id, QVariant());
 }
 
-QVariant AppSettings::setting(const QString& key) const
+QVariant AppSettings::settingValue(const QString& key) const
 {
     QMetaEnum metaEnum = QMetaEnum::fromType<AppSettings::SettingID>();
     bool ok = false;
@@ -145,6 +145,8 @@ void AppSettings::load()
         return;
     }
 
+    loadTexts();
+
     emit settingsChanged();
 }
 
@@ -179,4 +181,62 @@ void AppSettings::save()
     }
 
     xml.writeEndDocument();
+}
+
+void AppSettings::loadTexts()
+{
+    mSettingsNames.clear();
+    mSettingsComments.clear();
+
+    mSettingsNames[CYCLOGRAM_WIDGET_SCALE_MIN] = tr("Cyclogram widget min scale");
+    mSettingsNames[CYCLOGRAM_WIDGET_SCALE_MAX] = tr("Cyclogram widget max scale");
+    mSettingsNames[CYCLOGRAM_WIDGET_SCALE_DEFAULT] = tr("Cyclogram widget default scale");
+    mSettingsNames[CYCLOGRAM_WIDGET_SCALE_STEP] = tr("Cyclogram widget scale change step");
+    mSettingsNames[CELL_WIDTH] = tr("Cyclogram widget cell width");
+    mSettingsNames[CELL_HEIGHT] = tr("Cyclogram widget cell height");
+    mSettingsNames[CELLS_PER_ITEM_V] = tr("Command shape width");
+    mSettingsNames[CELLS_PER_ITEM_H] = tr("Command shape height");
+    mSettingsNames[APP_START_CYCLOGRAM_FILE] = tr("Application start cyclogram file");
+    mSettingsNames[APP_FINISH_CYCLOGRAM_FILE] = tr("Application finish cyclogram file");
+    mSettingsNames[CYCLOGRAM_START_CYCLOGRAM_FILE] = tr("Pre-action cyclogram");
+    mSettingsNames[CYCLOGRAM_FINISH_CYCLOGRAM_FILE] = tr("Post-action cyclogram");
+    mSettingsNames[COMMAND_EXECUTION_DELAY] = tr("Command execution delay");
+    mSettingsNames[MODULE_RESPONSE_WAIT_TIMEOUT] = tr("Soft module response wait time");
+    mSettingsNames[DEFAULT_RESPONSE_WAIT_TIME] = tr("Hard module response wait time");
+    mSettingsNames[DEFAULT_SEND_REQUEST_INTERVAL] = tr("Min send request interval");
+    mSettingsNames[SOFT_RESET_UPDATE_TIME] = tr("Module up after soft reset check timeout");
+    mSettingsNames[MAX_BUP_ALLOWED_VOLTAGE] = tr("Max output voltage");
+    mSettingsNames[MAX_BUP_ALLOWED_CURRENT] = tr("Max output current");
+    mSettingsNames[MAX_MKO_REPEAT_REQUESTS] = tr("Max requests repeat count");
+
+    mSettingsComments[CYCLOGRAM_WIDGET_SCALE_MIN] = tr("Float. 100% = 1.0");
+    mSettingsComments[CYCLOGRAM_WIDGET_SCALE_MAX] = tr("Float. 100% = 1.0");
+    mSettingsComments[CYCLOGRAM_WIDGET_SCALE_DEFAULT] = tr("Float. 100% = 1.0");
+    mSettingsComments[CYCLOGRAM_WIDGET_SCALE_STEP] = tr("Float. 100% = 1.0");
+    mSettingsComments[CELL_WIDTH] = tr("Integer. Pixels count");
+    mSettingsComments[CELL_HEIGHT] = tr("Integer. Pixels count");
+    mSettingsComments[CELLS_PER_ITEM_V] = tr("Integer. Cells width count");
+    mSettingsComments[CELLS_PER_ITEM_H] = tr("Integer. Cells height count");
+    mSettingsComments[APP_START_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application START (file path relative to APP_FOLDER/cyclograms/");
+    mSettingsComments[APP_FINISH_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application FINISH (file path relative to APP_FOLDER/cyclograms/");
+    mSettingsComments[CYCLOGRAM_START_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched before main cyclogram START (file path relative to APP_FOLDER/cyclograms/");
+    mSettingsComments[CYCLOGRAM_FINISH_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched after main cyclogram FINISHED (file path relative to APP_FOLDER/cyclograms/"); //TODO remove this setting
+    mSettingsComments[COMMAND_EXECUTION_DELAY] = tr("Integer. Milliseconds. Cyclogram command forced execution delay for visuzalization");
+    mSettingsComments[MODULE_RESPONSE_WAIT_TIMEOUT] = tr("Integer. Milliseconds. Waiting for cyclogram module command execution timeout value.");
+    mSettingsComments[DEFAULT_RESPONSE_WAIT_TIME] = tr("Integer. Milliseconds. Waiting for COM-port hardware module response timeout");
+    mSettingsComments[DEFAULT_SEND_REQUEST_INTERVAL] = tr("Integer. Milliseconds. Minimal interval between two requests sent to same COM-port module");
+    mSettingsComments[SOFT_RESET_UPDATE_TIME] = tr("Integer. Milliseconds."); // check COM port module is up after soft reset
+    mSettingsComments[MAX_BUP_ALLOWED_VOLTAGE] = tr("Float. Volts. Maximal input voltage for Drive Control Unit");
+    mSettingsComments[MAX_BUP_ALLOWED_CURRENT] = tr("Float. Ampers. Maximal input current for Drive Control Unit");
+    mSettingsComments[MAX_MKO_REPEAT_REQUESTS] = tr("Interger. Maximum request repeat count if MKO responds with error 'Response not ready'");
+}
+
+QString AppSettings::settingName(SettingID id) const
+{
+    return mSettingsNames.value(id, tr("Setting name not found!"));
+}
+
+QString AppSettings::settingComment(SettingID id) const
+{
+    return mSettingsComments.value(id, tr("Setting comment not found!"));
 }

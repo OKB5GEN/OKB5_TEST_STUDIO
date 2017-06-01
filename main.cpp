@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     mainWin.onApplicationStart();
     int result = app.exec();
 
-    AppSettings::instance().save();
+    //AppSettings::instance().save();
 
     LOG_INFO(QString("========== APPLICATION FINISHED =========="));
 

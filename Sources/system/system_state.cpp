@@ -832,7 +832,7 @@ void SystemState::sendCommand(CmdActionModule* command)
         break;
     }
 
-    int protectionTimeout = AppSettings::instance().setting(AppSettings::MODULE_RESPONSE_WAIT_TIMEOUT).toInt();
+    int protectionTimeout = AppSettings::instance().settingValue(AppSettings::MODULE_RESPONSE_WAIT_TIMEOUT).toInt();
     mProtectionTimer->start(protectionTimeout);
 }
 

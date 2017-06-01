@@ -477,10 +477,10 @@ const QSizeF& ShapeItem::itemSize(bool needUpdate)
     static QSizeF itemSz;
     if (itemSz.isEmpty() || needUpdate)
     {
-        qreal cellWidth = AppSettings::instance().setting(AppSettings::CELL_WIDTH).toDouble();
-        qreal cellsPerItemHorizontal = AppSettings::instance().setting(AppSettings::CELLS_PER_ITEM_H).toDouble();
-        qreal cellHeight = AppSettings::instance().setting(AppSettings::CELL_HEIGHT).toDouble();
-        qreal cellsPerItemVeritical = AppSettings::instance().setting(AppSettings::CELLS_PER_ITEM_V).toDouble();
+        qreal cellWidth = AppSettings::instance().settingValue(AppSettings::CELL_WIDTH).toDouble();
+        qreal cellsPerItemHorizontal = AppSettings::instance().settingValue(AppSettings::CELLS_PER_ITEM_H).toDouble();
+        qreal cellHeight = AppSettings::instance().settingValue(AppSettings::CELL_HEIGHT).toDouble();
+        qreal cellsPerItemVeritical = AppSettings::instance().settingValue(AppSettings::CELLS_PER_ITEM_V).toDouble();
 
         itemSz.setWidth(cellWidth * cellsPerItemHorizontal);
         itemSz.setHeight(cellHeight * cellsPerItemVeritical);
@@ -494,8 +494,8 @@ const QSizeF& ShapeItem::cellSize(bool needUpdate)
     static QSizeF cellSz;
     if (cellSz.isEmpty() || needUpdate)
     {
-        qreal cellWidth = AppSettings::instance().setting(AppSettings::CELL_WIDTH).toDouble();
-        qreal cellHeight = AppSettings::instance().setting(AppSettings::CELL_HEIGHT).toDouble();
+        qreal cellWidth = AppSettings::instance().settingValue(AppSettings::CELL_WIDTH).toDouble();
+        qreal cellHeight = AppSettings::instance().settingValue(AppSettings::CELL_HEIGHT).toDouble();
         cellSz.setWidth(cellWidth);
         cellSz.setHeight(cellHeight);
     }

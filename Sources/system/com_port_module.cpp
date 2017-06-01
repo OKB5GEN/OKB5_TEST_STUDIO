@@ -39,8 +39,8 @@ COMPortModule::~COMPortModule()
 
 void COMPortModule::onAppSettingsChanged()
 {
-    mResponseWaitTime = AppSettings::instance().setting(AppSettings::DEFAULT_RESPONSE_WAIT_TIME).toInt();
-    mSendInterval = AppSettings::instance().setting(AppSettings::DEFAULT_SEND_REQUEST_INTERVAL).toInt();
+    mResponseWaitTime = AppSettings::instance().settingValue(AppSettings::DEFAULT_RESPONSE_WAIT_TIME).toInt();
+    mSendInterval = AppSettings::instance().settingValue(AppSettings::DEFAULT_SEND_REQUEST_INTERVAL).toInt();
 }
 
 bool COMPortModule::sendToPort(const QByteArray& request)
@@ -262,7 +262,7 @@ void COMPortModule::softReset() // TODO power modules can be soft resetted?
     //disconnect(mPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(onErrorOccured(QSerialPort::SerialPortError)));
     closePort();
 
-    int timerValue = AppSettings::instance().setting(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
+    int timerValue = AppSettings::instance().settingValue(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
     mSoftResetTimer->start(timerValue);
 }
 
@@ -288,7 +288,7 @@ void COMPortModule::tryCreatePort()
     if (portName.isNull())
     {
         LOG_INFO(QString("Module %1 still not active. Restarting update timer ...").arg(moduleName()));
-        int timerValue = AppSettings::instance().setting(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
+        int timerValue = AppSettings::instance().settingValue(AppSettings::SOFT_RESET_UPDATE_TIME).toInt();
         mSoftResetTimer->start(timerValue);
         return;
     }
