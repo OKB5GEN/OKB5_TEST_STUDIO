@@ -20,7 +20,7 @@
                 <param name="U" type="6" value="27"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
@@ -52,7 +52,7 @@
                 <param name="U" type="6" value="25.65"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
@@ -70,7 +70,7 @@
                 <param name="U" type="6" value="28.35"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
@@ -85,7 +85,7 @@
                 <param name="U" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
@@ -94,7 +94,7 @@
                 <param name="OK" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>

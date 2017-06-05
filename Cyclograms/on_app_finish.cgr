@@ -10,39 +10,39 @@
         <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1493381028430" name="Stop_Tech" file="on_app_finish_sub/sub_stop_tech.cgr">
             <input_params>
-                <param name="Sub.AddrC" type="6" value="0"/>
-                <param name="Sub.AddrD" type="6" value="0"/>
-                <param name="Sub.HasErr" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
-                <param name="Sub.IsOn_H1" type="6" value="0"/>
-                <param name="Sub.IsOn_H2" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
-                <param name="Sub.IsOn_POW" type="6" value="0"/>
-                <param name="Sub.IsReady" type="6" value="0"/>
-                <param name="Sub.IsReset" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="SUBPROGRAM" id="1493381032075" name="Stop_OTD" file="on_app_finish_sub/sub_stop_otd.cgr">
             <input_params>
-                <param name="Sub.AddrC" type="6" value="0"/>
-                <param name="Sub.AddrD" type="6" value="0"/>
-                <param name="Sub.HasErr" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
-                <param name="Sub.IsOn_H1" type="6" value="0"/>
-                <param name="Sub.IsOn_H2" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
-                <param name="Sub.IsOn_POW" type="6" value="0"/>
-                <param name="Sub.IsReady" type="6" value="0"/>
-                <param name="Sub.IsReset" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
@@ -52,52 +52,52 @@
         </command>
         <command type="SUBPROGRAM" id="1493381043352" name="Stop_STM" file="on_app_finish_sub/sub_stop_stm.cgr">
             <input_params>
-                <param name="Sub.AddrC" type="6" value="0"/>
-                <param name="Sub.AddrD" type="6" value="0"/>
-                <param name="Sub.HasErr" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPM" type="6" value="0"/>
-                <param name="Sub.IsOn_BUPR" type="6" value="0"/>
-                <param name="Sub.IsOn_H1" type="6" value="0"/>
-                <param name="Sub.IsOn_H2" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOM" type="6" value="0"/>
-                <param name="Sub.IsOn_MKOR" type="6" value="0"/>
-                <param name="Sub.IsOn_POW" type="6" value="0"/>
-                <param name="Sub.IsReady" type="6" value="0"/>
-                <param name="Sub.IsReset" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="SUBPROGRAM" id="1493381052574" name="Stop_PNA_PU" file="on_app_finish_sub/sub_stop_bp_pna.cgr">
             <input_params>
-                <param name="Sub.Class" type="6" value="0"/>
-                <param name="Sub.I" type="6" value="0"/>
-                <param name="Sub.Inom" type="6" value="0"/>
-                <param name="Sub.Iocp" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
-                <param name="Sub.Pnom" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="0"/>
-                <param name="Sub.Unom" type="6" value="0"/>
-                <param name="Sub.Uovp" type="6" value="0"/>
+                <param name="Class" type="6" value="0"/>
+                <param name="I" type="6" value="0"/>
+                <param name="Inom" type="6" value="0"/>
+                <param name="Iocp" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+                <param name="Pnom" type="6" value="0"/>
+                <param name="U" type="6" value="0"/>
+                <param name="Unom" type="6" value="0"/>
+                <param name="Uovp" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="SUBPROGRAM" id="1493381062843" name="Stop_BUP_PU" file="on_app_finish_sub/sub_stop_bp_bup.cgr">
             <input_params>
-                <param name="Sub.Class" type="6" value="0"/>
-                <param name="Sub.I" type="6" value="0"/>
-                <param name="Sub.Inom" type="6" value="0"/>
-                <param name="Sub.Iocp" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
-                <param name="Sub.Pnom" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="0"/>
-                <param name="Sub.Unom" type="6" value="0"/>
-                <param name="Sub.Uovp" type="6" value="0"/>
+                <param name="Class" type="6" value="0"/>
+                <param name="I" type="6" value="0"/>
+                <param name="Inom" type="6" value="0"/>
+                <param name="Iocp" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+                <param name="Pnom" type="6" value="0"/>
+                <param name="U" type="6" value="0"/>
+                <param name="Unom" type="6" value="0"/>
+                <param name="Uovp" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>

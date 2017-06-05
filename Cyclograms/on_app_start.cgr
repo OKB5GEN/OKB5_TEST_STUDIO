@@ -10,33 +10,33 @@
         <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1493381028430" name="Init_BUP_PU" file="on_app_start_sub/sub_init_bp_bup.cgr">
             <input_params>
-                <param name="Sub.Class" type="6" value="0"/>
-                <param name="Sub.I" type="6" value="0"/>
-                <param name="Sub.Inom" type="6" value="0"/>
-                <param name="Sub.Iocp" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
-                <param name="Sub.Pnom" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="0"/>
-                <param name="Sub.Unom" type="6" value="0"/>
-                <param name="Sub.Uovp" type="6" value="0"/>
+                <param name="Class" type="6" value="0"/>
+                <param name="I" type="6" value="0"/>
+                <param name="Inom" type="6" value="0"/>
+                <param name="Iocp" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+                <param name="Pnom" type="6" value="0"/>
+                <param name="U" type="6" value="0"/>
+                <param name="Unom" type="6" value="0"/>
+                <param name="Uovp" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="SUBPROGRAM" id="1493381032075" name="Init_PNA_PU" file="on_app_start_sub/sub_init_bp_pna.cgr">
             <input_params>
-                <param name="Sub.Class" type="6" value="0"/>
-                <param name="Sub.I" type="6" value="0"/>
-                <param name="Sub.Inom" type="6" value="0"/>
-                <param name="Sub.Iocp" type="6" value="0"/>
-                <param name="Sub.LActive" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PActive" type="6" value="0"/>
-                <param name="Sub.Pnom" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="0"/>
-                <param name="Sub.Unom" type="6" value="0"/>
-                <param name="Sub.Uovp" type="6" value="0"/>
+                <param name="Class" type="6" value="0"/>
+                <param name="I" type="6" value="0"/>
+                <param name="Inom" type="6" value="0"/>
+                <param name="Iocp" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+                <param name="Pnom" type="6" value="0"/>
+                <param name="U" type="6" value="0"/>
+                <param name="Unom" type="6" value="0"/>
+                <param name="Uovp" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>

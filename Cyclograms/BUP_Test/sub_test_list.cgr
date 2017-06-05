@@ -18,9 +18,9 @@
                 <param name="U" type="10" value="U"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="BRANCH_BEGIN" id="1491891404569" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test1"/>
@@ -62,9 +62,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891686240" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -103,9 +103,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891736336" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -131,9 +131,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891777155" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
@@ -145,9 +145,9 @@
                 <param name="Steps" type="6" value="1e+7"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891781150" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
@@ -159,9 +159,9 @@
                 <param name="Steps" type="6" value="1333"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891786550" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
@@ -173,9 +173,9 @@
                 <param name="Steps" type="6" value="10000"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="ACTION_MATH" id="1491891810046" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
@@ -206,9 +206,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891824978" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -264,9 +264,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891854276" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
@@ -297,9 +297,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891860453" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
@@ -333,9 +333,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891865958" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
@@ -369,9 +369,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891871062" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
@@ -405,9 +405,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491891920264" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -438,9 +438,9 @@
         <command type="SUBPROGRAM" id="1491893788257" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
             <input_params/>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="SubOK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491991092223" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
@@ -461,9 +461,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491991186019" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -490,9 +490,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491991270534" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -518,9 +518,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491995683235" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -537,9 +537,9 @@
                 <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491996318484" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -566,9 +566,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491996388558" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -585,9 +585,9 @@
                 <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997026353" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -614,9 +614,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997105384" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -643,9 +643,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997141672" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -662,9 +662,9 @@
                 <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997331965" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -691,9 +691,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997338557" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -719,9 +719,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997517710" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -748,9 +748,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997525074" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -778,9 +778,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997804977" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -793,9 +793,9 @@
                 <param name="OK" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997831242" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -821,9 +821,9 @@
                 <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997839728" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -850,9 +850,9 @@
                 <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="OK" type="10" value="OK"/>
+                <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
-                <param name="U" type="10" value="U"/>
+                <param name="U" type="10" value=""/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491997848282" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
