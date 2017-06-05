@@ -11,7 +11,7 @@ namespace
     static const QString END_FLAG = "END";
     static const QString DELIMITER = " ";
 
-    static const qreal PRECISION = 0.0001;
+    //static const qreal PRECISION = 0.0001;
 }
 
 VariableController::VariableController(QObject* parent):
@@ -71,7 +71,8 @@ void VariableController::setCurrentValue(const QString& name, qreal value)
 
         // do not set value, if variable does not changed significantly
         // to prevent multiple currentValueChanged signals
-        if (qAbs(data.currentValue - value) > PRECISION)
+
+        //if (qAbs(data.currentValue - value) > PRECISION) // commented what if value actually was not changed, for example temperature?
         {
             LOG_INFO(QString("Variable '%1' current value changed to %2").arg(name).arg(value));
 
