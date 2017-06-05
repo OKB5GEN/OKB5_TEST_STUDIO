@@ -596,6 +596,11 @@ void EditorWindow::onCyclogramFinish(const QString& errorText)
 
 void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString& text)
 {
+    if (shortFileName.isEmpty())
+    {
+        return;
+    }
+
     ModalCyclogramExecutionDialog dialog(Q_NULLPTR);
     if (dialog.init(shortFileName, text, mSystemState))
     {
