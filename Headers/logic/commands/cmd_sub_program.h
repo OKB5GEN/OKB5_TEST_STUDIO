@@ -34,8 +34,6 @@ public:
     const QMap<QString, QVariant>& inputParams() const;
     const QMap<QString, QVariant>& outputParams() const;
 
-    QString subprogramPrefix() const;
-
     void stop() override;
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     void pause() override;

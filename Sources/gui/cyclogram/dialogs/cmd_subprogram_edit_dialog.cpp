@@ -15,11 +15,7 @@ CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
 {
     setupUI();
     setWindowTitle(tr("Edit sub program"));
-
-    //adjustSize();
-    //setFixedSize(sizeHint());
-
-    setMinimumSize(QSize(850, 500));
+    setMinimumSize(QSize(1000, 500));
 }
 
 CmdSubProgramEditDialog::~CmdSubProgramEditDialog()
@@ -53,29 +49,29 @@ void CmdSubProgramEditDialog::setupUI()
     layout->addWidget(filePathBox, 0, 0, 1, 2);
 
     // input and output params
-    QGroupBox* inputGroupBox = new QGroupBox(tr("Input"), this);
-    QGroupBox* outputGroupBox = new QGroupBox(tr("Output"), this);
+    QGroupBox* inputGroupBox = new QGroupBox(tr("Input. Set subprogram variables initial values (either from calling cyclogram variable or direct value)"), this);
+    QGroupBox* outputGroupBox = new QGroupBox(tr("Output. Set calling cyclogram variables current values (either from subprogram variable value or direct value)"), this);
     QVBoxLayout* inputLayout = new QVBoxLayout();
     QVBoxLayout* outputLayout = new QVBoxLayout();
 
     mInParams = new QTableWidget(this);
     QStringList inHeaders;
-    inHeaders.append(tr("Вх.Переменная"));
+    inHeaders.append(tr("Subprogram variable"));
     inHeaders.append(tr(""));
-    inHeaders.append(tr("Переменная"));
+    inHeaders.append(tr("Calling c. variable"));
     inHeaders.append(tr(""));
-    inHeaders.append(tr("Значение"));
+    inHeaders.append(tr("Direct value"));
     mInParams->setColumnCount(inHeaders.size());
     mInParams->setHorizontalHeaderLabels(inHeaders);
     inputLayout->addWidget(mInParams);
 
     mOutParams = new QTableWidget(this);
     QStringList outHeaders;
-    outHeaders.append(tr("Вых.Переменная"));
+    outHeaders.append(tr("Calling c. variable"));
     outHeaders.append(tr(""));
-    outHeaders.append(tr("Переменная"));
+    outHeaders.append(tr("Subprogram variable"));
     outHeaders.append(tr(""));
-    outHeaders.append(tr("Значение"));
+    outHeaders.append(tr("Direct value"));
     mOutParams->setColumnCount(outHeaders.size());
     mOutParams->setHorizontalHeaderLabels(outHeaders);
     outputLayout->addWidget(mOutParams);
@@ -271,7 +267,7 @@ void CmdSubProgramEditDialog::updateUI()
     for (auto it = subprogramVariables.begin(); it != subprogramVariables.end(); ++it)
     {
         // param name
-        QString name = mCommand->subprogramPrefix() + it.key();
+        QString name = it.key();
         QLabel* text = new QLabel(mInParams);
         text->setTextInteractionFlags(Qt::NoTextInteraction);
         text->setText(name);
@@ -347,14 +343,15 @@ void CmdSubProgramEditDialog::updateUI()
 
         // variable selector
         QComboBox* comboBox = new QComboBox(mOutParams);
+        comboBox->addItem("");;
         comboBox->installEventFilter(this);
         for (auto iter = subprogramVariables.begin(); iter != subprogramVariables.end(); ++iter)
         {
-            QString subName = mCommand->subprogramPrefix() + iter.key();
+            QString subName = iter.key();
             comboBox->addItem(subName);
         }
 
-        comboBox->addItems(callingCyclogramVariables.keys());
+        //comboBox->addItems(callingCyclogramVariables.keys());
         mOutParams->setCellWidget(i, 2, comboBox);
 
         // "use direct value input" button
@@ -389,22 +386,6 @@ void CmdSubProgramEditDialog::updateUI()
                     isVariable = false;
                 }
             }
-            else
-            {
-                int index = comboBox->findText(name);
-                if (index != -1)
-                {
-                    comboBox->setCurrentIndex(index);
-                }
-            }
-        }
-        else // set output variable value to itself by default if command not loaded
-        {
-            int index = comboBox->findText(name);
-            if (index != -1)
-            {
-                comboBox->setCurrentIndex(index);
-            }
         }
 
         valueEdit->setEnabled(!isVariable);
@@ -417,11 +398,8 @@ void CmdSubProgramEditDialog::updateUI()
         ++i;
     }
 
-    mInParams->resizeColumnToContents(1);
-    mInParams->resizeColumnToContents(3);
-
-    mOutParams->resizeColumnToContents(1);
-    mOutParams->resizeColumnToContents(3);
+    mInParams->resizeColumnsToContents();
+    mOutParams->resizeColumnsToContents();
 
     if (mFileNameStr->text().isEmpty())
     {

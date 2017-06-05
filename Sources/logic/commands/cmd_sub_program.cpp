@@ -15,15 +15,13 @@
 
 namespace
 {
-    static const QString SUBPROGRAM_PREFIX = "Sub";
-    static const QString DELIMITER = ".";
 }
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
     mLoaded(false)
 {
-    mText = SUBPROGRAM_PREFIX;
+    mText = tr("Subprogram");
 
     auto cyclogram = CyclogramManager::createCyclogram();
 
@@ -103,7 +101,7 @@ void CmdSubProgram::execute()
     for (auto it = vc->variablesData().begin(); it != vc->variablesData().end(); ++it)
     {
         qreal value = 0;
-        QVariant valueVariant = mInputParams.value(subprogramPrefix() + it.key());
+        QVariant valueVariant = mInputParams.value(it.key());
 
         if (valueVariant.type() == QVariant::String)
         {
@@ -232,14 +230,7 @@ void CmdSubProgram::onVariableRemoved(const QString& name)
     {
         if (it.value().type() == QVariant::String && it.value().toString() == name)
         {
-            QStringList tokens = it.key().split(DELIMITER);
-            if (tokens.size() != 2)
-            {
-                LOG_ERROR(QString("Invalid variable name '%1'").arg(it.key()));
-                continue;
-            }
-
-            qreal value = cyclogram->variableController()->initialValue(tokens.at(1));
+            qreal value = cyclogram->variableController()->initialValue(it.key());
             LOG_WARNING(QString("Subprogram '%1' input link to variable '%2' is corrupted due to '%3' variable deletion. Replaced by initial value: %4")
                         .arg(mText)
                         .arg(it.key())
@@ -446,10 +437,10 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
 
     // Set calling cyclogram variables current values according to output parameter mapping
     auto cyclogram = mCyclogram.lock();
-    VariableController* vc = cyclogram->variableController();
+    VariableController* subprogramVC = cyclogram->variableController();
 
     // add subprogram data timeline to calling cyclogram
-    mVarCtrl->addDataTimeline(vc->dataTimeline());
+    mVarCtrl->addDataTimeline(subprogramVC->dataTimeline());
     QMap<QString, qreal> variables;
 
     for (auto it = mVarCtrl->variablesData().begin(); it != mVarCtrl->variablesData().end(); ++it)
@@ -461,22 +452,12 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
         {
             QString variableName = valueVariant.toString();
 
-            if (mVarCtrl->isVariableExist(variableName)) // set to own variable value
+            if (variableName.isEmpty())
             {
-                value = mVarCtrl->currentValue(variableName);
+                continue;
             }
-            else // set to subprogram variable value
-            {
-                QStringList tokens = variableName.split(DELIMITER);
-                if (tokens.size() == 2)
-                {
-                    value = vc->currentValue(tokens.at(1));
-                }
-                else
-                {
-                    LOG_ERROR(QString("Invalid variable name '%1'").arg(variableName));
-                }
-            }
+
+            value = subprogramVC->currentValue(variableName);
         }
         else if (valueVariant.type() == QVariant::Double)
         {
@@ -507,11 +488,6 @@ void CmdSubProgram::setParams(const QMap<QString, QVariant>& in, const QMap<QStr
     mInputParams = in;
     mOutputParams = out;
     updateText();
-}
-
-QString CmdSubProgram::subprogramPrefix() const
-{
-    return (SUBPROGRAM_PREFIX + DELIMITER);
 }
 
 void CmdSubProgram::restart()
