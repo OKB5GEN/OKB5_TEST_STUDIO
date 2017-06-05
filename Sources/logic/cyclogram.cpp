@@ -23,6 +23,8 @@
 #include "Headers/file_reader.h"
 
 const QString Cyclogram::SETTING_DESCRIPTION = "description";
+const QString Cyclogram::SETTING_CLEANUP_CYCLOGRAM = "cleanup_cyclogram";
+const QString Cyclogram::SETTING_DEFAULT_NAME = "default_name";
 
 namespace
 {
@@ -56,6 +58,12 @@ Cyclogram::Cyclogram(QObject * parent):
     mModified(false)
 {
     mVarController = new VariableController(this);
+
+    QString cleanupCyclogram = setting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM).toString();
+    if (cleanupCyclogram.isEmpty())
+    {
+        setSetting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM, "on_cyclogram_finish.cgr", false); // set cleanup cyclogram by default
+    }
 
     connect(mVarController, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(variablesChanged()));
     connect(mVarController, SIGNAL(variableRemoved(const QString&)), this, SLOT(variablesChanged()));

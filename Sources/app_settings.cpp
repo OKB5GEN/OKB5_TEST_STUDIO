@@ -198,8 +198,6 @@ void AppSettings::loadTexts()
     mSettingsNames[CELLS_PER_ITEM_H] = tr("Command shape height");
     mSettingsNames[APP_START_CYCLOGRAM_FILE] = tr("Application start cyclogram file");
     mSettingsNames[APP_FINISH_CYCLOGRAM_FILE] = tr("Application finish cyclogram file");
-    mSettingsNames[CYCLOGRAM_START_CYCLOGRAM_FILE] = tr("Pre-action cyclogram");
-    mSettingsNames[CYCLOGRAM_FINISH_CYCLOGRAM_FILE] = tr("Post-action cyclogram");
     mSettingsNames[COMMAND_EXECUTION_DELAY] = tr("Command execution delay");
     mSettingsNames[MODULE_RESPONSE_WAIT_TIMEOUT] = tr("Soft module response wait time");
     mSettingsNames[DEFAULT_RESPONSE_WAIT_TIME] = tr("Hard module response wait time");
@@ -219,8 +217,6 @@ void AppSettings::loadTexts()
     mSettingsComments[CELLS_PER_ITEM_H] = tr("Integer. Cells height count");
     mSettingsComments[APP_START_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application START (file path relative to APP_FOLDER/cyclograms/");
     mSettingsComments[APP_FINISH_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application FINISH (file path relative to APP_FOLDER/cyclograms/");
-    mSettingsComments[CYCLOGRAM_START_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched before main cyclogram START (file path relative to APP_FOLDER/cyclograms/");
-    mSettingsComments[CYCLOGRAM_FINISH_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched after main cyclogram FINISHED (file path relative to APP_FOLDER/cyclograms/"); //TODO remove this setting
     mSettingsComments[COMMAND_EXECUTION_DELAY] = tr("Integer. Milliseconds. Cyclogram command forced execution delay for visuzalization");
     mSettingsComments[MODULE_RESPONSE_WAIT_TIMEOUT] = tr("Integer. Milliseconds. Waiting for cyclogram module command execution timeout value.");
     mSettingsComments[DEFAULT_RESPONSE_WAIT_TIME] = tr("Integer. Milliseconds. Waiting for COM-port hardware module response timeout");

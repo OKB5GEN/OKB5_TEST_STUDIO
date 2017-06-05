@@ -14,12 +14,12 @@
         <command type="TERMINATOR" id="1491891253286" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1491891401632" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
             <input_params>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.U" type="10" value="U"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="U" type="10" value="U"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -46,24 +46,24 @@
         <command type="GO_TO_BRANCH" id="1491891548094" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491891646132" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="5000"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="3"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="10000"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="5000"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="3"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="10000"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -74,37 +74,37 @@
         <command type="GO_TO_BRANCH" id="1491891686244" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491891705619" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.DestSteps" type="6" value="10000"/>
-                <param name="Sub.Diff" type="6" value="0"/>
-                <param name="Sub.MaxDelta" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="0"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="1e+6"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="DestSteps" type="6" value="10000"/>
+                <param name="Diff" type="6" value="0"/>
+                <param name="MaxDelta" type="6" value="10"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="0"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="1e+6"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -115,66 +115,66 @@
         <command type="GO_TO_BRANCH" id="1491891736341" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491891773395" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="5000"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="3"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="1e+7"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="5000"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="3"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="1e+7"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891777155" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="5000"/>
-                <param name="Sub.Mode" type="6" value="3"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="1e+7"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="5000"/>
+                <param name="Mode" type="6" value="3"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="1e+7"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891781150" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="50"/>
-                <param name="Sub.Mode" type="6" value="2"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="1333"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="50"/>
+                <param name="Mode" type="6" value="2"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="1333"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891786550" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="5000"/>
-                <param name="Sub.Mode" type="6" value="3"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="10000"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="5000"/>
+                <param name="Mode" type="6" value="3"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="10000"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -190,24 +190,24 @@
         </command>
         <command type="SUBPROGRAM" id="1491891817376" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="200"/>
-                <param name="Sub.MaxV" type="6" value="500"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="4"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="1333"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="200"/>
+                <param name="MaxV" type="6" value="500"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="4"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="1333"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -238,175 +238,175 @@
         <command type="GO_TO_BRANCH" id="1491891844038" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491891851123" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="0"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="100"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="10000"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="0"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="100"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="10000"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891854276" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="400"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="1"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="100"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="10000"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="MaxI" type="6" value="400"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="1"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="100"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="10000"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891860453" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.DestSteps" type="6" value="1333"/>
-                <param name="Sub.Diff" type="6" value="0"/>
-                <param name="Sub.MaxDelta" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="0"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="1e+6"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="DestSteps" type="6" value="1333"/>
+                <param name="Diff" type="6" value="0"/>
+                <param name="MaxDelta" type="6" value="10"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="0"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="1e+6"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891865958" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.DestSteps" type="6" value="10000"/>
-                <param name="Sub.Diff" type="6" value="0"/>
-                <param name="Sub.MaxDelta" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="0"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="1e+6"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="DestSteps" type="6" value="10000"/>
+                <param name="Diff" type="6" value="0"/>
+                <param name="MaxDelta" type="6" value="10"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="0"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="1e+6"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1491891871062" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
-                <param name="Sub.DestN" type="6" value="10"/>
-                <param name="Sub.DestSteps" type="6" value="1333"/>
-                <param name="Sub.Diff" type="6" value="0"/>
-                <param name="Sub.MaxDelta" type="6" value="10"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="0"/>
-                <param name="Sub.N" type="6" value="0"/>
-                <param name="Sub.Nst" type="6" value="0"/>
-                <param name="Sub.NstMax" type="6" value="1e+6"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.StepsCur" type="6" value="0"/>
-                <param name="Sub.StepsPrev" type="6" value="0"/>
-                <param name="Sub.StopDelay" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestN" type="6" value="10"/>
+                <param name="DestSteps" type="6" value="1333"/>
+                <param name="Diff" type="6" value="0"/>
+                <param name="MaxDelta" type="6" value="10"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="0"/>
+                <param name="N" type="6" value="0"/>
+                <param name="Nst" type="6" value="0"/>
+                <param name="NstMax" type="6" value="1e+6"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="StepsCur" type="6" value="0"/>
+                <param name="StepsPrev" type="6" value="0"/>
+                <param name="StopDelay" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -445,24 +445,24 @@
         </command>
         <command type="SUBPROGRAM" id="1491991092223" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -473,25 +473,25 @@
         <command type="GO_TO_BRANCH" id="1491991186025" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491991254104" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check12" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -502,24 +502,24 @@
         <command type="GO_TO_BRANCH" id="1491991270540" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491995677225" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -530,15 +530,15 @@
         <command type="GO_TO_BRANCH" id="1491995683239" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491996271432" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -549,25 +549,25 @@
         <command type="GO_TO_BRANCH" id="1491996318489" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491996354186" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check22" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -578,15 +578,15 @@
         <command type="GO_TO_BRANCH" id="1491996388564" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491996983811" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -597,25 +597,25 @@
         <command type="GO_TO_BRANCH" id="1491997026359" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997071373" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check32" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -626,25 +626,25 @@
         <command type="GO_TO_BRANCH" id="1491997105389" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997137287" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check42" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -655,15 +655,15 @@
         <command type="GO_TO_BRANCH" id="1491997141677" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997328827" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Steps" type="6" value="0"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Steps" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -674,25 +674,25 @@
         <command type="GO_TO_BRANCH" id="1491997331970" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997335316" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check52" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -703,24 +703,24 @@
         <command type="GO_TO_BRANCH" id="1491997338563" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997514909" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -731,25 +731,25 @@
         <command type="GO_TO_BRANCH" id="1491997517716" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997521906" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check62" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -762,24 +762,24 @@
         <command type="GO_TO_BRANCH" id="1491997762662" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997801170" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="500"/>
-                <param name="Sub.MaxV" type="6" value="5000"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="3"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="1333"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="500"/>
+                <param name="MaxV" type="6" value="5000"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="3"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="1333"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -790,11 +790,11 @@
         <command type="GO_TO_BRANCH" id="1491997804982" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997826826" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check71" file="BUP_TEST/sub_check_dest_angle.cgr">
             <input_params>
-                <param name="Sub.OK" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -805,24 +805,24 @@
         <command type="GO_TO_BRANCH" id="1491997831248" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997835422" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
-                <param name="Sub.Error" type="6" value="0"/>
-                <param name="Sub.Imax" type="6" value="511"/>
-                <param name="Sub.Imin" type="6" value="50"/>
-                <param name="Sub.MaxI" type="6" value="0"/>
-                <param name="Sub.MaxV" type="6" value="0"/>
-                <param name="Sub.Mmax" type="6" value="5"/>
-                <param name="Sub.Mmin" type="6" value="0"/>
-                <param name="Sub.Mode" type="6" value="5"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.Smax" type="6" value="214749000"/>
-                <param name="Sub.Smin" type="6" value="-214749000"/>
-                <param name="Sub.Steps" type="6" value="0"/>
-                <param name="Sub.Vmax" type="6" value="8000"/>
-                <param name="Sub.Vmin" type="6" value="20"/>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
+                <param name="MaxI" type="6" value="0"/>
+                <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
+                <param name="Mode" type="6" value="5"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
+                <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>
@@ -833,25 +833,25 @@
         <command type="GO_TO_BRANCH" id="1491997839732" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="SUBPROGRAM" id="1491997844543" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check72" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
-                <param name="Sub.DestMode" type="6" value="5"/>
-                <param name="Sub.DestSteps" type="6" value="0"/>
-                <param name="Sub.NuA" type="6" value="0"/>
-                <param name="Sub.NuI" type="6" value="0"/>
-                <param name="Sub.NuM" type="6" value="0"/>
-                <param name="Sub.NuS" type="6" value="0"/>
-                <param name="Sub.NuV" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.PsyA" type="6" value="0"/>
-                <param name="Sub.PsyI" type="6" value="0"/>
-                <param name="Sub.PsyM" type="6" value="0"/>
-                <param name="Sub.PsyS" type="6" value="0"/>
-                <param name="Sub.PsyV" type="6" value="0"/>
-                <param name="Sub.T" type="6" value="0"/>
-                <param name="Sub.TSF" type="6" value="0"/>
+                <param name="DestMode" type="6" value="5"/>
+                <param name="DestSteps" type="6" value="0"/>
+                <param name="NuA" type="6" value="0"/>
+                <param name="NuI" type="6" value="0"/>
+                <param name="NuM" type="6" value="0"/>
+                <param name="NuS" type="6" value="0"/>
+                <param name="NuV" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="PsyA" type="6" value="0"/>
+                <param name="PsyI" type="6" value="0"/>
+                <param name="PsyM" type="6" value="0"/>
+                <param name="PsyS" type="6" value="0"/>
+                <param name="PsyV" type="6" value="0"/>
+                <param name="T" type="6" value="0"/>
+                <param name="TSF" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
                 <param name="U" type="10" value="U"/>
             </output_params>
         </command>

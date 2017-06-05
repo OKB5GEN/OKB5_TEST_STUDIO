@@ -15,6 +15,8 @@ class Cyclogram: public QObject
 
 public:
     static const QString SETTING_DESCRIPTION;
+    static const QString SETTING_CLEANUP_CYCLOGRAM;
+    static const QString SETTING_DEFAULT_NAME;
 
     enum State
     {

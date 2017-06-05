@@ -96,7 +96,7 @@ void FileReader::readSettings()
                 value = attributes.value("value").toString();
             }
 
-            if (!name.isEmpty() && !value.isEmpty())
+            if (!name.isEmpty())
             {
                 cyclogram->setSetting(name, value, false);
             }

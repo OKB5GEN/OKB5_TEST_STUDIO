@@ -243,6 +243,8 @@ void CmdSubProgramEditDialog::updateUI()
             CyclogramManager::removeCyclogram(cyclogram);
             return;
         }
+
+        mSubprogramNameStr->setText(cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString());
     }
     else // no cyclogram file set, possibly just batch calling cyclogram variables changing
     {

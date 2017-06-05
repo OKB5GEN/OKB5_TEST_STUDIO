@@ -11,8 +11,6 @@
     <setting name="CELLS_PER_ITEM_H" value="8"/>
     <setting name="APP_START_CYCLOGRAM_FILE" value="on_app_start.cgr"/>
     <setting name="APP_FINISH_CYCLOGRAM_FILE" value="on_app_finish.cgr"/>
-    <setting name="CYCLOGRAM_START_CYCLOGRAM_FILE" value="on_cyclogram_start.cgr"/>
-    <setting name="CYCLOGRAM_FINISH_CYCLOGRAM_FILE" value="on_cyclogram_finish.cgr"/>
     <setting name="COMMAND_EXECUTION_DELAY" value="50"/>
     <setting name="MODULE_RESPONSE_WAIT_TIMEOUT" value="20000"/>
     <setting name="DEFAULT_RESPONSE_WAIT_TIME" value="10000"/>

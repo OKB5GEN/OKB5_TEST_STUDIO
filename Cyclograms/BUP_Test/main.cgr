@@ -15,13 +15,13 @@
         <command type="TERMINATOR" id="1491892365463" name="FINISH" cmd_type="END"/>
         <command type="SUBPROGRAM" id="1491892387211" name="TestSet1" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.SubOK" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="27"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="SubOK" type="6" value="0"/>
+                <param name="U" type="6" value="27"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
         <command type="BRANCH_BEGIN" id="1491892427913" name="OK"/>
@@ -45,15 +45,15 @@
         <command type="GO_TO_BRANCH" id="1491892491483"/>
         <command type="SUBPROGRAM" id="1491892508600" name="TestSet2" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
-                <param name="Sub.CheckOK" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.SendOK" type="6" value="0"/>
-                <param name="Sub.SysOK" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="25.65"/>
+                <param name="CheckOK" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="SendOK" type="6" value="0"/>
+                <param name="SysOK" type="6" value="0"/>
+                <param name="U" type="6" value="25.65"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491892539255" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -63,15 +63,15 @@
         <command type="GO_TO_BRANCH" id="1491892539258"/>
         <command type="SUBPROGRAM" id="1491892556392" name="TestSet3" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
-                <param name="Sub.CheckOK" type="6" value="0"/>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.SendOK" type="6" value="0"/>
-                <param name="Sub.SysOK" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="28.35"/>
+                <param name="CheckOK" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="SendOK" type="6" value="0"/>
+                <param name="SysOK" type="6" value="0"/>
+                <param name="U" type="6" value="28.35"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1491892580758" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
@@ -81,21 +81,21 @@
         <command type="GO_TO_BRANCH" id="1491892580762"/>
         <command type="SUBPROGRAM" id="1492600298438" name="MKO_On" file="BUP_TEST/sub_mko_on.cgr">
             <input_params>
-                <param name="Sub.OK" type="6" value="0"/>
-                <param name="Sub.U" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
+                <param name="U" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
         <command type="SUBPROGRAM" id="1492600327609" name="MKO_Off" file="BUP_TEST/sub_mko_off.cgr">
             <input_params>
-                <param name="Sub.OK" type="6" value="0"/>
+                <param name="OK" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value="OK"/>
-                <param name="SubOK" type="10" value="Sub.OK"/>
+                <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
         <command type="QUESTION" id="1492600574115" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">

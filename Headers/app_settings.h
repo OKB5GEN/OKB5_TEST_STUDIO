@@ -21,8 +21,6 @@ public:
         CELLS_PER_ITEM_H, // ShapeItem size and position params
         APP_START_CYCLOGRAM_FILE,
         APP_FINISH_CYCLOGRAM_FILE,
-        CYCLOGRAM_START_CYCLOGRAM_FILE, //TODO remove this setting
-        CYCLOGRAM_FINISH_CYCLOGRAM_FILE, //TODO remove this setting
         COMMAND_EXECUTION_DELAY, // Cyclogram command "force" command execution delay for visuzalization
         MODULE_RESPONSE_WAIT_TIMEOUT, // Internal timeout waiting response from "program" module (buggy module logic detection)
         DEFAULT_RESPONSE_WAIT_TIME, // COM port module wait for response from real device time

@@ -15,13 +15,14 @@
 
 namespace
 {
+    static const QString DEFAULT_TEXT = "Subprogram";
 }
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
     mLoaded(false)
 {
-    mText = tr("Subprogram");
+    mText = DEFAULT_TEXT;
 
     auto cyclogram = CyclogramManager::createCyclogram();
 
@@ -61,6 +62,16 @@ bool CmdSubProgram::load()
     if (!ok)
     {
         return false;
+    }
+
+    if (mText == DEFAULT_TEXT)
+    {
+        mText = cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString();
+    }
+
+    if (mText.isEmpty())
+    {
+        mText = DEFAULT_TEXT;
     }
 
     setLoaded(true);
@@ -337,15 +348,10 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
                             {
                                 mInputParams[name] = attributes.value("value").toString();
                             }
-                            else //if (metaType == QMetaType::Double)
+                            else
                             {
                                 mInputParams[name] = attributes.value("value").toDouble();
                             }
-//                            else
-//                            {
-//                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
-//                                mInputParams[name] = QVariant();
-//                            }
                         }
                     }
 
@@ -379,15 +385,10 @@ void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
                             {
                                 mOutputParams[name] = attributes.value("value").toString();
                             }
-                            else// if (metaType == QMetaType::Double)
+                            else
                             {
                                 mOutputParams[name] = attributes.value("value").toDouble();
                             }
-//                            else
-//                            {
-//                                LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
-//                                mOutputParams[name] = QVariant();
-//                            }
                         }
                     }
 

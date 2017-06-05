@@ -4,6 +4,7 @@
 #include <QDialog>
 
 class QTextEdit;
+class QLineEdit;
 
 class Cyclogram;
 
@@ -21,8 +22,12 @@ protected:
 
 private slots:
     void onAccept();
+    void openFile();
 
 private:
+    QLineEdit* mDefaultNameStr;
+    QLineEdit* mFileNameStr;
+
     QTextEdit* mCyclogramDescription;
     QWeakPointer<Cyclogram> mCyclogram;
 };
