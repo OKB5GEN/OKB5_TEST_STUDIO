@@ -123,7 +123,7 @@ void CmdSubProgram::execute()
     cyclogram->run();
 }
 
-void CmdSubProgram::setFilePath(const QString& filePath)
+void CmdSubProgram::setFilePath(const QString& filePath, bool reload)
 {
     if (mFilePath == filePath)
     {
@@ -131,8 +131,12 @@ void CmdSubProgram::setFilePath(const QString& filePath)
     }
 
     mFilePath = filePath;
-    load();
-    updateText();
+
+    if (reload)
+    {
+        load();
+        updateText();
+    }
 }
 
 bool CmdSubProgram::loaded() const

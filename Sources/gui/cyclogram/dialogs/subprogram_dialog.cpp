@@ -72,7 +72,22 @@ SubProgramDialog::~SubProgramDialog()
 
 void SubProgramDialog::onSaveClick()
 {
-    QString fileName = Cyclogram::defaultStorePath() + mCommand->filePath();
+    QString fileName;
+
+    if (mCommand->filePath().isEmpty())
+    {
+        fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"), Cyclogram::defaultStorePath(), tr("OKB5 Cyclogram Files (*.cgr)"));
+
+        if (fileName.isEmpty())
+        {
+            return;
+        }
+    }
+    else
+    {
+        fileName = Cyclogram::defaultStorePath() + mCommand->filePath();
+    }
+
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
@@ -86,6 +101,18 @@ void SubProgramDialog::onSaveClick()
     if (writer.writeFile(&file))
     {
         LOG_INFO(QString("File '%1' saved").arg(fileName));
+        if (mCommand->filePath().isEmpty())
+        {
+            QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
+
+            if (tokens.size() != 2)
+            {
+                LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
+                return;
+            }
+
+            mCommand->setFilePath(tokens.at(1), false);
+        }
     }
     else
     {

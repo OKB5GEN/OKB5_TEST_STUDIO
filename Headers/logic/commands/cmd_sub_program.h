@@ -19,7 +19,7 @@ public:
     void restart();
 
 public:
-    void setFilePath(const QString& filePath);
+    void setFilePath(const QString& filePath, bool reload = true);
     void setName(const QString& name);
     const QString& filePath() const;
     const QString& name() const;
