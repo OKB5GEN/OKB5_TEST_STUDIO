@@ -27,7 +27,8 @@ private slots:
     void onSaveClick();
     void onVariablesClick();
     void onChartClick();
-    void onSettingsClick();
+    void onCyclogramSettingsClick();
+    void onCommandSettingsClick();
 
 private:
     CmdSubProgram* mCommand;

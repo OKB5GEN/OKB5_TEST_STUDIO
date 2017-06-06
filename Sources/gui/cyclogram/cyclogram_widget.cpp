@@ -418,30 +418,32 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
     }
     else if (event->button() == Qt::RightButton)
     {
-        int index = commandAt(event->pos());
-        if (index >= 0)
-        {
-            ShapeItem* clickedItem = mCommands[index];
+        clearSelection();
 
-            clearSelection(false);
-            mSelectedItem = clickedItem;
-            mSelectedItem->setSelected(true);
-            update();
+//        int index = commandAt(event->pos());
+//        if (index >= 0)
+//        {
+//            ShapeItem* clickedItem = mCommands[index];
 
-            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
-            {
-                mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
-                QMenu *menu = new QMenu(this);
-                menu->addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
-                menu->addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
-                menu->exec(mapToGlobal(event->pos()));
-                menu->deleteLater();
-            }
-        }
-        else
-        {
-            clearSelection();
-        }
+//            clearSelection(false);
+//            mSelectedItem = clickedItem;
+//            mSelectedItem->setSelected(true);
+//            update();
+
+//            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
+//            {
+//                mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
+//                QMenu *menu = new QMenu(this);
+//                menu->addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
+//                menu->addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
+//                menu->exec(mapToGlobal(event->pos()));
+//                menu->deleteLater();
+//            }
+//        }
+//        else
+//        {
+//            clearSelection();
+//        }
     }
 }
 
@@ -1032,9 +1034,12 @@ void CyclogramWidget::showEditDialog(Command *command)
 
     case DRAKON::SUBPROGRAM:
         {
-            CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
-            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram.lock());
-            dialog = d;
+            mCurSubprogram = qobject_cast<CmdSubProgram*>(command);
+            showSubprogramWidget();
+
+//            CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
+//            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram.lock());
+//            dialog = d;
         }
         break;
 
@@ -1063,19 +1068,20 @@ void CyclogramWidget::showEditDialog(Command *command)
         break;
 
     default:
+        {
+            LOG_WARNING(QString("Default shape edit dualog launched"));
+            ShapeEditDialog* shapeEditDialog = new ShapeEditDialog(this);
+            shapeEditDialog->setCommand(command);
+            dialog = shapeEditDialog;
+        }
         break;
     }
 
-    if (!dialog) // show default dialog
+    if (dialog)
     {
-        LOG_WARNING(QString("Default shape edit dualog launched"));
-        ShapeEditDialog* shapeEditDialog = new ShapeEditDialog(this);
-        shapeEditDialog->setCommand(command);
-        dialog = shapeEditDialog;
+        dialog->exec();
+        dialog->deleteLater();
     }
-
-    dialog->exec();
-    dialog->deleteLater();
 }
 
 void CyclogramWidget::showValidationError(Command* cmd)

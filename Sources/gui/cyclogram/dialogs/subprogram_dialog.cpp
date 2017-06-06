@@ -11,6 +11,7 @@
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
@@ -36,19 +37,22 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     QPushButton* variablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
     QPushButton* chartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
     QPushButton* deleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
-    QPushButton* settingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Settings"), this);
+    QPushButton* cyclogramSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Cyclogram Settings"), this);
+    QPushButton* commandSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Command Settings"), this);
 
     connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
     connect(chartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
     connect(deleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
-    connect(settingsBtn, SIGNAL(clicked(bool)), this, SLOT(onSettingsClick()));
+    connect(cyclogramSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCyclogramSettingsClick()));
+    connect(commandSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCommandSettingsClick()));
 
     buttonLayout->addWidget(saveBtn);
     buttonLayout->addWidget(variablesBtn);
     buttonLayout->addWidget(chartBtn);
     buttonLayout->addWidget(deleteBtn);
-    buttonLayout->addWidget(settingsBtn);
+    buttonLayout->addWidget(cyclogramSettingsBtn);
+    buttonLayout->addWidget(commandSettingsBtn);
     buttonLayout->addStretch();
 
     mScrollArea->setBackgroundRole(QPalette::Dark);
@@ -141,7 +145,7 @@ void SubProgramDialog::onChartClick()
     dialog->show();
 }
 
-void SubProgramDialog::onSettingsClick()
+void SubProgramDialog::onCyclogramSettingsClick()
 {
     CyclogramSettingsDialog dialog(Q_NULLPTR);
     dialog.setCyclogram(mCommand->cyclogram());
@@ -151,4 +155,12 @@ void SubProgramDialog::onSettingsClick()
 CyclogramWidget* SubProgramDialog::cyclogramWidget() const
 {
     return mCyclogramWidget;
+}
+
+void SubProgramDialog::onCommandSettingsClick()
+{
+    CmdSubProgramEditDialog* dialog = new CmdSubProgramEditDialog(this);
+    dialog->setCommand(mCommand, mCommand->cyclogram());
+    dialog->exec();
+    dialog->deleteLater();
 }

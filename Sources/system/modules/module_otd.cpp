@@ -40,6 +40,8 @@ void ModuleOTD::processCustomCommand()
     case ModuleCommands::RESET_LINE_2:
     case ModuleCommands::START_MEASUREMENT_LINE_1:
     case ModuleCommands::START_MEASUREMENT_LINE_2:
+    case ModuleCommands::GET_DS1820_COUNT_LINE_1:
+    case ModuleCommands::GET_DS1820_COUNT_LINE_2:
         {
             addModuleCmd(command, 0, 0);
         }
