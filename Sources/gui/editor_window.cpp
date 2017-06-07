@@ -107,49 +107,69 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+void EditorWindow::closeAll()
+{
+    foreach (QObject* object, mOpenedSubprogramDialogs)
+    {
+        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
+        if (dialog)
+        {
+            dialog->close();
+        }
+    }
+
+    CyclogramManager::clear();
+}
+
 void EditorWindow::newFile()
 {
-    if (maybeSave())
+    if (!maybeSave())
     {
-        CyclogramManager::clear();
-        auto cyclogram = CyclogramManager::createCyclogram();
-
-        setNewCyclogram(cyclogram);
-        setCurrentFile(QString());
-
-        cyclogram->setModified(true, true);
+        return;
     }
+
+    closeAll();
+    auto cyclogram = CyclogramManager::createCyclogram();
+
+    setNewCyclogram(cyclogram);
+    setCurrentFile(QString());
+
+    cyclogram->setModified(true, true);
 }
 
 void EditorWindow::openFile()
 {
-    if (maybeSave())
+    if (!maybeSave())
     {
-        // try read last file open path
-        QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-        QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
-        if (path.isEmpty())
-        {
-            path = QDir::currentPath();
-        }
-
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
-        if (!fileName.isEmpty())
-        {
-            // load cyclogram
-            QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
-
-            if (tokens.size() != 2)
-            {
-                LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
-                return;
-            }
-
-            QString openPath = QFileInfo(fileName).absoluteDir().path();
-            settings.setValue(SETTING_LAST_OPEN_FILE_DIR, openPath);
-            loadFile(fileName);
-        }
+        return;
     }
+
+    // try read last file open path
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
+    if (path.isEmpty())
+    {
+        path = QDir::currentPath();
+    }
+
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    if (fileName.isEmpty())
+    {
+        return;
+    }
+
+    // load cyclogram
+    QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
+
+    if (tokens.size() != 2)
+    {
+        LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
+        return;
+    }
+
+    QString openPath = QFileInfo(fileName).absoluteDir().path();
+    settings.setValue(SETTING_LAST_OPEN_FILE_DIR, openPath);
+    loadFile(fileName);
 }
 
 bool EditorWindow::save()
@@ -408,7 +428,7 @@ bool EditorWindow::maybeSave()
 
 void EditorWindow::loadFile(const QString &fileName)
 {
-    CyclogramManager::clear();
+    closeAll();
 
     bool ok = false;
     auto cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
@@ -681,7 +701,6 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     cyclogram->setSystemState(mSystemState);
 
     mCyclogramWidget->load(cyclogram);
-
 }
 
 void EditorWindow::onSettings()

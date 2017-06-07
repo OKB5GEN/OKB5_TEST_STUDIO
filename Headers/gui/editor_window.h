@@ -64,6 +64,7 @@ signals:
 private:
     void runModalCyclogram(const QString& shortFileName, const QString& text);
 
+    void closeAll();
     void createActions();
     void createStatusBar();
     void readSettings();
