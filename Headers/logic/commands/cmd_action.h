@@ -9,6 +9,7 @@ class CmdAction: public Command
 
 public:
     CmdAction(DRAKON::IconType type, QObject* parent);
+    virtual ~CmdAction();
 
     void run() override;
 

@@ -15,6 +15,8 @@ class CyclogramConsole;
 class VariablesWindow;
 class SystemState;
 class CyclogramChartDialog;
+class CmdSubProgram;
+class SubProgramDialog;
 
 class EditorWindow : public QMainWindow
 {
@@ -25,6 +27,9 @@ public:
 
     void loadFile(const QString &fileName);
     void onApplicationStart();
+
+    SubProgramDialog* subprogramDialog(CmdSubProgram* command) const;
+    void addSuprogramDialog(CmdSubProgram* command, SubProgramDialog* dialog);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
@@ -49,6 +54,9 @@ private slots:
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
     void commitData(QSessionManager &);
+
+    void onSubprogramDestroyed(QObject* object);
+    void onSubprogramDialogDestroyed(QObject* object);
 
 signals:
     void documentSaved(bool saved);
@@ -94,5 +102,7 @@ private:
     CyclogramConsole* mCyclogramConsole;
 
     int mSnapshotsCouner; // hack for force data snapshot save
+
+    QMap<QObject*, QObject*> mOpenedSubprogramDialogs;
 };
 #endif // EDITOR_WINDOW_H

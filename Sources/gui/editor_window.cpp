@@ -21,6 +21,9 @@
 
 #include "Headers/logger/Logger.h"
 
+#include "Headers/logic/commands/cmd_sub_program.h"
+#include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
+
 namespace
 {
     static const int TOOLBAR_ICON_SIZE = 64;
@@ -35,7 +38,7 @@ EditorWindow::EditorWindow():
     mScrollArea = new QScrollArea(this);
     mSystemState = new SystemState(this);
     mCyclogramWidget = new CyclogramWidget(this);
-    mCyclogramWidget->setDialogParent(this);
+    mCyclogramWidget->setMainWindow(this);
 
     mCyclogramWidget->setParentScrollArea(mScrollArea);
 
@@ -663,6 +666,8 @@ void EditorWindow::commitData(QSessionManager &manager)
 
 void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
+    mOpenedSubprogramDialogs.clear(); // all dialogs will be closed by destroyed() command signal
+
     mCyclogramConsole->clear();
 
     mCyclogram = cyclogram;
@@ -680,10 +685,49 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     cyclogram->setSystemState(mSystemState);
 
     mCyclogramWidget->load(cyclogram);
+
 }
 
 void EditorWindow::onSettings()
 {
     AppSettingsDialog dialog(Q_NULLPTR);
     dialog.exec();
+}
+
+SubProgramDialog* EditorWindow::subprogramDialog(CmdSubProgram* command) const
+{
+    return qobject_cast<SubProgramDialog*>(mOpenedSubprogramDialogs.value(command, Q_NULLPTR));
+}
+
+void EditorWindow::addSuprogramDialog(CmdSubProgram* command, SubProgramDialog* dialog)
+{
+    Q_ASSERT(subprogramDialog(command) == Q_NULLPTR);
+
+    connect(command, SIGNAL(destroyed(QObject*)), this, SLOT(onSubprogramDestroyed(QObject*)));
+    connect(dialog, SIGNAL(destroyed(QObject*)), this, SLOT(onSubprogramDialogDestroyed(QObject*)));
+
+    mOpenedSubprogramDialogs[command] = dialog;
+}
+
+void EditorWindow::onSubprogramDestroyed(QObject* object)
+{
+    // command deleted by the user
+    SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(mOpenedSubprogramDialogs.take(object)); // close dialog and remove it from container
+    if (dialog)
+    {
+        disconnect(dialog, SIGNAL(destroyed(QObject*)), this, SLOT(onSubprogramDialogDestroyed(QObject*)));
+        dialog->close();
+    }
+}
+
+void EditorWindow::onSubprogramDialogDestroyed(QObject* object)
+{
+    // dialog closed by the user
+    QObject* key = mOpenedSubprogramDialogs.key(object, Q_NULLPTR);
+    if (!key)
+    {
+        return;
+    }
+
+    mOpenedSubprogramDialogs.take(key);
 }

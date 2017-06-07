@@ -14,6 +14,7 @@ class CmdSubProgram: public CmdAction
 
 public:
     CmdSubProgram(QObject* parent);
+    ~CmdSubProgram();
 
     void run() override;
     void restart();

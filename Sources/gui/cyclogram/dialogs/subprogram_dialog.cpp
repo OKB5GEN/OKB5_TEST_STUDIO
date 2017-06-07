@@ -14,20 +14,29 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
 
 
-SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
-    QDialog(parent),
+namespace
+{
+    static const int SIZE_ADJUST = 100;
+    static const int MAX_DIALOG_WIDTH = 1600;
+    static const int MAX_DIALOG_HEIGHT = 800;
+}
+
+SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow):
+    QDialog(mainWindow),
     mCommand(command),
     mVariablesWindow(Q_NULLPTR)
 {
     mScrollArea = new QScrollArea(this);
-    setMaximumSize(QSize(1600, 800));
+    mScrollArea->setBackgroundRole(QPalette::Dark);
+
+    setMaximumSize(QSize(MAX_DIALOG_WIDTH, MAX_DIALOG_HEIGHT));
 
     mCyclogramWidget = new CyclogramWidget(this);
-    mCyclogramWidget->setDialogParent(parent);
+    mCyclogramWidget->setMainWindow(mainWindow);
     mCyclogramWidget->setParentScrollArea(mScrollArea);
     mCyclogramWidget->load(mCommand->cyclogram());
 
-    connect(mCommand->cyclogram().data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
+    mScrollArea->setWidget(mCyclogramWidget);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -55,18 +64,11 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * parent):
     buttonLayout->addWidget(commandSettingsBtn);
     buttonLayout->addStretch();
 
-    mScrollArea->setBackgroundRole(QPalette::Dark);
-    mScrollArea->setWidget(mCyclogramWidget);
-    mScrollArea->resize(mCyclogramWidget->size()); //TODO too big size case
-
     layout->addWidget(mScrollArea);
     setLayout(layout);
     setAttribute(Qt::WA_DeleteOnClose);
-    resize(mScrollArea->size());
 
-    //TODO connect cyclogram & cyclogram widget signals
-    // (file changed, can be saved, cyclogram command selected and can be deleted, variables window active)
-    // QFileSystemWatcher - for outside file/directory changing detection etc
+    updateSize();
 }
 
 SubProgramDialog::~SubProgramDialog()
@@ -157,10 +159,38 @@ CyclogramWidget* SubProgramDialog::cyclogramWidget() const
     return mCyclogramWidget;
 }
 
+void SubProgramDialog::updateSize()
+{
+    mScrollArea->resize(mCyclogramWidget->size());
+
+    QSize defaultSize = mScrollArea->size();
+    defaultSize.setWidth(defaultSize.width() + SIZE_ADJUST);
+    defaultSize.setHeight(defaultSize.height() + SIZE_ADJUST);
+    resize(defaultSize);
+}
+
 void SubProgramDialog::onCommandSettingsClick()
 {
-    CmdSubProgramEditDialog* dialog = new CmdSubProgramEditDialog(this);
-    dialog->setCommand(mCommand, mCommand->cyclogram());
-    dialog->exec();
-    dialog->deleteLater();
+    //TODO connect cyclogram & cyclogram widget signals
+    // (file changed, can be saved, cyclogram command selected and can be deleted, variables window active)
+    // QFileSystemWatcher - for outside file/directory changing detection etc
+
+    QString filePathBefore = mCommand->filePath();
+
+    CmdSubProgramEditDialog dialog(Q_NULLPTR);
+    dialog.setCommand(mCommand, mCommand->cyclogram());
+    dialog.exec();
+
+    QString filePathAfter = mCommand->filePath();
+
+    if (filePathBefore != filePathAfter)
+    {
+        mCyclogramWidget->load(mCommand->cyclogram());
+        updateSize();
+    }
+}
+
+CmdSubProgram* SubProgramDialog::command() const
+{
+    return mCommand;
 }

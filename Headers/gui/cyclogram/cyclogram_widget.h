@@ -28,7 +28,7 @@ public:
     ~CyclogramWidget();
 
     void clear(bool onDestroy = false);
-    void setDialogParent(QWidget* widget);
+    void setMainWindow(QWidget* widget);
     void setParentTitle(const QString& title);
     void setParentScrollArea(QScrollArea* scroll);
 
@@ -103,7 +103,7 @@ private:
 
     CmdSubProgram* mCurSubprogram;
 
-    QWidget* mDialogParent;
+    QWidget* mMainWindow;
     QString mParentTitle;
 
     qreal mScale;

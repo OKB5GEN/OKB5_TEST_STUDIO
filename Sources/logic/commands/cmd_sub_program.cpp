@@ -34,6 +34,11 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     updateText();
 }
 
+CmdSubProgram::~CmdSubProgram()
+{
+    CyclogramManager::removeCyclogram(mCyclogram.lock());
+}
+
 bool CmdSubProgram::load()
 {
     setLoaded(false);

@@ -26,3 +26,7 @@ void CmdAction::finish()
     emit finished(nextCommand());
 }
 
+CmdAction::~CmdAction()
+{
+
+}

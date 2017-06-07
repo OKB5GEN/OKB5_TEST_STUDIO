@@ -18,10 +18,11 @@ class SubProgramDialog : public QDialog
     Q_OBJECT
 
 public:
-    SubProgramDialog(CmdSubProgram* command, QWidget * parent);
+    SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow);
     ~SubProgramDialog();
 
     CyclogramWidget* cyclogramWidget() const;
+    CmdSubProgram* command() const;
 
 private slots:
     void onSaveClick();
@@ -31,6 +32,8 @@ private slots:
     void onCommandSettingsClick();
 
 private:
+    void updateSize();
+
     CmdSubProgram* mCommand;
     CyclogramWidget* mCyclogramWidget;
     VariablesWindow* mVariablesWindow;

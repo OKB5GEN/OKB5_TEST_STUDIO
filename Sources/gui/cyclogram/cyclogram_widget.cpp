@@ -34,6 +34,7 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_parallel_process_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
+#include "Headers/gui/editor_window.h"
 
 #include "Headers/gui/cyclogram/shape_item.h"
 
@@ -50,7 +51,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
-    mDialogParent(Q_NULLPTR),
+    mMainWindow(Q_NULLPTR),
     mParentScrollArea(Q_NULLPTR)
 {
     onAppSettingsChanged();
@@ -461,11 +462,24 @@ void CyclogramWidget::showSubprogramWidget()
         return;
     }
 
-    Q_ASSERT(mDialogParent);
-    SubProgramDialog* subProgramDialog = new SubProgramDialog(mCurSubprogram, mDialogParent);
-    QString title = updateWindowTitle(subProgramDialog);
-    subProgramDialog->cyclogramWidget()->setParentTitle(title);
-    subProgramDialog->show();
+    Q_ASSERT(mMainWindow);
+
+    EditorWindow* mainWindow = qobject_cast<EditorWindow*>(mMainWindow);
+
+    SubProgramDialog* subProgramDialog = mainWindow->subprogramDialog(mCurSubprogram);
+    if (subProgramDialog)
+    {
+        subProgramDialog->activateWindow();
+        subProgramDialog->raise();
+    }
+    else
+    {
+        subProgramDialog = new SubProgramDialog(mCurSubprogram, mMainWindow);
+        mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
+        QString title = updateWindowTitle(subProgramDialog);
+        subProgramDialog->cyclogramWidget()->setParentTitle(title);
+        subProgramDialog->show();
+    }
 }
 
 void CyclogramWidget::showSubprogramChart()
@@ -482,8 +496,8 @@ void CyclogramWidget::showSubprogramChart()
         return;
     }
 
-    Q_ASSERT(mDialogParent);
-    CyclogramChartDialog* dialog = new CyclogramChartDialog(mDialogParent);
+    Q_ASSERT(mMainWindow);
+    CyclogramChartDialog* dialog = new CyclogramChartDialog(mMainWindow);
     updateWindowTitle(dialog);
 
     dialog->setCyclogram(mCurSubprogram->cyclogram());
@@ -522,7 +536,7 @@ QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
 
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    //TODO remember that mousePressEvent will be called first!
+    //remember that mousePressEvent will be called first!
     if (event->button() == Qt::LeftButton)
     {
         if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
@@ -601,7 +615,6 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
 {
     ShapeItem* shapeItem = new ShapeItem(this);
     shapeItem->setCommand(cmd);
-    //shapeItem->setToolTip(tr("Tooltip\n next row"));
     shapeItem->setCell(cell);
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
@@ -1547,10 +1560,9 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     mRootShape->adjust();
 }
 
-void CyclogramWidget::setDialogParent(QWidget* widget)
+void CyclogramWidget::setMainWindow(QWidget* widget)
 {
-    int TODO; // what in case of replace parent?
-    mDialogParent = widget;
+    mMainWindow = widget;
 }
 
 void CyclogramWidget::setParentTitle(const QString& title)
