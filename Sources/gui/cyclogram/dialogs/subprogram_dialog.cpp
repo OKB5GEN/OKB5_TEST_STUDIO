@@ -2,6 +2,7 @@
 
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
+#include "Headers/gui/cyclogram/shape_item.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
@@ -26,6 +27,8 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow)
     mCommand(command),
     mVariablesWindow(Q_NULLPTR)
 {
+    setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
+
     mScrollArea = new QScrollArea(this);
     mScrollArea->setBackgroundRole(QPalette::Dark);
 
@@ -42,26 +45,29 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow)
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     layout->addLayout(buttonLayout);
 
-    QPushButton* saveBtn = new QPushButton(QIcon(":/resources/images/save"), tr("Save"), this);
-    QPushButton* variablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
-    QPushButton* chartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
-    QPushButton* deleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
-    QPushButton* cyclogramSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Cyclogram Settings"), this);
-    QPushButton* commandSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Command Settings"), this);
+    mSaveBtn = new QPushButton(QIcon(":/resources/images/save"), tr("Save"), this);
+    mVariablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
+    mChartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
+    mDeleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
+    mCyclogramSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Cyclogram Settings"), this);
+    mCommandSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Command Settings"), this);
 
-    connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
-    connect(variablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
-    connect(chartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
-    connect(deleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
-    connect(cyclogramSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCyclogramSettingsClick()));
-    connect(commandSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCommandSettingsClick()));
+    connect(mSaveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
+    connect(mVariablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
+    connect(mChartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
+    connect(mDeleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
+    connect(mCyclogramSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCyclogramSettingsClick()));
+    connect(mCommandSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCommandSettingsClick()));
 
-    buttonLayout->addWidget(saveBtn);
-    buttonLayout->addWidget(variablesBtn);
-    buttonLayout->addWidget(chartBtn);
-    buttonLayout->addWidget(deleteBtn);
-    buttonLayout->addWidget(cyclogramSettingsBtn);
-    buttonLayout->addWidget(commandSettingsBtn);
+    connect(mCommand->cyclogram().data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
+    connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
+
+    buttonLayout->addWidget(mSaveBtn);
+    buttonLayout->addWidget(mVariablesBtn);
+    buttonLayout->addWidget(mChartBtn);
+    buttonLayout->addWidget(mDeleteBtn);
+    buttonLayout->addWidget(mCyclogramSettingsBtn);
+    buttonLayout->addWidget(mCommandSettingsBtn);
     buttonLayout->addStretch();
 
     layout->addWidget(mScrollArea);
@@ -69,6 +75,9 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow)
     setAttribute(Qt::WA_DeleteOnClose);
 
     updateSize();
+
+    onCyclogramModified();
+    onCyclogramSelectionChanged(mCyclogramWidget->selectedItem());
 }
 
 SubProgramDialog::~SubProgramDialog()
@@ -76,7 +85,7 @@ SubProgramDialog::~SubProgramDialog()
 
 }
 
-void SubProgramDialog::onSaveClick()
+bool SubProgramDialog::onSaveClick()
 {
     QString fileName;
 
@@ -86,7 +95,7 @@ void SubProgramDialog::onSaveClick()
 
         if (fileName.isEmpty())
         {
-            return;
+            return false;
         }
     }
     else
@@ -100,13 +109,16 @@ void SubProgramDialog::onSaveClick()
         QMessageBox::warning(this, tr("OKB5 Test Studio"),
                                    tr("Cannot write file %1:\n%2.").
                                    arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
+        return false;
     }
 
     FileWriter writer(mCommand->cyclogram());
     if (writer.writeFile(&file))
     {
         LOG_INFO(QString("File '%1' saved").arg(fileName));
+
+        mCommand->cyclogram()->setModified(false, true);
+
         if (mCommand->filePath().isEmpty())
         {
             QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
@@ -114,7 +126,7 @@ void SubProgramDialog::onSaveClick()
             if (tokens.size() != 2)
             {
                 LOG_ERROR(QString("Invalid directory. All cyclograms must be stored in %1 or its subfolders").arg(Cyclogram::defaultStorePath()));
-                return;
+                return false;
             }
 
             mCommand->setFilePath(tokens.at(1), false);
@@ -123,7 +135,10 @@ void SubProgramDialog::onSaveClick()
     else
     {
         LOG_ERROR(QString("File '%1' not saved!").arg(fileName));
+        return false;
     }
+
+    return true;
 }
 
 void SubProgramDialog::onVariablesClick()
@@ -133,9 +148,12 @@ void SubProgramDialog::onVariablesClick()
         mVariablesWindow = new VariablesWindow(this);
         mVariablesWindow->setCyclogram(mCommand->cyclogram());
         mVariablesWindow->setWindowTitle(windowTitle());
+        //TODO variables window will be closed with subprogram window. What if we want to watch variables afterwards?
     }
 
     mVariablesWindow->show();
+    mVariablesWindow->activateWindow();
+    mVariablesWindow->raise();
 }
 
 void SubProgramDialog::onChartClick()
@@ -171,10 +189,6 @@ void SubProgramDialog::updateSize()
 
 void SubProgramDialog::onCommandSettingsClick()
 {
-    //TODO connect cyclogram & cyclogram widget signals
-    // (file changed, can be saved, cyclogram command selected and can be deleted, variables window active)
-    // QFileSystemWatcher - for outside file/directory changing detection etc
-
     QString filePathBefore = mCommand->filePath();
 
     CmdSubProgramEditDialog dialog(Q_NULLPTR);
@@ -219,14 +233,63 @@ void SubProgramDialog::onCommandTextChanged(const QString& newText)
         newTitle.append(newText);
     }
 
-    setWindowTitle(newTitle);
-    mCyclogramWidget->setWindowTitle(newTitle);
+    updateTitle(newTitle);
 }
 
 void SubProgramDialog::onParentWindowTitleChanged(const QString& newParentWindowTitle)
 {
     QString delimiter = CyclogramWidget::delimiter();
     QString newTitle = newParentWindowTitle + delimiter + mCommand->text();
-    setWindowTitle(newTitle);
+    updateTitle(newTitle);
+}
+
+void SubProgramDialog::updateTitle(const QString &newTitle)
+{
+    setWindowTitle(newTitle + "[*]");
     mCyclogramWidget->setWindowTitle(newTitle);
+
+    if (mVariablesWindow)
+    {
+        mVariablesWindow->setWindowTitle(newTitle);
+    }
+
+    //TODO chart window title update?
+}
+
+void SubProgramDialog::onCyclogramModified()
+{
+    bool isModified = mCommand->cyclogram()->isModified();
+    setWindowModified(isModified);
+    mSaveBtn->setEnabled(isModified);
+}
+
+void SubProgramDialog::onCyclogramSelectionChanged(ShapeItem* item)
+{
+    mDeleteBtn->setEnabled(item != Q_NULLPTR);
+}
+
+void SubProgramDialog::closeEvent(QCloseEvent *event)
+{
+    bool isModified = isWindowModified();
+
+    if (!isModified)
+    {
+        event->accept();
+        return;
+    }
+
+    int button = QMessageBox::question(this,
+                                       tr("Subprogram window close"),
+                                       tr("Cyclogram was modified. Would you like to save it?"),
+                                       QMessageBox::Ok,
+                                       QMessageBox::Cancel);
+
+    if (button == QMessageBox::Ok && onSaveClick())
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
 }

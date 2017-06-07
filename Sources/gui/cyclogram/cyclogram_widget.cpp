@@ -52,7 +52,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mSihlouetteArrow(Q_NULLPTR),
     mCurSubprogram(Q_NULLPTR),
     mMainWindow(Q_NULLPTR),
-    mParentScrollArea(Q_NULLPTR)
+    mParentScrollArea(Q_NULLPTR),
+    mSelectedItem(Q_NULLPTR)
 {
     onAppSettingsChanged();
 
@@ -70,7 +71,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
     mMovingItem = 0;
-    mSelectedItem = 0;
+    setSelectedItem(0);
     mRootShape = 0;
 
     setFocusPolicy(Qt::ClickFocus);
@@ -85,7 +86,7 @@ void CyclogramWidget::clear(bool onDestroy)
 {
     if (onDestroy)
     {
-        mSelectedItem = Q_NULLPTR;
+        setSelectedItem(0);
     }
 
     clearSelection();
@@ -244,34 +245,36 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
 
 void CyclogramWidget::deleteSelectedItem()
 {
-    if (mSelectedItem)
+    if (!mSelectedItem)
     {
-        QString errorDesc;
-        if (canBeDeleted(mSelectedItem, errorDesc))
-        {
-            bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
-            QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
-            QString text = tr("Are you sure that you want to delete ");
-            if (isBranch)
-            {
-                text += tr("entire branch with all its commands?");
-            }
-            else
-            {
-                text += tr("this command?");
-            }
+        return;
+    }
 
-            if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
-            {
-                ShapeItem* item = mSelectedItem;
-                clearSelection();
-                deleteCommand(item);
-            }
+    QString errorDesc;
+    if (canBeDeleted(mSelectedItem, errorDesc))
+    {
+        bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
+        QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
+        QString text = tr("Are you sure that you want to delete ");
+        if (isBranch)
+        {
+            text += tr("entire branch with all its commands?");
         }
         else
         {
-            QMessageBox::warning(this, tr("Command deletion"), tr("Command can not be deleted!\nReason: ") + errorDesc);
+            text += tr("this command?");
         }
+
+        if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
+        {
+            ShapeItem* item = mSelectedItem;
+            clearSelection();
+            deleteCommand(item);
+        }
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("Command deletion"), tr("Command can not be deleted!\nReason: ") + errorDesc);
     }
 }
 
@@ -411,8 +414,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
                 if (!mSelectedItem || mSelectedItem != clickedItem)
                 {
                     clearSelection(false);
-                    mSelectedItem = clickedItem;
-                    mSelectedItem->setSelected(true);
+                    setSelectedItem(clickedItem);
                     update();
                 }
             }
@@ -432,8 +434,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 //            ShapeItem* clickedItem = mCommands[index];
 
 //            clearSelection(false);
-//            mSelectedItem = clickedItem;
-//            mSelectedItem->setSelected(true);
+//            setSelectedItem(clickedItem);
 //            update();
 
 //            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
@@ -538,6 +539,7 @@ QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
     }
 
     title += mCurSubprogram->text();
+    title += "[*]";
     dialog->setWindowTitle(title);
 
     return title;
@@ -837,14 +839,15 @@ void CyclogramWidget::clearSelection(bool needUpdate)
 {
     mCurSubprogram = Q_NULLPTR;
 
-    if (mSelectedItem)
+    if (!mSelectedItem)
     {
-        mSelectedItem->setSelected(false);
-        mSelectedItem = 0;
-        if (needUpdate)
-        {
-            update();
-        }
+        return;
+    }
+
+    setSelectedItem(0);
+    if (needUpdate)
+    {
+        update();
     }
 }
 
@@ -1589,4 +1592,26 @@ void CyclogramWidget::onAppSettingsChanged()
 QString CyclogramWidget::delimiter()
 {
     return QString(" -> ");
+}
+
+void CyclogramWidget::setSelectedItem(ShapeItem* item)
+{
+    if (mSelectedItem)
+    {
+        mSelectedItem->setSelected(false);
+    }
+
+    mSelectedItem = item;
+
+    if (mSelectedItem)
+    {
+        mSelectedItem->setSelected(true);
+    }
+
+    emit selectionChanged(mSelectedItem);
+}
+
+ShapeItem* CyclogramWidget::selectedItem() const
+{
+    return mSelectedItem;
 }

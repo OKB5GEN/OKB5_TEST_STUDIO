@@ -566,10 +566,6 @@ void EditorWindow::makeDataSnapshot()
     ++mSnapshotsCouner;
     auto cyclogram = mCyclogram.lock();
     cyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
-
-    int TODO; // по идее надо делать снэпшот, не главной циклограммы, а активной подпрограммы, которая самая верхняя по стеку
-    // хотя по большому счету важны не реальные значения переменных, а просто момент, что "вот в этот момент произошла
-    // неведомая х*ня, которую надо смотреть по логам"
 }
 
 void EditorWindow::addChartWidget()

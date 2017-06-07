@@ -7,11 +7,13 @@ class QLineEdit;
 class QCheckBox;
 class QTableWidget;
 class QScrollArea;
+class QPushButton;
 
 class CmdSubProgram;
 class CyclogramWidget;
 class Cyclogram;
 class VariablesWindow;
+class ShapeItem;
 
 class SubProgramDialog : public QDialog
 {
@@ -28,12 +30,20 @@ public slots:
     void onCommandTextChanged(const QString& newText);
     void onParentWindowTitleChanged(const QString& newParentWindowTitle);
 
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
-    void onSaveClick();
+    bool onSaveClick();
     void onVariablesClick();
     void onChartClick();
     void onCyclogramSettingsClick();
     void onCommandSettingsClick();
+
+    void updateTitle(const QString& newTitle);
+
+    void onCyclogramModified();
+    void onCyclogramSelectionChanged(ShapeItem* item);
 
 private:
     void updateSize();
@@ -43,6 +53,14 @@ private:
     VariablesWindow* mVariablesWindow;
 
     QScrollArea * mScrollArea;
+
+    QPushButton* mSaveBtn;
+    QPushButton* mVariablesBtn;
+    QPushButton* mChartBtn;
+    QPushButton* mDeleteBtn;
+    QPushButton* mCyclogramSettingsBtn;
+    QPushButton* mCommandSettingsBtn;
+
 };
 
 #endif // SUBPROGRAM_DIALOG_H

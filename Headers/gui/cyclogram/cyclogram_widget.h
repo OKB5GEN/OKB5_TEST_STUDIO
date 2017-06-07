@@ -31,6 +31,8 @@ public:
     void setMainWindow(QWidget* widget);
     void setParentScrollArea(QScrollArea* scroll);
 
+    ShapeItem* selectedItem() const;
+
     static QString delimiter();
 
 public slots:
@@ -59,6 +61,8 @@ private slots:
     void onAppSettingsChanged();
 
 private:
+    void setSelectedItem(ShapeItem* item);
+
     void drawSilhouette();
     void clearSelection(bool needUpdate = true);
     QString updateWindowTitle(QWidget* dialog);
@@ -108,6 +112,9 @@ private:
 
     qreal mScale;
     QScrollArea* mParentScrollArea;
+
+signals:
+    void selectionChanged(ShapeItem* item);
 };
 
 #endif //CYCLOGRAM_WIDGET_H
