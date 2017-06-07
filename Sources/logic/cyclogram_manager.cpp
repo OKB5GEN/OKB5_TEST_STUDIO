@@ -100,5 +100,10 @@ QSharedPointer<Cyclogram> CyclogramManager::createDefault()
 
 void CyclogramManager::removeCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
+    if (cyclogram.isNull())
+    {
+        return;
+    }
+
     smCyclograms.remove(cyclogram);
 }

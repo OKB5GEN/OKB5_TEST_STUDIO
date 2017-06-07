@@ -24,6 +24,10 @@ public:
     CyclogramWidget* cyclogramWidget() const;
     CmdSubProgram* command() const;
 
+public slots:
+    void onCommandTextChanged(const QString& newText);
+    void onParentWindowTitleChanged(const QString& newParentWindowTitle);
+
 private slots:
     void onSaveClick();
     void onVariablesClick();

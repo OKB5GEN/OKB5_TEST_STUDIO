@@ -83,6 +83,11 @@ CyclogramWidget::~CyclogramWidget()
 
 void CyclogramWidget::clear(bool onDestroy)
 {
+    if (onDestroy)
+    {
+        mSelectedItem = Q_NULLPTR;
+    }
+
     clearSelection();
 
     qDeleteAll(mCommands);
@@ -476,9 +481,13 @@ void CyclogramWidget::showSubprogramWidget()
     {
         subProgramDialog = new SubProgramDialog(mCurSubprogram, mMainWindow);
         mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
+
         QString title = updateWindowTitle(subProgramDialog);
-        subProgramDialog->cyclogramWidget()->setParentTitle(title);
+        subProgramDialog->cyclogramWidget()->setWindowTitle(title);
         subProgramDialog->show();
+
+        connect(mCurSubprogram, SIGNAL(textChanged(const QString&)), subProgramDialog, SLOT(onCommandTextChanged(const QString&)));
+        connect(this, SIGNAL(windowTitleChanged(const QString&)), subProgramDialog, SLOT(onParentWindowTitleChanged(const QString&)));
     }
 }
 
@@ -508,6 +517,7 @@ void CyclogramWidget::showSubprogramChart()
 QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
 {
     QString title;
+
     if (!mCurSubprogram)
     {
         LOG_WARNING(QString("Subprogram not set 2"));
@@ -520,18 +530,17 @@ QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
         return title;
     }
 
-    if (mCurrentCyclogram.lock()->isMainCyclogram())
+    title = windowTitle();
+
+    if (!title.isEmpty())
     {
-        title = mCurSubprogram->text();
-    }
-    else
-    {
-        title = mParentTitle;
-        title += QString(" -> ");
-        title += mCurSubprogram->text();
+        title += CyclogramWidget::delimiter();
     }
 
+    title += mCurSubprogram->text();
     dialog->setWindowTitle(title);
+
+    return title;
 }
 
 void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
@@ -1565,11 +1574,6 @@ void CyclogramWidget::setMainWindow(QWidget* widget)
     mMainWindow = widget;
 }
 
-void CyclogramWidget::setParentTitle(const QString& title)
-{
-    mParentTitle = title;
-}
-
 void CyclogramWidget::setParentScrollArea(QScrollArea* scroll)
 {
     mParentScrollArea = scroll;
@@ -1580,4 +1584,9 @@ void CyclogramWidget::onAppSettingsChanged()
     ShapeItem::itemSize(true);
     ShapeItem::cellSize(true);
     ShapeItem::origin(true);
+}
+
+QString CyclogramWidget::delimiter()
+{
+    return QString(" -> ");
 }

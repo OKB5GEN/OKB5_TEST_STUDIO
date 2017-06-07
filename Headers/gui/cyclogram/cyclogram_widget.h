@@ -29,8 +29,9 @@ public:
 
     void clear(bool onDestroy = false);
     void setMainWindow(QWidget* widget);
-    void setParentTitle(const QString& title);
     void setParentScrollArea(QScrollArea* scroll);
+
+    static QString delimiter();
 
 public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
@@ -104,7 +105,6 @@ private:
     CmdSubProgram* mCurSubprogram;
 
     QWidget* mMainWindow;
-    QString mParentTitle;
 
     qreal mScale;
     QScrollArea* mParentScrollArea;

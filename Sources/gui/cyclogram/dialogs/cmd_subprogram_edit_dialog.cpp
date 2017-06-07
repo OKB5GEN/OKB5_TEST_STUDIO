@@ -101,88 +101,101 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<
     mCommand = command;
     mCallingCyclogram = cyclogram;
 
-    if (mCommand)
+    if (!mCommand)
     {
-        mSubprogramNameStr->setText(mCommand->name());
-        mFileNameStr->setText(mCommand->filePath());
-        updateUI();
-
-        mConsoleTextWidget->setCommand(mCommand);
+        LOG_ERROR(QString("Incorrect subprogram command specified"));
+        return;
     }
+
+    mSubprogramNameStr->setText(mCommand->name());
+    mFileNameStr->setText(mCommand->filePath());
+    updateUI();
+
+    mConsoleTextWidget->setCommand(mCommand);
+
 }
 
 void CmdSubProgramEditDialog::onAccept()
 {
-    if (mCommand)
+    if (!mCommand)
     {
-        mCommand->setFilePath(mFileNameStr->text());
-        mCommand->setName(mSubprogramNameStr->text());
-
-        QMap<QString, QVariant> input;
-        QMap<QString, QVariant> output;
-
-        int inCount = mInParams->rowCount();
-        int outCount = mOutParams->rowCount();
-
-        for (int i = 0; i < inCount; ++i)
-        {
-            QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
-            QString name;
-            if (label)
-            {
-                name = label->text();
-            }
-
-            QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
-            if (varSelectBtn->isChecked())
-            {
-                QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
-                if (comboBox)
-                {
-                    input[name] = comboBox->currentText();
-                }
-            }
-            else
-            {
-                QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
-                if (valueText)
-                {
-                    input[name] = valueText->text().toDouble();
-                }
-            }
-        }
-
-        for (int i = 0; i < outCount; ++i)
-        {
-            QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
-            QString name;
-            if (label)
-            {
-                name = label->text();
-            }
-
-            QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mOutParams->cellWidget(i, 1));
-            if (varSelectBtn->isChecked())
-            {
-                QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 2));
-                if (comboBox)
-                {
-                    output[name] = comboBox->currentText();
-                }
-            }
-            else
-            {
-                QLineEdit* valueText = qobject_cast<QLineEdit*>(mOutParams->cellWidget(i, 4));
-                if (valueText)
-                {
-                    output[name] = valueText->text().toDouble();
-                }
-            }
-        }
-
-        mCommand->setParams(input, output);
-        mConsoleTextWidget->saveCommand();
+        LOG_ERROR(QString("No subprogram command specified"));
+        return;
     }
+
+    if (mSubprogramNameStr->text().isEmpty())
+    {
+        QMessageBox::warning(this, tr("Incorrect input"), tr("Subprogram name must not be empty!"));
+        return;
+    }
+
+    mCommand->setFilePath(mFileNameStr->text());
+    mCommand->setName(mSubprogramNameStr->text());
+
+    QMap<QString, QVariant> input;
+    QMap<QString, QVariant> output;
+
+    int inCount = mInParams->rowCount();
+    int outCount = mOutParams->rowCount();
+
+    for (int i = 0; i < inCount; ++i)
+    {
+        QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
+        QString name;
+        if (label)
+        {
+            name = label->text();
+        }
+
+        QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
+        if (varSelectBtn->isChecked())
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
+            if (comboBox)
+            {
+                input[name] = comboBox->currentText();
+            }
+        }
+        else
+        {
+            QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
+            if (valueText)
+            {
+                input[name] = valueText->text().toDouble();
+            }
+        }
+    }
+
+    for (int i = 0; i < outCount; ++i)
+    {
+        QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
+        QString name;
+        if (label)
+        {
+            name = label->text();
+        }
+
+        QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mOutParams->cellWidget(i, 1));
+        if (varSelectBtn->isChecked())
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 2));
+            if (comboBox)
+            {
+                output[name] = comboBox->currentText();
+            }
+        }
+        else
+        {
+            QLineEdit* valueText = qobject_cast<QLineEdit*>(mOutParams->cellWidget(i, 4));
+            if (valueText)
+            {
+                output[name] = valueText->text().toDouble();
+            }
+        }
+    }
+
+    mCommand->setParams(input, output);
+    mConsoleTextWidget->saveCommand();
 
     accept();
 }
@@ -232,6 +245,7 @@ void CmdSubProgramEditDialog::updateUI()
     QSharedPointer<Cyclogram> cyclogram;
     auto callingCyclogram = mCallingCyclogram.lock();
 
+    int TODO; // why not use cyclogram from command without copy creation?
     if (!mFileNameStr->text().isEmpty()) // some cyclogram file name exist, load cyclogram from file
     {
         QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
@@ -244,7 +258,13 @@ void CmdSubProgramEditDialog::updateUI()
             return;
         }
 
-        mSubprogramNameStr->setText(cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString());
+        QString commandName = cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString();
+        if (commandName.isEmpty()) // if cyclogram default name not specified, use current command text
+        {
+            commandName = mCommand->text();
+        }
+
+        mSubprogramNameStr->setText(commandName);
     }
     else // no cyclogram file set, possibly just batch calling cyclogram variables changing
     {

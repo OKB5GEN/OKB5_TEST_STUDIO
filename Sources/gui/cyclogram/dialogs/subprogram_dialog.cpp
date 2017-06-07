@@ -194,3 +194,39 @@ CmdSubProgram* SubProgramDialog::command() const
 {
     return mCommand;
 }
+
+void SubProgramDialog::onCommandTextChanged(const QString& newText)
+{
+    QString title = windowTitle();
+
+    QString newTitle;
+    QString delimiter = CyclogramWidget::delimiter();
+    QStringList token = title.split(delimiter);
+    if (token.empty())
+    {
+        newTitle = newText;
+    }
+    else
+    {
+        token.pop_back();
+
+        foreach (QString str, token)
+        {
+            newTitle.append(str);
+            newTitle.append(delimiter);
+        }
+
+        newTitle.append(newText);
+    }
+
+    setWindowTitle(newTitle);
+    mCyclogramWidget->setWindowTitle(newTitle);
+}
+
+void SubProgramDialog::onParentWindowTitleChanged(const QString& newParentWindowTitle)
+{
+    QString delimiter = CyclogramWidget::delimiter();
+    QString newTitle = newParentWindowTitle + delimiter + mCommand->text();
+    setWindowTitle(newTitle);
+    mCyclogramWidget->setWindowTitle(newTitle);
+}
