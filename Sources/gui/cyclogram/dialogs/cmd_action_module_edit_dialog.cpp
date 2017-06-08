@@ -18,7 +18,7 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     //adjustSize();
     //setFixedSize(sizeHint());
 
-    setMinimumSize(QSize(1200, 500));
+    setMinimumSize(QSize(1300, 650));
 }
 
 CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
@@ -28,47 +28,70 @@ CmdActionModuleEditDialog::~CmdActionModuleEditDialog()
 
 void CmdActionModuleEditDialog::setupUI()
 {
-    QGridLayout * layout = new QGridLayout(this);
+    QGridLayout * mainLayout = new QGridLayout(this);
     mValidator = new QDoubleValidator(this);
 
-    mModules = new QListWidget(this); //TODO names mus be in ModuleCommands::ModuleID order
-    mModules->addItem(tr("Блок питания БУП"));
-    mModules->addItem(tr("Блок питания ПНА"));
-    mModules->addItem(tr("МКО"));
-    mModules->addItem(tr("СТМ"));
-    mModules->addItem(tr("ОТД"));
-    mModules->addItem(tr("Технологический"));
-    mModules->addItem(tr("ИП"));
+    QGroupBox* modulesBox = new QGroupBox(tr("Modules"), this);
+    QGroupBox* commandsBox = new QGroupBox(tr("Commands"), this);
+    QGroupBox* inputBox = new QGroupBox(tr("Input parameters"), this);
+    QGroupBox* outputBox = new QGroupBox(tr("Output parameters"), this);
 
-    layout->addWidget(mModules, 0, 0);
+    QVBoxLayout* modulesBoxLayout = new QVBoxLayout();
+    QVBoxLayout* commandsBoxLayout = new QVBoxLayout();
+    QVBoxLayout* inputBoxLayout = new QVBoxLayout();
+    QVBoxLayout* outputBoxLayout = new QVBoxLayout();
+
+    mModules = new QListWidget(this); //TODO names must be in ModuleCommands::ModuleID order
+    mModules->addItem(tr("Power unit 1"));
+    mModules->addItem(tr("Power unit 2"));
+    mModules->addItem(tr("MKO"));
+    mModules->addItem(tr("STM"));
+    mModules->addItem(tr("OTD"));
+    mModules->addItem(tr("Technological"));
+    mModules->addItem(tr("DS"));
+    modulesBox->setMaximumWidth(150);
+
+    modulesBoxLayout->addWidget(mModules);
 
     mCommands = new QListWidget(this);
-    layout->addWidget(mCommands, 0, 1);
+    commandsBoxLayout->addWidget(mCommands);
 
     mInParams = new QTableWidget(this);
     QStringList headers;
-    headers.append(tr("Вх.Параметр"));
+    headers.append(tr("In param"));
     headers.append(tr(""));
-    headers.append(tr("Переменная"));
+    headers.append(tr("Variable"));
     headers.append(tr(""));
-    headers.append(tr("Значение"));
+    headers.append(tr("Value"));
     mInParams->setColumnCount(headers.size());
     mInParams->setHorizontalHeaderLabels(headers);
-    layout->addWidget(mInParams, 0, 2);
+    inputBox->setMaximumWidth(400);
+    inputBoxLayout->addWidget(mInParams);
 
     mOutParams = new QTableWidget(this);
     QStringList outHeaders;
-    outHeaders.append(tr("Вых.Параметр"));
-    outHeaders.append(tr("Переменная"));
+    outHeaders.append(tr("Out param"));
+    outHeaders.append(tr("Variable"));
     mOutParams->setColumnCount(outHeaders.size());
     mOutParams->setHorizontalHeaderLabels(outHeaders);
-    layout->addWidget(mOutParams, 0, 3);
+    outputBox->setMaximumWidth(250);
+    outputBoxLayout->addWidget(mOutParams);
+
+    modulesBox->setLayout(modulesBoxLayout);
+    commandsBox->setLayout(commandsBoxLayout);
+    inputBox->setLayout(inputBoxLayout);
+    outputBox->setLayout(outputBoxLayout);
+
+    mainLayout->addWidget(modulesBox, 0, 0);
+    mainLayout->addWidget(commandsBox, 0, 1);
+    mainLayout->addWidget(inputBox, 0, 2);
+    mainLayout->addWidget(outputBox, 0, 3);
 
     mConsoleTextWidget = new ConsoleTextWidget(this);
-    layout->addWidget(mConsoleTextWidget, 1, 0, 1, 4);
+    mainLayout->addWidget(mConsoleTextWidget, 1, 0, 1, 4);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 2, 1);
+    mainLayout->addWidget(buttonBox, 2, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -76,7 +99,7 @@ void CmdActionModuleEditDialog::setupUI()
     connect(mModules, SIGNAL(currentRowChanged(int)), this, SLOT(onModuleChanged(int)));
     connect(mCommands, SIGNAL(currentRowChanged(int)), this, SLOT(onCommandChanged(int)));
 
-    setLayout(layout);
+    setLayout(mainLayout);
 }
 
 void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
@@ -307,6 +330,12 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::OTD:
         {
+            QMap<QString, QVariant> implicitParams1;
+            QMap<QString, QVariant> implicitParams2;
+            QString sensorID = sysState->paramName(SystemState::SENSOR_NUMBER);
+            implicitParams1[sensorID] = QVariant(int(1));
+            implicitParams2[sensorID] = QVariant(int(2));
+
             addOKBCommonCommands();
 
             addCommand(ModuleCommands::RESET_LINE_1);
@@ -315,7 +344,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(ModuleCommands::GET_DS1820_COUNT_LINE_2);
             addCommand(ModuleCommands::START_MEASUREMENT_LINE_1);
             addCommand(ModuleCommands::START_MEASUREMENT_LINE_2);
-            addCommand(ModuleCommands::GET_TEMPERATURE_PT100);
+            addCommand(ModuleCommands::GET_TEMPERATURE_PT100, implicitParams1);
+            addCommand(ModuleCommands::GET_TEMPERATURE_PT100, implicitParams2);
             addCommand(ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
             addCommand(ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
 
@@ -460,8 +490,8 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     mInParams->setRowCount(inCount);
     mOutParams->setRowCount(outCount);
 
-    mInParams->setVisible(inCount > 0);
-    mOutParams->setVisible(outCount > 0);
+    //mInParams->setVisible(inCount > 0);
+    //mOutParams->setVisible(outCount > 0);
 
     for (int i = 0; i < inCount; ++i)
     {
@@ -490,7 +520,29 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         // variable selector
         QLineEdit* valueEdit = new QLineEdit(mInParams);
         valueEdit->setValidator(new QDoubleValidator(mInParams));
-        valueEdit->setText("0");
+
+        // direct value selection
+        QString defaultValue = "0";
+        switch (mCommandID)
+        {
+        case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+        case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+        case ModuleCommands::GET_TEMPERATURE_PT100:
+        case ModuleCommands::GET_CHANNEL_TELEMETRY:
+        case ModuleCommands::GET_FUSE_STATE:
+        case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+        case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+        case ModuleCommands::GET_POWER_CHANNEL_STATE:
+        case ModuleCommands::SET_POWER_CHANNEL_STATE:
+        case ModuleCommands::GET_DS1820_ADDR_LINE_1:
+        case ModuleCommands::GET_DS1820_ADDR_LINE_2:
+            defaultValue = "1";
+            break;
+        default:
+            break;
+        }
+        valueEdit->setText(defaultValue);
+
         mInParams->setCellWidget(i, 4, valueEdit);
 
         bool isVariable = false; // by default command input params are directly set values

@@ -278,13 +278,12 @@ void SubProgramDialog::closeEvent(QCloseEvent *event)
         return;
     }
 
-    int button = QMessageBox::question(this,
-                                       tr("Subprogram window close"),
-                                       tr("Cyclogram was modified. Would you like to save it?"),
-                                       QMessageBox::Ok,
-                                       QMessageBox::Cancel);
+    const QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("Subprogram window close"),
+                               tr("The cyclogram has been modified.\n"
+                                  "Do you want to save your changes?"),
+                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-    if (button == QMessageBox::Ok && onSaveClick())
+    if (ret == QMessageBox::Save && onSaveClick())
     {
         event->accept();
     }

@@ -515,7 +515,7 @@ void SystemState::createOTDCommandsParams()
     // input params
     QMap<int, QStringList> inParams;
     inParams[ModuleCommands::SET_MODULE_LOGIC_STATUS] = setStatusParams;
-    inParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureInParams;
+    //inParams[ModuleCommands::GET_TEMPERATURE_PT100] = temperatureInParams; // sensor id for this command made implicit
     inParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1] = temperatureInParams;
     inParams[ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2] = temperatureInParams;
 

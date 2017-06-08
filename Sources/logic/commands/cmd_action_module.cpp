@@ -191,23 +191,6 @@ QString CmdActionModule::moduleNameImpl() const
         }
         break;
 
-        {
-            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = mInputParams.value(paramName).toInt();
-
-            switch (channel)
-            {
-            case ModuleCommands::BUP_MAIN:
-            case ModuleCommands::BUP_RESERVE:
-            case ModuleCommands::RESERVED_RELAY_3:
-                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
-                break;
-            default:
-                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
-                break;
-            }
-        }
-        break;
     default:
         text += moduleName(false);
         break;
@@ -387,7 +370,18 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         text += isFullName ? tr("ЗАПРОС: телеметрия канала") : tr("ПолТелем");
         break;
     case ModuleCommands::GET_TEMPERATURE_PT100:
-        text += isFullName ? tr("ЗАПРОС: температура с датчиков ПТ-100") : tr("ПолТемпПТ");
+        {
+            QString paramName = mSystemState->paramName(SystemState::SENSOR_NUMBER);
+            int sensorID = inputParams.value(paramName).toInt();
+            if (isFullName)
+            {
+                text += tr("ЗАПРОС: температура с датчика ПТ-100 #%1").arg(sensorID);
+            }
+            else
+            {
+                text += tr("ПолТемпПТ%1").arg(sensorID);
+            }
+        }
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
         text += isFullName ? tr("ЗАПРОС: температура с датчика DS1820 линия 1") : tr("ПолТемпDS1");
