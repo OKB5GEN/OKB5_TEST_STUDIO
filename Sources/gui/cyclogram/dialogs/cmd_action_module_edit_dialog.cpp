@@ -7,6 +7,12 @@
 #include "Headers/gui/tools/console_text_widget.h"
 
 #include <QtWidgets>
+#include <QSettings>
+
+namespace
+{
+    static const QString SETTING_LAST_OPENED_MODULE = "LastOpenedModule";
+}
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     QDialog(parent),
@@ -108,7 +114,22 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 
     if (mCommand)
     {
-        mModules->setCurrentRow(mCommand->module());
+        int index = 0;
+        if (mCommand->hasError())
+        {
+            QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+            int module = settings.value(SETTING_LAST_OPENED_MODULE, "-1").toInt();
+            if (module != -1 && module < mModules->count())
+            {
+                index = module;
+            }
+        }
+        else
+        {
+            index = mCommand->module();
+        }
+
+        mModules->setCurrentRow(index);
         mConsoleTextWidget->setCommand(mCommand);
     }
 }
@@ -634,85 +655,91 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
 void CmdActionModuleEditDialog::onAccept()
 {
-    if (mCommand)
+    if (!mCommand)
     {
-        QMap<QString, QVariant> input;
-        QMap<QString, QVariant> output;
+        LOG_ERROR(QString("No command set"));
+        return;
+    }
 
-        SystemState* system = mCommand->systemState();
-        int inCount = system->paramsCount(mModuleID, mCommandID, true);
-        int outCount = system->paramsCount(mModuleID, mCommandID, false);
+    QMap<QString, QVariant> input;
+    QMap<QString, QVariant> output;
 
-        for (int i = 0; i < inCount; ++i)
+    SystemState* system = mCommand->systemState();
+    int inCount = system->paramsCount(mModuleID, mCommandID, true);
+    int outCount = system->paramsCount(mModuleID, mCommandID, false);
+
+    for (int i = 0; i < inCount; ++i)
+    {
+        QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
+        QString name;
+        if (label)
         {
-            QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
-            QString name;
-            if (label)
-            {
-                name = label->text();
-            }
-
-            QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
-            //QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
-
-            bool variableChecked = varSelectBtn->isChecked();
-            //bool valueChecked = valueSelectBtn->isChecked();
-
-            if (variableChecked)
-            {
-                QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
-                if (comboBox)
-                {
-                    input[name] = comboBox->currentText();
-                }
-            }
-            else
-            {
-                QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
-                if (valueText)
-                {
-                    input[name] = valueText->text().toDouble();
-                }
-            }
+            name = label->text();
         }
 
-        for (int i = 0; i < outCount; ++i)
-        {
-            QString name;
-            QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
-            if (label)
-            {
-                name = label->text();
-            }
+        QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
+        //QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
 
-            QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 1));
+        bool variableChecked = varSelectBtn->isChecked();
+        //bool valueChecked = valueSelectBtn->isChecked();
+
+        if (variableChecked)
+        {
+            QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
             if (comboBox)
             {
-                QString variableName = comboBox->currentText();
-                VariableController* vc = mCommand->variableController();
-                auto it = vc->variablesData().find(variableName);
-                if (it == vc->variablesData().end())
-                {
-                    vc->addVariable(variableName, 0);
-                    QString desc = system->paramDefaultDesc(system->paramID(name));
-                    vc->setDescription(variableName, desc);
-                }
-
-                output[name] = variableName;
+                input[name] = comboBox->currentText();
             }
         }
-
-        // add implicit params to command input params
-        QListWidgetItem* item = mCommands->currentItem();
-        QMap<QString,QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
-        for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
+        else
         {
-            input[it.key()] = it.value();
+            QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
+            if (valueText)
+            {
+                input[name] = valueText->text().toDouble();
+            }
+        }
+    }
+
+    for (int i = 0; i < outCount; ++i)
+    {
+        QString name;
+        QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
+        if (label)
+        {
+            name = label->text();
         }
 
-        mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
-        mConsoleTextWidget->saveCommand();
+        QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 1));
+        if (comboBox)
+        {
+            QString variableName = comboBox->currentText();
+            VariableController* vc = mCommand->variableController();
+            auto it = vc->variablesData().find(variableName);
+            if (it == vc->variablesData().end())
+            {
+                vc->addVariable(variableName, 0);
+                QString desc = system->paramDefaultDesc(system->paramID(name));
+                vc->setDescription(variableName, desc);
+            }
+
+            output[name] = variableName;
+        }
     }
+
+    // add implicit params to command input params
+    QListWidgetItem* item = mCommands->currentItem();
+    QMap<QString,QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
+    for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
+    {
+        input[it.key()] = it.value();
+    }
+
+    mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);
+    mConsoleTextWidget->saveCommand();
+
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    settings.setValue(SETTING_LAST_OPENED_MODULE, QString::number(mModules->currentRow()));
 
     accept();
 }
