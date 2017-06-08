@@ -832,4 +832,3 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
 
     updateText();
 }
-

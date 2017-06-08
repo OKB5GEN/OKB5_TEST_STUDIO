@@ -4,7 +4,7 @@
 
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
 #include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
-#include "Headers/gui/cyclogram/dialogs/shape_edit_dialog.h"
+#include "Headers/gui/cyclogram/dialogs/text_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/command_error_dialog.h"
 #include "Headers/app_settings.h"
 
@@ -1095,7 +1095,7 @@ void CyclogramWidget::showEditDialog(Command *command)
     default:
         {
             LOG_WARNING(QString("Default shape edit dualog launched"));
-            ShapeEditDialog* shapeEditDialog = new ShapeEditDialog(this);
+            TextEditDialog* shapeEditDialog = new TextEditDialog(TextEditDialog::SHAPE_EDIT, this);
             shapeEditDialog->setCommand(command);
             dialog = shapeEditDialog;
         }

@@ -26,6 +26,7 @@ private slots:
     void onModuleChanged(int index);
     void onCommandChanged(int index);
     void onCheckBoxStateChanged(int state);
+    void onOutVarChanged(const QString& text);
 
 private:
     void setupUI();

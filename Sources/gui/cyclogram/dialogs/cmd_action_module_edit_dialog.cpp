@@ -5,6 +5,7 @@
 #include "Headers/system/modules/module_mko.h"
 #include "Headers/logger/Logger.h"
 #include "Headers/gui/tools/console_text_widget.h"
+#include "Headers/gui/cyclogram/dialogs/text_edit_dialog.h"
 
 #include <QtWidgets>
 #include <QSettings>
@@ -112,26 +113,28 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 {
     mCommand = command;
 
-    if (mCommand)
+    if (!mCommand)
     {
-        int index = 0;
-        if (mCommand->hasError())
-        {
-            QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-            int module = settings.value(SETTING_LAST_OPENED_MODULE, "-1").toInt();
-            if (module != -1 && module < mModules->count())
-            {
-                index = module;
-            }
-        }
-        else
-        {
-            index = mCommand->module();
-        }
-
-        mModules->setCurrentRow(index);
-        mConsoleTextWidget->setCommand(mCommand);
+        return;
     }
+
+    int index = 0;
+    if (mCommand->hasError())
+    {
+        QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+        int module = settings.value(SETTING_LAST_OPENED_MODULE, "-1").toInt();
+        if (module != -1 && module < mModules->count())
+        {
+            index = module;
+        }
+    }
+    else
+    {
+        index = mCommand->module();
+    }
+
+    mModules->setCurrentRow(index);
+    mConsoleTextWidget->setCommand(mCommand);
 }
 
 void CmdActionModuleEditDialog::addPowerUnitCommonCommands()
@@ -599,8 +602,6 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         varSelectBtn->setChecked(isVariable);
     }
 
-    QSet<QString> generatedVariableNames;
-
     for (int i = 0; i < outCount; ++i)
     {
         QString name = system->paramName(mModuleID, mCommandID, i, false);
@@ -614,6 +615,8 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         VariableController* vc = mCommand->variableController();
         comboBox->addItems(vc->variablesData().keys());
         mOutParams->setCellWidget(i, 1, comboBox);
+
+        connect(comboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onOutVarChanged(const QString&)));
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
@@ -630,20 +633,12 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         }
         else
         {
-
             QString defaultParamName = system->paramDefaultVarName(system->paramID(name));
-            QString tmp = CmdActionModule::moduleName(mModuleID, false) + "_" + defaultParamName;
+            QString defaultVarName = CmdActionModule::moduleName(mModuleID, false) + "_" + defaultParamName;
 
-            int index = 1;
-            while (generatedVariableNames.contains(tmp))
-            {
-                tmp = defaultParamName + QString::number(index);
-                ++index;
-            }
-
-            generatedVariableNames.insert(tmp);
-            comboBox->addItem(tmp);
-            comboBox->setCurrentIndex(comboBox->count() - 1);
+            comboBox->addItem(defaultVarName);
+            comboBox->addItem(TextEditDialog::addVarText());
+            comboBox->setCurrentIndex(comboBox->count() - 2); // set default genarated name by default
         }
     }
 
@@ -799,4 +794,35 @@ bool CmdActionModuleEditDialog::eventFilter(QObject *obj, QEvent *event)
     {
         return QObject::eventFilter(obj, event); // standard event processing
     }
+}
+
+void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
+{
+    if (text != TextEditDialog::addVarText())
+    {
+        return;
+    }
+
+    TextEditDialog dialog(TextEditDialog::VARIABLE_EDIT, this);
+    dialog.setText("NewVariable");
+    dialog.setCommand(mCommand);
+    int result = dialog.exec();
+    if (result != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QString newVariable = dialog.text();
+
+    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
+    if (!comboBox)
+    {
+        return;
+    }
+
+    comboBox->blockSignals(true);
+    int index = comboBox->count() - 1;
+    comboBox->insertItem(index, newVariable);
+    comboBox->setCurrentIndex(index);
+    comboBox->blockSignals(false);
 }

@@ -29,7 +29,6 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/command_error_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp \
     Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp \
-    Sources/gui/cyclogram/dialogs/shape_edit_dialog.cpp \
     Sources/gui/cyclogram/cyclogram_widget.cpp \
     Sources/gui/cyclogram/shape_item.cpp \
     Sources/gui/cyclogram/valency_point.cpp \
@@ -90,7 +89,8 @@ SOURCES += main.cpp\
     Sources/gui/tools/cyclogram_chart_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp \
     Sources/app_settings.cpp \
-    Sources/gui/tools/app_settings_dialog.cpp
+    Sources/gui/tools/app_settings_dialog.cpp \
+    Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -106,7 +106,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/dialogs/command_error_dialog.h \
     Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h \
     Headers/gui/cyclogram/dialogs/shape_add_dialog.h \
-    Headers/gui/cyclogram/dialogs/shape_edit_dialog.h \
     Headers/logic/command.h \
     Headers/logic/cyclogram.h \
     Headers/logic/variable_controller.h \
@@ -164,7 +163,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/tools/cyclogram_chart_dialog.h \
     Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h \
     Headers/app_settings.h \
-    Headers/gui/tools/app_settings_dialog.h
+    Headers/gui/tools/app_settings_dialog.h \
+    Headers/gui/cyclogram/dialogs/text_edit_dialog.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 

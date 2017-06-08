@@ -2,6 +2,8 @@
 #include "Headers/logic/commands/cmd_action_math.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/gui/tools/console_text_widget.h"
+#include "Headers/gui/cyclogram/dialogs/text_edit_dialog.h"
+#include "Headers/system/system_state.h"
 
 #include <QtWidgets>
 
@@ -24,7 +26,6 @@ CmdActionMathEditDialog::~CmdActionMathEditDialog()
 void CmdActionMathEditDialog::setupUI()
 {
     // TODO: убрать нафиг row/column span'ы у виджетов
-
     QGridLayout * layout = new QGridLayout(this);
 
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -42,6 +43,7 @@ void CmdActionMathEditDialog::setupUI()
 
     QLabel* equalSign = new QLabel(this);
     equalSign->setText("=");
+    equalSign->setFixedWidth(10);
     layout->addWidget(equalSign, 0, 2, 2, 1);
 
     mValidator = new QDoubleValidator(this);
@@ -143,36 +145,50 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
 {
     mCommand = command;
 
-    if (mCommand)
+    if (!mCommand)
     {
-        // set default state
-        mTwoOperandsCheckBox->setChecked(true);
-        mOper1VarBtn->setChecked(true);
-        mOper2VarBtn->setChecked(true);
-        mOper1Num->setText("0");
-        mOper2Num->setText("0");
-
-        mOper1Box->clear();
-        mOper2Box->clear();
-        mResultBox->clear();
-
-        VariableController* vc = mCommand->variableController();
-        mOper1Box->addItems(vc->variablesData().keys());
-        mOper2Box->addItems(vc->variablesData().keys());
-        mResultBox->addItems(vc->variablesData().keys());
-
-        int index = mOperationBox->findData(QVariant(int(mCommand->operation())));
-        if (index != -1)
-        {
-            mOperationBox->setCurrentIndex(index);
-        }
-
-        updateComponent(CmdActionMath::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
-        updateComponent(CmdActionMath::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
-        updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
-
-        mConsoleTextWidget->setCommand(mCommand);
+        return;
     }
+
+    // set default state
+    mTwoOperandsCheckBox->setChecked(true);
+    mOper1VarBtn->setChecked(true);
+    mOper2VarBtn->setChecked(true);
+    mOper1Num->setText("0");
+    mOper2Num->setText("0");
+
+    mOper1Box->clear();
+    mOper2Box->clear();
+    mResultBox->clear();
+
+    VariableController* vc = mCommand->variableController();
+    mOper1Box->addItems(vc->variablesData().keys());
+    mOper2Box->addItems(vc->variablesData().keys());
+    mResultBox->addItems(vc->variablesData().keys());
+
+    if (vc->variablesData().empty())
+    {
+        mResultBox->addItem("NewVar");
+        mOper1NumBtn->setChecked(true);
+    }
+
+    int currentDefaultIndex = mResultBox->count() - 1;
+    mResultBox->addItem(TextEditDialog::addVarText());
+    mResultBox->setCurrentIndex(currentDefaultIndex); // new vaiable by default
+
+    connect(mResultBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onResultVarChanged(const QString&)));
+
+    int index = mOperationBox->findData(QVariant(int(mCommand->operation())));
+    if (index != -1)
+    {
+        mOperationBox->setCurrentIndex(index);
+    }
+
+    updateComponent(CmdActionMath::Result, mResultBox, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
+    updateComponent(CmdActionMath::Operand1, mOper1Box, mOper1Num, mOper1VarBtn, mOper1NumBtn);
+    updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
+
+    mConsoleTextWidget->setCommand(mCommand);
 }
 
 void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)
@@ -218,54 +234,66 @@ void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLine
 
 void CmdActionMathEditDialog::onAccept()
 {
-    if (mCommand)
+    if (!mCommand)
     {
-        if (mTwoOperandsCheckBox->isChecked())
-        {
-            CmdActionMath::Operation operation = CmdActionMath::Operation(mOperationBox->currentData().toInt());
-
-            if (mOper2VarBtn->isChecked())
-            {
-                QString oper2Var = mOper2Box->currentText();
-                mCommand->setOperand(CmdActionMath::Operand2, oper2Var);
-            }
-            else
-            {
-                qreal oper2Val = mOper2Num->text().replace(",", ".").toDouble();
-
-                // division by zero protection
-                if (operation == CmdActionMath::Divide && oper2Val == 0)
-                {
-                    QMessageBox::warning(this, tr("Error"), tr("Division by zero detected!"));
-                    return;
-                }
-
-                mCommand->setOperand(CmdActionMath::Operand2, oper2Val);
-            }
-
-            mCommand->setOperation(operation);
-        }
-        else
-        {
-            mCommand->setOperation(CmdActionMath::Assign);
-        }
-
-        QString resultVar = mResultBox->currentText();
-        mCommand->setOperand(CmdActionMath::Result, resultVar);
-
-        if (mOper1VarBtn->isChecked())
-        {
-            QString oper1Var = mOper1Box->currentText();
-            mCommand->setOperand(CmdActionMath::Operand1, oper1Var);
-        }
-        else
-        {
-            qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
-            mCommand->setOperand(CmdActionMath::Operand1, oper1Val);
-        }
-
-        mConsoleTextWidget->saveCommand();
+        return;
     }
+    if (mTwoOperandsCheckBox->isChecked())
+    {
+        CmdActionMath::Operation operation = CmdActionMath::Operation(mOperationBox->currentData().toInt());
+
+        if (mOper2VarBtn->isChecked())
+        {
+            QString oper2Var = mOper2Box->currentText();
+            mCommand->setOperand(CmdActionMath::Operand2, oper2Var);
+        }
+        else
+        {
+            qreal oper2Val = mOper2Num->text().replace(",", ".").toDouble();
+
+            // division by zero protection
+            if (operation == CmdActionMath::Divide && oper2Val == 0)
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Division by zero detected!"));
+                return;
+            }
+
+            mCommand->setOperand(CmdActionMath::Operand2, oper2Val);
+        }
+
+        mCommand->setOperation(operation);
+    }
+    else
+    {
+        mCommand->setOperation(CmdActionMath::Assign);
+    }
+
+    QString resultVar = mResultBox->currentText();
+    mCommand->setOperand(CmdActionMath::Result, resultVar);
+
+    // add variable if it is not exist
+    VariableController* vc = mCommand->variableController();
+    auto it = vc->variablesData().find(resultVar);
+    if (it == vc->variablesData().end())
+    {
+        //SystemState* system = mCommand->systemState();
+        vc->addVariable(resultVar, 0);
+//        QString desc = system->paramDefaultDesc(system->paramID(name));
+//        vc->setDescription(resultVar, desc);
+    }
+
+    if (mOper1VarBtn->isChecked())
+    {
+        QString oper1Var = mOper1Box->currentText();
+        mCommand->setOperand(CmdActionMath::Operand1, oper1Var);
+    }
+    else
+    {
+        qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
+        mCommand->setOperand(CmdActionMath::Operand1, oper1Val);
+    }
+
+    mConsoleTextWidget->saveCommand();
 
     accept();
 }
@@ -316,4 +344,36 @@ void CmdActionMathEditDialog::onOper2NumBtnStateChanged(bool toggled)
     mOper2VarBtn->blockSignals(false);
 }
 
+void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
+{
+    if (text != TextEditDialog::addVarText())
+    {
+        return;
+    }
 
+    TextEditDialog dialog(TextEditDialog::VARIABLE_EDIT, this);
+    dialog.setText("NewVariable");
+    dialog.setCommand(mCommand);
+    int result = dialog.exec();
+    if (result != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QString newVariable = dialog.text();
+
+    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
+    if (!comboBox)
+    {
+        return;
+    }
+
+    comboBox->blockSignals(true);
+    int index = comboBox->count() - 1;
+    comboBox->insertItem(index, newVariable);
+    comboBox->setCurrentIndex(index);
+    comboBox->blockSignals(false);
+
+    comboBox->update();
+
+}

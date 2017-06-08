@@ -31,6 +31,7 @@ private slots:
     void onOper1NumBtnStateChanged(bool toggled);
     void onOper2VarBtnStateChanged(bool toggled);
     void onOper2NumBtnStateChanged(bool toggled);
+    void onResultVarChanged(const QString& text);
 
 private:
     void setupUI();
