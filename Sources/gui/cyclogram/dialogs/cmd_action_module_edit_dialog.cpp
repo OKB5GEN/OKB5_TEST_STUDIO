@@ -807,16 +807,18 @@ void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
     dialog.setText("NewVariable");
     dialog.setCommand(mCommand);
     int result = dialog.exec();
-    if (result != QDialog::Accepted)
-    {
-        return;
-    }
 
     QString newVariable = dialog.text();
 
     QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
     if (!comboBox)
     {
+        return;
+    }
+
+    if (result != QDialog::Accepted)
+    {
+        comboBox->setCurrentIndex(0);
         return;
     }
 

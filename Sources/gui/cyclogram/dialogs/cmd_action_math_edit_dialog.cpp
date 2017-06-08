@@ -14,8 +14,7 @@ CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
     setupUI();
     setWindowTitle(tr("Math operation"));
 
-    adjustSize();
-    setFixedSize(sizeHint());
+    setFixedHeight(sizeHint().height());
 }
 
 CmdActionMathEditDialog::~CmdActionMathEditDialog()
@@ -25,13 +24,14 @@ CmdActionMathEditDialog::~CmdActionMathEditDialog()
 
 void CmdActionMathEditDialog::setupUI()
 {
-    // TODO: убрать нафиг row/column span'ы у виджетов
     QGridLayout * layout = new QGridLayout(this);
 
     // Result box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* resultBox = new QGroupBox(this);
+    resultBox->setMinimumWidth(150);
     resultBox->setTitle(tr("Result"));
-    QVBoxLayout* box4layout = new QVBoxLayout(resultBox);
+
+    QVBoxLayout* box4layout = new QVBoxLayout();
     mResultBox = new QComboBox(this);
     mResultBox->installEventFilter(this);
 
@@ -39,19 +39,19 @@ void CmdActionMathEditDialog::setupUI()
     box4layout->addStretch();
 
     resultBox->setLayout(box4layout);
-    layout->addWidget(resultBox, 0, 0, 2, 2);
+    layout->addWidget(resultBox, 0, 0);
 
-    QLabel* equalSign = new QLabel(this);
-    equalSign->setText("=");
-    equalSign->setFixedWidth(10);
-    layout->addWidget(equalSign, 0, 2, 2, 1);
+//    QLabel* equalSign = new QLabel(this);
+//    equalSign->setText("=");
+//    equalSign->setFixedWidth(10);
+//    layout->addWidget(equalSign, 0, 1);
 
     mValidator = new QDoubleValidator(this);
 
     // Operand 1 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand1Box = new QGroupBox(this);
     mOperand1Box->setTitle(tr("Operand 1"));
-    QGridLayout* box1layout = new QGridLayout(mOperand1Box);
+    QGridLayout* box1layout = new QGridLayout();
 
     mOper1VarBtn = new QRadioButton(this);
     mOper1NumBtn = new QRadioButton(this);
@@ -60,24 +60,25 @@ void CmdActionMathEditDialog::setupUI()
     mOper1Num = new QLineEdit(this);
     mOper1Num->setValidator(mValidator);
 
-    box1layout->addWidget(mOper1VarBtn, 0, 0, 1, 1);
-    box1layout->addWidget(mOper1NumBtn, 1, 0, 1, 1);
-    box1layout->addWidget(mOper1Box, 0, 1, 1, 1);
-    box1layout->addWidget(mOper1Num, 1, 1, 1, 1);
+    box1layout->addWidget(mOper1VarBtn, 0, 0);
+    box1layout->addWidget(mOper1NumBtn, 1, 0);
+    box1layout->addWidget(mOper1Box, 0, 1);
+    box1layout->addWidget(mOper1Num, 1, 1);
 
     mOperand1Box->setLayout(box1layout);
-    layout->addWidget(mOperand1Box, 0, 3, 2, 2);
+    layout->addWidget(mOperand1Box, 0, 1);
 
     // Operation box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* operationBox = new QGroupBox(this);
     operationBox->setTitle(tr("Operation"));
-    QVBoxLayout* box3layout = new QVBoxLayout(operationBox);
+    QVBoxLayout* box3layout = new QVBoxLayout();
     mOperationBox = new QComboBox(this);
     mOperationBox->installEventFilter(this);
     mOperationBox->addItem("+", QVariant(int(CmdActionMath::Add)));
     mOperationBox->addItem("-", QVariant(int(CmdActionMath::Subtract)));
     mOperationBox->addItem("*", QVariant(int(CmdActionMath::Multiply)));
     mOperationBox->addItem(":", QVariant(int(CmdActionMath::Divide)));
+    operationBox->setMaximumWidth(150);
 
     mTwoOperandsCheckBox = new QCheckBox(this);
     mTwoOperandsCheckBox->setText(tr("Two operands"));
@@ -86,12 +87,12 @@ void CmdActionMathEditDialog::setupUI()
     box3layout->addWidget(mTwoOperandsCheckBox);
 
     operationBox->setLayout(box3layout);
-    layout->addWidget(operationBox, 0, 5, 2, 2);
+    layout->addWidget(operationBox, 0, 2);
 
     // Operand 2 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand2Box = new QGroupBox(this);
     mOperand2Box->setTitle(tr("Operand 2"));
-    QGridLayout* box2layout = new QGridLayout(mOperand2Box);
+    QGridLayout* box2layout = new QGridLayout();
 
     mOper2VarBtn = new QRadioButton(this);
     mOper2NumBtn = new QRadioButton(this);
@@ -100,22 +101,22 @@ void CmdActionMathEditDialog::setupUI()
     mOper2Num = new QLineEdit(this);
     mOper2Num->setValidator(mValidator);
 
-    box2layout->addWidget(mOper2VarBtn, 0, 0, 1, 1);
-    box2layout->addWidget(mOper2NumBtn, 1, 0, 1, 1);
-    box2layout->addWidget(mOper2Box, 0, 1, 1, 1);
-    box2layout->addWidget(mOper2Num, 1, 1, 1, 1);
+    box2layout->addWidget(mOper2VarBtn, 0, 0);
+    box2layout->addWidget(mOper2NumBtn, 1, 0);
+    box2layout->addWidget(mOper2Box, 0, 1);
+    box2layout->addWidget(mOper2Num, 1, 1);
 
     mOperand2Box->setLayout(box2layout);
 
-    layout->addWidget(mOperand2Box, 0, 7, 2, 2);
+    layout->addWidget(mOperand2Box, 0, 3);
 
     // Console text widget >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mConsoleTextWidget = new ConsoleTextWidget(this);
-    layout->addWidget(mConsoleTextWidget, 3, 0, 2, 8);
+    layout->addWidget(mConsoleTextWidget, 1, 0, 1, 4);
 
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 5, 2, 1, 2);
+    layout->addWidget(buttonBox, 2, 3);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -355,16 +356,18 @@ void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
     dialog.setText("NewVariable");
     dialog.setCommand(mCommand);
     int result = dialog.exec();
-    if (result != QDialog::Accepted)
-    {
-        return;
-    }
 
     QString newVariable = dialog.text();
 
     QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
     if (!comboBox)
     {
+        return;
+    }
+
+    if (result != QDialog::Accepted)
+    {
+        comboBox->setCurrentIndex(0);
         return;
     }
 
@@ -375,5 +378,4 @@ void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
     comboBox->blockSignals(false);
 
     comboBox->update();
-
 }

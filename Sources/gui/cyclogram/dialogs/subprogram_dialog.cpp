@@ -283,7 +283,18 @@ void SubProgramDialog::closeEvent(QCloseEvent *event)
                                   "Do you want to save your changes?"),
                                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 
-    if (ret == QMessageBox::Save && onSaveClick())
+    if (ret == QMessageBox::Save)
+    {
+        if (onSaveClick())
+        {
+            event->accept();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
+    else if (ret == QMessageBox::Discard)
     {
         event->accept();
     }
