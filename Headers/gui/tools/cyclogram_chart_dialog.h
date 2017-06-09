@@ -5,7 +5,7 @@
 #include <QMap>
 
 class QCheckBox;
-class QListWidget;
+class QTableWidget;
 class QCustomPlot;
 class Cyclogram;
 
@@ -17,19 +17,18 @@ public:
     CyclogramChartDialog(QWidget * parent);
     ~CyclogramChartDialog();
 
-    void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
+    void setCyclogram(QSharedPointer<Cyclogram> cyclogram, const QStringList& variables);
 
 private slots:
     //void updateGraphs(const VariableController::DataSnapshot& data); //TODO possibly not needed
     void onVariableValueChanged(const QString& name, qreal value);
     void onCyclogramStateChanged(int state);
-    void onVariableSelectionChanged(bool toggled);
 
 private:
-    QCustomPlot* mPlot;
-    QListWidget* mVariables;
+    void addRow(int row, const QString& name, qreal value);
 
-    QMap<QString, QCheckBox*> mCheckboxes;
+    QCustomPlot* mPlot;
+    QTableWidget* mVariablesTable;
 
     QWeakPointer<Cyclogram> mCyclogram;
     qreal mMinY;

@@ -492,28 +492,29 @@ void CyclogramWidget::showSubprogramWidget()
     }
 }
 
-void CyclogramWidget::showSubprogramChart()
-{
-    if (!mCurSubprogram)
-    {
-        LOG_WARNING(QString("Subprogram not set 3"));
-        return;
-    }
+//void CyclogramWidget::showSubprogramChart(const QStringList& variables)
+//{
+//    if (!mCurSubprogram)
+//    {
+//        LOG_WARNING(QString("Subprogram not set 3"));
+//        return;
+//    }
 
-    if (!mCurSubprogram->loaded())
-    {
-        LOG_ERROR(QString("Subprogram configuration error 3"));
-        return;
-    }
+//    if (!mCurSubprogram->loaded())
+//    {
+//        LOG_ERROR(QString("Subprogram configuration error 3"));
+//        return;
+//    }
 
-    Q_ASSERT(mMainWindow);
-    CyclogramChartDialog* dialog = new CyclogramChartDialog(mMainWindow);
-    updateWindowTitle(dialog);
+//    Q_ASSERT(mMainWindow);
 
-    dialog->setCyclogram(mCurSubprogram->cyclogram());
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->show();
-}
+//    CyclogramChartDialog* dialog = new CyclogramChartDialog(mMainWindow);
+//    updateWindowTitle(dialog);
+
+//    dialog->setCyclogram(mCurSubprogram->cyclogram(), variables);
+//    dialog->setAttribute(Qt::WA_DeleteOnClose);
+//    dialog->show();
+//}
 
 QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
 {

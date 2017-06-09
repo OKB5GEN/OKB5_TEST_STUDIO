@@ -49,7 +49,7 @@ private slots:
 
     void showVariables();
     void makeDataSnapshot();
-    void addChartWidget();
+    void addVariablesMonitor();
 
     void onCyclogramFinish(const QString& errorText);
     void onCyclogramStateChanged(int state);
@@ -86,6 +86,8 @@ private:
     QAction* mRunAct;
     QAction* mStopAct;
     QAction* mSettingsAct;
+    QAction* mShowVariablesAct;
+    QAction* mAddMonitorAct;
 
     QAction* mOpenAct;
     QAction* mNewAct;

@@ -59,13 +59,13 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     QHBoxLayout* checkBoxLayout = new QHBoxLayout();
 
     mSelectAllBox = new QCheckBox(tr("Select/deselect all"), this);
-    mShowAllBox = new QCheckBox(tr("Show all variables"), this);
+    //mShowAllBox = new QCheckBox(tr("Show all variables"), this);
     checkBoxLayout->addWidget(mSelectAllBox);
-    checkBoxLayout->addWidget(mShowAllBox);
+    //checkBoxLayout->addWidget(mShowAllBox);
     checkBoxLayout->addStretch();
     mainLayout->addLayout(checkBoxLayout);
     connect(mSelectAllBox, SIGNAL(stateChanged(int)), this, SLOT(onSelectAllCheckBoxStateChanged(int)));
-    connect(mShowAllBox, SIGNAL(stateChanged(int)), this, SLOT(onShowAllCheckBoxStateChanged(int)));
+    //connect(mShowAllBox, SIGNAL(stateChanged(int)), this, SLOT(onShowAllCheckBoxStateChanged(int)));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     mainLayout->addWidget(buttonBox);
@@ -77,6 +77,8 @@ VariablesWindow::VariablesWindow(QWidget * parent):
 
     setLayout(mainLayout);
     setWindowTitle(tr("Variables"));
+
+    mSelectAllBox->setEnabled(false);
 }
 
 VariablesWindow::~VariablesWindow()
@@ -105,7 +107,7 @@ void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
         addRow(index, key, initial, desc);
     }
 
-    updateSize();
+    mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
 }
 
 void VariablesWindow::onAddClicked()
@@ -121,18 +123,11 @@ void VariablesWindow::onAddClicked()
     }
 
     addRow(mTableWidget->rowCount(), name, 0, "");
-    updateSize();
+    mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
 }
 
 void VariablesWindow::onRemoveClicked()
 {
-    if (mTableWidget->rowCount() == mSelectedRows.size())
-    {
-        mTableWidget->clearContents();
-        mSelectedRows.clear();
-        return;
-    }
-
     int rowsDeleted = 0;
     auto sortedDeletionList = mSelectedRows.toList();
     qSort(sortedDeletionList);
@@ -143,6 +138,10 @@ void VariablesWindow::onRemoveClicked()
     }
 
     mSelectedRows.clear();
+    mSelectAllBox->setCheckState(Qt::Unchecked);
+    mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
+
+    mRemoveBtn->setEnabled(false);
 }
 
 void VariablesWindow::onNameChanged()
@@ -172,7 +171,6 @@ void VariablesWindow::onNameChanged()
 
     mRenameLog.append(QPair<QString, QString>(oldName, newName));
     lineEdit->setProperty(PREV_NAME_PROPERTY, QVariant(newName));
-    updateSize();
 }
 
 void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, const QString& description)
@@ -201,11 +199,12 @@ void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, c
     lineEditDescription->setText(description);
     lineEditDescription->setFrame(false);
     mTableWidget->setCellWidget(row, 3, lineEditDescription);
-    connect(lineEditDescription, SIGNAL(editingFinished()), this, SLOT(updateSize()));
 }
 
 void VariablesWindow::onAccept()
 {
+    mSelectedVariables.clear();
+
     // Here we need to analyze and apply all user actions from GUI to variable controller:
 
     // 1. Get all existing variables from variable controller
@@ -226,6 +225,7 @@ void VariablesWindow::onAccept()
     QSet<QString> newVariables;
     for(int row = 0; row < mTableWidget->rowCount(); row++)
     {
+        QCheckBox* selectedBox = qobject_cast<QCheckBox*>(mTableWidget->cellWidget(row, 0));
         QLineEdit* nameEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 1));
         QLineEdit* defaultValueEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 2));
         QLineEdit* descriptionEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 3));
@@ -252,6 +252,11 @@ void VariablesWindow::onAccept()
         {
             controller->addVariable(varName, defaultValue);
             controller->setDescription(varName, description);
+        }
+
+        if (selectedBox->checkState() == Qt::Checked)
+        {
+            mSelectedVariables.append(varName);
         }
     }
 
@@ -373,10 +378,7 @@ void VariablesWindow::optimizeRenameLog()
     optimizedLog.swap(mRenameLog);
 }
 
-void VariablesWindow::updateSize()
+QStringList VariablesWindow::selectedVariables() const
 {
-    // TODO possibly remove
-//    mTableWidget->resizeColumnsToContents();
-//    resize(size() + QSize(1, 1));
-//    resize(size() - QSize(1, 1));
+    return mSelectedVariables;
 }

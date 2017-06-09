@@ -286,9 +286,9 @@ void EditorWindow::createActions()
     QAction *aboutQtAct = helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
 */
-    QMenu *runMenu = menuBar()->addMenu(tr("Cyclogram"));
-    QToolBar *runToolBar = addToolBar(tr("Cyclogram"));
-    runToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+    QMenu *cyclogramMenu = menuBar()->addMenu(tr("Cyclogram"));
+    QToolBar *cyclogramToolBar = addToolBar(tr("Cyclogram"));
+    cyclogramToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     mPlayIcon = QIcon(":/resources/images/play");
@@ -303,32 +303,32 @@ void EditorWindow::createActions()
     //mRunAct->setShortcuts(QKeySequence::New);
     mRunAct->setStatusTip(tr("Execute cyclogram"));
     connect(mRunAct, &QAction::triggered, this, &EditorWindow::runCyclogram);
-    runMenu->addAction(mRunAct);
-    runToolBar->addAction(mRunAct);
+    cyclogramMenu->addAction(mRunAct);
+    cyclogramToolBar->addAction(mRunAct);
 
     QIcon stopIcon = QIcon(":/resources/images/stop");
     mStopAct = new QAction(stopIcon, tr("Stop"), this);
     //stopAct->setShortcuts(QKeySequence::New);
     mStopAct->setStatusTip(tr("Stop cyclogram execution"));
     connect(mStopAct, &QAction::triggered, this, &EditorWindow::stopCyclogram);
-    runMenu->addAction(mStopAct);
-    runToolBar->addAction(mStopAct);
+    cyclogramMenu->addAction(mStopAct);
+    cyclogramToolBar->addAction(mStopAct);
 
-    runMenu->addSeparator();
+    cyclogramMenu->addSeparator();
 
     QIcon settingsIcon = QIcon(":/resources/images/settings");
     mSettingsAct = new QAction(settingsIcon, tr("Settings"), this);
     mSettingsAct->setStatusTip(tr("Cyclogram settings"));
     connect(mSettingsAct, &QAction::triggered, this, &EditorWindow::showCyclogramSettings);
-    runMenu->addAction(mSettingsAct);
-    runToolBar->addAction(mSettingsAct);
+    cyclogramMenu->addAction(mSettingsAct);
+    cyclogramToolBar->addAction(mSettingsAct);
 
     const QIcon addVariablesIcon = QIcon(":/resources/images/variable");
-    QAction *addVariablesAct = new QAction(addVariablesIcon, tr("Variables"), this);
-    addVariablesAct->setStatusTip(tr("Show cyclogram variables"));
-    connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::showVariables);
-    runMenu->addAction(addVariablesAct);
-    runToolBar->addAction(addVariablesAct);
+    mShowVariablesAct = new QAction(addVariablesIcon, tr("Variables"), this);
+    mShowVariablesAct->setStatusTip(tr("Show cyclogram variables"));
+    connect(mShowVariablesAct, &QAction::triggered, this, &EditorWindow::showVariables);
+    cyclogramMenu->addAction(mShowVariablesAct);
+    cyclogramToolBar->addAction(mShowVariablesAct);
 
     stopCyclogram();
 
@@ -343,12 +343,12 @@ void EditorWindow::createActions()
 //    monitorMenu->addAction(addManualMonitorAct);
 //    monitorToolBar->addAction(addManualMonitorAct);
 
-//    const QIcon addAutoMonitorIcon = QIcon(":/resources/images/monitor_auto");
-//    QAction *addAutoMonitorAct = new QAction(addAutoMonitorIcon, tr("Add auto monitor"), this);
-//    addAutoMonitorAct->setStatusTip(tr("Add auto parameter monitor"));
-//    connect(addAutoMonitorAct, &QAction::triggered, this, &EditorWindow::addChartWidget);
-//    monitorMenu->addAction(addAutoMonitorAct);
-//    monitorToolBar->addAction(addAutoMonitorAct);
+    const QIcon addMonitorIcon = QIcon(":/resources/images/monitor_auto");
+    mAddMonitorAct = new QAction(addMonitorIcon, tr("Add monitor"), this);
+    mAddMonitorAct->setStatusTip(tr("Add variables monitor"));
+    connect(mAddMonitorAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
+    cyclogramMenu->addAction(mAddMonitorAct);
+    cyclogramToolBar->addAction(mAddMonitorAct);
 
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
 
@@ -537,6 +537,8 @@ void EditorWindow::runCyclogram()
     }
 #else
     mRunAct->setEnabled(false);
+    mShowVariablesAct->setEnabled(false);
+    mAddMonitorAct->setEnabled(false);
     cyclogram->run();
 #endif
 
@@ -560,6 +562,8 @@ void EditorWindow::stopCyclogram()
 
     //mRunOneCmdAct->setEnabled(true);
     mRunAct->setEnabled(true);
+    mShowVariablesAct->setEnabled(true);
+    mAddMonitorAct->setEnabled(true);
 }
 
 void EditorWindow::showCyclogramSettings()
@@ -583,11 +587,28 @@ void EditorWindow::makeDataSnapshot()
     cyclogram->variableController()->makeDataSnapshot(QString("Label %1").arg(mSnapshotsCouner));
 }
 
-void EditorWindow::addChartWidget()
+void EditorWindow::addVariablesMonitor()
 {
+    VariablesWindow variablesWindow(this);
+    variablesWindow.setCyclogram(mCyclogram);
+    variablesWindow.setWindowTitle(tr("Select variables to show in monitor"));
+    int result = variablesWindow.exec();
+
+    if (result != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QStringList selectedVariables = variablesWindow.selectedVariables();
+    if (selectedVariables.empty())
+    {
+        QMessageBox::warning(this, tr("Error"), tr("No variables selected for monitor"));
+        return;
+    }
+
     CyclogramChartDialog* dialog = new CyclogramChartDialog(this);
 
-    dialog->setCyclogram(mCyclogram);
+    dialog->setCyclogram(mCyclogram, selectedVariables);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }

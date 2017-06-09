@@ -23,13 +23,13 @@ public:
     ~VariablesWindow();
 
     void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
+    QStringList selectedVariables() const;
 
 private slots:
     void onAddClicked();
     void onRemoveClicked();
 
     void onNameChanged();
-    void updateSize();
 
     void onSelectAllCheckBoxStateChanged(int state);
     void onShowAllCheckBoxStateChanged(int state);
@@ -53,6 +53,7 @@ private:
     QDoubleValidator* mValidator;
 
     QSet<int> mSelectedRows;
+    QStringList mSelectedVariables;
 
     QList<QPair<QString, QString>> mRenameLog;
 };

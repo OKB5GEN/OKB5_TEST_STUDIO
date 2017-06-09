@@ -10,15 +10,9 @@
 
 namespace
 {
-    static const qreal WIDTH = 500;
-    static const qreal HEIGHT = 300;
+    static const qreal WIDTH = 600;
+    static const qreal HEIGHT = 400;
     static const qreal X_AXIS_ADD = 30;
-
-//    double fRand(double fMin, double fMax)
-//    {
-//        double f = (double)rand() / RAND_MAX;
-//        return fMin + f * (fMax - fMin);
-//    }
 }
 
 CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
@@ -26,10 +20,18 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
 {
     QHBoxLayout* hLayout = new QHBoxLayout(this);
 
-    mVariables = new QListWidget(this);
-    mVariables->setMaximumWidth(100);
+    mVariablesTable = new QTableWidget(this);
+    QStringList list;
+    list.append(tr("Name"));
+    list.append(tr("Value"));
+    mVariablesTable->setColumnCount(list.size());
+    mVariablesTable->setHorizontalHeaderLabels(list);
+    mVariablesTable->horizontalHeader()->setStretchLastSection(true);
+    mVariablesTable->setMinimumWidth(200);
+    mVariablesTable->setMaximumWidth(300);
+    mVariablesTable->setSelectionMode(QAbstractItemView::NoSelection);
 
-    hLayout->addWidget(mVariables);
+    hLayout->addWidget(mVariablesTable);
 
     QCustomPlot* plot = new QCustomPlot(this);
     plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
@@ -46,7 +48,7 @@ CyclogramChartDialog::~CyclogramChartDialog()
 
 }
 
-void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
+void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram, const QStringList& variables)
 {
     if (cyclogram.isNull())
     {
@@ -62,25 +64,26 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     mCyclogram = cyclogram;
 
-    mCheckboxes.clear();
-    mVariables->clear();
+    mVariablesTable->clearContents();
+    mVariablesTable->setRowCount(0);
     mPlot->clearGraphs();
     mPlot->legend->setVisible(false);
     mPlot->replot();
 
+    auto variablesToDisplay = variables.toSet();
+
     const QMap<QString, VariableController::VariableData>& data = cyclogram->variableController()->variablesData();
 
+    int row = 0;
     for (auto it = data.begin(); it != data.end(); ++it)
     {
-        QCheckBox* checkBox = new QCheckBox(this);
-        checkBox->setText(it.key());
-        mCheckboxes[it.key()] = checkBox;
+        if (!variablesToDisplay.contains(it.key()))
+        {
+            continue;
+        }
 
-        connect(checkBox, SIGNAL(toggled(bool)), this, SLOT(onVariableSelectionChanged(bool)));
-
-        QListWidgetItem* item = new QListWidgetItem();
-        mVariables->addItem(item);
-        mVariables->setItemWidget(item, checkBox);
+        addRow(row, it.key(), it.value().currentValue);
+        ++row;
     }
 
     //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
@@ -90,27 +93,6 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO "hot" graphs adding
     {
         onCyclogramStateChanged(Cyclogram::RUNNING);
-    }
-}
-
-void CyclogramChartDialog::onVariableSelectionChanged(bool toggled)
-{
-    QCheckBox* changedBox = qobject_cast<QCheckBox*>(QObject::sender());
-    if (changedBox && !toggled)
-    {
-        QString name = changedBox->text();
-        int count = mPlot->graphCount();
-        QCPGraph* graph = Q_NULLPTR;
-
-        for (int i = 0; i < count; ++i)
-        {
-            QCPGraph* tmp = mPlot->graph(i);
-            if (tmp->name() == name)
-            {
-                tmp->setVisible(false);
-                break;
-            }
-        }
     }
 }
 
@@ -131,21 +113,28 @@ void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal val
 
     if (!graph)
     {
-        LOG_DEBUG(QString("Graph for variable '%1' not found").arg(name)); //TODO variable not included in display list?
+        LOG_DEBUG(QString("Graph for variable '%1' not found").arg(name));
         return;
+    }
+
+    // update variable value in table
+    for(int row = 0; row < mVariablesTable->rowCount(); row++)
+    {
+        QLineEdit* tmp = qobject_cast<QLineEdit*>(mVariablesTable->cellWidget(row, 0));
+        if (!tmp)
+        {
+            continue;
+        }
+
+        if (tmp->text() == name)
+        {
+            tmp = qobject_cast<QLineEdit*>(mVariablesTable->cellWidget(row, 1));
+            tmp->setText(QString::number(value));
+        }
     }
 
     qreal time = qreal(QDateTime::currentMSecsSinceEpoch() - mStartTime) / 1000;
     graph->addData(time, value);
-
-    QCheckBox* checkBox = mCheckboxes.value(name);
-    graph->setVisible(checkBox->isChecked());
-
-    if (!checkBox->isChecked())
-    {
-        mPlot->replot();
-        return; // variable not selected
-    }
 
     // if graphs reached right plot point, expand it
     if (time > mMaxX)
@@ -254,11 +243,11 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
 
         mPlot->xAxis->setTickLabelFont(font);
         mPlot->xAxis->setLabelFont(font);
-        mPlot->xAxis->setLabel(tr("Время, с"));
+        mPlot->xAxis->setLabel(tr("Time, s"));
 
         mPlot->yAxis->setTickLabelFont(font);
         mPlot->yAxis->setLabelFont(font);
-        mPlot->yAxis->setLabel(tr("Значение"));
+        mPlot->yAxis->setLabel(tr("Value"));
 
         mMinY = 0;
         mMaxY = 0;
@@ -274,21 +263,20 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
         const QMap<QString, VariableController::VariableData>& data = vc->variablesData();
 
         int color = Qt::red;
-        for (auto it = data.begin(); it != data.end(); ++it)
+
+        for(int row = 0; row < mVariablesTable->rowCount(); row++)
         {
+            QLineEdit* varNameEdit = qobject_cast<QLineEdit*>(mVariablesTable->cellWidget(row, 0));
             QCPGraph* graph = mPlot->addGraph();
-            graph->setName(tr("%1").arg(it.key()));
+            graph->setName(tr("%1").arg(varNameEdit->text()));
             graph->setPen(QPen(Qt::GlobalColor(color)));
-            graph->addData(mMinX, it.value().currentValue);
+            graph->addData(mMinX, vc->currentValue(varNameEdit->text()));
             ++color;
 
             if (color > Qt::darkYellow)
             {
                 color = Qt::red; //TODO temporary
             }
-
-            bool isChecked = mCheckboxes.value(it.key())->isChecked();
-            graph->setVisible(isChecked);
         }
 
         mPlot->legend->setVisible(true);
@@ -300,4 +288,21 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
     {
         //TODO some hacks with subprogram charts
     }
+}
+
+void CyclogramChartDialog::addRow(int row, const QString& name, qreal value)
+{
+    mVariablesTable->insertRow(row);
+
+    QLineEdit* lineEditName = new QLineEdit(mVariablesTable);
+    lineEditName->setFrame(false);
+    lineEditName->setText(name);
+    lineEditName->setReadOnly(true);
+    mVariablesTable->setCellWidget(row, 0, lineEditName);
+
+    QLineEdit* lineEditInitial = new QLineEdit(mVariablesTable);
+    lineEditInitial->setFrame(false);
+    lineEditInitial->setText(QString::number(value));
+    lineEditInitial->setReadOnly(true);
+    mVariablesTable->setCellWidget(row, 1, lineEditInitial);
 }
