@@ -32,7 +32,6 @@ namespace
 }
 
 EditorWindow::EditorWindow():
-    mVariablesWindow(Q_NULLPTR),
     mScaleFactor(1.0)
 {
     mScrollArea = new QScrollArea(this);
@@ -327,7 +326,7 @@ void EditorWindow::createActions()
     const QIcon addVariablesIcon = QIcon(":/resources/images/variable");
     QAction *addVariablesAct = new QAction(addVariablesIcon, tr("Variables"), this);
     addVariablesAct->setStatusTip(tr("Show cyclogram variables"));
-    connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
+    connect(addVariablesAct, &QAction::triggered, this, &EditorWindow::showVariables);
     runMenu->addAction(addVariablesAct);
     runToolBar->addAction(addVariablesAct);
 
@@ -570,15 +569,11 @@ void EditorWindow::showCyclogramSettings()
     dialog.exec();
 }
 
-void EditorWindow::addVariablesMonitor()
+void EditorWindow::showVariables()
 {
-    if (!mVariablesWindow)
-    {
-        mVariablesWindow = new VariablesWindow(this);
-    }
-
-    mVariablesWindow->setCyclogram(mCyclogram);
-    mVariablesWindow->show();
+    VariablesWindow variablesWindow(this);
+    variablesWindow.setCyclogram(mCyclogram);
+    variablesWindow.exec();
 }
 
 void EditorWindow::makeDataSnapshot()

@@ -50,7 +50,6 @@ private:
 
     CmdSubProgram* mCommand;
     CyclogramWidget* mCyclogramWidget;
-    VariablesWindow* mVariablesWindow;
 
     QScrollArea * mScrollArea;
 

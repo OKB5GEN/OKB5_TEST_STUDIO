@@ -14,11 +14,11 @@ namespace
     static const qreal HEIGHT = 300;
     static const qreal X_AXIS_ADD = 30;
 
-    double fRand(double fMin, double fMax)
-    {
-        double f = (double)rand() / RAND_MAX;
-        return fMin + f * (fMax - fMin);
-    }
+//    double fRand(double fMin, double fMax)
+//    {
+//        double f = (double)rand() / RAND_MAX;
+//        return fMin + f * (fMax - fMin);
+//    }
 }
 
 CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):

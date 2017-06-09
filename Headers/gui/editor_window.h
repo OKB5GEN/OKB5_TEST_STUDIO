@@ -47,7 +47,7 @@ private slots:
     void stopCyclogram();
     void showCyclogramSettings();
 
-    void addVariablesMonitor();
+    void showVariables();
     void makeDataSnapshot();
     void addChartWidget();
 
@@ -79,7 +79,6 @@ private:
     QWeakPointer<Cyclogram> mCyclogram;
     CyclogramWidget *mCyclogramWidget;
 
-    VariablesWindow* mVariablesWindow;
     SystemState* mSystemState;
 
     QString mCurFile;

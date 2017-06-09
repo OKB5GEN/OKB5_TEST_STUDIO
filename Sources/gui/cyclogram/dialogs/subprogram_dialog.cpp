@@ -24,8 +24,7 @@ namespace
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow):
     QDialog(mainWindow),
-    mCommand(command),
-    mVariablesWindow(Q_NULLPTR)
+    mCommand(command)
 {
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
@@ -143,17 +142,10 @@ bool SubProgramDialog::onSaveClick()
 
 void SubProgramDialog::onVariablesClick()
 {
-    if (!mVariablesWindow)
-    {
-        mVariablesWindow = new VariablesWindow(this);
-        mVariablesWindow->setCyclogram(mCommand->cyclogram());
-        mVariablesWindow->setWindowTitle(windowTitle());
-        //TODO variables window will be closed with subprogram window. What if we want to watch variables afterwards?
-    }
-
-    mVariablesWindow->show();
-    mVariablesWindow->activateWindow();
-    mVariablesWindow->raise();
+    VariablesWindow variablesWindow(this);
+    variablesWindow.setCyclogram(mCommand->cyclogram());
+    variablesWindow.setWindowTitle(windowTitle());
+    variablesWindow.exec();
 }
 
 void SubProgramDialog::onChartClick()
@@ -247,13 +239,6 @@ void SubProgramDialog::updateTitle(const QString &newTitle)
 {
     setWindowTitle(newTitle + "[*]");
     mCyclogramWidget->setWindowTitle(newTitle);
-
-    if (mVariablesWindow)
-    {
-        mVariablesWindow->setWindowTitle(newTitle);
-    }
-
-    //TODO chart window title update?
 }
 
 void SubProgramDialog::onCyclogramModified()
