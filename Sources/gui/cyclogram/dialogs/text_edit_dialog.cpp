@@ -8,11 +8,14 @@
 
 TextEditDialog::TextEditDialog(Mode mode, QWidget * parent):
     QDialog(parent),
-    mMode(mode)
+    mMode(mode),
+    mLineEdit(Q_NULLPTR),
+    mValueEdit(Q_NULLPTR)
 {
     QGridLayout * layout = new QGridLayout(this);
 
     int row = 0;
+    int column = 1;
     mLineEdit = new QLineEdit(this);
     mLineEdit->setText("Default value");
     layout->addWidget(mLineEdit, row, 0);
@@ -27,13 +30,18 @@ TextEditDialog::TextEditDialog(Mode mode, QWidget * parent):
     }
     else if (mMode == VARIABLE_EDIT)
     {
+        mValueEdit = new QLineEdit(this);
+        mValueEdit->setText("0");
+        mValueEdit->setValidator(new QDoubleValidator(mValueEdit));
         setWindowTitle(tr("Add new variable"));
+        layout->addWidget(mValueEdit, row - 1, 1);
+        ++column;
     }
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    layout->addWidget(buttonBox, row, 0);
+    layout->addWidget(buttonBox, row, 0, 1, column);
     ++row;
 
     setLayout(layout);
@@ -85,4 +93,15 @@ void TextEditDialog::onAccept()
 QString TextEditDialog::addVarText()
 {
     return tr("Add new");
+}
+
+qreal TextEditDialog::value() const
+{
+    qreal val = 0;
+    if (mMode == VARIABLE_EDIT)
+    {
+        val = mValueEdit->text().toDouble();
+    }
+
+    return val;
 }

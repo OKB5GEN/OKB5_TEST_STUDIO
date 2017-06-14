@@ -715,7 +715,13 @@ void CmdActionModuleEditDialog::onAccept()
             auto it = vc->variablesData().find(variableName);
             if (it == vc->variablesData().end())
             {
-                vc->addVariable(variableName, 0);
+                qreal value = 0;
+                if (comboBox->currentData().isValid())
+                {
+                    value = comboBox->currentData().toDouble();
+                }
+
+                vc->addVariable(variableName, value);
                 QString desc = system->paramDefaultDesc(system->paramID(name));
                 vc->setDescription(variableName, desc);
             }
@@ -820,13 +826,13 @@ void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
 
     if (result != QDialog::Accepted)
     {
-        comboBox->setCurrentIndex(0);
+        comboBox->setCurrentIndex(0); // TODO revert to previous variable
         return;
     }
 
     comboBox->blockSignals(true);
     int index = comboBox->count() - 1;
-    comboBox->insertItem(index, newVariable);
+    comboBox->insertItem(index, newVariable, dialog.value());
     comboBox->setCurrentIndex(index);
     comboBox->blockSignals(false);
 }

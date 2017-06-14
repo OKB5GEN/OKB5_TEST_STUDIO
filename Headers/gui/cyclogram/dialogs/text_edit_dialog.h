@@ -26,12 +26,14 @@ public:
     void setCommand(Command* command);
     void setText(const QString& text);
     QString text() const;
+    qreal value() const;
 
 private slots:
     void onAccept();
 
 private:
     QLineEdit* mLineEdit;
+    QLineEdit* mValueEdit;
     Command* mCommand;
     Mode mMode;
 };
