@@ -630,6 +630,8 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
                     comboBox->setCurrentIndex(index);
                 }
             }
+
+            comboBox->addItem(TextEditDialog::addVarText()); // add ability to add variable
         }
         else
         {
