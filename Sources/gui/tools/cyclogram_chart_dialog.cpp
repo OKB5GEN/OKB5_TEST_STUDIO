@@ -81,6 +81,10 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     mVariablesTable->horizontalHeader()->setStretchLastSection(true);
     mVariablesTable->setMinimumWidth(300);
 
+    //mVariablesTable->setSortingEnabled(true);
+    // при сортировке творится какая-то неведомая хуйня с итемами, толи индексы перемешиваются толи еще что,
+    // но при перемещениях вверх-вниз падает из-за того, что похерился где-то итем
+
     connect(mVariablesTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(onCellDoubleClicked(int, int)));
     connect(mVariablesTable, SIGNAL(itemSelectionChanged()), this, SLOT(onTableSelectionChanged()));
     mVariablesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -305,6 +309,7 @@ void CyclogramChartDialog::onAddClicked()
         ++row;
     }
 
+    //mVariablesTable->sortByColumn(0);
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
 }
 
@@ -330,6 +335,7 @@ void CyclogramChartDialog::onRemoveClicked()
 
     int TODO; // remove graphs
 
+    //mVariablesTable->sortByColumn(0);
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
 }
 
