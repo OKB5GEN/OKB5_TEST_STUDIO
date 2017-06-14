@@ -75,13 +75,11 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     mVariablesTable = new QTableWidget(this);
     QStringList list;
     list.append(tr("Name"));
-    list.append(tr("Chart"));
     list.append(tr("Value"));
     mVariablesTable->setColumnCount(list.size());
     mVariablesTable->setHorizontalHeaderLabels(list);
     mVariablesTable->horizontalHeader()->setStretchLastSection(true);
-    mVariablesTable->setColumnWidth(1, 50);
-    mVariablesTable->setMinimumWidth(400);
+    mVariablesTable->setMinimumWidth(300);
 
     connect(mVariablesTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(onCellDoubleClicked(int, int)));
     connect(mVariablesTable, SIGNAL(itemSelectionChanged()), this, SLOT(onTableSelectionChanged()));
@@ -96,7 +94,7 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Main cyclogram")); // TODO write cyclogram path / subprogram name
+    setWindowTitle(tr("Main cyclogram"));
 }
 
 CyclogramChartDialog::~CyclogramChartDialog()
@@ -126,7 +124,6 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     mPlot->legend->setVisible(false);
     mPlot->replot();
 
-    //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(cyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
 
@@ -163,7 +160,7 @@ void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal val
         QString variableName = mVariablesTable->item(row, 0)->text();
         if (variableName == name)
         {
-            mVariablesTable->item(row, 2)->setText(QString::number(value));
+            mVariablesTable->item(row, 1)->setText(QString::number(value));
         }
     }
 
@@ -278,13 +275,9 @@ void CyclogramChartDialog::addRow(int row, const QString& name, qreal value)
     nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     mVariablesTable->setItem(row, 0, nameItem);
 
-    QCheckBox* chartCheckBox = new QCheckBox(mVariablesTable);
-    mVariablesTable->setCellWidget(row, 1, chartCheckBox);
-    connect(chartCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onShowVariableChartSelectionChanged(int)));
-
     QTableWidgetItem* valueItem = new QTableWidgetItem(QString::number(value));
     valueItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    mVariablesTable->setItem(row, 2, valueItem);
+    mVariablesTable->setItem(row, 1, valueItem);
 }
 
 void CyclogramChartDialog::onAddClicked()
@@ -336,24 +329,34 @@ void CyclogramChartDialog::onRemoveClicked()
     }
 
     int TODO; // remove graphs
-    //mRemoveBtn->setEnabled(false);
 
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
 }
 
 void CyclogramChartDialog::onMoveUpClicked()
 {
-    int TODO;
+    int rowFrom = mVariablesTable->selectionModel()->selectedRows().at(0).row();
+
+    QString variable = mVariablesTable->item(rowFrom, 0)->text();
+    qreal value = mVariablesTable->item(rowFrom, 1)->text().toDouble();
+
+    mVariablesTable->removeRow(rowFrom);
+
+    addRow(rowFrom - 1, variable, value);
+    mVariablesTable->selectRow(rowFrom - 1);
 }
 
 void CyclogramChartDialog::onMoveDownClicked()
 {
-    int TODO;
-}
+    int rowFrom = mVariablesTable->selectionModel()->selectedRows().at(0).row();
 
-void CyclogramChartDialog::onShowVariableChartSelectionChanged(int state)
-{
-    int TODO;
+    QString variable = mVariablesTable->item(rowFrom, 0)->text();
+    qreal value = mVariablesTable->item(rowFrom, 1)->text().toDouble();
+
+    mVariablesTable->removeRow(rowFrom);
+
+    addRow(rowFrom + 1, variable, value);
+    mVariablesTable->selectRow(rowFrom + 1);
 }
 
 void CyclogramChartDialog::onCellDoubleClicked(int row, int column)
