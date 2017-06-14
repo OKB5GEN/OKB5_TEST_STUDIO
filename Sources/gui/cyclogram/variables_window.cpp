@@ -20,13 +20,13 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     QHBoxLayout* buttonLayout = new QHBoxLayout();
 
     // add button
-    QToolButton* addBtn = new QToolButton(this);
-    addBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
-    addBtn->setIcon(QIcon(":/resources/images/edit_add.png"));
-    addBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
-    addBtn->setToolTip(tr("Add new variable"));
-    connect(addBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
-    buttonLayout->addWidget(addBtn);
+    mAddBtn = new QToolButton(this);
+    mAddBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mAddBtn->setIcon(QIcon(":/resources/images/edit_add.png"));
+    mAddBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mAddBtn->setToolTip(tr("Add new variable"));
+    connect(mAddBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
+    buttonLayout->addWidget(mAddBtn);
 
     // remove button
     mRemoveBtn = new QToolButton(this);
@@ -37,8 +37,28 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     mRemoveBtn->setEnabled(false);
     connect(mRemoveBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
     buttonLayout->addWidget(mRemoveBtn);
-    buttonLayout->addStretch();
 
+    // move up button
+    mMoveUpBtn = new QToolButton(this);
+    mMoveUpBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveUpBtn->setIcon(QIcon(":/resources/images/arrow_up.png"));
+    mMoveUpBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveUpBtn->setToolTip(tr("Move selected variable up"));
+    mMoveUpBtn->setEnabled(false);
+    connect(mMoveUpBtn, SIGNAL(clicked()), this, SLOT(onMoveUpClicked()));
+    buttonLayout->addWidget(mMoveUpBtn);
+
+    // move down button
+    mMoveDownBtn = new QToolButton(this);
+    mMoveDownBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveDownBtn->setIcon(QIcon(":/resources/images/arrow_down.png"));
+    mMoveDownBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveDownBtn->setToolTip(tr("Move selected variable down"));
+    mMoveDownBtn->setEnabled(false);
+    connect(mMoveDownBtn, SIGNAL(clicked()), this, SLOT(onMoveDownClicked()));
+    buttonLayout->addWidget(mMoveDownBtn);
+
+    buttonLayout->addStretch();
     mainLayout->addLayout(buttonLayout);
 
     mTableWidget = new QTableWidget(this);
@@ -381,4 +401,14 @@ void VariablesWindow::optimizeRenameLog()
 QStringList VariablesWindow::selectedVariables() const
 {
     return mSelectedVariables;
+}
+
+void VariablesWindow::onMoveUpClicked()
+{
+
+}
+
+void VariablesWindow::onMoveDownClicked()
+{
+
 }

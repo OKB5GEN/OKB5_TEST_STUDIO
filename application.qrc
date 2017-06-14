@@ -1,14 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
     <qresource  prefix="/">
-        <file>resources/images/copy.png</file>
-        <file>resources/images/cut.png</file>
         <file>resources/images/new.png</file>
         <file>resources/images/open.png</file>
-        <file>resources/images/paste.png</file>
         <file>resources/images/save.png</file>
-        <file>resources/images/media-pause-32.png</file>
-        <file>resources/images/media-play-32.png</file>
-        <file>resources/images/media-stop-32.png</file>
         <file>resources/images/pause.png</file>
         <file>resources/images/play.png</file>
         <file>resources/images/settings.png</file>
@@ -18,9 +12,10 @@
         <file>resources/images/monitor_manual.png</file>
         <file>resources/images/edit_add.png</file>
         <file>resources/images/edit_remove.png</file>
-        <file>resources/images/contents-256.png</file>
         <file>resources/images/variable.png</file>
         <file>resources/images/delete_all.png</file>
+        <file>resources/images/arrow_up.png</file>
+        <file>resources/images/arrow_down.png</file>
         <file>resources/translations/OKB5TestStudio_ru.qm</file>
     </qresource>
 </RCC>

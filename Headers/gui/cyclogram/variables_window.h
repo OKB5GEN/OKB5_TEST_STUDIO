@@ -28,6 +28,8 @@ public:
 private slots:
     void onAddClicked();
     void onRemoveClicked();
+    void onMoveUpClicked();
+    void onMoveDownClicked();
 
     void onNameChanged();
 
@@ -41,9 +43,11 @@ private:
     bool isVariableExist(const QString& name, QLineEdit* excludeRow) const;
     void optimizeRenameLog();
 
-
     QTableWidget* mTableWidget;
+    QToolButton* mAddBtn;
     QToolButton* mRemoveBtn;
+    QToolButton* mMoveUpBtn;
+    QToolButton* mMoveDownBtn;
 
     QCheckBox* mSelectAllBox;
     QCheckBox* mShowAllBox;
@@ -53,7 +57,7 @@ private:
     QDoubleValidator* mValidator;
 
     QSet<int> mSelectedRows;
-    QStringList mSelectedVariables;
+    QStringList mSelectedVariables; //TODO unused anymore
 
     QList<QPair<QString, QString>> mRenameLog;
 };

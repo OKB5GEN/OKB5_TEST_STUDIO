@@ -1,9 +1,9 @@
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/qcustomplot.h"
 #include "Headers/logic/cyclogram.h"
-#include "Headers/logger/Logger.h"
-
 #include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
+#include "Headers/gui/cyclogram/variables_select_window.h"
 
 #include <QtWidgets>
 #include <QDateTime>
@@ -13,12 +13,64 @@ namespace
     static const qreal WIDTH = 600;
     static const qreal HEIGHT = 400;
     static const qreal X_AXIS_ADD = 30;
+    static const int BTN_SIZE = 32;
+    static const qreal RANGE_FACTOR = 1.1;
 }
 
 CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     QDialog(parent)
 {
-    QHBoxLayout* hLayout = new QHBoxLayout(this);
+    setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
+
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+
+    QVBoxLayout* variablesLayout = new QVBoxLayout();
+    mainLayout->addLayout(variablesLayout, 1);
+
+    QHBoxLayout* buttonsLayout = new QHBoxLayout();
+
+    // add button
+    mAddBtn = new QToolButton(this);
+    mAddBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mAddBtn->setIcon(QIcon(":/resources/images/edit_add.png"));
+    mAddBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mAddBtn->setToolTip(tr("Add existing variable"));
+    connect(mAddBtn, SIGNAL(clicked()), this, SLOT(onAddClicked()));
+    buttonsLayout->addWidget(mAddBtn);
+
+    // remove button
+    mRemoveBtn = new QToolButton(this);
+    mRemoveBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mRemoveBtn->setIcon(QIcon(":/resources/images/edit_remove.png"));
+    mRemoveBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mRemoveBtn->setToolTip(tr("Remove selected variables"));
+    mRemoveBtn->setEnabled(false);
+    connect(mRemoveBtn, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
+    buttonsLayout->addWidget(mRemoveBtn);
+
+    // move up button
+    mMoveUpBtn = new QToolButton(this);
+    mMoveUpBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveUpBtn->setIcon(QIcon(":/resources/images/arrow_up.png"));
+    mMoveUpBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveUpBtn->setToolTip(tr("Move selected variable up"));
+    mMoveUpBtn->setEnabled(false);
+    connect(mMoveUpBtn, SIGNAL(clicked()), this, SLOT(onMoveUpClicked()));
+    buttonsLayout->addWidget(mMoveUpBtn);
+
+    // move down button
+    mMoveDownBtn = new QToolButton(this);
+    mMoveDownBtn->setFixedSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveDownBtn->setIcon(QIcon(":/resources/images/arrow_down.png"));
+    mMoveDownBtn->setIconSize(QSize(BTN_SIZE, BTN_SIZE));
+    mMoveDownBtn->setToolTip(tr("Move selected variable down"));
+    mMoveDownBtn->setEnabled(false);
+    connect(mMoveDownBtn, SIGNAL(clicked()), this, SLOT(onMoveDownClicked()));
+    buttonsLayout->addWidget(mMoveDownBtn);
+
+    buttonsLayout->addStretch();
+
+    variablesLayout->addLayout(buttonsLayout);
 
     mVariablesTable = new QTableWidget(this);
     QStringList list;
@@ -27,18 +79,19 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     mVariablesTable->setColumnCount(list.size());
     mVariablesTable->setHorizontalHeaderLabels(list);
     mVariablesTable->horizontalHeader()->setStretchLastSection(true);
-    mVariablesTable->setMinimumWidth(200);
-    mVariablesTable->setMaximumWidth(300);
+    mVariablesTable->setMinimumWidth(250);
+    //mVariablesTable->setMaximumWidth(300);
     mVariablesTable->setSelectionMode(QAbstractItemView::NoSelection);
 
-    hLayout->addWidget(mVariablesTable);
+    variablesLayout->addWidget(mVariablesTable);
 
     QCustomPlot* plot = new QCustomPlot(this);
+    //plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
-    hLayout->addWidget(plot);
+    mainLayout->addWidget(plot, 10);
     mPlot = plot;
 
-    setLayout(hLayout);
+    setLayout(mainLayout);
 
     setWindowTitle(tr("Main cyclogram")); // TODO write cyclogram path / subprogram name
 }
@@ -48,7 +101,7 @@ CyclogramChartDialog::~CyclogramChartDialog()
 
 }
 
-void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram, const QStringList& variables)
+void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 {
     if (cyclogram.isNull())
     {
@@ -69,22 +122,6 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram, con
     mPlot->clearGraphs();
     mPlot->legend->setVisible(false);
     mPlot->replot();
-
-    auto variablesToDisplay = variables.toSet();
-
-    const QMap<QString, VariableController::VariableData>& data = cyclogram->variableController()->variablesData();
-
-    int row = 0;
-    for (auto it = data.begin(); it != data.end(); ++it)
-    {
-        if (!variablesToDisplay.contains(it.key()))
-        {
-            continue;
-        }
-
-        addRow(row, it.key(), it.value().currentValue);
-        ++row;
-    }
 
     //connect(cyclogram->variableController(), SIGNAL(dataSnapshotAdded(const VariableController::DataSnapshot&)), this, SLOT(updateGraphs(const VariableController::DataSnapshot&)));
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
@@ -153,7 +190,7 @@ void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal val
         mMaxY = value;
     }
 
-    mPlot->yAxis->setRange(mMinY, mMaxY); //TODO all negative values?
+    mPlot->yAxis->setRange(mMinY * RANGE_FACTOR, mMaxY * RANGE_FACTOR);
 
     mPlot->replot();
 }
@@ -305,4 +342,50 @@ void CyclogramChartDialog::addRow(int row, const QString& name, qreal value)
     lineEditInitial->setText(QString::number(value));
     lineEditInitial->setReadOnly(true);
     mVariablesTable->setCellWidget(row, 1, lineEditInitial);
+}
+
+void CyclogramChartDialog::onAddClicked()
+{
+    auto cyclogram = mCyclogram.lock();
+    VariablesSelectWindow varSelectWindow(this);
+
+    QStringList varList;
+
+    for(int row = 0; row < mVariablesTable->rowCount(); row++)
+    {
+        QLineEdit* tmp = qobject_cast<QLineEdit*>(mVariablesTable->cellWidget(row, 0));
+        if (!tmp)
+        {
+            continue;
+        }
+
+        varList.append(tmp->text());
+    }
+
+    varSelectWindow.setCyclogram(cyclogram, varList);
+    varSelectWindow.exec();
+
+    int row = mVariablesTable->rowCount();
+    VariableController* vc = cyclogram->variableController();
+
+    foreach (QString var, varSelectWindow.selectedVariables())
+    {
+        addRow(row, var, vc->currentValue(var));
+        ++row;
+    }
+}
+
+void CyclogramChartDialog::onRemoveClicked()
+{
+
+}
+
+void CyclogramChartDialog::onMoveUpClicked()
+{
+
+}
+
+void CyclogramChartDialog::onMoveDownClicked()
+{
+
 }

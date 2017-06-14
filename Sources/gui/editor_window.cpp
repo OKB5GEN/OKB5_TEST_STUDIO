@@ -589,48 +589,30 @@ void EditorWindow::makeDataSnapshot()
 
 void EditorWindow::addVariablesMonitor()
 {
-    VariablesWindow variablesWindow(this);
-    variablesWindow.setCyclogram(mCyclogram);
-    variablesWindow.setWindowTitle(tr("Select variables to show in monitor"));
-    int result = variablesWindow.exec();
-
-    if (result != QDialog::Accepted)
-    {
-        return;
-    }
-
-    QStringList selectedVariables = variablesWindow.selectedVariables();
-    if (selectedVariables.empty())
-    {
-        QMessageBox::warning(this, tr("Error"), tr("No variables selected for monitor"));
-        return;
-    }
-
     CyclogramChartDialog* dialog = new CyclogramChartDialog(this);
 
-    dialog->setCyclogram(mCyclogram, selectedVariables);
+    dialog->setCyclogram(mCyclogram);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
 void EditorWindow::onCyclogramFinish(const QString& errorText)
 {
-    CyclogramEndDialog * dialog = new CyclogramEndDialog(this);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    CyclogramEndDialog dialog(this);
     stopCyclogram();
 
-    dialog->setCyclogram(mCyclogram);
+    dialog.setCyclogram(mCyclogram);
 
     if (!errorText.isEmpty())
     {
-        dialog->setText(errorText);
+        dialog.setText(errorText);
     }
     else
     {
-        dialog->setText(tr("Cyclogram execution finished"));
+        dialog.setText(tr("Cyclogram execution finished"));
     }
 
-    dialog->exec();
+    dialog.exec();
 }
 
 void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString& text)

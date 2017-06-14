@@ -150,25 +150,9 @@ void SubProgramDialog::onVariablesClick()
 
 void SubProgramDialog::onChartClick()
 {
-    VariablesWindow variablesWindow(this);
-    variablesWindow.setWindowTitle(tr("Select variables to show in monitor"));
-    variablesWindow.setCyclogram(mCommand->cyclogram());
-    int result = variablesWindow.exec();
-
-    if (result != QDialog::Accepted)
-    {
-        return;
-    }
-
-    if (variablesWindow.selectedVariables().empty())
-    {
-        QMessageBox::warning(this, tr("Error"), tr("No variables selected for monitor"));
-        return;
-    }
-
     CyclogramChartDialog* dialog = new CyclogramChartDialog(parentWidget());
     dialog->setWindowTitle(windowTitle());
-    dialog->setCyclogram(mCommand->cyclogram(), variablesWindow.selectedVariables());
+    dialog->setCyclogram(mCommand->cyclogram());
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
     connect(this, SIGNAL(windowTitleChanged(const QString&)), dialog, SLOT(setWindowTitle(const QString&)));
