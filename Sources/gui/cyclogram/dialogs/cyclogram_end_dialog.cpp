@@ -22,9 +22,10 @@ CyclogramEndDialog::CyclogramEndDialog(QWidget * parent):
     //connect(textEdit, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    QPushButton* saveBtn = buttonBox->addButton(tr("Save report as..."), QDialogButtonBox::ActionRole);
 
-    connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(saveReportAs()));
+    int TODO; // save report button
+    //QPushButton* saveBtn = buttonBox->addButton(tr("Save report as..."), QDialogButtonBox::ActionRole);
+    //connect(saveBtn, SIGNAL(clicked(bool)), this, SLOT(saveReportAs()));
 
     layout->addWidget(buttonBox, 1, 0);
 

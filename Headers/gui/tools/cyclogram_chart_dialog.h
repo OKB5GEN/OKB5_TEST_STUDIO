@@ -24,6 +24,11 @@ private slots:
     void onVariableValueChanged(const QString& name, qreal value);
     void onCyclogramStateChanged(int state);
 
+    void onShowVariableChartSelectionChanged(int state);
+
+    void onCellDoubleClicked(int row, int column);
+    void onTableSelectionChanged();
+
     void onAddClicked();
     void onRemoveClicked();
     void onMoveUpClicked();
