@@ -346,7 +346,7 @@ void CyclogramChartDialog::onRemoveClicked()
         QTableWidgetItem* item = mVariablesTable->item(index.row(), 0);
         if (!item)
         {
-            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(row).arg(0));
+            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(index.row()).arg(0));
             continue;
         }
 
