@@ -330,7 +330,12 @@ void EditorWindow::createActions()
     cyclogramMenu->addAction(mShowVariablesAct);
     cyclogramToolBar->addAction(mShowVariablesAct);
 
-    stopCyclogram();
+    const QIcon addMonitorIcon = QIcon(":/resources/images/monitor_auto");
+    mAddMonitorAct = new QAction(addMonitorIcon, tr("Add monitor"), this);
+    mAddMonitorAct->setStatusTip(tr("Add variables monitor"));
+    connect(mAddMonitorAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
+    cyclogramMenu->addAction(mAddMonitorAct);
+    cyclogramToolBar->addAction(mAddMonitorAct);
 
 //    QMenu *monitorMenu = menuBar()->addMenu(tr("&Monitor"));
 //    QToolBar *monitorToolBar = addToolBar(tr("Monitor"));
@@ -342,13 +347,6 @@ void EditorWindow::createActions()
 //    connect(addManualMonitorAct, &QAction::triggered, this, &EditorWindow::makeDataSnapshot);
 //    monitorMenu->addAction(addManualMonitorAct);
 //    monitorToolBar->addAction(addManualMonitorAct);
-
-    const QIcon addMonitorIcon = QIcon(":/resources/images/monitor_auto");
-    mAddMonitorAct = new QAction(addMonitorIcon, tr("Add monitor"), this);
-    mAddMonitorAct->setStatusTip(tr("Add variables monitor"));
-    connect(mAddMonitorAct, &QAction::triggered, this, &EditorWindow::addVariablesMonitor);
-    cyclogramMenu->addAction(mAddMonitorAct);
-    cyclogramToolBar->addAction(mAddMonitorAct);
 
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
 
@@ -371,6 +369,8 @@ void EditorWindow::createActions()
 
     QAction *settingsAct = toolsMenu->addAction(tr("Settings"), this, &EditorWindow::onSettings);
     settingsAct->setStatusTip(tr("Application settings"));
+
+    stopCyclogram();
 }
 
 void EditorWindow::createStatusBar()

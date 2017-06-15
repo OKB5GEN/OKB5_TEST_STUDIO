@@ -170,15 +170,16 @@ void COMPortModule::addRequest(uint32_t operationID, const QByteArray& request)
         return;
     }
 
-    if (mRequestQueue.empty())
-    {
-        mSendTimer->start(mSendInterval);
-    }
-
+    bool sendNow = mRequestQueue.empty();
     Request r;
     r.data = request;
     r.operation = operationID;
     mRequestQueue.push_back(r);
+
+    if (sendNow)
+    {
+        sendRequest();
+    }
 }
 
 void COMPortModule::onResponseTimeout()
