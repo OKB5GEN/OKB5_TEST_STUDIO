@@ -29,6 +29,7 @@ private slots:
 
     void onCellDoubleClicked(int row, int column);
     void onTableSelectionChanged();
+    void onShowChartBoxStateChanged(int state);
 
     void onAddClicked();
     void onRemoveClicked();

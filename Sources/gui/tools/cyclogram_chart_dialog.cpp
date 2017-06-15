@@ -81,24 +81,25 @@ CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
     mVariablesTable->horizontalHeader()->setStretchLastSection(true);
     mVariablesTable->setMinimumWidth(300);
 
-    //mVariablesTable->setSortingEnabled(true);
-    // при сортировке творится какая-то неведомая хуйня с итемами, толи индексы перемешиваются толи еще что,
-    // но при перемещениях вверх-вниз падает из-за того, что похерился где-то итем
-
     connect(mVariablesTable, SIGNAL(cellDoubleClicked(int,int)), this, SLOT(onCellDoubleClicked(int, int)));
     connect(mVariablesTable, SIGNAL(itemSelectionChanged()), this, SLOT(onTableSelectionChanged()));
     mVariablesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     variablesLayout->addWidget(mVariablesTable);
 
-    QCustomPlot* plot = new QCustomPlot(this);
-    plot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
-    mainLayout->addWidget(plot, 10);
-    mPlot = plot;
+    QCheckBox* showChartBox = new QCheckBox(tr("Show/hide charts"), this);
+    connect(showChartBox, SIGNAL(stateChanged(int)), this, SLOT(onShowChartBoxStateChanged(int)));
+    variablesLayout->addWidget(showChartBox);
+
+    mPlot = new QCustomPlot(this);
+    mPlot->setMinimumSize(QSize(WIDTH * 0.95, HEIGHT * 0.7));
+    mainLayout->addWidget(mPlot, 10);
 
     setLayout(mainLayout);
 
     setWindowTitle(tr("Main cyclogram"));
+
+    showChartBox->setCheckState(Qt::Checked); // must be after QCustomPlot creation
 }
 
 CyclogramChartDialog::~CyclogramChartDialog()
@@ -477,4 +478,9 @@ void CyclogramChartDialog::removeVariableGraph(const QString& name)
     }
 
     mPlot->removeGraph(graph);
+}
+
+void CyclogramChartDialog::onShowChartBoxStateChanged(int state)
+{
+    mPlot->setVisible(state == Qt::Checked);
 }
