@@ -333,6 +333,31 @@ void CyclogramChartDialog::onAddClicked()
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
 }
 
+void CyclogramChartDialog::keyPressEvent(QKeyEvent *event)
+{
+    bool processed = true;
+
+    switch (event->key())
+    {
+        case Qt::Key_Delete:
+        {
+            if (mRemoveBtn->isEnabled())
+            {
+                onRemoveClicked();
+            }
+        }
+        break;
+    default:
+        processed = false;
+        break;
+    }
+
+    if (!processed)
+    {
+        QDialog::keyPressEvent(event);
+    }
+}
+
 void CyclogramChartDialog::onRemoveClicked()
 {
     auto cyclogram = mCyclogram.lock();

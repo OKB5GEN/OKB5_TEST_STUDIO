@@ -22,6 +22,9 @@ public:
 
     void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void onAddClicked();
     void onRemoveClicked();

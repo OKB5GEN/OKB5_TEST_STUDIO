@@ -21,6 +21,9 @@ public:
 
     void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void onVariableValueChanged(const QString& name, qreal value);
     void onVariableNameChanged(const QString& newName, const QString& oldName);
