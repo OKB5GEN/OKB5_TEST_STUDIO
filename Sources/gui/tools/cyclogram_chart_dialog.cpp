@@ -115,8 +115,11 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     if (mCyclogram.lock())
     {
+        VariableController* vc =  mCyclogram.lock()->variableController();
         disconnect(mCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCyclogram.lock()->variableController(), SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+        disconnect(vc, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
+        disconnect(vc, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onVariableNameChanged(const QString&, const QString&)));
+        disconnect(vc, SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)));
         disconnect(mCyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
     }
 
@@ -130,6 +133,8 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(cyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
+    connect(cyclogram->variableController(), SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onVariableNameChanged(const QString&, const QString&)));
+    connect(cyclogram->variableController(), SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)));
 
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO "hot" graphs adding
     {
@@ -137,7 +142,7 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     }
 }
 
-void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal value)
+QCPGraph* CyclogramChartDialog::variableGraph(const QString& name) const
 {
     int count = mPlot->graphCount();
     QCPGraph* graph = Q_NULLPTR;
@@ -152,10 +157,17 @@ void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal val
         }
     }
 
+    return graph;
+}
+
+void CyclogramChartDialog::onVariableValueChanged(const QString& name, qreal value)
+{
+    QCPGraph* graph = variableGraph(name);
+
     if (!graph)
     {
-        LOG_DEBUG(QString("Graph for variable '%1' not found").arg(name));
-        return;
+        //LOG_ERROR(QString("Graph for variable '%1' not found").arg(name));
+        return; // normal situation, "no plot graph" option can be selected for variable
     }
 
     // update variable value in table
@@ -215,7 +227,7 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
 
     if (state == Cyclogram::RUNNING)
     {
-        mPlot->clearGraphs(); //TODO не очищать графики подпрограм, а сдлеать метод для очистки графиков/рестарта
+        mPlot->clearGraphs(); //TODO не очищать графики подпрограм, а сделать метод для очистки графиков/рестарта
 
         mStartTime = QDateTime::currentMSecsSinceEpoch();
         QFont font;
@@ -247,9 +259,16 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
 
         for(int row = 0; row < mVariablesTable->rowCount(); row++)
         {
-            QString variableName = mVariablesTable->item(row, 0)->text();
+            QTableWidgetItem* item = mVariablesTable->item(row, 0);
+            if (!item)
+            {
+                LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(row).arg(0));
+                continue;
+            }
+
+            QString variableName = item->text();
             QCPGraph* graph = mPlot->addGraph();
-            graph->setName(tr("%1").arg(variableName));
+            graph->setName(variableName);
             graph->setPen(QPen(Qt::GlobalColor(color)));
             graph->addData(mMinX, vc->currentValue(variableName));
             ++color;
@@ -319,10 +338,19 @@ void CyclogramChartDialog::onRemoveClicked()
     VariableController* vc = cyclogram->variableController();
 
     QList<int> selectedRows;
+    QList<QString> selectedVariables;
 
     foreach (auto index, mVariablesTable->selectionModel()->selectedRows())
     {
         selectedRows.append(index.row());
+        QTableWidgetItem* item = mVariablesTable->item(index.row(), 0);
+        if (!item)
+        {
+            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(row).arg(0));
+            continue;
+        }
+
+        selectedVariables.append(item->text());
     }
 
     int rowsDeleted = 0;
@@ -333,9 +361,11 @@ void CyclogramChartDialog::onRemoveClicked()
         ++rowsDeleted;
     }
 
-    int TODO; // remove graphs
+    foreach (QString name, selectedVariables)
+    {
+        removeVariableGraph(name);
+    }
 
-    //mVariablesTable->sortByColumn(0);
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
 }
 
@@ -391,4 +421,60 @@ void CyclogramChartDialog::onTableSelectionChanged()
         mMoveUpBtn->setEnabled(false);
         mMoveDownBtn->setEnabled(false);
     }
+}
+
+void CyclogramChartDialog::onVariableNameChanged(const QString& newName, const QString& oldName)
+{
+    for(int row = 0; row < mVariablesTable->rowCount(); row++)
+    {
+        QTableWidgetItem* item = mVariablesTable->item(row, 0);
+        if (!item)
+        {
+            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(row).arg(0));
+            continue;
+        }
+
+        if (item->text() == oldName)
+        {
+            item->setText(newName);
+            QCPGraph* graph = variableGraph(oldName);
+            if (graph)
+            {
+                graph->setName(newName);
+            }
+
+            return;
+        }
+    }
+}
+
+void CyclogramChartDialog::onVariableRemoved(const QString& name)
+{
+    for(int row = 0; row < mVariablesTable->rowCount(); row++)
+    {
+        QTableWidgetItem* item = mVariablesTable->item(row, 0);
+        if (!item)
+        {
+            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(row).arg(0));
+            continue;
+        }
+
+        if (item->text() == name)
+        {
+            mVariablesTable->removeRow(row);
+            removeVariableGraph(name);
+            return;
+        }
+    }
+}
+
+void CyclogramChartDialog::removeVariableGraph(const QString& name)
+{
+    QCPGraph* graph = variableGraph(name);
+    if (!graph)
+    {
+        return;
+    }
+
+    mPlot->removeGraph(graph);
 }
