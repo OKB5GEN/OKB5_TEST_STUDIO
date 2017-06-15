@@ -221,7 +221,7 @@ void COMPortModule::sendRequest()
     mResponseWaitTimer->start(mResponseWaitTime);
 
     //TODO this is some hack. without it readyRead() signal is not emitted or emitted randomly true random :)
-    if (mPort->waitForReadyRead(1))
+    if (mPort->waitForReadyRead(5))
     {
         LOG_DEBUG(QString("Bytes available %1").arg(mPort->bytesAvailable()));
     }

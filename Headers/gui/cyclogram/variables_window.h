@@ -2,15 +2,13 @@
 #define VARIABLES_WINDOW_H
 
 #include <QDialog>
-#include <QSet>
-#include <QList>
-#include <QPair>
 
 class QTableWidget;
 class QToolButton;
 class QDoubleValidator;
 class QCheckBox;
 class QLineEdit;
+class QTableWidgetItem;
 
 class Cyclogram;
 
@@ -23,7 +21,6 @@ public:
     ~VariablesWindow();
 
     void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
-    QStringList selectedVariables() const;
 
 private slots:
     void onAddClicked();
@@ -31,17 +28,17 @@ private slots:
     void onMoveUpClicked();
     void onMoveDownClicked();
 
-    void onNameChanged();
-
     void onSelectAllCheckBoxStateChanged(int state);
-    void onShowAllCheckBoxStateChanged(int state);
-    void onSelectVarCheckBoxStateChanged(int state);
+    void onItemChanged(QTableWidgetItem* item);
+    void onItemDoubleClicked(QTableWidgetItem* item);
+
     void onAccept();
+    void onTableSelectionChanged();
 
 private:
-    void addRow(int row, const QString& name, qreal defaultValue, const QString& description);
-    bool isVariableExist(const QString& name, QLineEdit* excludeRow) const;
-    void optimizeRenameLog();
+    void addRow(int row, const QString& name, qreal defaultValue, const QString& description, bool existingVariable);
+    bool isVariableExist(const QString& name, int excludeRow = -1) const;
+    void moveItem(int offset);
 
     QTableWidget* mTableWidget;
     QToolButton* mAddBtn;
@@ -52,14 +49,8 @@ private:
     QCheckBox* mSelectAllBox;
     QCheckBox* mShowAllBox;
 
+    QString mPrevText;
     QWeakPointer<Cyclogram> mCyclogram;
-
-    QDoubleValidator* mValidator;
-
-    QSet<int> mSelectedRows;
-    QStringList mSelectedVariables; //TODO unused anymore
-
-    QList<QPair<QString, QString>> mRenameLog;
 };
 
 #endif // VARIABLES_WINDOW_H

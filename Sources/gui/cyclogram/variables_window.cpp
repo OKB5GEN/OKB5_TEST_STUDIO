@@ -9,7 +9,6 @@ namespace
 {
     static const int BTN_SIZE = 32;
     static const qreal PRECISION = 0.001;
-    static const char* PREV_NAME_PROPERTY = "Prev";
 }
 
 VariablesWindow::VariablesWindow(QWidget * parent):
@@ -63,7 +62,6 @@ VariablesWindow::VariablesWindow(QWidget * parent):
 
     mTableWidget = new QTableWidget(this);
     QStringList list;
-    list.append("");
     list.append(tr("Name"));
     list.append(tr("Default value"));
     list.append(tr("Description"));
@@ -71,29 +69,27 @@ VariablesWindow::VariablesWindow(QWidget * parent):
     mTableWidget->setHorizontalHeaderLabels(list);
     mTableWidget->horizontalHeader()->setStretchLastSection(true);
     mTableWidget->setMinimumSize(600, 400);
-    mTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-    mTableWidget->setColumnWidth(0, 30);
+
+    connect(mTableWidget, SIGNAL(itemSelectionChanged()), this, SLOT(onTableSelectionChanged()));
+    connect(mTableWidget, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(onItemChanged(QTableWidgetItem*)));
+    connect(mTableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(onItemDoubleClicked(QTableWidgetItem*)));
+    mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     mainLayout->addWidget(mTableWidget);
 
     QHBoxLayout* checkBoxLayout = new QHBoxLayout();
 
     mSelectAllBox = new QCheckBox(tr("Select/deselect all"), this);
-    //mShowAllBox = new QCheckBox(tr("Show all variables"), this);
     checkBoxLayout->addWidget(mSelectAllBox);
-    //checkBoxLayout->addWidget(mShowAllBox);
     checkBoxLayout->addStretch();
     mainLayout->addLayout(checkBoxLayout);
     connect(mSelectAllBox, SIGNAL(stateChanged(int)), this, SLOT(onSelectAllCheckBoxStateChanged(int)));
-    //connect(mShowAllBox, SIGNAL(stateChanged(int)), this, SLOT(onShowAllCheckBoxStateChanged(int)));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
     mainLayout->addWidget(buttonBox);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-    mValidator = new QDoubleValidator(this);
 
     setLayout(mainLayout);
     setWindowTitle(tr("Variables"));
@@ -112,8 +108,6 @@ void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     mTableWidget->clearContents();
     mTableWidget->setRowCount(0);
-    mRenameLog.clear();
-    mSelectedRows.clear();
 
     VariableController* controller = cyclogram->variableController();
 
@@ -124,7 +118,7 @@ void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
         int index = mTableWidget->rowCount();
         qreal initial = controller->initialValue(key, -1);
         QString desc = controller->description(key);
-        addRow(index, key, initial, desc);
+        addRow(index, key, initial, desc, true);
     }
 
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
@@ -136,123 +130,102 @@ void VariablesWindow::onAddClicked()
     QString name = prefix;
     int index = 0;
 
-    while (isVariableExist(name, Q_NULLPTR))
+    while (isVariableExist(name))
     {
         ++index;
         name = prefix + QString::number(index);
     }
 
-    addRow(mTableWidget->rowCount(), name, 0, "");
+    addRow(mTableWidget->rowCount(), name, 0, "", false);
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
 }
 
 void VariablesWindow::onRemoveClicked()
 {
+    QList<int> selectedRows;
+
+    foreach (auto index, mTableWidget->selectionModel()->selectedRows())
+    {
+        selectedRows.append(index.row());
+        QTableWidgetItem* item = mTableWidget->item(index.row(), 0);
+        if (!item)
+        {
+            LOG_ERROR(QString("Invalid item detected! Row: %1, Column: %2").arg(index.row()).arg(0));
+            continue;
+        }
+    }
+
     int rowsDeleted = 0;
-    auto sortedDeletionList = mSelectedRows.toList();
-    qSort(sortedDeletionList);
-    foreach (int row, sortedDeletionList)
+    qSort(selectedRows);
+    foreach (int row, selectedRows)
     {
         mTableWidget->removeRow(row - rowsDeleted);
         ++rowsDeleted;
     }
 
-    mSelectedRows.clear();
     mSelectAllBox->setCheckState(Qt::Unchecked);
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
 
     mRemoveBtn->setEnabled(false);
 }
 
-void VariablesWindow::onNameChanged()
-{
-    QLineEdit* lineEdit = qobject_cast<QLineEdit*>(QObject::sender());
-
-    QString oldName = lineEdit->property(PREV_NAME_PROPERTY).toString();
-    QString newName = lineEdit->text();
-    if (newName.isEmpty())
-    {
-        lineEdit->setText(oldName);
-        return;
-    }
-
-    if (newName == oldName)
-    {
-        return; // name doesn't changed
-    }
-
-    if (isVariableExist(newName, lineEdit))
-    {
-        // name is not unique, restore old name
-        QMessageBox::warning(this, tr("Error"), tr("Variable '%1' already exist").arg(newName));
-        lineEdit->setText(oldName);
-        return;
-    }
-
-    mRenameLog.append(QPair<QString, QString>(oldName, newName));
-    lineEdit->setProperty(PREV_NAME_PROPERTY, QVariant(newName));
-}
-
-void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, const QString& description)
+void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, const QString& description, bool existingVariable)
 {
     mTableWidget->insertRow(row);
 
-    QCheckBox* selectCheckbox = new QCheckBox(mTableWidget);
-    mTableWidget->setCellWidget(row, 0, selectCheckbox);
-    connect(selectCheckbox, SIGNAL(stateChanged(int)), this, SLOT(onSelectVarCheckBoxStateChanged(int)));
+    QTableWidgetItem* nameItem = new QTableWidgetItem(name);
+    if (existingVariable)
+    {
+        nameItem->setData(Qt::UserRole, QVariant(name));
+    }
 
-    QLineEdit* lineEditName = new QLineEdit(mTableWidget);
-    lineEditName->setFrame(false);
-    lineEditName->setText(name);
-    lineEditName->setProperty(PREV_NAME_PROPERTY, QVariant(name));
-    mTableWidget->setCellWidget(row, 1, lineEditName);
-    connect(lineEditName, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
+    nameItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    mTableWidget->setItem(row, 0, nameItem);
 
-    QString initial = QString::number(defaultValue);
-    QLineEdit* lineEditInitial = new QLineEdit(mTableWidget);
-    lineEditInitial->setFrame(false);
-    lineEditInitial->setText(initial);
-    lineEditInitial->setValidator(mValidator);
-    mTableWidget->setCellWidget(row, 2, lineEditInitial);
+    QTableWidgetItem* valueItem = new QTableWidgetItem(QString::number(defaultValue));
+    valueItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    mTableWidget->setItem(row, 1, valueItem);
 
-    QLineEdit* lineEditDescription = new QLineEdit(mTableWidget);
-    lineEditDescription->setText(description);
-    lineEditDescription->setFrame(false);
-    mTableWidget->setCellWidget(row, 3, lineEditDescription);
+    QTableWidgetItem* descriptionItem = new QTableWidgetItem(description);
+    descriptionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    mTableWidget->setItem(row, 2, descriptionItem);
 }
 
 void VariablesWindow::onAccept()
 {
-    mSelectedVariables.clear();
-
     // Here we need to analyze and apply all user actions from GUI to variable controller:
 
     // 1. Get all existing variables from variable controller
     auto cyclogram = mCyclogram.lock();
     VariableController* controller = cyclogram->variableController();
 
-    // 2. Apply rename log to them
-    optimizeRenameLog();
-    foreach (auto operation, mRenameLog)
+    // 2. Perform variable rename operation
+    for(int row = 0; row < mTableWidget->rowCount(); row++)
     {
-        controller->renameVariable(operation.second, operation.first);
+        QTableWidgetItem* nameItem = mTableWidget->item(row, 0);
+        QString varName = nameItem->text();
+        QString prevName = nameItem->data(Qt::UserRole).toString();
+        if (!prevName.isEmpty() && prevName != varName) // variable existed before, and its name changed
+        {
+            controller->renameVariable(varName, prevName);
+        }
     }
 
     // 3. For each existing variable:
     //    - Compare existing default value and its table value, if not equal - set new value
     //    - Compare existion description and its table value, if not equal - set new value
     // 4. Add variables that are in table, but not in variable controller
+
     QSet<QString> newVariables;
     for(int row = 0; row < mTableWidget->rowCount(); row++)
     {
-        QCheckBox* selectedBox = qobject_cast<QCheckBox*>(mTableWidget->cellWidget(row, 0));
-        QLineEdit* nameEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 1));
-        QLineEdit* defaultValueEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 2));
-        QLineEdit* descriptionEdit = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 3));
+        QTableWidgetItem* nameItem = mTableWidget->item(row, 0);
+        QTableWidgetItem* valueItem = mTableWidget->item(row, 1);
+        QTableWidgetItem* descriptionItem = mTableWidget->item(row, 2);
 
-        QString varName = nameEdit->text();
-        qreal defaultValue = defaultValueEdit->text().replace(",", ".").toDouble();
-        QString description = descriptionEdit->text();
+        QString varName = nameItem->text();
+        qreal value = valueItem->text().toDouble();
+        QString description = descriptionItem->text();
 
         newVariables.insert(varName);
 
@@ -263,20 +236,15 @@ void VariablesWindow::onAccept()
                 controller->setDescription(varName, description);
             }
 
-            if (qAbs(controller->initialValue(varName) - defaultValue) > PRECISION)
+            if (qAbs(controller->initialValue(varName) - value) > PRECISION)
             {
-                controller->setInitialValue(varName, defaultValue);
+                controller->setInitialValue(varName, value);
             }
         }
         else
         {
-            controller->addVariable(varName, defaultValue);
+            controller->addVariable(varName, value);
             controller->setDescription(varName, description);
-        }
-
-        if (selectedBox->checkState() == Qt::Checked)
-        {
-            mSelectedVariables.append(varName);
         }
     }
 
@@ -294,69 +262,33 @@ void VariablesWindow::onAccept()
 
 void VariablesWindow::onSelectAllCheckBoxStateChanged(int state)
 {
-    for(int row = 0; row < mTableWidget->rowCount(); row++)
+    if (state == Qt::Checked)
     {
-        QCheckBox* tmp = qobject_cast<QCheckBox*>(mTableWidget->cellWidget(row, 0));
-        if (!tmp)
-        {
-            continue;
-        }
-
-        if (tmp->checkState() != state)
-        {
-            tmp->setCheckState(Qt::CheckState(state));
-        }
+        mTableWidget->selectAll();
+    }
+    else
+    {
+        mTableWidget->clearSelection();
     }
 }
 
-void VariablesWindow::onShowAllCheckBoxStateChanged(int state)
-{
-    LOG_DEBUG(QString("Show all checkbox state changed to %1").arg(state));
-}
-
-void VariablesWindow::onSelectVarCheckBoxStateChanged(int state)
-{
-    QCheckBox* changedCheckBox = qobject_cast<QCheckBox*>(QObject::sender());
-
-    for(int row = 0; row < mTableWidget->rowCount(); row++)
-    {
-        QCheckBox* tmp = qobject_cast<QCheckBox*>(mTableWidget->cellWidget(row, 0));
-        if(tmp != changedCheckBox)
-        {
-            continue;
-        }
-
-        if (state == Qt::Checked)
-        {
-            mSelectedRows.insert(row);
-        }
-        else
-        {
-            mSelectedRows.remove(row);
-        }
-
-        break;
-    }
-
-    mRemoveBtn->setEnabled(!mSelectedRows.empty());
-}
-
-bool VariablesWindow::isVariableExist(const QString& name, QLineEdit* excludeRow) const
+bool VariablesWindow::isVariableExist(const QString& name, int excludeRow) const
 {
     for(int row = 0; row < mTableWidget->rowCount(); row++)
     {
-        QLineEdit* tmp = qobject_cast<QLineEdit*>(mTableWidget->cellWidget(row, 1));
-        if(!tmp)
+        QTableWidgetItem* item = mTableWidget->item(row, 0);
+
+        if(!item)
         {
             continue;
         }
 
-        if (excludeRow && tmp == excludeRow)
+        if (excludeRow != -1 && row == excludeRow)
         {
             continue;
         }
 
-        if (tmp->text() == name)
+        if (item->text() == name)
         {
             return true;
         }
@@ -365,50 +297,94 @@ bool VariablesWindow::isVariableExist(const QString& name, QLineEdit* excludeRow
     return false;
 }
 
-void VariablesWindow::optimizeRenameLog()
+void VariablesWindow::moveItem(int offset)
 {
-    QList<QPair<QString, QString>> optimizedLog;
-    while (!mRenameLog.isEmpty())
-    {
-        auto iter = mRenameLog.begin();
-        QString from = (*iter).first;
-        QString to = (*iter).second;
+    int rowFrom = mTableWidget->selectionModel()->selectedRows().at(0).row();
 
-        mRenameLog.erase(iter);
+    QTableWidgetItem* nameItem = mTableWidget->item(rowFrom, 0);
+    QString variable = nameItem->text();
+    QString prevName = nameItem->data(Qt::UserRole).toString();
+    qreal value = mTableWidget->item(rowFrom, 1)->text().toDouble();
+    QString description = mTableWidget->item(rowFrom, 2)->text();
 
-        for (auto it = mRenameLog.begin(); it != mRenameLog.end();)
-        {
-            if ((*it).first == to)
-            {
-                to = (*it).second;
-                it = mRenameLog.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
+    mTableWidget->removeRow(rowFrom);
 
-        if (from != to)
-        {
-            optimizedLog.append(QPair<QString, QString>(from, to));
-        }
-    }
-
-    optimizedLog.swap(mRenameLog);
-}
-
-QStringList VariablesWindow::selectedVariables() const
-{
-    return mSelectedVariables;
+    addRow(rowFrom + offset, variable, value, description, !prevName.isEmpty());
+    mTableWidget->selectRow(rowFrom + offset);
 }
 
 void VariablesWindow::onMoveUpClicked()
 {
-
+    moveItem(-1);
 }
 
 void VariablesWindow::onMoveDownClicked()
 {
+    moveItem(1);
+}
 
+void VariablesWindow::onTableSelectionChanged()
+{
+    int rowsSelected = mTableWidget->selectionModel()->selectedRows().size();
+
+    mRemoveBtn->setEnabled(rowsSelected > 0);
+    if (rowsSelected == 1)
+    {
+        int row = mTableWidget->selectionModel()->selectedRows().at(0).row();
+        mMoveUpBtn->setEnabled(row > 0);
+        mMoveDownBtn->setEnabled(row < (mTableWidget->rowCount() - 1));
+    }
+    else
+    {
+        mMoveUpBtn->setEnabled(false);
+        mMoveDownBtn->setEnabled(false);
+    }
+}
+
+void VariablesWindow::onItemChanged(QTableWidgetItem* item)
+{
+    switch (item->column())
+    {
+    case 0: // name changed, check is name unique
+        {
+            QString newName = item->text();
+            if (isVariableExist(newName, item->row()))
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Variable '%1' already exist").arg(newName));
+                item->setText(mPrevText);
+            }
+        }
+        break;
+
+    case 1: // value changed, no special control needed
+        {
+            bool ok = false;
+            item->text().toDouble(&ok);
+            if (!ok)
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Incorrect variable value"));
+                item->setText(mPrevText);
+            }
+        }
+        break;
+    //case 2: // description changed, no special control needed
+    default:
+        break;
+    }
+}
+
+void VariablesWindow::onItemDoubleClicked(QTableWidgetItem* item)
+{
+    switch (item->column())
+    {
+    case 0: // name activated
+    case 1: // value activated
+        {
+            mPrevText = item->text();
+        }
+        break;
+    //case 2: // description changed, no special control needed
+    default:
+        break;
+    }
 }
