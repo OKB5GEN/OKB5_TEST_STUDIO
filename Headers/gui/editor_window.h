@@ -36,7 +36,8 @@ protected:
 
 private slots:
     void newFile();
-    void openFile();
+    void openExistingFile();
+    void openFile(const QString& name);
     bool save();
     bool saveAs();
     void onSettings();
@@ -62,6 +63,11 @@ signals:
     void documentSaved(bool saved);
 
 private:
+    enum
+    {
+        MAX_RECENT_FILES = 10
+    };
+
     void runModalCyclogram(const QString& shortFileName, const QString& text);
 
     void closeAll();
@@ -75,6 +81,13 @@ private:
     QString strippedName(const QString &fullFileName);
 
     void setNewCyclogram(QSharedPointer<Cyclogram> cyclogram);
+
+    // recent files functionality
+    static bool hasRecentFiles();
+    void prependToRecentFiles(const QString &fileName);
+    void setRecentFilesVisible(bool visible);
+    void updateRecentFileActions();
+    void openRecentFile();
 
     QWeakPointer<Cyclogram> mCyclogram;
     CyclogramWidget *mCyclogramWidget;
@@ -106,5 +119,10 @@ private:
     int mSnapshotsCouner; // hack for force data snapshot save
 
     QMap<QObject*, QObject*> mOpenedSubprogramDialogs;
+
+    // recent files
+    QAction* mRecentFileActs[MAX_RECENT_FILES];
+    QAction* mRecentFileSeparator;
+    QAction* mRecentFileSubMenuAct;
 };
 #endif // EDITOR_WINDOW_H

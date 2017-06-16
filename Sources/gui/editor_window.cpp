@@ -31,6 +31,36 @@ namespace
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
 }
 
+static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
+static inline QString fileKey() { return QStringLiteral("file"); }
+
+static QStringList readRecentFiles(QSettings &settings)
+{
+    QStringList result;
+    const int count = settings.beginReadArray(recentFilesKey());
+    for (int i = 0; i < count; ++i)
+    {
+        settings.setArrayIndex(i);
+        result.append(settings.value(fileKey()).toString());
+    }
+
+    settings.endArray();
+    return result;
+}
+
+static void writeRecentFiles(const QStringList &files, QSettings &settings)
+{
+    const int count = files.size();
+    settings.beginWriteArray(recentFilesKey());
+    for (int i = 0; i < count; ++i)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue(fileKey(), files.at(i));
+    }
+
+    settings.endArray();
+}
+
 EditorWindow::EditorWindow():
     mScaleFactor(1.0)
 {
@@ -66,6 +96,11 @@ void EditorWindow::onApplicationStart()
     mSystemState->onApplicationStart();
     QString fileName = AppSettings::instance().settingValue(AppSettings::APP_START_CYCLOGRAM_FILE).toString();
     runModalCyclogram(fileName, tr("Running application start cyclogram..."));
+}
+
+void EditorWindow::openExistingFile()
+{
+    openFile(QString(""));
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
@@ -136,14 +171,14 @@ void EditorWindow::newFile()
     cyclogram->setModified(true, true);
 }
 
-void EditorWindow::openFile()
+void EditorWindow::openFile(const QString& name)
 {
     if (!maybeSave())
     {
         return;
     }
 
-    // try read last file open path
+    QString fileName = name;
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
     QString path = settings.value(SETTING_LAST_OPEN_FILE_DIR).toString();
     if (path.isEmpty())
@@ -151,7 +186,11 @@ void EditorWindow::openFile()
         path = QDir::currentPath();
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    if (fileName.isEmpty())
+    {
+        fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    }
+
     if (fileName.isEmpty())
     {
         return;
@@ -200,17 +239,14 @@ bool EditorWindow::saveAs()
         return false;
     }
 
-    return saveFile(fileName);
+    bool result = saveFile(fileName);
 
-    //QFileDialog dialog(this);
-    //dialog.setWindowModality(Qt::WindowModal);
-    //dialog.setAcceptMode(QFileDialog::AcceptSave);
-    //if (dialog.exec() != QDialog::Accepted)
-    //{
-    //    return false;
-    //}
+    if (result)
+    {
+        EditorWindow::prependToRecentFiles(fileName);
+    }
 
-    //return saveFile(dialog.selectedFiles().first());
+    return result;
 }
 
 void EditorWindow::about()
@@ -250,7 +286,7 @@ void EditorWindow::createActions()
     mOpenAct = new QAction(openIcon, tr("&Open..."), this);
     mOpenAct->setShortcuts(QKeySequence::Open);
     mOpenAct->setStatusTip(tr("Open an existing file"));
-    connect(mOpenAct, &QAction::triggered, this, &EditorWindow::openFile);
+    connect(mOpenAct, &QAction::triggered, this, &EditorWindow::openExistingFile);
     fileMenu->addAction(mOpenAct);
     fileToolBar->addAction(mOpenAct);
 
@@ -267,6 +303,22 @@ void EditorWindow::createActions()
     QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &EditorWindow::saveAs);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the document under a new file name"));
+
+    fileMenu->addSeparator();
+
+    QMenu *recentMenu = fileMenu->addMenu(tr("Recent..."));
+    connect(recentMenu, &QMenu::aboutToShow, this, &EditorWindow::updateRecentFileActions);
+    mRecentFileSubMenuAct = recentMenu->menuAction();
+
+    for (int i = 0; i < MAX_RECENT_FILES; ++i)
+    {
+        mRecentFileActs[i] = recentMenu->addAction(QString(), this, &EditorWindow::openRecentFile);
+        mRecentFileActs[i]->setVisible(false);
+    }
+
+    mRecentFileSeparator = fileMenu->addSeparator();
+
+    setRecentFilesVisible(EditorWindow::hasRecentFiles());
 
     fileMenu->addSeparator();
 
@@ -493,6 +545,11 @@ void EditorWindow::setCurrentFile(const QString &fileName)
     shownName += "[*]";
     setWindowFilePath(shownName);
     setWindowTitle(shownName);
+
+    if (!fileName.isEmpty())
+    {
+        EditorWindow::prependToRecentFiles(fileName);
+    }
 }
 
 QString EditorWindow::strippedName(const QString &fullFileName)
@@ -703,7 +760,7 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
 void EditorWindow::onSettings()
 {
-    AppSettingsDialog dialog(Q_NULLPTR);
+    AppSettingsDialog dialog(this);
     dialog.exec();
 }
 
@@ -743,4 +800,73 @@ void EditorWindow::onSubprogramDialogDestroyed(QObject* object)
     }
 
     mOpenedSubprogramDialogs.take(key);
+}
+
+void EditorWindow::prependToRecentFiles(const QString &fileName)
+{
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+
+    const QStringList oldRecentFiles = readRecentFiles(settings);
+    QStringList recentFiles = oldRecentFiles;
+    recentFiles.removeAll(fileName);
+    recentFiles.removeAll("");
+    recentFiles.prepend(fileName);
+    if (oldRecentFiles != recentFiles)
+    {
+        writeRecentFiles(recentFiles, settings);
+    }
+
+    setRecentFilesVisible(!recentFiles.isEmpty());
+}
+
+void EditorWindow::setRecentFilesVisible(bool visible)
+{
+    mRecentFileSubMenuAct->setVisible(visible);
+    mRecentFileSeparator->setVisible(visible);
+}
+
+bool EditorWindow::hasRecentFiles()
+{
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    const int count = settings.beginReadArray(recentFilesKey());
+    settings.endArray();
+    return (count > 0);
+}
+
+void EditorWindow::updateRecentFileActions()
+{
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+
+    const QStringList recentFiles = readRecentFiles(settings);
+    const int count = qMin(int(MAX_RECENT_FILES), recentFiles.size());
+
+    for (int i = 0; i < MAX_RECENT_FILES; ++i)
+    {
+        if (i < count)
+        {
+            const QString fileName = QFileInfo(recentFiles.at(i)).fileName();
+            if (!fileName.isEmpty())
+            {
+                mRecentFileActs[i]->setText(tr("&%1: %2").arg(i + 1).arg(fileName));
+                mRecentFileActs[i]->setData(recentFiles.at(i));
+                mRecentFileActs[i]->setVisible(true);
+            }
+            else
+            {
+                mRecentFileActs[i]->setVisible(false);
+            }
+        }
+        else
+        {
+            mRecentFileActs[i]->setVisible(false);
+        }
+    }
+}
+
+void EditorWindow::openRecentFile()
+{
+    if (const QAction *action = qobject_cast<const QAction *>(sender()))
+    {
+        openFile(action->data().toString());
+    }
 }
