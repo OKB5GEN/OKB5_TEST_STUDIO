@@ -195,7 +195,7 @@ void COMPortModule::onResponseTimeout()
     }
     else
     {
-        LOG_ERROR(QString("%1 (%2) wait for response timeout. Flushing request queue...").arg(moduleName()).arg(mPort->portName()));
+        LOG_ERROR(QString("%1 (%2) wait for response timeout (%3 bytes available). Flushing request queue...").arg(moduleName()).arg(mPort->portName()).arg(mPort->bytesAvailable()));
         mRequestQueue.clear();
         onTransmissionError(operationID);
     }

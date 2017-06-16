@@ -507,5 +507,31 @@ void CyclogramChartDialog::removeVariableGraph(const QString& name)
 
 void CyclogramChartDialog::onShowChartBoxStateChanged(int state)
 {
+    QSize curSize = this->size();
+    QSize newSize = curSize;
+    QSize tableSize = mVariablesTable->size();
+
     mPlot->setVisible(state == Qt::Checked);
+
+//    QRect childRect = this->childrenRect();
+//    QSize newSize;
+//    newSize.setWidth(childRect.right() - childRect.left());
+//    newSize.setHeight(childRect.bottom() - childRect.top());
+
+    if (state != Qt::Checked)
+    {
+        newSize.setWidth(tableSize.width() + 50);
+        resize(newSize);
+    }
+
+    adjustSize();
+//    if (state == Qt::Checked)
+//    {
+
+//    }
+//    else
+//    {
+//        curSize.setWidth(curSize.width() - plotSize.width());
+//        resize(curSize);
+//    }
 }
