@@ -43,7 +43,7 @@ public:
 #endif
 
     bool isModified() const;
-    void setModified(bool isModified, bool sendSignal);
+    void setModified(bool isModified, bool sendSignal, bool recursive);
 
     Command* first() const;
     Command* last() const;

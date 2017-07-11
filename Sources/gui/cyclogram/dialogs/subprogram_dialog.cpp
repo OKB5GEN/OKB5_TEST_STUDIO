@@ -116,7 +116,7 @@ bool SubProgramDialog::onSaveClick()
     {
         LOG_INFO(QString("File '%1' saved").arg(fileName));
 
-        mCommand->cyclogram()->setModified(false, true);
+        mCommand->cyclogram()->setModified(false, true, false);
 
         if (mCommand->filePath().isEmpty())
         {

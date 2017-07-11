@@ -395,7 +395,7 @@ void Cyclogram::deleteCommandImpl(Command* cmd, bool silent)
 {
     disconnect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
     cmd->deleteLater();
-    setModified(true, !silent); // modified on command deletion
+    setModified(true, !silent, false); // modified on command deletion
 }
 
 Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
@@ -474,7 +474,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
 
         mCommands.push_back(cmd);
         connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
-        setModified(true, true); // modified on command adding
+        setModified(true, true, false); // modified on command adding
     }
 
     return cmd;
@@ -598,9 +598,21 @@ bool Cyclogram::isModified() const
     return mModified;
 }
 
-void Cyclogram::setModified(bool isModified, bool sendSignal)
+void Cyclogram::setModified(bool isModified, bool sendSignal, bool recursive)
 {
     mModified = isModified;
+
+    if (recursive)
+    {
+        foreach (Command* command, mCommands)
+        {
+            if (command->type() == DRAKON::SUBPROGRAM)
+            {
+                CmdSubProgram* cmd = qobject_cast<CmdSubProgram*>(command);
+                cmd->cyclogram()->setModified(isModified, sendSignal, recursive);
+            }
+        }
+    }
 
     if (sendSignal)
     {
@@ -610,12 +622,12 @@ void Cyclogram::setModified(bool isModified, bool sendSignal)
 
 void Cyclogram::onCommandTextChanged(const QString& text)
 {
-    setModified(true, true);
+    setModified(true, true, false);
 }
 
 void Cyclogram::variablesChanged()
 {
-    setModified(true, true);
+    setModified(true, true, false);
 }
 
 void Cyclogram::variableCurrentValueChanged(const QString& name, qreal value)
@@ -683,7 +695,7 @@ void Cyclogram::setSetting(const QString& key, const QVariant& value, bool sendS
 
     mSettings[key] = value;
 
-    setModified(sendSignal, sendSignal);
+    setModified(sendSignal, sendSignal, false);
 }
 
 const QMap<QString, QVariant>& Cyclogram::settings() const

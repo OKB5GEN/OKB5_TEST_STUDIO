@@ -133,6 +133,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
         QString fileName = AppSettings::instance().settingValue(AppSettings::APP_FINISH_CYCLOGRAM_FILE).toString();
         runModalCyclogram(fileName, tr("Running application finish cyclogram..."));
         mSystemState->onApplicationFinish();
+        CyclogramManager::clear();
         event->accept();
     }
     else
@@ -168,7 +169,7 @@ void EditorWindow::newFile()
     setNewCyclogram(cyclogram);
     setCurrentFile(QString());
 
-    cyclogram->setModified(true, true);
+    cyclogram->setModified(true, true, false);
 }
 
 void EditorWindow::openFile(const QString& name)
@@ -533,7 +534,7 @@ void EditorWindow::setCurrentFile(const QString &fileName)
 {
     mCurFile = fileName;
     auto cyclogram = mCyclogram.lock();
-    cyclogram->setModified(false, false);
+    cyclogram->setModified(false, false, false);
     setWindowModified(false);
 
     QString shownName = mCurFile;
@@ -756,6 +757,8 @@ void EditorWindow::setNewCyclogram(QSharedPointer<Cyclogram> cyclogram)
     cyclogram->setSystemState(mSystemState);
 
     mCyclogramWidget->load(cyclogram);
+
+    cyclogram->setModified(false, true, true);
 }
 
 void EditorWindow::onSettings()
