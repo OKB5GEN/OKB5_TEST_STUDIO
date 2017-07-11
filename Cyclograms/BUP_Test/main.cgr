@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+        <setting name="default_name" value="MainBUPTest"/>
+        <setting name="description" value="Главная циклограмма для тестирования БУП."/>
+    </settings>
     <variables>
         <variable name="OK" value="0" desc=""/>
         <variable name="SubOK" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="BRANCH_BEGIN" id="1492600080069" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1492600080072"/>
-        <command type="TERMINATOR" id="1491892365458" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491892365459" name="TestList"/>
-        <command type="GO_TO_BRANCH" id="1491892365460"/>
-        <command type="BRANCH_BEGIN" id="1491892365462" name="End"/>
-        <command type="TERMINATOR" id="1491892365463" name="FINISH" cmd_type="END"/>
-        <command type="SUBPROGRAM" id="1491892387211" name="TestSet1" file="BUP_TEST/sub_test_list.cgr">
+        <command type="BRANCH_BEGIN" id="1492600080069" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1492600080072" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="TERMINATOR" id="1491892365458" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491892365459" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="TestList"/>
+        <command type="GO_TO_BRANCH" id="1491892365460" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491892365462" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491892365463" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1491892387211" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="TestSet1" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
                 <param name="OK" type="6" value="0"/>
                 <param name="SubOK" type="6" value="0"/>
@@ -24,26 +29,26 @@
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
-        <command type="BRANCH_BEGIN" id="1491892427913" name="OK"/>
-        <command type="GO_TO_BRANCH" id="1491892427915"/>
-        <command type="BRANCH_BEGIN" id="1491892429602" name="FAIL"/>
-        <command type="GO_TO_BRANCH" id="1491892429605"/>
-        <command type="ACTION_MATH" id="1491892451940" operation="Assign">
+        <command type="BRANCH_BEGIN" id="1491892427913" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1491892427915" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491892429602" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1491892429605" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1491892451940" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1491892461782" operation="Assign">
+        <command type="ACTION_MATH" id="1491892461782" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="QUESTION" id="1491892491479" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="QUESTION" id="1491892491479" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491892491483"/>
-        <command type="SUBPROGRAM" id="1491892508600" name="TestSet2" file="BUP_TEST/sub_test_list.cgr">
+        <command type="GO_TO_BRANCH" id="1491892491483" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491892508600" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="TestSet2" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
                 <param name="CheckOK" type="6" value="0"/>
                 <param name="OK" type="6" value="0"/>
@@ -56,12 +61,12 @@
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491892539255" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="QUESTION" id="1491892539255" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491892539258"/>
-        <command type="SUBPROGRAM" id="1491892556392" name="TestSet3" file="BUP_TEST/sub_test_list.cgr">
+        <command type="GO_TO_BRANCH" id="1491892539258" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491892556392" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="TestSet3" file="BUP_TEST/sub_test_list.cgr">
             <input_params>
                 <param name="CheckOK" type="6" value="0"/>
                 <param name="OK" type="6" value="0"/>
@@ -74,43 +79,19 @@
                 <param name="SubOK" type="10" value="OK"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491892580758" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="QUESTION" id="1491892580758" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491892580762"/>
-        <command type="SUBPROGRAM" id="1492600298438" name="MKO_On" file="BUP_TEST/sub_mko_on.cgr">
-            <input_params>
-                <param name="OK" type="6" value="0"/>
-                <param name="U" type="6" value="0"/>
-            </input_params>
-            <output_params>
-                <param name="OK" type="10" value=""/>
-                <param name="SubOK" type="10" value="OK"/>
-            </output_params>
-        </command>
-        <command type="SUBPROGRAM" id="1492600327609" name="MKO_Off" file="BUP_TEST/sub_mko_off.cgr">
-            <input_params>
-                <param name="OK" type="6" value="0"/>
-            </input_params>
-            <output_params>
-                <param name="OK" type="10" value=""/>
-                <param name="SubOK" type="10" value="OK"/>
-            </output_params>
-        </command>
-        <command type="QUESTION" id="1492600574115" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
-            <operand id="Left" type="Variable" value="0" variable="SubOK"/>
-            <operand id="Right" type="Number" value="0" variable=""/>
-        </command>
-        <command type="GO_TO_BRANCH" id="1492600574118"/>
+        <command type="GO_TO_BRANCH" id="1491892580762" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
     </commands>
     <tree>
-        <item id="1492600080069" down="1492600298438" right="-1" under_arrow="-1"/>
+        <item id="1492600080069" down="1492600080072" right="-1" under_arrow="-1"/>
         <item id="1492600080072" down="1491892365459" right="-1" under_arrow="-1"/>
         <item id="1491892365458" down="1492600080069" right="-1" under_arrow="-1"/>
         <item id="1491892365459" down="1491892387211" right="-1" under_arrow="-1"/>
         <item id="1491892365460" down="1491892427913" right="-1" under_arrow="-1"/>
-        <item id="1491892365462" down="1492600327609" right="-1" under_arrow="-1"/>
+        <item id="1491892365462" down="1491892365463" right="-1" under_arrow="-1"/>
         <item id="1491892365463" down="-1" right="-1" under_arrow="-1"/>
         <item id="1491892387211" down="1491892491479" right="-1" under_arrow="-1"/>
         <item id="1491892427913" down="1491892451940" right="-1" under_arrow="-1"/>
@@ -127,9 +108,5 @@
         <item id="1491892556392" down="1491892580758" right="-1" under_arrow="-1"/>
         <item id="1491892580758" down="1491892365460" right="1491892580762" under_arrow="-1"/>
         <item id="1491892580762" down="1491892429602" right="-1" under_arrow="-1"/>
-        <item id="1492600298438" down="1492600574115" right="-1" under_arrow="-1"/>
-        <item id="1492600327609" down="1491892365463" right="-1" under_arrow="-1"/>
-        <item id="1492600574115" down="1492600080072" right="1492600574118" under_arrow="-1"/>
-        <item id="1492600574118" down="1491892429602" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
