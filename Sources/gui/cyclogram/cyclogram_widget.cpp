@@ -1276,7 +1276,7 @@ void CyclogramWidget::drawChildren(ShapeItem* item, const QList<Command*>& stopD
                     QPoint cell = item->cell();
                     cell.setY(cell.y() + 1);
 
-                    if (down)
+                    if (down && down != underArrow)
                     {
                         cell.setX(cell.x() + downRect.width());
                     }
