@@ -261,7 +261,7 @@ void CmdQuestion::updateText()
         setErrorStatus(!isValid);
     }
 
-    emit textChanged(mText);
+    emit dataChanged(mText);
 }
 
 void CmdQuestion::onNameChanged(const QString& newName, const QString& oldName)

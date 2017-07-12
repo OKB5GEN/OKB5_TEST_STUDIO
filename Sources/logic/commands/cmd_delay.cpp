@@ -72,53 +72,64 @@ int CmdDelay::delay() const
 
 void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 {
-     mDelay = (hours * 3600 + minutes * 60 + seconds) * 1000 + msec;
-     mText = tr("Wait:");
-     if (hours > 0)
-     {
-         mText += QString::number(hours);
-         mText += tr("h");
-     }
+    QString text;
+    mDelay = (hours * 3600 + minutes * 60 + seconds) * 1000 + msec;
+    text = tr("Wait:");
+    if (hours > 0)
+    {
+        text += QString::number(hours);
+        text += tr("h");
+    }
 
-     if (minutes > 0)
-     {
-         mText += QString::number(minutes);
-         mText += tr("m");
-     }
+    if (minutes > 0)
+    {
+        text += QString::number(minutes);
+        text += tr("m");
+    }
 
-     if (hours > 0)
-     {
-         emit textChanged(mText);
-         return;
-     }
+    if (hours > 0)
+    {
+        setText(text);
+        return;
+    }
 
-     if (seconds > 0)
-     {
-         mText += QString::number(seconds);
-         mText += tr("s");
-     }
+    if (seconds > 0)
+    {
+        text += QString::number(seconds);
+        text += tr("s");
+    }
 
-     if (minutes > 0)
-     {
-         emit textChanged(mText);
-         return;
-     }
+    if (minutes > 0)
+    {
+        setText(text);
+        return;
+    }
 
-     if (msec > 0)
-     {
-         mText += QString::number(msec);
-         mText += tr("ms");
-         emit textChanged(mText);
-         return;
-     }
+    if (msec > 0)
+    {
+        text += QString::number(msec);
+        text += tr("ms");
+        setText(text);
+        return;
+    }
 
-     if (seconds == 0)
-     {
-         mText += QString::number(seconds);
-         mText += tr("s");
-     }
+    if (seconds == 0)
+    {
+        text += QString::number(seconds);
+        text += tr("s");
+    }
 
-     emit textChanged(mText);
+    setText(text);
+}
+
+void CmdDelay::setText(const QString& text)
+{
+    QString textBefore = mText;
+    mText = text;
+    if (textBefore != mText)
+    {
+        emit dataChanged(mText);
+    }
 }
 
 void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)

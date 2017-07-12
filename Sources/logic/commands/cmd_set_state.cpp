@@ -10,6 +10,6 @@ void CmdSetState::setText(const QString& text)
 {
     //mText = tr("To state '%1'").arg(text);
     mText = text;
-    emit textChanged(mText);
+    emit dataChanged(mText);
 }
 

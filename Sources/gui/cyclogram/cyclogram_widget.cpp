@@ -487,7 +487,7 @@ void CyclogramWidget::showSubprogramWidget()
         subProgramDialog->cyclogramWidget()->setWindowTitle(title);
         subProgramDialog->show();
 
-        connect(mCurSubprogram, SIGNAL(textChanged(const QString&)), subProgramDialog, SLOT(onCommandTextChanged(const QString&)));
+        connect(mCurSubprogram, SIGNAL(dataChanged(const QString&)), subProgramDialog, SLOT(onCommandTextChanged(const QString&)));
         connect(this, SIGNAL(windowTitleChanged(const QString&)), subProgramDialog, SLOT(onParentWindowTitleChanged(const QString&)));
     }
 }

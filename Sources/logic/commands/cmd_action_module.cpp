@@ -137,7 +137,7 @@ void CmdActionModule::updateText()
         setErrorStatus(!isValid);
     }
 
-    emit textChanged(mText);
+    emit dataChanged(mText);
 }
 
 QString CmdActionModule::moduleNameImpl() const

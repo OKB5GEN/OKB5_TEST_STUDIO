@@ -95,10 +95,7 @@ void ConsoleTextWidget::saveCommand()
     QColor startColor = QColor::fromRgba(mStartColor->itemData(mStartColor->currentIndex()).toUInt());
     QColor finishColor = QColor::fromRgba(mFinishColor->itemData(mFinishColor->currentIndex()).toUInt());
 
-    mCommand->setOnStartConsoleText(mStartEdit->text(), false);
-    mCommand->setOnFinishConsoleText(mFinishEdit->text(), false);
-    mCommand->setOnStartConsoleTextColor(startColor.rgba(), false);
-    mCommand->setOnFinishConsoleTextColor(finishColor.rgba(), true);
+    mCommand->setConsoleMessageData(mStartEdit->text(), mFinishEdit->text(), startColor.rgba(), finishColor.rgba());
 }
 
 bool ConsoleTextWidget::eventFilter(QObject *obj, QEvent *event)

@@ -11,7 +11,7 @@ CmdStateStart::CmdStateStart(QObject * parent):
 void CmdStateStart::setText(const QString& text)
 {
     mText = text;
-    emit textChanged(mText);
+    emit dataChanged(mText);
 }
 
 void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)

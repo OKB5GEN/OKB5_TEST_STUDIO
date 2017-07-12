@@ -393,7 +393,7 @@ void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 
 void Cyclogram::deleteCommandImpl(Command* cmd, bool silent)
 {
-    disconnect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
+    disconnect(cmd, SIGNAL(dataChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
     cmd->deleteLater();
     setModified(true, !silent, false); // modified on command deletion
 }
@@ -473,7 +473,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         cmd->setSystemState(mSystemState);
 
         mCommands.push_back(cmd);
-        connect(cmd, SIGNAL(textChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
+        connect(cmd, SIGNAL(dataChanged(const QString&)), this, SLOT(onCommandTextChanged(QString)));
         setModified(true, true, false); // modified on command adding
     }
 

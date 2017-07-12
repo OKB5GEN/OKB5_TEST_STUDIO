@@ -189,7 +189,7 @@ void CmdSubProgram::updateText()
         setErrorStatus(true);
     }
 
-    emit textChanged(mText);
+    emit dataChanged(mText);
 
     // update system state if it is not set
     auto cyclogram = mCyclogram.lock();

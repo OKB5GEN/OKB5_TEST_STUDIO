@@ -43,10 +43,11 @@ public:
     void write(QXmlStreamWriter* writer);
     void read(QXmlStreamReader* reader);
 
-    void setOnStartConsoleText(const QString& text, bool sendChanged = true);
-    void setOnFinishConsoleText(const QString& text, bool sendChanged = true);
-    void setOnStartConsoleTextColor(uint32_t argb, bool sendChanged = true);
-    void setOnFinishConsoleTextColor(uint32_t argb, bool sendChanged = true);
+    void setConsoleMessageData(const QString& beforeText, const QString& afterText, uint32_t beforeTextColorARGB, uint32_t afterTextColorARGB);
+    void setOnStartConsoleText(const QString& text);
+    void setOnFinishConsoleText(const QString& text);
+    void setOnStartConsoleTextColor(uint32_t argb);
+    void setOnFinishConsoleTextColor(uint32_t argb);
 
     const QString& text() const;
     const QString& errorDesc() const;
@@ -85,7 +86,7 @@ public:
 
 signals:
     void finished(Command* nextCmd);
-    void textChanged(const QString& text);
+    void dataChanged(const QString& text);
     void errorStatusChanged(bool status); //true - has error, false - no error/error fixed
     void criticalError(Command* cmd); // cmd - where the critical error occured
     void activeStateChanged(bool state); // true - command is active cyclogram cmd, false - become inactive

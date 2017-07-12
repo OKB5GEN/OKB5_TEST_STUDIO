@@ -33,6 +33,7 @@ private slots:
 
 private:
     void setDelay(int msec);
+    void setText(const QString& text);
 
     QTimer* mTimer;
     int mDelay; // msec

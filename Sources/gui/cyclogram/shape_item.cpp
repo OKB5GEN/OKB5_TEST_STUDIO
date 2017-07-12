@@ -139,13 +139,13 @@ void ShapeItem::setCommand(Command* command)
 {
     if (mCommand)
     {
-        disconnect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+        disconnect(mCommand, SIGNAL(dataChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
         disconnect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
         disconnect(mCommand, SIGNAL(activeStateChanged(bool)), this, SLOT(setActive(bool)));
     }
 
     mCommand = command;
-    connect(mCommand, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+    connect(mCommand, SIGNAL(dataChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
     connect(mCommand, SIGNAL(errorStatusChanged(bool)), this, SLOT(onErrorStatusChanged(bool)));
     connect(mCommand, SIGNAL(activeStateChanged(bool)), this, SLOT(setActive(bool)));
 

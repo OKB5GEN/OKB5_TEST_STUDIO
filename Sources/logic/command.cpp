@@ -122,10 +122,10 @@ void Command::replaceCommand(Command *newCmd, ValencyPoint::Role role)
         {
             if (nextCommand(role))
             {
-                disconnect(nextCommand(role), SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+                disconnect(nextCommand(role), SIGNAL(dataChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
             }
 
-            connect(newCmd, SIGNAL(textChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
+            connect(newCmd, SIGNAL(dataChanged(const QString&)), this, SLOT(onNextCmdTextChanged(const QString&)));
             onNextCmdTextChanged(newCmd->text());
 
             if (hasError()) // error fixing after branch deletion
@@ -178,7 +178,7 @@ void Command::replaceCommand(Command* newCmd, Command* oldCmd)
 void Command::onNextCmdTextChanged(const QString& text)
 {
     mText = text;
-    emit textChanged(mText);
+    emit dataChanged(mText);
 }
 
 ValencyPoint::Role Command::role() const
@@ -405,39 +405,66 @@ const QString& Command::onFinishConsoleText() const
     return mOnFinishConsoleText;
 }
 
-void Command::setOnStartConsoleText(const QString& text, bool sendChanged)
+void Command::setConsoleMessageData(const QString& beforeText, const QString& afterText, uint32_t beforeTextColorARGB, uint32_t afterTextColorARGB)
 {
+    QString startTextBefore = mOnStartConsoleText;
+    QString endTextBefore = mOnFinishConsoleText;
+    uint32_t startColorBefore = mOnStartTextColor;
+    uint32_t endColorBefore = mOnFinishTextColor;
+
+    mOnFinishConsoleText = afterText;
+    mOnStartConsoleText = beforeText;
+    mOnStartTextColor = beforeTextColorARGB;
+    mOnFinishTextColor = afterTextColorARGB;
+
+    bool isDataChanged = ((startTextBefore != mOnStartConsoleText)
+                          || (endTextBefore != mOnFinishConsoleText)
+                          || (startColorBefore != mOnStartTextColor)
+                          || (endColorBefore != mOnFinishTextColor));
+
+    if (isDataChanged)
+    {
+        emit dataChanged(mText);
+    }
+}
+
+void Command::setOnStartConsoleText(const QString& text)
+{
+    QString textBefore = mOnStartConsoleText;
     mOnStartConsoleText = text;
-    if (sendChanged)
+    if (textBefore != mOnStartConsoleText)
     {
-        emit textChanged(mText);
+        emit dataChanged(mText);
     }
 }
 
-void Command::setOnFinishConsoleText(const QString& text, bool sendChanged)
+void Command::setOnFinishConsoleText(const QString& text)
 {
+    QString textBefore = mOnFinishConsoleText;
     mOnFinishConsoleText = text;
-    if (sendChanged)
+    if (textBefore != mOnFinishConsoleText)
     {
-        emit textChanged(mText);
+        emit dataChanged(mText);
     }
 }
 
-void Command::setOnStartConsoleTextColor(uint32_t argb, bool sendChanged)
+void Command::setOnStartConsoleTextColor(uint32_t argb)
 {
+    uint32_t colorBefore = mOnStartTextColor;
     mOnStartTextColor = argb;
-    if (sendChanged)
+    if (colorBefore != mOnStartTextColor)
     {
-        emit textChanged(mText);
+        emit dataChanged(mText);
     }
 }
 
-void Command::setOnFinishConsoleTextColor(uint32_t argb, bool sendChanged)
+void Command::setOnFinishConsoleTextColor(uint32_t argb)
 {
+    uint32_t colorBefore = mOnFinishTextColor;
     mOnFinishTextColor = argb;
-    if (sendChanged)
+    if (colorBefore != mOnFinishTextColor)
     {
-        emit textChanged(mText);
+        emit dataChanged(mText);
     }
 }
 

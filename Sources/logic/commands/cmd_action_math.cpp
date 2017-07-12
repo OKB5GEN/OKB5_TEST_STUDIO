@@ -176,6 +176,8 @@ qreal CmdActionMath::value(OperandID operand) const
 
 void CmdActionMath::updateText()
 {
+    QString textBefore = mText;
+
     mText = "";
 
     if (mOperands[Result].variable.isEmpty())
@@ -248,7 +250,10 @@ void CmdActionMath::updateText()
         setErrorStatus(!isValid);
     }
 
-    emit textChanged(mText);
+    if (textBefore != mText)
+    {
+        emit dataChanged(mText);
+    }
 }
 
 void CmdActionMath::onNameChanged(const QString& newName, const QString& oldName)
