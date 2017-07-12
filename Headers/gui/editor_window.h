@@ -17,6 +17,7 @@ class SystemState;
 class CyclogramChartDialog;
 class CmdSubProgram;
 class SubProgramDialog;
+class ShapeItem;
 
 class EditorWindow : public QMainWindow
 {
@@ -43,6 +44,9 @@ private slots:
     void onSettings();
     void about();
     void documentWasModified();
+
+    void deleteSelected();
+    void onCyclogramSelectionChanged(ShapeItem* item);
 
     void runCyclogram();
     void stopCyclogram();
@@ -98,6 +102,7 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
+    QAction* mDeleteAct;
     QAction* mSettingsAct;
     QAction* mShowVariablesAct;
     QAction* mAddMonitorAct;

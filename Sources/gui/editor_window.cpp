@@ -328,10 +328,21 @@ void EditorWindow::createActions()
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
 
-    /*
+    // edit toolbar
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     QToolBar *editToolBar = addToolBar(tr("Edit"));
+    editToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
 
+    mDeleteAct = new QAction(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
+    mDeleteAct->setEnabled(false);
+    mDeleteAct->setStatusTip(tr("Delete selected command"));
+    connect(mDeleteAct, &QAction::triggered, this, &EditorWindow::deleteSelected);
+    connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
+
+    editMenu->addAction(mDeleteAct);
+    editToolBar->addAction(mDeleteAct);
+
+    /*
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     QAction *aboutAct = helpMenu->addAction(tr("&About"), this, &EditorWindow::about);
     aboutAct->setStatusTip(tr("Show the application's About box"));
@@ -500,6 +511,7 @@ void EditorWindow::loadFile(const QString &fileName)
     }
 
     mSaveAct->setDisabled(true);
+    mDeleteAct->setDisabled(true);
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -872,4 +884,14 @@ void EditorWindow::openRecentFile()
     {
         openFile(action->data().toString());
     }
+}
+
+void EditorWindow::deleteSelected()
+{
+    mCyclogramWidget->deleteSelectedItem();
+}
+
+void EditorWindow::onCyclogramSelectionChanged(ShapeItem* item)
+{
+    mDeleteAct->setEnabled(item != Q_NULLPTR);
 }
