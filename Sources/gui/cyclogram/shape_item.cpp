@@ -467,9 +467,26 @@ void ShapeItem::updateToolTip()
     }
 }
 
-void ShapeItem::onErrorStatusChanged(bool status)
+void ShapeItem::onErrorStatusChanged(bool hasErrors)
 {
-    setColor(status ? QColor::fromRgba(0xffff0000) : QColor::fromRgba(0xffffffff));
+    if (hasErrors)
+    {
+        QColor red = QColor::fromRgba(0xffff0000);
+        setColor(red);
+    }
+    else
+    {
+        QColor white = QColor::fromRgba(0xffffffff);
+        QColor green = QColor::fromRgba(0xff00ff00);
+        if (mColor == green)
+        {
+            setColor(green);
+        }
+        else
+        {
+            setColor(white);
+        }
+    }
 }
 
 const QSizeF& ShapeItem::itemSize(bool needUpdate)
@@ -768,11 +785,21 @@ void ShapeItem::setSelected(bool selected)
 {
     if (selected)
     {
-        setColor(QColor::fromRgba(0xff00ff00));
+        QColor green = QColor::fromRgba(0xff00ff00);
+        setColor(green);
     }
     else
     {
-        onErrorStatusChanged(mCommand->hasError());
+        if (mCommand->hasError())
+        {
+            QColor red = QColor::fromRgba(0xffff0000);
+            setColor(red);
+        }
+        else
+        {
+            QColor white = QColor::fromRgba(0xffffffff);
+            setColor(white);
+        }
     }
 }
 

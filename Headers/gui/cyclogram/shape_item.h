@@ -67,7 +67,7 @@ signals:
 
 private slots:
     void onTextChanged(const QString& text);
-    void onErrorStatusChanged(bool status);
+    void onErrorStatusChanged(bool hasErrors);
     void setActive(bool active);
 
 private:

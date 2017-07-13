@@ -206,7 +206,17 @@ void CmdQuestion::updateText()
     switch (mOperands[Left].type)
     {
     case Variable:
-        mText += mOperands[Left].variable;
+        {
+            if (mOperands[Left].variable.isEmpty())
+            {
+                mText += "N/A";
+                isValid = false;
+            }
+            else
+            {
+                mText += mOperands[Left].variable;
+            }
+        }
         break;
     case Number:
         mText += QString::number(mOperands[Left].value);
@@ -245,7 +255,15 @@ void CmdQuestion::updateText()
     switch (mOperands[Right].type)
     {
     case Variable:
-        mText += mOperands[Right].variable;
+        if (mOperands[Right].variable.isEmpty())
+        {
+            mText += "N/A";
+            isValid = false;
+        }
+        else
+        {
+            mText += mOperands[Right].variable;
+        }
         break;
     case Number:
         mText += QString::number(mOperands[Right].value);
