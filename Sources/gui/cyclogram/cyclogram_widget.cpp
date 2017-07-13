@@ -480,7 +480,7 @@ void CyclogramWidget::showSubprogramWidget()
     }
     else
     {
-        subProgramDialog = new SubProgramDialog(mCurSubprogram, mMainWindow);
+        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCurrentCyclogram.lock(), mMainWindow);
         mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
 
         QString title = updateWindowTitle(subProgramDialog);

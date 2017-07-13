@@ -20,7 +20,7 @@ class SubProgramDialog : public QDialog
     Q_OBJECT
 
 public:
-    SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow);
+    SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow);
     ~SubProgramDialog();
 
     CyclogramWidget* cyclogramWidget() const;
@@ -60,6 +60,7 @@ private:
     QPushButton* mCyclogramSettingsBtn;
     QPushButton* mCommandSettingsBtn;
 
+    QWeakPointer<Cyclogram> mCallingCyclogram;
 };
 
 #endif // SUBPROGRAM_DIALOG_H

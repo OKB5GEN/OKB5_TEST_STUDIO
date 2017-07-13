@@ -112,7 +112,6 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<
     updateUI();
 
     mConsoleTextWidget->setCommand(mCommand);
-
 }
 
 void CmdSubProgramEditDialog::onAccept()

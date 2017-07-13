@@ -22,10 +22,11 @@ namespace
     static const int MAX_DIALOG_HEIGHT = 800;
 }
 
-SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QWidget * mainWindow):
+SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow):
     QDialog(mainWindow),
     mCommand(command)
 {
+    mCallingCyclogram = callingCyclogram;
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
     mScrollArea = new QScrollArea(this);
@@ -186,7 +187,7 @@ void SubProgramDialog::onCommandSettingsClick()
     QString filePathBefore = mCommand->filePath();
 
     CmdSubProgramEditDialog dialog(Q_NULLPTR);
-    dialog.setCommand(mCommand, mCommand->cyclogram());
+    dialog.setCommand(mCommand, mCallingCyclogram.lock());
     dialog.exec();
 
     QString filePathAfter = mCommand->filePath();
