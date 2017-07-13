@@ -56,11 +56,55 @@ void CmdActionModule::onCommandFinished(bool success)
 
 void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out)
 {
+    ModuleCommands::ModuleID moduleBefore = mModule;
+    uint32_t operationBefore = mOperation;
+    QMap<QString, QVariant> inBefore = mInputParams;
+    QMap<QString, QVariant> outBefore = mOutputParams;
+
     mModule = module;
     mOperation = operation;
     mInputParams = in;
     mOutputParams = out;
-    updateText();
+
+    bool isDataChanged = ((moduleBefore != mModule)
+                          || (operationBefore != mOperation));
+
+    if (!isDataChanged) // module and command does not changed, check command input parameters change
+    {
+        for (auto it = inBefore.begin(); it != inBefore.end(); ++it)
+        {
+            auto iter = mInputParams.find(it.key());
+            if (iter != mInputParams.end())
+            {
+                if (iter.value() != it.value())
+                {
+                    isDataChanged = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!isDataChanged) // module and command does not changed, check command output parameters change
+    {
+        for (auto it = outBefore.begin(); it != outBefore.end(); ++it)
+        {
+            auto iter = mOutputParams.find(it.key());
+            if (iter != mOutputParams.end())
+            {
+                if (iter.value() != it.value())
+                {
+                    isDataChanged = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isDataChanged)
+    {
+        updateText();
+    }
 }
 
 uint32_t CmdActionModule::operation() const
