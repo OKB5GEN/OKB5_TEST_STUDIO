@@ -57,13 +57,24 @@ public:
 
     Q_ENUM(OperandType)
 
+    struct OperandData
+    {
+        OperandData();
+
+        QString variable;
+        qreal value;
+        OperandType type;
+    };
+
     CmdQuestion(QObject* parent);
 
     void run() override;
 
+    void setData(Operation operation, Orientation orientation, const OperandData& left, const OperandData& right);
+
     void setQuestionType(QuestionType type);
     void setOperation(Operation operation);
-    void setOrientation(Orientation operation);
+    void setOrientation(Orientation orientation);
     void setOperand(OperandID operand, qreal value);
     void setOperand(OperandID operand, const QString& variable);
 
@@ -85,15 +96,6 @@ private slots:
     void execute();
 
 private:
-    struct OperandData
-    {
-        OperandData();
-
-        QString variable;
-        qreal value;
-        OperandType type;
-    };
-
     void updateText() override;
 
     void insertInCycle(Command* newCmd, ValencyPoint::Role role);

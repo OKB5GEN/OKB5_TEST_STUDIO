@@ -291,6 +291,34 @@ void CmdQuestion::onVariableRemoved(const QString& name)
     updateText();
 }
 
+void CmdQuestion::setData(Operation operation, Orientation orientation, const OperandData& left, const OperandData& right)
+{
+    Operation operationBefore = mOperation;
+    Orientation orientationBefore = mOrientation;
+    OperandData leftBefore = mOperands[Left];
+    OperandData rightBefore = mOperands[Right];
+
+    mOperation = operation;
+    mOrientation = orientation;
+    mOperands[Left] = left;
+    mOperands[Right] = right;
+
+    bool isDataChanged = ((operationBefore != mOperation)
+                          || (orientationBefore != mOrientation)
+                          || (leftBefore.variable != mOperands[Left].variable)
+                          || (leftBefore.value != mOperands[Left].value)
+                          || (leftBefore.type != mOperands[Left].type)
+                          || (rightBefore.variable != mOperands[Right].variable)
+                          || (rightBefore.value != mOperands[Right].value)
+                          || (rightBefore.type != mOperands[Right].type)
+                          );
+
+    if (isDataChanged)
+    {
+        updateText();
+    }
+}
+
 CmdQuestion::QuestionType CmdQuestion::questionType() const
 {
     return mQuestionType;

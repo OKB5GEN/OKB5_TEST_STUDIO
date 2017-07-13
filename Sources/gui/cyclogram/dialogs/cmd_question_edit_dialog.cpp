@@ -2,6 +2,7 @@
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/gui/tools/console_text_widget.h"
+#include "Headers/logger/Logger.h"
 
 #include <QtWidgets>
 
@@ -189,44 +190,56 @@ void CmdQuestionEditDialog::updateComponent(int operand, QComboBox* box, QLineEd
 
 void CmdQuestionEditDialog::onAccept()
 {
-    if (mCommand)
+    if (!mCommand)
     {
-        CmdQuestion::Operation operation = CmdQuestion::Operation(mOperationBox->currentData().toInt());
-        mCommand->setOperation(operation);
-
-        if (mOper1VarBtn->isChecked())
-        {
-            QString oper1Var = mOper1Box->currentText();
-            mCommand->setOperand(CmdQuestion::Left, oper1Var);
-        }
-        else
-        {
-            qreal oper1Val = mOper1Num->text().replace(",", ".").toDouble();
-            mCommand->setOperand(CmdQuestion::Left, oper1Val);
-        }
-
-        if (mOper2VarBtn->isChecked())
-        {
-            QString oper2Var = mOper2Box->currentText();
-            mCommand->setOperand(CmdQuestion::Right, oper2Var);
-        }
-        else
-        {
-            qreal oper2Val = mOper2Num->text().replace(",", ".").toDouble();
-            mCommand->setOperand(CmdQuestion::Right, oper2Val);
-        }
-
-        if (mYesDownBtn->isChecked())
-        {
-            mCommand->setOrientation(CmdQuestion::YesDown);
-        }
-        else if (mYesRightBtn->isChecked())
-        {
-            mCommand->setOrientation(CmdQuestion::YesRight);
-        }
-
-        mConsoleTextWidget->saveCommand();
+        LOG_ERROR(QString("No question command set!"));
+        accept();
+        return;
     }
+
+    CmdQuestion::Operation operation = CmdQuestion::Operation(mOperationBox->currentData().toInt());
+    CmdQuestion::Orientation orientation;
+
+    CmdQuestion::OperandData left;
+    CmdQuestion::OperandData right;
+
+    if (mOper1VarBtn->isChecked())
+    {
+        left.type = CmdQuestion::Variable;
+        left.variable = mOper1Box->currentText();
+        left.value = 0;
+    }
+    else
+    {
+        left.type = CmdQuestion::Number;
+        left.variable = "";
+        left.value = mOper1Num->text().replace(",", ".").toDouble();
+    }
+
+    if (mOper2VarBtn->isChecked())
+    {
+        right.type = CmdQuestion::Variable;
+        right.variable = mOper2Box->currentText();
+        right.value = 0;
+    }
+    else
+    {
+        right.type = CmdQuestion::Number;
+        right.variable = "";
+        right.value = mOper2Num->text().replace(",", ".").toDouble();
+    }
+
+    if (mYesDownBtn->isChecked())
+    {
+        orientation = CmdQuestion::YesDown;
+    }
+    else if (mYesRightBtn->isChecked())
+    {
+        orientation = CmdQuestion::YesRight;
+    }
+
+    mCommand->setData(operation, orientation, left, right);
+    mConsoleTextWidget->saveCommand();
 
     accept();
 }

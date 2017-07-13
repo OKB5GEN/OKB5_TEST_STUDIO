@@ -10,8 +10,13 @@ CmdStateStart::CmdStateStart(QObject * parent):
 
 void CmdStateStart::setText(const QString& text)
 {
+    QString textBefore = mText;
     mText = text;
-    emit dataChanged(mText);
+
+    if (textBefore != mText)
+    {
+        emit dataChanged(mText);
+    }
 }
 
 void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)
