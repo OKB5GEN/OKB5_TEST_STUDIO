@@ -160,8 +160,12 @@ bool CmdSubProgram::loaded() const
 
 void CmdSubProgram::setName(const QString& name)
 {
+    QString nameBefore = mText;
     mText = name;
-    updateText();
+    if (nameBefore != mText)
+    {
+        updateText();
+    }
 }
 
 const QString& CmdSubProgram::name() const
@@ -491,9 +495,46 @@ const QMap<QString, QVariant>& CmdSubProgram::outputParams() const
 
 void CmdSubProgram::setParams(const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out)
 {
+    QMap<QString, QVariant> inBefore = mInputParams;
+    QMap<QString, QVariant> outBefore = mOutputParams;
     mInputParams = in;
     mOutputParams = out;
-    updateText();
+
+    bool isDataChanged = false;
+
+    for (auto it = inBefore.begin(); it != inBefore.end(); ++it)
+    {
+        auto iter = mInputParams.find(it.key());
+        if (iter != mInputParams.end())
+        {
+            if (iter.value() != it.value())
+            {
+                isDataChanged = true;
+                break;
+            }
+        }
+    }
+
+    if (!isDataChanged)
+    {
+        for (auto it = outBefore.begin(); it != outBefore.end(); ++it)
+        {
+            auto iter = mOutputParams.find(it.key());
+            if (iter != mOutputParams.end())
+            {
+                if (iter.value() != it.value())
+                {
+                    isDataChanged = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isDataChanged)
+    {
+        updateText();
+    }
 }
 
 void CmdSubProgram::restart()
