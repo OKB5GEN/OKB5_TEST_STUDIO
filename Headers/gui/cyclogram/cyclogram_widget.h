@@ -7,7 +7,6 @@
 #include "Headers/shape_types.h"
 #include "Headers/gui/cyclogram/valency_point.h"
 
-
 class QAction;
 class QPoint;
 class QToolButton;
@@ -93,6 +92,8 @@ private:
     ShapeItem* addNewBranch(ShapeItem* item);
 
     void showEditDialog(Command* command);
+    void onClickVP(const ValencyPoint& point);
+    void showContextMenuForVP(const ValencyPoint& point, const QPoint& pos);
 
     QList<ShapeItem*> mCommands;
     ShapeItem* mSihlouetteArrow;

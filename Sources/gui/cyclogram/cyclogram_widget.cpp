@@ -375,23 +375,11 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             return;
         }
 
-        // check valency point tap first
+        // check valency point click first
         ValencyPoint point;
         if (hasValencyPointAt(event->pos(), point))
         {
-            clearSelection();
-
-            ShapeAddDialog* dialog = new ShapeAddDialog(this);
-
-            dialog->setValencyPoint(point);
-            dialog->exec();
-
-            if (dialog->result() == QDialog::Accepted)
-            {
-                addCommand(dialog->shapeType(), point, dialog->param());
-            }
-
-            dialog->deleteLater();
+            onClickVP(point);
         }
         else // if no valency point click, check command shape click
         {
@@ -428,29 +416,117 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
     {
         clearSelection();
 
-//        int index = commandAt(event->pos());
-//        if (index >= 0)
-//        {
-//            ShapeItem* clickedItem = mCommands[index];
+        // check valency point click first
+        ValencyPoint point;
+        if (hasValencyPointAt(event->pos(), point))
+        {
+            showContextMenuForVP(point, mapToGlobal(event->pos()));
+        }
+        else // if no valency point click, check command shape click
+        {
+            int index = commandAt(event->pos());
+            if (index < 0)
+            {
+                return;
+            }
 
-//            clearSelection(false);
-//            setSelectedItem(clickedItem);
-//            update();
+            ShapeItem* clickedItem = mCommands[index];
 
+            clearSelection(false);
+            setSelectedItem(clickedItem);
+            update();
+
+            //TODO show context menu for command
 //            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
 //            {
 //                mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
-//                QMenu *menu = new QMenu(this);
-//                menu->addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
-//                menu->addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
-//                menu->exec(mapToGlobal(event->pos()));
-//                menu->deleteLater();
+//                QMenu menu(this);
+//                menu.addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
+//                menu.addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
+//                menu.exec(mapToGlobal(event->pos()));
 //            }
-//        }
-//        else
-//        {
-//            clearSelection();
-//        }
+        }
+    }
+}
+
+void CyclogramWidget::onClickVP(const ValencyPoint& point)
+{
+    clearSelection();
+
+    ShapeItem* item = point.owner();
+    DRAKON::IconType type = item->command()->type();
+
+    if (type == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right)
+    {
+        addCommand(type, point); // just add new branch immediately
+    }
+    else // add some command via dialog (TODO tempotary)
+    {
+        ShapeAddDialog dialog(this);
+
+        dialog.setValencyPoint(point);
+        dialog.exec();
+
+        if (dialog.result() == QDialog::Accepted)
+        {
+            addCommand(dialog.shapeType(), point, dialog.param());
+        }
+    }
+}
+
+void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoint& pos)
+{
+    clearSelection();
+
+    ShapeItem* item = point.owner();
+    DRAKON::IconType type = item->command()->type();
+    if (type == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right)
+    {
+        QMenu menu(this);
+        menu.addAction(tr("Add BRANCH"))->setData(int(DRAKON::BRANCH_BEGIN));
+        QAction* action = menu.exec(pos);
+        if (action)
+        {
+            addCommand(DRAKON::BRANCH_BEGIN, point);
+        }
+
+        return;
+    }
+
+    QMenu menu(this);
+    menu.addAction(tr("Add MODULE COMMAND"))->setData(int(DRAKON::ACTION_MODULE));
+    menu.addAction(tr("Add MATH COMMAND"))->setData(int(DRAKON::ACTION_MATH));
+    menu.addAction(tr("Add SUBPROGRAM"))->setData(int(DRAKON::SUBPROGRAM));
+    menu.addAction(tr("Add QUESTION"))->setData(int(DRAKON::QUESTION));
+    menu.addAction(tr("Add DELAY"))->setData(int(DRAKON::DELAY));
+    menu.addAction(tr("Add OUTPUT"))->setData(int(DRAKON::OUTPUT));
+
+    if (point.canBeLanded())
+    {
+        menu.addAction(tr("Add SWITCH STATE"))->setData(int(DRAKON::QUESTION)); //TODO remove and add "Add GO_TO_BRANCH"
+        //TODO cycle?
+    }
+
+    QAction* action = menu.exec(pos);
+    if (action)
+    {
+        int param = -1;
+        int command = action->data().toInt();
+        if (command == DRAKON::QUESTION) //TODO remove
+        {
+            if (point.canBeLanded())
+            {
+                param = CmdQuestion::SWITCH_STATE;
+            }
+            else
+            {
+                param = CmdQuestion::IF;
+            }
+
+//          mParam = CmdQuestion::CYCLE; //TODO
+        }
+
+        addCommand(DRAKON::IconType(command), point, param);
     }
 }
 

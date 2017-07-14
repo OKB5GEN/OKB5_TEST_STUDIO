@@ -26,7 +26,7 @@
 
 namespace
 {
-    static const int TOOLBAR_ICON_SIZE = 64;
+    static const int TOOLBAR_ICON_SIZE = 48;
     static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir";
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
 }
