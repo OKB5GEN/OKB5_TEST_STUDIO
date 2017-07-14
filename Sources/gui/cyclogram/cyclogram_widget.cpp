@@ -53,7 +53,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mCurSubprogram(Q_NULLPTR),
     mMainWindow(Q_NULLPTR),
     mParentScrollArea(Q_NULLPTR),
-    mSelectedItem(Q_NULLPTR)
+    mSelectedItem(Q_NULLPTR),
+    mItemToCopy(Q_NULLPTR)
 {
     onAppSettingsChanged();
 
@@ -436,15 +437,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             setSelectedItem(clickedItem);
             update();
 
-            //TODO show context menu for command
-//            if (mSelectedItem->command()->type() == DRAKON::SUBPROGRAM)
-//            {
-//                mCurSubprogram = qobject_cast<CmdSubProgram*>(mSelectedItem->command());
-//                QMenu menu(this);
-//                menu.addAction(tr("Show subprogram"), this, SLOT(showSubprogramWidget()));
-//                menu.addAction(tr("Show subprogram chart"), this, SLOT(showSubprogramChart()));
-//                menu.exec(mapToGlobal(event->pos()));
-//            }
+            showContextMenuForCommand(clickedItem, mapToGlobal(event->pos()));
         }
     }
 }
@@ -507,26 +500,76 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
         //TODO cycle?
     }
 
-    QAction* action = menu.exec(pos);
-    if (action)
-    {
-        int param = -1;
-        int command = action->data().toInt();
-        if (command == DRAKON::QUESTION) //TODO remove
-        {
-            if (point.canBeLanded())
-            {
-                param = CmdQuestion::SWITCH_STATE;
-            }
-            else
-            {
-                param = CmdQuestion::IF;
-            }
+    menu.addSeparator();
+    QAction* pasteAction = menu.addAction(tr("Paste"));
 
-//          mParam = CmdQuestion::CYCLE; //TODO
+    pasteAction->setEnabled(mItemToCopy != Q_NULLPTR);
+
+    QAction* action = menu.exec(pos);
+    if (!action)
+    {
+        return;
+    }
+
+    if (action == pasteAction)
+    {
+        //copyCommandTo(mItemToCopy, point);
+        return;
+    }
+
+    int param = -1;
+    int command = action->data().toInt();
+    if (command == DRAKON::QUESTION) //TODO remove
+    {
+        if (point.canBeLanded())
+        {
+            param = CmdQuestion::SWITCH_STATE;
+        }
+        else
+        {
+            param = CmdQuestion::IF;
         }
 
-        addCommand(DRAKON::IconType(command), point, param);
+//      mParam = CmdQuestion::CYCLE; //TODO
+    }
+
+    addCommand(DRAKON::IconType(command), point, param);
+}
+
+void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& pos)
+{
+    QMenu menu(this);
+
+    QString editText = tr("Edit");
+    QString deleteText = tr("Delete");
+    QString copyText = tr("Copy");
+
+    menu.addAction(editText);
+    menu.addAction(deleteText);
+    menu.addAction(copyText);
+
+    QAction* action = menu.exec(pos);
+    if (!action)
+    {
+        return;
+    }
+
+    if (action->text() == editText)
+    {
+        showEditDialog(item->command());
+        return;
+    }
+
+    if (action->text() == deleteText)
+    {
+        deleteSelectedItem();
+        return;
+    }
+
+    if (action->text() == copyText)
+    {
+        mItemToCopy = item;
+        return;
     }
 }
 

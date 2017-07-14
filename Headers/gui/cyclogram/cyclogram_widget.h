@@ -94,6 +94,7 @@ private:
     void showEditDialog(Command* command);
     void onClickVP(const ValencyPoint& point);
     void showContextMenuForVP(const ValencyPoint& point, const QPoint& pos);
+    void showContextMenuForCommand(ShapeItem* item, const QPoint& pos);
 
     QList<ShapeItem*> mCommands;
     ShapeItem* mSihlouetteArrow;
@@ -102,6 +103,7 @@ private:
     QPoint mPreviousPosition;
     ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;
+    ShapeItem * mItemToCopy;
 
     ShapeItem* mRootShape;
 
