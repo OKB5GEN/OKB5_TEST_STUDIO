@@ -167,3 +167,8 @@ void CmdDelay::setDelay(int msec)
     setDelay(hours, minutes, seconds, milliseconds);
 
 }
+
+bool CmdDelay::loadFromImpl(Command* other)
+{
+    return true;
+}

@@ -20,6 +20,7 @@ public:
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
+    bool loadFromImpl(Command* other) override;
 
 private slots:
     void finish();

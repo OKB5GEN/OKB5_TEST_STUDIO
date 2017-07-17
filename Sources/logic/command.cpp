@@ -477,3 +477,37 @@ QColor Command::onFinishConsoleTextColor() const
 {
     return QColor::fromRgba(mOnFinishTextColor);
 }
+
+bool Command::copyFrom(Command* other)
+{
+    if (!other)
+    {
+        LOG_ERROR("No commad specified for copying");
+        return false;
+    }
+
+    int TODO; // copy command common data
+//    DRAKON::IconType mType;
+//    QString mText;
+//    QString mErrorText;
+//    QString mOnStartConsoleText;
+//    QString mOnFinishConsoleText;
+//    uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
+//    uint32_t mOnStartTextColor;
+//    uint32_t mOnFinishTextColor;
+//    int mExecutionDelay;
+//    VariableController* mVarCtrl;
+//    SystemState* mSystemState;
+//    QList<Command*> mNextCommands;
+//    ValencyPoint::Role mRole; // TODO role belongs to valency point not the command
+//    bool mHasError;
+//    qint64 mID;
+//    static qint64 smCounter; // command creation counter in current session
+
+    return loadFromImpl(other);
+}
+
+bool Command::loadFromImpl(Command* other)
+{
+    return true;
+}

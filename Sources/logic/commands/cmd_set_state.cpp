@@ -13,3 +13,8 @@ void CmdSetState::setText(const QString& text)
     emit dataChanged(mText);
 }
 
+bool CmdSetState::loadFromImpl(Command* other)
+{
+    return true;
+}
+

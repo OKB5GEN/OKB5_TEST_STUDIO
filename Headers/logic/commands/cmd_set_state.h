@@ -10,6 +10,9 @@ class CmdSetState: public Command
 public:
     CmdSetState(QObject * parent);
 
+protected:
+    bool loadFromImpl(Command* other) override;
+
 public slots:
     void setText(const QString& text);
 

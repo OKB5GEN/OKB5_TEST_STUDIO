@@ -364,3 +364,8 @@ void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)
 
     updateText();
 }
+
+bool CmdActionMath::loadFromImpl(Command* other)
+{
+    return true;
+}

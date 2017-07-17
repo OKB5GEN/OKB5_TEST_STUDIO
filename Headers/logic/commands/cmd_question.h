@@ -89,6 +89,7 @@ protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
     void insertCommand(Command* newCmd, ValencyPoint::Role role) override;
+    bool loadFromImpl(Command* other) override;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;

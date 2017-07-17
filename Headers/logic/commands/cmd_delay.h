@@ -3,9 +3,7 @@
 
 #include "Headers/logic/command.h"
 
-QT_BEGIN_NAMESPACE
 class QTimer;
-QT_END_NAMESPACE
 
 class CmdDelay: public Command
 {
@@ -27,6 +25,7 @@ public:
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
+    bool loadFromImpl(Command* other) override;
 
 private slots:
     void finish();

@@ -84,6 +84,8 @@ public:
     void setSystemState(SystemState* state);
     SystemState* systemState() const;
 
+    bool copyFrom(Command* other);
+
 signals:
     void finished(Command* nextCmd);
     void dataChanged(const QString& text);
@@ -102,6 +104,8 @@ protected:
     virtual void writeCustomAttributes(QXmlStreamWriter* writer);
     virtual void readCustomAttributes(QXmlStreamReader* reader);
     virtual void updateText();
+
+    virtual bool loadFromImpl(Command* other);
 
     DRAKON::IconType mType;
     QString mText;

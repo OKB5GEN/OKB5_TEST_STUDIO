@@ -98,3 +98,8 @@ void CmdParallelProcess::readCustomAttributes(QXmlStreamReader* reader)
 
 //    setDelay(delay);
 }
+
+bool CmdParallelProcess::loadFromImpl(Command* other)
+{
+    return true;
+}

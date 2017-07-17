@@ -53,6 +53,9 @@ public:
     QString variableName(OperandID operand) const;
     qreal value(OperandID operand) const;
 
+protected:
+    bool loadFromImpl(Command* other) override;
+
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;

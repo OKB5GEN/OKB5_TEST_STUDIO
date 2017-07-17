@@ -44,3 +44,8 @@ void CmdOutput::readCustomAttributes(QXmlStreamReader* reader)
 //        delay = attributes.value("delay").toInt();
 //    }
 }
+
+bool CmdOutput::loadFromImpl(Command* other)
+{
+    return true;
+}

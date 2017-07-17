@@ -557,3 +557,8 @@ void CmdSubProgram::setLoaded(bool loaded)
 {
     mLoaded = loaded;
 }
+
+bool CmdSubProgram::loadFromImpl(Command* other)
+{
+    return true;
+}

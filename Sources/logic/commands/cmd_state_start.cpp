@@ -32,3 +32,8 @@ void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
         mText = attributes.value("name").toString();
     }
 }
+
+bool CmdStateStart::loadFromImpl(Command* other)
+{
+    return true;
+}

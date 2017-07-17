@@ -918,3 +918,8 @@ void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::
     newCmd->replaceCommand(cmd, ValencyPoint::Down);
     mNextCommands[role] = newCmd;
 }
+
+bool CmdQuestion::loadFromImpl(Command* other)
+{
+    return true;
+}

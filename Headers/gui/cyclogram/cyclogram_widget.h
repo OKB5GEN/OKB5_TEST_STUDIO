@@ -71,12 +71,16 @@ private:
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
 
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
-    ShapeItem* addCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
+    ShapeItem* addNewCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
+    ShapeItem* addCommand(Command* cmd, const ValencyPoint& point);
     bool canBeDeleted(ShapeItem* item, QString& error) const;
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 
     const ShapeItem* findBranch(const Command* command) const;
+
+    void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& point);
+    void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
@@ -84,6 +88,9 @@ private:
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
     void moveItemTo(const QPoint &pos);
+
+    QPoint calculateNewCommandCell(const ValencyPoint& point);
+    void updateWidgetShapes(ShapeItem* newShape, const ValencyPoint& point);
 
     QString generateBranchName() const;
 
