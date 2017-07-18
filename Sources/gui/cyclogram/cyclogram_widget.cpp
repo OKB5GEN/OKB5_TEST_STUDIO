@@ -496,7 +496,15 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
 
         if (action == pasteAction)
         {
-            copyCommandTo(mItemToCopy, point);
+            if (mItemToCopy->command()->type() == DRAKON::BRANCH_BEGIN)
+            {
+                copyBranchTo(mItemToCopy, point);
+            }
+            else
+            {
+                QMessageBox::warning(this, tr("Error"), tr("Selected command can not be copied here"));
+            }
+            //copyCommandTo(mItemToCopy, point);
         }
 
         return;
@@ -625,7 +633,7 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
     menu.addAction(copyText);
 
     bool enableCopyAction = true;
-    if (type == DRAKON::TERMINATOR)
+    if (type == DRAKON::TERMINATOR || type == DRAKON::QUESTION) //TODO temporary disable question command copy
     {
         enableCopyAction = false; // no copy action available, cyclogram can have only one start and one end
     }

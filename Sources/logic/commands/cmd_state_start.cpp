@@ -1,4 +1,5 @@
 #include "Headers/logic/commands/cmd_state_start.h"
+#include "Headers/logger/Logger.h"
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
@@ -35,5 +36,13 @@ void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
 
 bool CmdStateStart::loadFromImpl(Command* other)
 {
+    CmdStateStart* otherStateStartCmd = qobject_cast<CmdStateStart*>(other);
+    if (!otherStateStartCmd)
+    {
+        LOG_ERROR(QString("Command type mismatch (not branch begin)"));
+        return false;
+    }
+
+    setText(otherStateStartCmd->text());
     return true;
 }

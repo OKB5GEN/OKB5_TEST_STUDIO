@@ -921,5 +921,18 @@ void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::
 
 bool CmdQuestion::loadFromImpl(Command* other)
 {
+    CmdQuestion* otherQuestion = qobject_cast<CmdQuestion*>(other);
+    if (!otherQuestion)
+    {
+        LOG_ERROR(QString("Command type mismatch (not question)"));
+        return false;
+    }
+
+    mOperation = otherQuestion->operation();
+    mOrientation = otherQuestion->orientation();
+    mQuestionType = otherQuestion->questionType();
+    mOperands[Left] = otherQuestion->mOperands[Left];
+    mOperands[Right] = otherQuestion->mOperands[Right];
+
     return true;
 }

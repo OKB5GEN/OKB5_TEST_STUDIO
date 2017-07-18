@@ -560,5 +560,16 @@ void CmdSubProgram::setLoaded(bool loaded)
 
 bool CmdSubProgram::loadFromImpl(Command* other)
 {
+    CmdSubProgram* otherSubprogram = qobject_cast<CmdSubProgram*>(other);
+    if (!otherSubprogram)
+    {
+        LOG_ERROR(QString("Command type mismatch (not subprogram)"));
+        return false;
+    }
+
+    setFilePath(otherSubprogram->filePath());
+    mInputParams = otherSubprogram->inputParams();
+    mOutputParams = otherSubprogram->outputParams();
+
     return true;
 }

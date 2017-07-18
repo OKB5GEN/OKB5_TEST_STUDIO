@@ -367,5 +367,17 @@ void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)
 
 bool CmdActionMath::loadFromImpl(Command* other)
 {
+    CmdActionMath* otherMath = qobject_cast<CmdActionMath*>(other);
+    if (!otherMath)
+    {
+        LOG_ERROR(QString("Command type mismatch (not math)"));
+        return false;
+    }
+
+    mOperation = otherMath->operation();
+    mOperands[Result] = otherMath->mOperands[Result];
+    mOperands[Operand1] = otherMath->mOperands[Operand1];
+    mOperands[Operand2] = otherMath->mOperands[Operand2];
+
     return true;
 }

@@ -1,10 +1,10 @@
 #include "Headers/logic/commands/cmd_parallel_process.h"
+#include "Headers/logger/Logger.h"
 #include <QTimer>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
 /* Brainstorm по реализации параллельного процесса
-
 
 Итого основные моменты:
 
@@ -101,5 +101,12 @@ void CmdParallelProcess::readCustomAttributes(QXmlStreamReader* reader)
 
 bool CmdParallelProcess::loadFromImpl(Command* other)
 {
+    CmdParallelProcess* otherParallelProcCmd = qobject_cast<CmdParallelProcess*>(other);
+    if (!otherParallelProcCmd)
+    {
+        LOG_ERROR(QString("Command type mismatch (not parallel process)"));
+        return false;
+    }
+
     return true;
 }

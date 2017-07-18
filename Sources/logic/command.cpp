@@ -486,28 +486,25 @@ bool Command::copyFrom(Command* other)
         return false;
     }
 
-    int TODO; // copy command common data
-//    DRAKON::IconType mType;
-//    QString mText;
-//    QString mErrorText;
-//    QString mOnStartConsoleText;
-//    QString mOnFinishConsoleText;
-//    uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
-//    uint32_t mOnStartTextColor;
-//    uint32_t mOnFinishTextColor;
-//    int mExecutionDelay;
-//    VariableController* mVarCtrl;
-//    SystemState* mSystemState;
-//    QList<Command*> mNextCommands;
-//    ValencyPoint::Role mRole; // TODO role belongs to valency point not the command
-//    bool mHasError;
-//    qint64 mID;
-//    static qint64 smCounter; // command creation counter in current session
+    mOnStartConsoleText = other->onStartConsoleText();
+    mOnFinishConsoleText = other->onFinishConsoleText();
+    mOnStartTextColor = other->onStartConsoleTextColor().rgba();
+    mOnFinishTextColor = other->onFinishConsoleTextColor().rgba();
+    mHasError = other->hasError();
+    mExecutionDelay = other->executionDelay();
 
-    return loadFromImpl(other);
+    bool loaded = loadFromImpl(other);
+    updateText();
+
+    return loaded;
 }
 
 bool Command::loadFromImpl(Command* other)
 {
     return true;
+}
+
+int Command::executionDelay() const
+{
+    return mExecutionDelay;
 }

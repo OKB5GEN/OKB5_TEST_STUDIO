@@ -879,5 +879,17 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
 
 bool CmdActionModule::loadFromImpl(Command* other)
 {
+    CmdActionModule* otherModuleCmd = qobject_cast<CmdActionModule*>(other);
+    if (!otherModuleCmd)
+    {
+        LOG_ERROR(QString("Command type mismatch (not module cmd)"));
+        return false;
+    }
+
+    mModule = otherModuleCmd->module();
+    mOperation = otherModuleCmd->operation();
+    mInputParams = otherModuleCmd->inputParams();
+    mOutputParams = otherModuleCmd->outputParams();
+
     return true;
 }

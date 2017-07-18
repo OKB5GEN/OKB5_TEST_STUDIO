@@ -1,4 +1,6 @@
 #include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logger/Logger.h"
+
 #include <QTimer>
 #include <QTime>
 #include <QXmlStreamWriter>
@@ -165,10 +167,17 @@ void CmdDelay::setDelay(int msec)
     int milliseconds = delay;
 
     setDelay(hours, minutes, seconds, milliseconds);
-
 }
 
 bool CmdDelay::loadFromImpl(Command* other)
 {
+    CmdDelay* otherDelay = qobject_cast<CmdDelay*>(other);
+    if (!otherDelay)
+    {
+        LOG_ERROR(QString("Command type mismatch (not delay)"));
+        return false;
+    }
+
+    setDelay(otherDelay->delay());
     return true;
 }

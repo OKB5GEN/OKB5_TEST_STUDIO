@@ -77,6 +77,7 @@ public:
     void setActive(bool active);
 
     void setExecutionDelay(int msec);
+    int executionDelay() const;
 
     void setVariableController(VariableController* controller);
     VariableController* variableController() const;

@@ -56,7 +56,6 @@ private slots:
     void onNeedUpdate();
     void onNeedToDelete(ShapeItem* shape);
     void showSubprogramWidget();
-    //void showSubprogramChart(const QStringList& variables);
     void onAppSettingsChanged();
 
 private:
