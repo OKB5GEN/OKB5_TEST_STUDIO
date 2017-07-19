@@ -712,3 +712,86 @@ void Cyclogram::onAppSettingsChanged()
         command->setExecutionDelay(commandExecutionDelay);
     }
 }
+
+Command* Cyclogram::createBranchCopy(Command* branch, const ValencyPoint& point)
+{
+    Command* newBranch = Q_NULLPTR;
+
+    newBranch = createCommand(branch->type());
+    newBranch->copyFrom(branch);
+
+    QString name = generateBranchName(branch->text());
+    qobject_cast<CmdStateStart*>(newBranch)->setText(name);
+
+    copyCommandTree(newBranch, branch);
+
+    return newBranch;
+}
+
+void Cyclogram::copyCommandTree(Command* to, Command* from)
+{
+    auto nextCommands = from->nextCommands();
+
+    for (auto it = nextCommands.begin(); it != nextCommands.end(); ++it)
+    {
+        Command* cmd = *it;
+        if (!cmd)
+        {
+            continue;
+        }
+
+        int param = -1;
+        if (cmd->type() == DRAKON::QUESTION)
+        {
+            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
+        }
+
+        Command* newNextCmd = createCommand(cmd->type(), param);
+        newNextCmd->copyFrom(cmd);
+        to->replaceCommand(newNextCmd, cmd->role());
+
+        if (newNextCmd->type() != DRAKON::GO_TO_BRANCH)
+        {
+            copyCommandTree(newNextCmd, cmd);
+        }
+        else // stop copy on branch end
+        {
+            newNextCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
+        }
+
+        //newNextCmd->updateText(); //TODO
+    }
+}
+
+QString Cyclogram::generateBranchName(const QString& templateName) const
+{
+    QList<Command*> branches;
+    getBranches(branches);
+
+    QString prefix = templateName;
+    QString name = prefix;
+    bool nameGenerated = false;
+    int i = 1;
+    while (!nameGenerated)
+    {
+        bool exist = false;
+        foreach (Command* it, branches)
+        {
+            if (it->text() == name)
+            {
+                exist = true;
+                break;
+            }
+        }
+
+        nameGenerated = !exist;
+
+        if (!nameGenerated)
+        {
+            name = prefix + QString(" ") + QString::number(i);
+            ++i;
+        }
+    }
+
+    return name;
+}

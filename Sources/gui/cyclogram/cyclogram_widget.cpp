@@ -599,6 +599,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
     //DRAKON::BRANCH_BEGIN - this type of command is copied as entire branch
 
     int TODO1; // QUESTION command paste, need get param for it
+
     // create command and load it from another
     Command* newCmd = mCurrentCyclogram.lock()->createCommand(typeToCopy, -1/*param*/);
     newCmd->copyFrom(commandToCopy);
@@ -615,7 +616,82 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 
 void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point)
 {
-    int TODO;
+    auto cyclogram = mCurrentCyclogram.lock();
+    Command* newBranchCmd = cyclogram->createBranchCopy(itemToCopy->command(), point);
+
+    if (!newBranchCmd)
+    {
+        LOG_ERROR(QString("Branch copy not created"));
+        return;
+    }
+
+    // save branches order by moving the newly added branch start after the branch-owner of the valency point
+    cyclogram->moveLastCommand(point.owner()->command());
+
+    QRect ownerRect = point.owner()->rect();
+    QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
+
+    ShapeItem* newBranchCopy = copyBranch(newBranchCmd, cell);
+    mRootShape->addChildShape(newBranchCopy);
+
+    int maxHeight = mRootShape->rect().bottom();
+
+    QRect newRect = newBranchCopy->rect();
+    if (newRect.height() > maxHeight)
+    {
+        maxHeight = newRect.height();
+    }
+
+    auto branchesShapes = mRootShape->childShapes();
+
+    // shift branches to the right of the inserted
+    foreach (ShapeItem* it, branchesShapes)
+    {
+        if (it == newBranchCopy)
+        {
+            continue;
+        }
+
+        QPoint cell = it->cell();
+        QPoint newBranchCell = newBranchCopy->cell();
+        if (cell.x() < newBranchCell.x())
+        {
+            continue;
+        }
+
+        QRect rect = it->rect();
+        rect.setRight(rect.right() + newBranchCopy->rect().width());
+        rect.setLeft(rect.left() + newBranchCopy->rect().width());
+        it->setRect(rect, true);
+    }
+
+    // adjust branches height
+    foreach (ShapeItem* it, branchesShapes)
+    {
+        QRect rect = it->rect();
+        if (rect.height() < maxHeight)
+        {
+            rect.setBottom(rect.bottom() + maxHeight - rect.height());
+            it->setRect(rect, true);
+        }
+    }
+
+    // set root shape rect
+    QRect rect = mRootShape->rect();
+    rect.setRight(rect.right() + itemToCopy->rect().width());
+    rect.setBottom(maxHeight);
+    mRootShape->setRect(rect, false);
+
+    onNeedUpdate();
+}
+
+ShapeItem* CyclogramWidget::copyBranch(Command* branchCmd, const QPoint& cell)
+{
+    ShapeItem* shape = addShape(branchCmd, cell, mRootShape);
+    QList<Command*> stopList;
+    drawChildren(shape, stopList, true);
+
+    return shape;
 }
 
 void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& pos)
@@ -1112,46 +1188,6 @@ void CyclogramWidget::onNeedUpdate()
     update();
 }
 
-QString CyclogramWidget::generateBranchName() const
-{
-    QList<ShapeItem*> existingBranches;
-
-    foreach (ShapeItem* it, mCommands)
-    {
-        if (it->command()->type() == DRAKON::BRANCH_BEGIN)
-        {
-            existingBranches.push_back(it);
-        }
-    }
-
-    QString prefix = tr("New Branch");
-    QString name = prefix;
-    bool nameGenerated = false;
-    int i = 1;
-    while (!nameGenerated)
-    {
-        bool exist = false;
-        foreach (ShapeItem* it, existingBranches)
-        {
-            if (it->command()->text() == name)
-            {
-                exist = true;
-                break;
-            }
-        }
-
-        nameGenerated = !exist;
-
-        if (!nameGenerated)
-        {
-            name = prefix + QString(" ") + QString::number(i);
-            ++i;
-        }
-    }
-
-    return name;
-}
-
 ShapeItem* CyclogramWidget::findExpandedItem(ShapeItem* newItem) const
 {
     ShapeItem* expandedItem = Q_NULLPTR;
@@ -1351,7 +1387,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
 
     if (cmd->type() != DRAKON::TERMINATOR || cmd->nextCommands().empty())
     {
-        LOG_WARNING(QString("Not cyclogram start terminator"));
+        LOG_ERROR(QString("Not cyclogram start terminator"));
         return;
     }
 
@@ -1592,8 +1628,9 @@ ShapeItem* CyclogramWidget::addCommand(Command* cmd, const ValencyPoint &point)
     QPoint newCmdCell = calculateNewCommandCell(point);
     ShapeItem* newShape = addShape(cmd, newCmdCell, owner);
     updateWidgetShapes(newShape, point);
-
+    return newShape;
 }
+
 void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint& point)
 {
     ValencyPoint::Role role = point.role();
@@ -1669,7 +1706,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
     //generate unique branch name
     CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);
-    cmd->setText(generateBranchName());
+    cmd->setText(cyclogram->generateBranchName(tr("New Branch")));
 
     // create new branch to the right of the item command tree
     QPoint newCmdCell = item->cell();

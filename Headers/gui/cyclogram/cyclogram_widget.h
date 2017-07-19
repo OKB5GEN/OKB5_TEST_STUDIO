@@ -80,6 +80,7 @@ private:
 
     void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& point);
     void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point);
+    ShapeItem* copyBranch(Command* branchCmd, const QPoint& cell);
 
     int commandAt(const QPoint &pos);
     bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
@@ -90,8 +91,6 @@ private:
 
     QPoint calculateNewCommandCell(const ValencyPoint& point);
     void updateWidgetShapes(ShapeItem* newShape, const ValencyPoint& point);
-
-    QString generateBranchName() const;
 
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     ShapeItem* findNextBranch(const QPoint& cell) const;

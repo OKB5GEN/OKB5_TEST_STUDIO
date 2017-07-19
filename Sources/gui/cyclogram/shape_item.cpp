@@ -1662,3 +1662,8 @@ void ShapeItem::updateFlags()
         mValencyPoints[0].setCanBeLanded(point.canBeLanded());
     }
 }
+
+const QList<ShapeItem*>& ShapeItem::childShapes() const
+{
+    return mChildShapes;
+}

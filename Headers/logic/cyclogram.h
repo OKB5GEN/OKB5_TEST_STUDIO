@@ -8,6 +8,7 @@
 class Command;
 class VariableController;
 class SystemState;
+class ValencyPoint;
 
 class Cyclogram: public QObject
 {
@@ -49,6 +50,9 @@ public:
     Command* last() const;
     Command* current() const;
     Command* createCommand(DRAKON::IconType type, int param = -1);
+    Command* createBranchCopy(Command* branch, const ValencyPoint& point);
+
+    QString generateBranchName(const QString& templateName) const;
 
     void setFirst(Command* first);
     void setLast(Command* last);
@@ -95,6 +99,7 @@ private:
     void deleteCommandTree(Command* cmd, bool silent);
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);
+    void copyCommandTree(Command* to, Command* from);
 
     Command* mFirst;
     Command* mLast;

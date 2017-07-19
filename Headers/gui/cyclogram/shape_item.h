@@ -51,6 +51,7 @@ public:
     QRect rect() const;
     ShapeItem* parentShape() const;
     ShapeItem* childShape(int index) const;
+    const QList<ShapeItem*>& childShapes() const;
 
     static const QSizeF& itemSize(bool needUpdate = false);
     static const QSizeF& cellSize(bool needUpdate = false);
