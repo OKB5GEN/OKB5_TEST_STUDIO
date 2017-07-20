@@ -54,6 +54,7 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mMainWindow(Q_NULLPTR),
     mParentScrollArea(Q_NULLPTR),
     mSelectedItem(Q_NULLPTR),
+    mMovingItem(Q_NULLPTR),
     mItemToCopy(Q_NULLPTR)
 {
     onAppSettingsChanged();
@@ -71,11 +72,11 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
 
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-    mMovingItem = 0;
     setSelectedItem(0);
     mRootShape = 0;
 
     setFocusPolicy(Qt::ClickFocus);
+    setAcceptDrops(true);
 }
 
 CyclogramWidget::~CyclogramWidget()
@@ -332,6 +333,13 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
 
     drawItems(sihlouetteItems, painter);
     drawItems(mCommands, painter);
+
+//    if (mMovingItem)
+//    {
+//        QList<ShapeItem*> moving;
+//        moving.push_back(mMovingItem);
+//        drawItems(moving, painter);
+//    }
 }
 
 void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
@@ -376,6 +384,8 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             return;
         }
 
+        mDragStartPosition = event->pos();
+
         // check valency point click first
         ValencyPoint point;
         if (hasValencyPointAt(event->pos(), point))
@@ -389,16 +399,19 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             {
                 ShapeItem* clickedItem = mCommands[index];
 
-                /*
-                int TODO1; // split shapes on movable and selectable
-                if (clickedItem->isMovable())
-                {
-                    int TODO2; // create command shape copy and drag it under cursor
-                    mMovingItem = clickedItem;
-                    mPreviousPosition = event->pos();
-                    mCommands.move(index, mCommands.size() - 1);
-                }
-                */
+                Command* commandCopy = mCurrentCyclogram.lock()->createCommand(clickedItem->command()->type());
+                commandCopy->copyFrom(clickedItem->command());
+
+                mMovingItem = addShape(commandCopy, clickedItem->cell(), 0/*mRootShape*/); //clickedItem;
+
+                //mMovingItem->setPosition(clickedItem->position());
+                //mMovingItem->setCommand(mCommandCopy);
+                //mMovingItem->setRect(clickedItem->rect(), false);
+                //shapeItem->setCell(cell);
+                //shapeItem->setParentShape(mRootShape);
+                //shapeItem->updateFlags();
+
+                mPreviousPosition = event->pos();
 
                 if (!mSelectedItem || mSelectedItem != clickedItem)
                 {
@@ -789,30 +802,6 @@ void CyclogramWidget::showSubprogramWidget()
     }
 }
 
-//void CyclogramWidget::showSubprogramChart(const QStringList& variables)
-//{
-//    if (!mCurSubprogram)
-//    {
-//        LOG_WARNING(QString("Subprogram not set 3"));
-//        return;
-//    }
-
-//    if (!mCurSubprogram->loaded())
-//    {
-//        LOG_ERROR(QString("Subprogram configuration error 3"));
-//        return;
-//    }
-
-//    Q_ASSERT(mMainWindow);
-
-//    CyclogramChartDialog* dialog = new CyclogramChartDialog(mMainWindow);
-//    updateWindowTitle(dialog);
-
-//    dialog->setCyclogram(mCurSubprogram->cyclogram(), variables);
-//    dialog->setAttribute(Qt::WA_DeleteOnClose);
-//    dialog->show();
-//}
-
 QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
 {
     QString title;
@@ -865,6 +854,28 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!(event->buttons() & Qt::LeftButton))
+    {
+        return;
+    }
+
+    if ((event->pos() - mDragStartPosition).manhattanLength() < QApplication::startDragDistance())
+    {
+        return;
+    }
+
+//    QDrag *drag = new QDrag(this);
+//    QMimeData *mimeData = new QMimeData;
+
+//    mimeData->setText(QString("TEXT"));
+//    //mimeData->setData(mimeType, QByteArray());
+//    drag->setMimeData(mimeData);
+
+//    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
+
+//    int i = 0;
+
+
     if (mMovingItem && (event->buttons() & Qt::LeftButton))
     {
         moveItemTo(event->pos());
@@ -875,8 +886,12 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 {
     if (mMovingItem && event->button() == Qt::LeftButton)
     {
-        moveItemTo(event->pos());
+        //moveItemTo(event->pos());
+
+        deleteCommand(mMovingItem);
         mMovingItem = 0;
+
+        int TODO; // insert command to valency point
     }
 }
 
@@ -915,7 +930,7 @@ bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 void CyclogramWidget::moveItemTo(const QPoint &pos)
 {
     QPoint offset = pos - mPreviousPosition;
-    //mMovingItem->setPosition(mMovingItem->position() + offset); //TODO item moving disabled
+    mMovingItem->setPosition(mMovingItem->position() + offset);
     mPreviousPosition = pos;
     update();
 }
@@ -1319,10 +1334,6 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             mCurSubprogram = qobject_cast<CmdSubProgram*>(command);
             showSubprogramWidget();
-
-//            CmdSubProgramEditDialog* d = new CmdSubProgramEditDialog(this);
-//            d->setCommand(qobject_cast<CmdSubProgram*>(command), mCurrentCyclogram.lock());
-//            dialog = d;
         }
         break;
 
@@ -1726,7 +1737,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
-    if (item->command()->type() == DRAKON::BRANCH_BEGIN)
+    if (mMovingItem != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         deleteBranch(item);
         return;
@@ -1896,4 +1907,24 @@ QPoint CyclogramWidget::calculateNewCommandCell(const ValencyPoint& point)
     }
 
     return newCmdCell;
+}
+
+void CyclogramWidget::dragEnterEvent(QDragEnterEvent* event)
+{
+    LOG_DEBUG(QString("drag ENTER event"));
+}
+
+void CyclogramWidget::dragMoveEvent(QDragMoveEvent* event)
+{
+    LOG_DEBUG(QString("drag MOVE event"));
+}
+
+void CyclogramWidget::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    LOG_DEBUG(QString("drag LEAVE event"));
+}
+
+void CyclogramWidget::dropEvent(QDropEvent* event)
+{
+    LOG_DEBUG(QString("DROP event"));
 }

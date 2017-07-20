@@ -40,15 +40,19 @@ public slots:
     void deleteSelectedItem();
 
 protected:
-    bool event(QEvent *event) Q_DECL_OVERRIDE;
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+    bool event(QEvent* event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
+    void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+    void mouseMoveEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+    void mouseReleaseEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+    void mouseDoubleClickEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
+    void wheelEvent(QWheelEvent* event) Q_DECL_OVERRIDE;
+    void dragEnterEvent(QDragEnterEvent* event) Q_DECL_OVERRIDE;
+    void dragMoveEvent(QDragMoveEvent* event) Q_DECL_OVERRIDE;
+    void dragLeaveEvent(QDragLeaveEvent* event) Q_DECL_OVERRIDE;
+    void dropEvent(QDropEvent* event) Q_DECL_OVERRIDE;
 
 private slots:
     void onCyclogramStateChanged(int state);
@@ -105,6 +109,7 @@ private:
     ShapeItem* mSihlouetteArrow;
     ShapeItem* mSihlouetteLine;
 
+    QPoint mDragStartPosition;
     QPoint mPreviousPosition;
     ShapeItem * mMovingItem;
     ShapeItem * mSelectedItem;

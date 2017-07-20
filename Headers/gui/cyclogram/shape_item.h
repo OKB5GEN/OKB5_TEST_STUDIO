@@ -27,6 +27,8 @@ public:
     void setSelected(bool selected);
     void setParentShape(ShapeItem* parent);
 
+    void setPosition(const QPoint& position);
+
     void setChildShape(ShapeItem* item, int index);
     void addChildShape(ShapeItem* item);
     void removeChildShape(ShapeItem* item);

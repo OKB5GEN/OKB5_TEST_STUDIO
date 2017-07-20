@@ -135,6 +135,11 @@ void ShapeItem::setCell(const QPoint &cell)
     mPosition.setY(origin().y() + mCell.y() * itemSize().height());
 }
 
+void ShapeItem::setPosition(const QPoint& position)
+{
+    mPosition = position;
+}
+
 void ShapeItem::setCommand(Command* command)
 {
     if (mCommand)
@@ -1258,6 +1263,11 @@ void ShapeItem::remove()
     if (mChildShapes.empty() || (mChildShapes.size() == 1 && mChildShapes[ValencyPoint::Down] == Q_NULLPTR))
     {
         mRect.setBottom(mRect.top());
+        if (!mParentShape)
+        {
+            return;
+        }
+
         mParentShape->replaceChildShape(0, this); // update shape connections
         mParentShape->onChildRectChanged(this);
         return;
