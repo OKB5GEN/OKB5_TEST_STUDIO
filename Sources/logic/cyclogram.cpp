@@ -723,15 +723,128 @@ Command* Cyclogram::createBranchCopy(Command* branch, const ValencyPoint& point)
     QString name = generateBranchName(branch->text());
     qobject_cast<CmdStateStart*>(newBranch)->setText(name);
 
-    copyCommandTree(newBranch, branch);
+    QMap<Command*, Command*> alreadyCreatedCommands;
+    copyCommandTree(newBranch, branch, alreadyCreatedCommands);
 
     return newBranch;
 }
 
-void Cyclogram::copyCommandTree(Command* to, Command* from)
+void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Command*>& alreadyCreatedCommands)
 {
-    auto nextCommands = from->nextCommands();
+    //alreadyCreatedCommands: key - existing command (template for copy), value - already created copy for "key" command
 
+    QMap<Command*, Command*> existingMapping = alreadyCreatedCommands;
+
+    if (from->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(from);
+        if (questionCmd->questionType() == CmdQuestion::CYCLE) //IF-CYCLE
+        {
+            int TODO; // depending on role and shape type
+        }
+        else // IF-QUESTION
+        {
+            Command* down = from->nextCommand(ValencyPoint::Down);
+            Command* right = from->nextCommand(ValencyPoint::Right);
+            Command* underArrow = from->nextCommand(ValencyPoint::UnderArrow);
+
+            if (underArrow)
+            {
+                Command* newUnderArrowCmd = Q_NULLPTR;
+
+                auto it = existingMapping.find(underArrow);
+                if (it == existingMapping.end()) // command was not created, create command copy
+                {
+                    Command* cmd = underArrow;
+
+                    int param = -1;
+                    if (cmd->type() == DRAKON::QUESTION)
+                    {
+                        param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
+                    }
+
+                    newUnderArrowCmd = createCommand(cmd->type(), param);
+                    newUnderArrowCmd->copyFrom(cmd);
+                    existingMapping[underArrow] = newUnderArrowCmd;
+
+                    to->replaceCommand(newUnderArrowCmd, ValencyPoint::UnderArrow);
+
+                    // move creation further to "under arrow" hierarchy
+                    if (newUnderArrowCmd->type() != DRAKON::GO_TO_BRANCH)
+                    {
+                        copyCommandTree(newUnderArrowCmd, cmd, existingMapping);
+                    }
+                    else // stop copy on branch end
+                    {
+                        newUnderArrowCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
+                    }
+                }
+                else
+                {
+                    newUnderArrowCmd = it.value();
+                    // do not create further hierarchy, because it is already created
+                    to->replaceCommand(newUnderArrowCmd, from->role());
+                }
+
+                if (down)
+                {
+                    Command* cmd = down;
+
+                    if (cmd == underArrow) // straight line without down command
+                    {
+                        to->replaceCommand(newUnderArrowCmd, ValencyPoint::Down); // just replace to the same command
+                    }
+                    else
+                    {
+                        int param = -1;
+                        if (cmd->type() == DRAKON::QUESTION)
+                        {
+                            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
+                        }
+
+                        Command* newDownCmd = createCommand(cmd->type(), param);
+                        newDownCmd->copyFrom(cmd);
+                        to->replaceCommand(newDownCmd, ValencyPoint::Down);
+
+                        copyCommandTree(newDownCmd, cmd, existingMapping);
+                    }
+                }
+
+                if (right)
+                {
+                    Command* cmd = right;
+                    if (cmd == underArrow) // straight line without right command
+                    {
+                        to->replaceCommand(newUnderArrowCmd, ValencyPoint::Right); // just replace to the same command
+                    }
+                    else
+                    {
+                        int param = -1;
+                        if (cmd->type() == DRAKON::QUESTION)
+                        {
+                            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
+                        }
+
+                        Command* newRightCmd = createCommand(cmd->type(), param);
+                        newRightCmd->copyFrom(cmd);
+                        to->replaceCommand(newRightCmd, ValencyPoint::Right);
+
+                        copyCommandTree(newRightCmd, cmd, existingMapping);
+                    }
+                }
+            }
+            else // "switch state"?
+            {
+                int i = 0;
+                int TODO;
+            }
+        }
+
+        return;
+    }
+
+    // simple commands
+    auto nextCommands = from->nextCommands();
     for (auto it = nextCommands.begin(); it != nextCommands.end(); ++it)
     {
         Command* cmd = *it;
@@ -740,26 +853,37 @@ void Cyclogram::copyCommandTree(Command* to, Command* from)
             continue;
         }
 
-        int param = -1;
-        if (cmd->type() == DRAKON::QUESTION)
-        {
-            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
-        }
+        Command* newNextCmd = Q_NULLPTR;
 
-        Command* newNextCmd = createCommand(cmd->type(), param);
-        newNextCmd->copyFrom(cmd);
-        to->replaceCommand(newNextCmd, cmd->role());
-
-        if (newNextCmd->type() != DRAKON::GO_TO_BRANCH)
+        auto iter = existingMapping.find(cmd);
+        if (iter == existingMapping.end())// command was not created, create command copy
         {
-            copyCommandTree(newNextCmd, cmd);
-        }
-        else // stop copy on branch end
-        {
-            newNextCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
-        }
+            int param = -1;
+            if (cmd->type() == DRAKON::QUESTION)
+            {
+                param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
+            }
 
-        //newNextCmd->updateText(); //TODO
+            newNextCmd = createCommand(cmd->type(), param);
+            newNextCmd->copyFrom(cmd);
+
+            to->replaceCommand(newNextCmd, ValencyPoint::Down);
+
+            if (newNextCmd->type() != DRAKON::GO_TO_BRANCH)
+            {
+                copyCommandTree(newNextCmd, cmd, existingMapping);
+            }
+            else // stop copy on branch end
+            {
+                newNextCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
+            }
+        }
+        else
+        {
+            newNextCmd = iter.value();
+
+            to->replaceCommand(newNextCmd, ValencyPoint::Down);
+        }
     }
 }
 

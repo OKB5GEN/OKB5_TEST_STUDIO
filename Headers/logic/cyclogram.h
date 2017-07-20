@@ -99,7 +99,7 @@ private:
     void deleteCommandTree(Command* cmd, bool silent);
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);
-    void copyCommandTree(Command* to, Command* from);
+    void copyCommandTree(Command* to, Command* from, QMap<Command*, Command*>& alreadyCreatedCommands);
 
     Command* mFirst;
     Command* mLast;

@@ -626,7 +626,7 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& po
     }
 
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
-    cyclogram->moveLastCommand(point.owner()->command());
+    //cyclogram->moveLastCommand(point.owner()->command()); //TODO branch order
 
     QRect ownerRect = point.owner()->rect();
     QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
