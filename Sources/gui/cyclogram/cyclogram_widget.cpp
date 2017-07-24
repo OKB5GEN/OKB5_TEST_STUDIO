@@ -520,11 +520,11 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 {
     Command* commandToCopy = itemToCopy->command();
     DRAKON::IconType typeToCopy = commandToCopy->type();
+    bool isBranchRightVP = (point.owner()->command()->type() == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right);
 
-    //ValencyPoint::Role role = point.role();
-    if (typeToCopy == DRAKON::BRANCH_BEGIN)
+    if (isBranchRightVP)
     {
-        if (point.owner()->command()->type() == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right)
+        if (typeToCopy == DRAKON::BRANCH_BEGIN)
         {
             copyBranchTo(itemToCopy, point);
         }
@@ -534,6 +534,14 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
         }
 
         return;
+    }
+    else
+    {
+        if (typeToCopy == DRAKON::BRANCH_BEGIN)
+        {
+            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be pasted here"));
+            return;
+        }
     }
 
     bool canBePasted = true;
@@ -833,22 +841,25 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         return; // no cyclogram mouse interaction available during cyclogram running
     }
 
-    mPressedShape = Q_NULLPTR;
     bool isRightBtnPressed = ((mMouseButtonState & Qt::RightButton) > 0);
     bool isLeftBtnPressed = ((mMouseButtonState & Qt::LeftButton) > 0);
 
     // move dragging item to valency point with left mouse button
     if (isLeftBtnPressed)
     {
+        ValencyPoint point;
+        bool isOverVP = hasValencyPointAt(event->pos(), point);
+
         if (mDraggingShape) // drag-and-drop with LMB
         {
-            int TODO; // try to move dragging shape to valency point above
+            if (isOverVP)
+            {
+                int TODO; // try to move dragging shape to valency point above
+            }
         }
         else // just usual click
         {
-            // check valency point click first
-            ValencyPoint point;
-            if (hasValencyPointAt(event->pos(), point))
+            if (isOverVP)
             {
                 onClickVP(point);
             }
@@ -878,17 +889,21 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     // copy dragging item to valency point with right mouse button
     if (isRightBtnPressed)
     {
-        if (mDraggingShape) // drag-and-drop with RMB
+        ValencyPoint point;
+        bool isOverVP = hasValencyPointAt(event->pos(), point);
+
+        if (mDraggingShape) // drag-and-drop with RMB,  try to copy dragging shape to valency point above
         {
-            int TODO; // try to copy dragging shape to valency point above
+            if (isOverVP)
+            {
+                copyCommandTo(mPressedShape, point);
+            }
         }
         else // just usual click, show context menu for "hotspot" object
         {
             clearSelection();
 
-            // check valency point click first
-            ValencyPoint point;
-            if (hasValencyPointAt(event->pos(), point))
+            if (isOverVP)
             {
                 showContextMenuForVP(point, mapToGlobal(event->pos()));
             }
@@ -911,6 +926,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         }
     }
 
+    mPressedShape = 0;
     if (mDraggingShape)
     {
         deleteCommand(mDraggingShape);
