@@ -63,6 +63,7 @@ private slots:
     void onAppSettingsChanged();
 
 private:
+    void updateCursor(const QPoint& pos);
     void setSelectedItem(ShapeItem* item);
 
     void drawSilhouette();
@@ -105,14 +106,17 @@ private:
     void showContextMenuForVP(const ValencyPoint& point, const QPoint& pos);
     void showContextMenuForCommand(ShapeItem* item, const QPoint& pos);
 
+    int mMouseButtonState;
+
     QList<ShapeItem*> mCommands;
     ShapeItem* mSihlouetteArrow;
     ShapeItem* mSihlouetteLine;
 
     QPoint mDragStartPosition;
     QPoint mPreviousPosition;
-    ShapeItem * mMovingItem;
-    ShapeItem * mSelectedItem;
+    ShapeItem * mDraggingShape;
+    ShapeItem * mSelectedShape;
+    ShapeItem * mPressedShape;
     ShapeItem * mItemToCopy;
 
     ShapeItem* mRootShape;

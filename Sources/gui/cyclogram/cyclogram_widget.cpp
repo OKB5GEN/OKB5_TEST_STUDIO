@@ -53,9 +53,11 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mCurSubprogram(Q_NULLPTR),
     mMainWindow(Q_NULLPTR),
     mParentScrollArea(Q_NULLPTR),
-    mSelectedItem(Q_NULLPTR),
-    mMovingItem(Q_NULLPTR),
-    mItemToCopy(Q_NULLPTR)
+    mSelectedShape(Q_NULLPTR),
+    mDraggingShape(Q_NULLPTR),
+    mPressedShape(Q_NULLPTR),
+    mItemToCopy(Q_NULLPTR),
+    mMouseButtonState(Qt::NoButton)
 {
     onAppSettingsChanged();
 
@@ -247,15 +249,15 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
 
 void CyclogramWidget::deleteSelectedItem()
 {
-    if (!mSelectedItem)
+    if (!mSelectedShape)
     {
         return;
     }
 
     QString errorDesc;
-    if (canBeDeleted(mSelectedItem, errorDesc))
+    if (canBeDeleted(mSelectedShape, errorDesc))
     {
-        bool isBranch = mSelectedItem->command()->type() == DRAKON::BRANCH_BEGIN;
+        bool isBranch = mSelectedShape->command()->type() == DRAKON::BRANCH_BEGIN;
         QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
         QString text = tr("Are you sure that you want to delete ");
         if (isBranch)
@@ -269,7 +271,7 @@ void CyclogramWidget::deleteSelectedItem()
 
         if (QMessageBox::Yes == QMessageBox::warning(this, title, text, QMessageBox::Yes, QMessageBox::No))
         {
-            ShapeItem* item = mSelectedItem;
+            ShapeItem* item = mSelectedShape;
             clearSelection();
             deleteCommand(item);
         }
@@ -296,11 +298,11 @@ void CyclogramWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Enter:
     case Qt::Key_Return:
         {
-            if (mSelectedItem)
+            if (mSelectedShape)
             {
-                if ((mSelectedItem->command()->flags() & Command::Editable) != 0)
+                if ((mSelectedShape->command()->flags() & Command::Editable) != 0)
                 {
-                    showEditDialog(mSelectedItem->command());
+                    showEditDialog(mSelectedShape->command());
                 }
                 else
                 {
@@ -376,81 +378,22 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
 
 void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton)
+    mMouseButtonState = event->button();
+    mDragStartPosition = event->pos();
+
+    // no interaction while cyclogram running
+    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
-        // no interaction while cyclogram running
-        if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
-        {
-            return;
-        }
-
-        mDragStartPosition = event->pos();
-
-        // check valency point click first
-        ValencyPoint point;
-        if (hasValencyPointAt(event->pos(), point))
-        {
-            onClickVP(point);
-        }
-        else // if no valency point click, check command shape click
-        {
-            int index = commandAt(event->pos());
-            if (index >= 0)
-            {
-                ShapeItem* clickedItem = mCommands[index];
-
-                Command* commandCopy = mCurrentCyclogram.lock()->createCommand(clickedItem->command()->type());
-                commandCopy->copyFrom(clickedItem->command());
-
-                mMovingItem = addShape(commandCopy, clickedItem->cell(), 0/*mRootShape*/); //clickedItem;
-
-                //mMovingItem->setPosition(clickedItem->position());
-                //mMovingItem->setCommand(mCommandCopy);
-                //mMovingItem->setRect(clickedItem->rect(), false);
-                //shapeItem->setCell(cell);
-                //shapeItem->setParentShape(mRootShape);
-                //shapeItem->updateFlags();
-
-                mPreviousPosition = event->pos();
-
-                if (!mSelectedItem || mSelectedItem != clickedItem)
-                {
-                    clearSelection(false);
-                    setSelectedItem(clickedItem);
-                    update();
-                }
-            }
-            else
-            {
-                clearSelection();
-            }
-        }
+        return;
     }
-    else if (event->button() == Qt::RightButton)
+
+    if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
-        clearSelection();
-
-        // check valency point click first
-        ValencyPoint point;
-        if (hasValencyPointAt(event->pos(), point))
+        int index = commandAt(event->pos());
+        if (index >= 0)
         {
-            showContextMenuForVP(point, mapToGlobal(event->pos()));
-        }
-        else // if no valency point click, check command shape click
-        {
-            int index = commandAt(event->pos());
-            if (index < 0)
-            {
-                return;
-            }
-
-            ShapeItem* clickedItem = mCommands[index];
-
-            clearSelection(false);
-            setSelectedItem(clickedItem);
-            update();
-
-            showContextMenuForCommand(clickedItem, mapToGlobal(event->pos()));
+            mPressedShape = mCommands[index];
+            mPreviousPosition = event->pos();
         }
     }
 }
@@ -854,7 +797,10 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
 
 void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!(event->buttons() & Qt::LeftButton))
+    bool isRightBtnPressed = ((event->buttons() & Qt::RightButton) > 0);
+    bool isLeftBtnPressed = ((event->buttons() & Qt::LeftButton) > 0);
+
+    if (!isRightBtnPressed && !isLeftBtnPressed)
     {
         return;
     }
@@ -864,19 +810,17 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
         return;
     }
 
-//    QDrag *drag = new QDrag(this);
-//    QMimeData *mimeData = new QMimeData;
+    if (mPressedShape && !mDraggingShape)
+    {
+        auto cyclogram = mCurrentCyclogram.lock();
+        DRAKON::IconType type = mPressedShape->command()->type();
+        Command* commandCopy = cyclogram->createCommand(type);
+        commandCopy->copyFrom(mPressedShape->command());
 
-//    mimeData->setText(QString("TEXT"));
-//    //mimeData->setData(mimeType, QByteArray());
-//    drag->setMimeData(mimeData);
+        mDraggingShape = addShape(commandCopy, mPressedShape->cell(), 0/*mRootShape*/);
+    }
 
-//    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction);
-
-//    int i = 0;
-
-
-    if (mMovingItem && (event->buttons() & Qt::LeftButton))
+    if (mDraggingShape)
     {
         moveItemTo(event->pos());
     }
@@ -884,15 +828,97 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 
 void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mMovingItem && event->button() == Qt::LeftButton)
+    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
-        //moveItemTo(event->pos());
-
-        deleteCommand(mMovingItem);
-        mMovingItem = 0;
-
-        int TODO; // insert command to valency point
+        return; // no cyclogram mouse interaction available during cyclogram running
     }
+
+    mPressedShape = Q_NULLPTR;
+    bool isRightBtnPressed = ((mMouseButtonState & Qt::RightButton) > 0);
+    bool isLeftBtnPressed = ((mMouseButtonState & Qt::LeftButton) > 0);
+
+    // move dragging item to valency point with left mouse button
+    if (isLeftBtnPressed)
+    {
+        if (mDraggingShape) // drag-and-drop with LMB
+        {
+            int TODO; // try to move dragging shape to valency point above
+        }
+        else // just usual click
+        {
+            // check valency point click first
+            ValencyPoint point;
+            if (hasValencyPointAt(event->pos(), point))
+            {
+                onClickVP(point);
+            }
+            else // if no valency point click, check command shape click
+            {
+                int index = commandAt(event->pos());
+                if (index >= 0)
+                {
+                    ShapeItem* clickedItem = mCommands[index];
+                    mPreviousPosition = event->pos();
+
+                    if (!mSelectedShape || mSelectedShape != clickedItem)
+                    {
+                        clearSelection(false);
+                        setSelectedItem(clickedItem);
+                        update();
+                    }
+                }
+                else
+                {
+                    clearSelection();
+                }
+            }
+        }
+    }
+
+    // copy dragging item to valency point with right mouse button
+    if (isRightBtnPressed)
+    {
+        if (mDraggingShape) // drag-and-drop with RMB
+        {
+            int TODO; // try to copy dragging shape to valency point above
+        }
+        else // just usual click, show context menu for "hotspot" object
+        {
+            clearSelection();
+
+            // check valency point click first
+            ValencyPoint point;
+            if (hasValencyPointAt(event->pos(), point))
+            {
+                showContextMenuForVP(point, mapToGlobal(event->pos()));
+            }
+            else // if no valency point click, check command shape click
+            {
+                int index = commandAt(event->pos());
+                if (index < 0)
+                {
+                    return;
+                }
+
+                ShapeItem* clickedItem = mCommands[index];
+
+                clearSelection(false);
+                setSelectedItem(clickedItem);
+                update();
+
+                showContextMenuForCommand(clickedItem, mapToGlobal(event->pos()));
+            }
+        }
+    }
+
+    if (mDraggingShape)
+    {
+        deleteCommand(mDraggingShape);
+        mDraggingShape = 0;
+    }
+
+    mMouseButtonState = Qt::NoButton;
+    updateCursor(event->pos());
 }
 
 int CyclogramWidget::commandAt(const QPoint &pos)
@@ -930,9 +956,52 @@ bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 void CyclogramWidget::moveItemTo(const QPoint &pos)
 {
     QPoint offset = pos - mPreviousPosition;
-    mMovingItem->setPosition(mMovingItem->position() + offset);
+    mDraggingShape->setPosition(mDraggingShape->position() + offset);
     mPreviousPosition = pos;
+
+    updateCursor(pos);
     update();
+}
+
+void CyclogramWidget::updateCursor(const QPoint& pos)
+{
+    Qt::CursorShape curShape = this->cursor().shape();
+
+    if (!mDraggingShape || mMouseButtonState == Qt::NoButton)
+    {
+        if (curShape != Qt::ArrowCursor)
+        {
+            setCursor(QCursor(Qt::ArrowCursor));
+        }
+
+        return;
+    }
+
+    bool isRightBtnPressed = ((mMouseButtonState & Qt::RightButton) > 0);
+    bool isLeftBtnPressed = ((mMouseButtonState & Qt::LeftButton) > 0);
+
+    if (!isRightBtnPressed && !isLeftBtnPressed)
+    {
+        return;
+    }
+
+    ValencyPoint point;
+    if (hasValencyPointAt(pos, point))
+    {
+        if (curShape == Qt::ArrowCursor)
+        {
+            QCursor cursor(isLeftBtnPressed ? Qt::DragMoveCursor : Qt::DragCopyCursor);
+            setCursor(cursor);
+        }
+    }
+    else
+    {
+        if (curShape == Qt::DragMoveCursor || curShape == Qt::DragCopyCursor)
+        {
+            QCursor cursor(Qt::ArrowCursor);
+            setCursor(cursor);
+        }
+    }
 }
 
 ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
@@ -1152,7 +1221,7 @@ void CyclogramWidget::clearSelection(bool needUpdate)
 {
     mCurSubprogram = Q_NULLPTR;
 
-    if (!mSelectedItem)
+    if (!mSelectedShape)
     {
         return;
     }
@@ -1737,7 +1806,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
-    if (mMovingItem != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
+    if (mDraggingShape != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         deleteBranch(item);
         return;
@@ -1829,24 +1898,24 @@ QString CyclogramWidget::delimiter()
 
 void CyclogramWidget::setSelectedItem(ShapeItem* item)
 {
-    if (mSelectedItem)
+    if (mSelectedShape)
     {
-        mSelectedItem->setSelected(false);
+        mSelectedShape->setSelected(false);
     }
 
-    mSelectedItem = item;
+    mSelectedShape = item;
 
-    if (mSelectedItem)
+    if (mSelectedShape)
     {
-        mSelectedItem->setSelected(true);
+        mSelectedShape->setSelected(true);
     }
 
-    emit selectionChanged(mSelectedItem);
+    emit selectionChanged(mSelectedShape);
 }
 
 ShapeItem* CyclogramWidget::selectedItem() const
 {
-    return mSelectedItem;
+    return mSelectedShape;
 }
 
 QPoint CyclogramWidget::calculateNewCommandCell(const ValencyPoint& point)
