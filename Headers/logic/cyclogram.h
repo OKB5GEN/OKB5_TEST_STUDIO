@@ -77,7 +77,7 @@ public:
     bool isMainCyclogram() const;
     void setMainCyclogram(bool isMain);
 
-    void moveLastCommand(Command* after);
+    void changeCommandsOrder(Command* commandToMove, Command* commandAfter);
 
     // cyclogram settings
     QVariant setting(const QString& name) const;

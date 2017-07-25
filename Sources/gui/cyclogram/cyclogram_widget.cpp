@@ -524,13 +524,13 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 
     if (isBranchRightVP)
     {
-        if (typeToCopy == DRAKON::BRANCH_BEGIN)
+        if (typeToCopy == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(itemToCopy->command()))
         {
             copyBranchTo(itemToCopy, point);
         }
         else
         {
-            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be pasted here"));
+            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be copied here"));
         }
 
         return;
@@ -539,7 +539,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
     {
         if (typeToCopy == DRAKON::BRANCH_BEGIN)
         {
-            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be pasted here"));
+            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be copied here"));
             return;
         }
     }
@@ -555,7 +555,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 
     if (!canBePasted)
     {
-        QMessageBox::warning(this, tr("Error"), tr("Selected item can not be pasted here"));
+        QMessageBox::warning(this, tr("Error"), tr("Selected item can not be copied here"));
         return;
     }
 
@@ -590,7 +590,7 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& po
     }
 
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
-    //cyclogram->moveLastCommand(point.owner()->command()); //TODO branch order
+    cyclogram->changeCommandsOrder(newBranchCmd, point.owner()->command());
 
     QRect ownerRect = point.owner()->rect();
     QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
@@ -665,91 +665,69 @@ void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& 
         return;
     }
 
-    /////////////////////////////////
-//    auto branchesShapes1 = mRootShape->childShapes();
-//    LOG_DEBUG(QString("======================="));
-//    LOG_DEBUG(QString("Move Branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(branchToMove->command()->text()).arg(branchToMove->cell().x()).arg(branchToMove->cell().y()).arg(branchToMove->rect().left()).arg(branchToMove->rect().right()).arg(branchToMove->rect().width()));
-//    LOG_DEBUG(QString("To VP of branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(point.owner()->command()->text()).arg(point.owner()->cell().x()).arg(point.owner()->cell().y()).arg(point.owner()->rect().left()).arg(point.owner()->rect().right()).arg(point.owner()->rect().width()));
-//    LOG_DEBUG(QString("======================="));
-
-//    foreach (ShapeItem* it, branchesShapes1)
-//    {
-//        LOG_DEBUG(QString("Branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(it->command()->text()).arg(it->cell().x()).arg(it->cell().y()).arg(it->rect().left()).arg(it->rect().right()).arg(it->rect().width()));
-//    }
-
-//    LOG_DEBUG(QString("======================="));
-//    //////////////////////////////////////
-
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
-    //cyclogram->moveLastCommand(point.owner()->command()); //TODO save branch order
+    auto cyclogram = mCyclogram.lock();
+    cyclogram->changeCommandsOrder(branchToMove->command(), point.owner()->command());
 
     QRect ownerRect = point.owner()->rect();
     QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
 
     int oldCell = branchToMove->cell().x();
     int xOffset = cell.x() - oldCell;
-    if (xOffset > 0)
-    {
-        xOffset -= branchToMove->rect().width();
-    }
-
-//    LOG_DEBUG(QString("Offset is %1").arg(xOffset));
-
-    //return;
-
-    QRect movingBranchRect = branchToMove->rect();
-    movingBranchRect.setLeft(movingBranchRect.left() + xOffset);
-    movingBranchRect.setRight(movingBranchRect.right() + xOffset);
-    branchToMove->setRect(movingBranchRect, true);
-
-//    LOG_DEBUG(QString("After moving '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(branchToMove->command()->text()).arg(branchToMove->cell().x()).arg(branchToMove->cell().y()).arg(branchToMove->rect().left()).arg(branchToMove->rect().right()).arg(branchToMove->rect().width()));
-
-    auto branchesShapes = mRootShape->childShapes();
 
     if (xOffset == 0)
     {
         return;
     }
 
-    if (xOffset > 0) // branch moved to the right
+    if (xOffset > 0)
     {
-        foreach (ShapeItem* it, branchesShapes)
-        {
-            if (it == branchToMove) // skip moving branch (it is already moved)
-            {
-                continue;
-            }
-
-            QPoint cell = it->cell();
-            QPoint newBranchCell = branchToMove->cell();
-            if (cell.x() > newBranchCell.x()) // do not move branches to the right of the insertion point
-            {
-                continue;
-            }
-
-            if (cell.x() < oldCell) // do not move branches to the right of the old position
-            {
-                continue;
-            }
-
-            // move branches between insertion point and old branch position
-            QRect rect = it->rect();
-            rect.setRight(rect.right() - branchToMove->rect().width());
-            rect.setLeft(rect.left() - branchToMove->rect().width());
-            it->setRect(rect, true);
-        }
+        xOffset -= branchToMove->rect().width();
     }
-    else // branch moved to the left
+
+    QRect movingBranchRect = branchToMove->rect();
+    movingBranchRect.setLeft(movingBranchRect.left() + xOffset);
+    movingBranchRect.setRight(movingBranchRect.right() + xOffset);
+    branchToMove->setRect(movingBranchRect, true);
+
+    int otherBranchesOffset = 0;
+    if (xOffset > 0)
     {
-        foreach (ShapeItem* it, branchesShapes)
+       otherBranchesOffset -= branchToMove->rect().width();
+    }
+    else
+    {
+       otherBranchesOffset += branchToMove->rect().width();
+    }
+
+    auto branchesShapes = mRootShape->childShapes();
+
+    foreach (ShapeItem* it, branchesShapes)
+    {
+        if (it == branchToMove) // skip moving branch (it is already moved)
         {
-            if (it == branchToMove) // skip moving branch (it is already moved)
+            continue;
+        }
+
+        QPoint cell = it->cell();
+        QPoint newBranchCell = branchToMove->cell();
+
+        if (xOffset > 0)
+        {
+            // do not move branches to the right of the insertion point
+            // if they do not intersect moving branch rect
+            if (cell.x() > newBranchCell.x() && cell.x() > branchToMove->rect().right())
             {
                 continue;
             }
 
-            QPoint cell = it->cell();
-            QPoint newBranchCell = branchToMove->cell();
+            if (cell.x() < oldCell) // do not move branches to the left of the old position
+            {
+                continue;
+            }
+        }
+        else
+        {
             if (cell.x() < newBranchCell.x()) // do not move branches to the left of the insertion point
             {
                 continue;
@@ -759,15 +737,19 @@ void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& 
             {
                 continue;
             }
+        }
 
-            // move branches between insertion point and old branch position
-            QRect rect = it->rect();
-            rect.setRight(rect.right() + branchToMove->rect().width());
-            rect.setLeft(rect.left() + branchToMove->rect().width());
-            it->setRect(rect, true);
+        QRect rect = it->rect();
+        rect.setRight(rect.right() + otherBranchesOffset);
+        rect.setLeft(rect.left() + otherBranchesOffset);
+        it->setRect(rect, true);
+
+        if (it->cell().x() == 0) // new "start" branch changed, update command hierarchy
+        {
+            Command* first = cyclogram->first();
+            first->replaceCommand(it->command());
         }
     }
-
 
     onNeedUpdate();
 }
@@ -1930,7 +1912,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
     }
 
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
-    cyclogram->moveLastCommand(item->command());
+    cyclogram->changeCommandsOrder(newCmd, item->command());
 
     //generate unique branch name
     CmdStateStart* cmd = qobject_cast<CmdStateStart*>(newCmd);

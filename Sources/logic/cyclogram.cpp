@@ -664,19 +664,24 @@ QString Cyclogram::defaultStorePath()
     return QDir::currentPath() + QString("/cyclograms/"); //TODO replace by application settings usage
 }
 
-void Cyclogram::moveLastCommand(Command *after)
+void Cyclogram::changeCommandsOrder(Command* commandToMove, Command* commandAfter)
 {
     if (mCommands.empty())
     {
         return;
     }
 
-    Command* cmd = mCommands.back();
-    int afterIndex = mCommands.indexOf(after);
+    int moveIndex = mCommands.indexOf(commandToMove);
+    int afterIndex = mCommands.indexOf(commandAfter);
+
+    if (moveIndex != -1)
+    {
+        mCommands.takeAt(moveIndex);
+    }
+
     if (afterIndex != -1)
     {
-        mCommands.insert(afterIndex + 1, cmd);
-        mCommands.pop_back();
+        mCommands.insert(afterIndex + 1, commandToMove);
     }
 }
 
