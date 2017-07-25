@@ -85,6 +85,7 @@ private:
 
     void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& point);
     void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point);
+    void moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& point);
     ShapeItem* copyBranch(Command* branchCmd, const QPoint& cell);
 
     int commandAt(const QPoint &pos);
@@ -121,7 +122,7 @@ private:
 
     ShapeItem* mRootShape;
 
-    QWeakPointer<Cyclogram> mCurrentCyclogram;
+    QWeakPointer<Cyclogram> mCyclogram;
 
     CmdSubProgram* mCurSubprogram;
 

@@ -98,13 +98,13 @@ void CyclogramWidget::clear(bool onDestroy)
     qDeleteAll(mCommands);
     mCommands.clear();
 
-    if (!onDestroy && mCurrentCyclogram.data())
+    if (!onDestroy && mCyclogram.data())
     {
-        disconnect(mCurrentCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCurrentCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+        disconnect(mCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
     }
 
-    mCurrentCyclogram.clear();
+    mCyclogram.clear();
 }
 
 bool CyclogramWidget::event(QEvent *event)
@@ -382,7 +382,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
     mDragStartPosition = event->pos();
 
     // no interaction while cyclogram running
-    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
+    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
         return;
     }
@@ -565,7 +565,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
     int TODO1; // QUESTION command paste, need get param for it
 
     // create command and load it from another
-    Command* newCmd = mCurrentCyclogram.lock()->createCommand(typeToCopy, -1/*param*/);
+    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy, -1/*param*/);
     newCmd->copyFrom(commandToCopy);
 
     if (!newCmd)
@@ -580,7 +580,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 
 void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point)
 {
-    auto cyclogram = mCurrentCyclogram.lock();
+    auto cyclogram = mCyclogram.lock();
     Command* newBranchCmd = cyclogram->createBranchCopy(itemToCopy->command(), point);
 
     if (!newBranchCmd)
@@ -649,6 +649,129 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& po
     onNeedUpdate();
 }
 
+void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& point)
+{
+    bool canBeMoved = (point.owner()->command()->type() == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right);
+    if (!canBeMoved)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Selected branch can not be moved here"));
+        return;
+    }
+
+    bool isEndBranch = Cyclogram::isCyclogramEndBranch(branchToMove->command());
+    if (isEndBranch)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("End branch can not be moved anywhere"));
+        return;
+    }
+
+    /////////////////////////////////
+//    auto branchesShapes1 = mRootShape->childShapes();
+//    LOG_DEBUG(QString("======================="));
+//    LOG_DEBUG(QString("Move Branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(branchToMove->command()->text()).arg(branchToMove->cell().x()).arg(branchToMove->cell().y()).arg(branchToMove->rect().left()).arg(branchToMove->rect().right()).arg(branchToMove->rect().width()));
+//    LOG_DEBUG(QString("To VP of branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(point.owner()->command()->text()).arg(point.owner()->cell().x()).arg(point.owner()->cell().y()).arg(point.owner()->rect().left()).arg(point.owner()->rect().right()).arg(point.owner()->rect().width()));
+//    LOG_DEBUG(QString("======================="));
+
+//    foreach (ShapeItem* it, branchesShapes1)
+//    {
+//        LOG_DEBUG(QString("Branch '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(it->command()->text()).arg(it->cell().x()).arg(it->cell().y()).arg(it->rect().left()).arg(it->rect().right()).arg(it->rect().width()));
+//    }
+
+//    LOG_DEBUG(QString("======================="));
+//    //////////////////////////////////////
+
+    // save branches order by moving the newly added branch start after the branch-owner of the valency point
+    //cyclogram->moveLastCommand(point.owner()->command()); //TODO save branch order
+
+    QRect ownerRect = point.owner()->rect();
+    QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
+
+    int oldCell = branchToMove->cell().x();
+    int xOffset = cell.x() - oldCell;
+    if (xOffset > 0)
+    {
+        xOffset -= branchToMove->rect().width();
+    }
+
+//    LOG_DEBUG(QString("Offset is %1").arg(xOffset));
+
+    //return;
+
+    QRect movingBranchRect = branchToMove->rect();
+    movingBranchRect.setLeft(movingBranchRect.left() + xOffset);
+    movingBranchRect.setRight(movingBranchRect.right() + xOffset);
+    branchToMove->setRect(movingBranchRect, true);
+
+//    LOG_DEBUG(QString("After moving '%1': cell (%2, %3), rect l=%4, r=%5, w=%6").arg(branchToMove->command()->text()).arg(branchToMove->cell().x()).arg(branchToMove->cell().y()).arg(branchToMove->rect().left()).arg(branchToMove->rect().right()).arg(branchToMove->rect().width()));
+
+    auto branchesShapes = mRootShape->childShapes();
+
+    if (xOffset == 0)
+    {
+        return;
+    }
+
+    if (xOffset > 0) // branch moved to the right
+    {
+        foreach (ShapeItem* it, branchesShapes)
+        {
+            if (it == branchToMove) // skip moving branch (it is already moved)
+            {
+                continue;
+            }
+
+            QPoint cell = it->cell();
+            QPoint newBranchCell = branchToMove->cell();
+            if (cell.x() > newBranchCell.x()) // do not move branches to the right of the insertion point
+            {
+                continue;
+            }
+
+            if (cell.x() < oldCell) // do not move branches to the right of the old position
+            {
+                continue;
+            }
+
+            // move branches between insertion point and old branch position
+            QRect rect = it->rect();
+            rect.setRight(rect.right() - branchToMove->rect().width());
+            rect.setLeft(rect.left() - branchToMove->rect().width());
+            it->setRect(rect, true);
+        }
+    }
+    else // branch moved to the left
+    {
+        foreach (ShapeItem* it, branchesShapes)
+        {
+            if (it == branchToMove) // skip moving branch (it is already moved)
+            {
+                continue;
+            }
+
+            QPoint cell = it->cell();
+            QPoint newBranchCell = branchToMove->cell();
+            if (cell.x() < newBranchCell.x()) // do not move branches to the left of the insertion point
+            {
+                continue;
+            }
+
+            if (cell.x() > oldCell) // do not move branches to the right of the old position
+            {
+                continue;
+            }
+
+            // move branches between insertion point and old branch position
+            QRect rect = it->rect();
+            rect.setRight(rect.right() + branchToMove->rect().width());
+            rect.setLeft(rect.left() + branchToMove->rect().width());
+            it->setRect(rect, true);
+        }
+    }
+
+
+    onNeedUpdate();
+}
+
 ShapeItem* CyclogramWidget::copyBranch(Command* branchCmd, const QPoint& cell)
 {
     ShapeItem* shape = addShape(branchCmd, cell, mRootShape);
@@ -680,7 +803,7 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
 
     if (type == DRAKON::BRANCH_BEGIN)
     {
-        auto cyclogram = mCurrentCyclogram.lock();
+        auto cyclogram = mCyclogram.lock();
         enableCopyAction = !cyclogram->isCyclogramEndBranch(item->command());
     }
 
@@ -741,7 +864,7 @@ void CyclogramWidget::showSubprogramWidget()
     }
     else
     {
-        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCurrentCyclogram.lock(), mMainWindow);
+        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCyclogram.lock(), mMainWindow);
         mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
 
         QString title = updateWindowTitle(subProgramDialog);
@@ -788,7 +911,7 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
     //remember that mousePressEvent will be called first!
     if (event->button() == Qt::LeftButton)
     {
-        if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
+        if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
         {
             return; // to not edit cyclogram while it is executed
         }
@@ -820,7 +943,7 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (mPressedShape && !mDraggingShape)
     {
-        auto cyclogram = mCurrentCyclogram.lock();
+        auto cyclogram = mCyclogram.lock();
         DRAKON::IconType type = mPressedShape->command()->type();
         Command* commandCopy = cyclogram->createCommand(type);
         commandCopy->copyFrom(mPressedShape->command());
@@ -836,7 +959,7 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 
 void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
+    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
         return; // no cyclogram mouse interaction available during cyclogram running
     }
@@ -854,7 +977,16 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         {
             if (isOverVP)
             {
-                int TODO; // try to move dragging shape to valency point above
+                // try to move dragging shape to valency point above
+                if (mPressedShape->command()->type() == DRAKON::BRANCH_BEGIN)
+                {
+                    moveBranchTo(mPressedShape, point);
+                }
+                else
+                {
+                    copyCommandTo(mPressedShape, point);
+                    deleteCommand(mPressedShape);
+                }
             }
         }
         else // just usual click
@@ -1119,13 +1251,13 @@ void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
         return;
     }
 
-    if (mCurrentCyclogram.data())
+    if (mCyclogram.data())
     {
-        disconnect(mCurrentCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
-        disconnect(mCurrentCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
+        disconnect(mCyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
+        disconnect(mCyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
     }
 
-    mCurrentCyclogram = cyclogram;
+    mCyclogram = cyclogram;
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(cyclogram.data(), SIGNAL(deleted(Command*)), this, SLOT(removeShape(Command*)));
 
@@ -1155,7 +1287,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     }
 
     // nothing can be deleted in running cyclogram
-    if (mCurrentCyclogram.lock()->state() == Cyclogram::RUNNING)
+    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
     {
         error = tr("THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!");
         return false;
@@ -1164,7 +1296,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     if (item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         // START and END branches never can be deleted
-        Command* startBranch = mCurrentCyclogram.lock()->first();
+        Command* startBranch = mCyclogram.lock()->first();
 
         // check is start branch trying to delete
         if (startBranch->nextCommand() == item->command())
@@ -1173,7 +1305,7 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
             return false;
         }
 
-        const ShapeItem* lastBranch = findBranch(mCurrentCyclogram.lock()->last());
+        const ShapeItem* lastBranch = findBranch(mCyclogram.lock()->last());
 
         // check is end branch trying to delete
         if (lastBranch->command() == item->command())
@@ -1266,7 +1398,7 @@ void CyclogramWidget::removeShape(Command* command)
 
 void CyclogramWidget::onNeedToDelete(ShapeItem* shape)
 {
-    mCurrentCyclogram.lock()->deleteCommand(shape->command());
+    mCyclogram.lock()->deleteCommand(shape->command());
 }
 
 void CyclogramWidget::onNeedUpdate()
@@ -1488,7 +1620,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
     }
 
     QList<Command*> branches;
-    mCurrentCyclogram.lock()->getBranches(branches);
+    mCyclogram.lock()->getBranches(branches);
 
     int maxHeight = -1;
     int width = 0;
@@ -1684,7 +1816,7 @@ ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPo
     }
 
     // 1. Create new command
-    Command* newCmd = mCurrentCyclogram.lock()->createCommand(type, param);
+    Command* newCmd = mCyclogram.lock()->createCommand(type, param);
     if (!newCmd)
     {
         return Q_NULLPTR;
@@ -1790,7 +1922,7 @@ void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint
 ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 {
     // Create and add BRANCH_BEGIN item
-    auto cyclogram = mCurrentCyclogram.lock();
+    auto cyclogram = mCyclogram.lock();
     Command* newCmd = cyclogram->createCommand(DRAKON::BRANCH_BEGIN);
     if (!newCmd)
     {
@@ -1829,7 +1961,7 @@ void CyclogramWidget::deleteCommand(ShapeItem* item)
     }
 
     item->remove();
-    mCurrentCyclogram.lock()->deleteCommand(item->command()); // shape will be deleted by the signal
+    mCyclogram.lock()->deleteCommand(item->command()); // shape will be deleted by the signal
 }
 
 void CyclogramWidget::deleteBranch(ShapeItem* item)
@@ -1880,7 +2012,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     }
 
     // 4. Kill all shapes and commands, belonging to deleting branch
-    mCurrentCyclogram.lock()->deleteCommand(item->command(), true);
+    mCyclogram.lock()->deleteCommand(item->command(), true);
 
     QRect r = mRootShape->rect();
     r.setRight(r.right() + xOffset);
