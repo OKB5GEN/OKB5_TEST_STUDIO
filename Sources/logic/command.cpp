@@ -22,8 +22,7 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
     mType(type),
     mRole(ValencyPoint::Down),
     mFlags(Command::All),
-    mOnStartTextColor(0xff000000), // black by default
-    mOnFinishTextColor(0xff000000), // black by default
+    mConsoleTextColor(0xff000000), // black by default
     mHasError(false),
     mExecutionDelay(0),
     mVarCtrl(Q_NULLPTR),
@@ -335,10 +334,8 @@ void Command::write(QXmlStreamWriter* writer)
     // write common commands attributes
     writer->writeAttribute("type", metaEnum.valueToKey(type()));
     writer->writeAttribute("id", QString::number(id()));
-    writer->writeAttribute("on_start_text", mOnStartConsoleText);
-    writer->writeAttribute("on_finish_text", mOnFinishConsoleText);
-    writer->writeAttribute("on_start_text_color", QString::number(mOnStartTextColor, 16));
-    writer->writeAttribute("on_finish_text_color", QString::number(mOnFinishTextColor, 16));
+    writer->writeAttribute("console_text", mConsoleText);
+    writer->writeAttribute("console_text_color", QString::number(mConsoleTextColor, 16));
 
     writeCustomAttributes(writer);
 
@@ -354,25 +351,15 @@ void Command::read(QXmlStreamReader* reader)
         mID = attributes.value("id").toString().toLongLong();
     }
 
-    if (attributes.hasAttribute("on_start_text"))
+    if (attributes.hasAttribute("console_text"))
     {
-        mOnStartConsoleText = attributes.value("on_start_text").toString();
-    }
-
-    if (attributes.hasAttribute("on_finish_text"))
-    {
-        mOnFinishConsoleText = attributes.value("on_finish_text").toString();
+        mConsoleText = attributes.value("console_text").toString();
     }
 
     bool ok;
-    if (attributes.hasAttribute("on_start_text_color"))
+    if (attributes.hasAttribute("console_text_color"))
     {
-        mOnStartTextColor = attributes.value("on_start_text_color").toULong(&ok, 16);
-    }
-
-    if (attributes.hasAttribute("on_finish_text_color"))
-    {
-        mOnFinishTextColor = attributes.value("on_finish_text_color").toULong(&ok, 16);
+        mConsoleTextColor = attributes.value("console_text_color").toULong(&ok, 16);
     }
 
     readCustomAttributes(reader);
@@ -395,32 +382,21 @@ qint64 Command::id() const
     return mID;
 }
 
-const QString& Command::onStartConsoleText() const
+const QString& Command::consoleText() const
 {
-    return mOnStartConsoleText;
+    return mConsoleText;
 }
 
-const QString& Command::onFinishConsoleText() const
+void Command::setConsoleMessage(const QString& text, uint32_t colorARGB)
 {
-    return mOnFinishConsoleText;
-}
+    QString textBefore = mConsoleText;
+    uint32_t colorBefore = mConsoleTextColor;
 
-void Command::setConsoleMessageData(const QString& beforeText, const QString& afterText, uint32_t beforeTextColorARGB, uint32_t afterTextColorARGB)
-{
-    QString startTextBefore = mOnStartConsoleText;
-    QString endTextBefore = mOnFinishConsoleText;
-    uint32_t startColorBefore = mOnStartTextColor;
-    uint32_t endColorBefore = mOnFinishTextColor;
+    mConsoleText = text;
+    mConsoleTextColor = colorARGB;
 
-    mOnFinishConsoleText = afterText;
-    mOnStartConsoleText = beforeText;
-    mOnStartTextColor = beforeTextColorARGB;
-    mOnFinishTextColor = afterTextColorARGB;
-
-    bool isDataChanged = ((startTextBefore != mOnStartConsoleText)
-                          || (endTextBefore != mOnFinishConsoleText)
-                          || (startColorBefore != mOnStartTextColor)
-                          || (endColorBefore != mOnFinishTextColor));
+    bool isDataChanged = ((textBefore != mConsoleText)
+                          || (colorBefore != mConsoleTextColor));
 
     if (isDataChanged)
     {
@@ -428,54 +404,29 @@ void Command::setConsoleMessageData(const QString& beforeText, const QString& af
     }
 }
 
-void Command::setOnStartConsoleText(const QString& text)
+void Command::setConsoleText(const QString& text)
 {
-    QString textBefore = mOnStartConsoleText;
-    mOnStartConsoleText = text;
-    if (textBefore != mOnStartConsoleText)
+    QString textBefore = mConsoleText;
+    mConsoleText = text;
+    if (textBefore != mConsoleText)
     {
         emit dataChanged(mText);
     }
 }
 
-void Command::setOnFinishConsoleText(const QString& text)
+void Command::setConsoleTextColor(uint32_t argb)
 {
-    QString textBefore = mOnFinishConsoleText;
-    mOnFinishConsoleText = text;
-    if (textBefore != mOnFinishConsoleText)
+    uint32_t colorBefore = mConsoleTextColor;
+    mConsoleTextColor = argb;
+    if (colorBefore != mConsoleTextColor)
     {
         emit dataChanged(mText);
     }
 }
 
-void Command::setOnStartConsoleTextColor(uint32_t argb)
+QColor Command::consoleTextColor() const
 {
-    uint32_t colorBefore = mOnStartTextColor;
-    mOnStartTextColor = argb;
-    if (colorBefore != mOnStartTextColor)
-    {
-        emit dataChanged(mText);
-    }
-}
-
-void Command::setOnFinishConsoleTextColor(uint32_t argb)
-{
-    uint32_t colorBefore = mOnFinishTextColor;
-    mOnFinishTextColor = argb;
-    if (colorBefore != mOnFinishTextColor)
-    {
-        emit dataChanged(mText);
-    }
-}
-
-QColor Command::onStartConsoleTextColor() const
-{
-    return QColor::fromRgba(mOnStartTextColor);
-}
-
-QColor Command::onFinishConsoleTextColor() const
-{
-    return QColor::fromRgba(mOnFinishTextColor);
+    return QColor::fromRgba(mConsoleTextColor);
 }
 
 bool Command::copyFrom(Command* other)
@@ -486,10 +437,8 @@ bool Command::copyFrom(Command* other)
         return false;
     }
 
-    mOnStartConsoleText = other->onStartConsoleText();
-    mOnFinishConsoleText = other->onFinishConsoleText();
-    mOnStartTextColor = other->onStartConsoleTextColor().rgba();
-    mOnFinishTextColor = other->onFinishConsoleTextColor().rgba();
+    mConsoleText = other->consoleText();
+    mConsoleTextColor = other->consoleTextColor().rgba();
     mHasError = other->hasError();
     mExecutionDelay = other->executionDelay();
 

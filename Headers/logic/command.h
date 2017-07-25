@@ -43,18 +43,14 @@ public:
     void write(QXmlStreamWriter* writer);
     void read(QXmlStreamReader* reader);
 
-    void setConsoleMessageData(const QString& beforeText, const QString& afterText, uint32_t beforeTextColorARGB, uint32_t afterTextColorARGB);
-    void setOnStartConsoleText(const QString& text);
-    void setOnFinishConsoleText(const QString& text);
-    void setOnStartConsoleTextColor(uint32_t argb);
-    void setOnFinishConsoleTextColor(uint32_t argb);
+    void setConsoleMessage(const QString& text, uint32_t colorARGB);
+    void setConsoleText(const QString& text);
+    void setConsoleTextColor(uint32_t argb);
 
     const QString& text() const;
     const QString& errorDesc() const;
-    const QString& onStartConsoleText() const;
-    const QString& onFinishConsoleText() const;
-    QColor onStartConsoleTextColor() const;
-    QColor onFinishConsoleTextColor() const;
+    const QString& consoleText() const;
+    QColor consoleTextColor() const;
 
     DRAKON::IconType type() const;
 
@@ -111,12 +107,10 @@ protected:
     DRAKON::IconType mType;
     QString mText;
     QString mErrorText;
-    QString mOnStartConsoleText;
-    QString mOnFinishConsoleText;
+    QString mConsoleText;
+    uint32_t mConsoleTextColor;
 
     uint32_t mFlags = 0; // Command flags here, by default the command is not interactive
-    uint32_t mOnStartTextColor;
-    uint32_t mOnFinishTextColor;
 
     int mExecutionDelay;
     VariableController* mVarCtrl;

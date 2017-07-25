@@ -456,9 +456,8 @@ void ShapeItem::updateToolTip()
     case DRAKON::OUTPUT:
         {
             CmdOutput* cmd = qobject_cast<CmdOutput*>(mCommand);
-            mToolTip = tr("Cyclogram console message.") + "\n";
-            mToolTip += tr("Before execution message: ") + cmd->onStartConsoleText() + "\n";
-            mToolTip += tr("After execution message: ") + cmd->onFinishConsoleText();
+            mToolTip = tr("Console message:") + "\n";
+            mToolTip += cmd->consoleText();// + "\n";
         }
         break;
     case DRAKON::PARALLEL_PROCESS:

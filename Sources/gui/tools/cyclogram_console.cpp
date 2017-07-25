@@ -38,36 +38,18 @@ CyclogramConsole::~CyclogramConsole()
 
 void CyclogramConsole::onCommandStarted(Command* command)
 {
-    if (command->onStartConsoleText().isEmpty())
-    {
-        return;
-    }
-
-    QString message = command->onStartConsoleText();
-    //TODO parse text to find variable links/macroses etc
-
-    addMessage(command->onStartConsoleTextColor(), message);
-
-//    QStringList colors = ConsoleTextWidget::colorsList();
-
-//    foreach (QString colorName, colors)
-//    {
-//        QColor color(colorName);
-//        addMessage(color, colorName);
-//    }
 }
 
 void CyclogramConsole::onCommandFinished(Command* command)
 {
-    if (command->onFinishConsoleText().isEmpty())
+    QString message = command->consoleText();
+    if (message.isEmpty())
     {
         return;
     }
 
-    QString message = command->onFinishConsoleText();
     //TODO parse text to find variable links/ьфскщыуы
-
-    addMessage(command->onFinishConsoleTextColor(), message);
+    addMessage(command->consoleTextColor(), message);
 }
 
 void CyclogramConsole::addMessage(const QColor& color, const QString& message)

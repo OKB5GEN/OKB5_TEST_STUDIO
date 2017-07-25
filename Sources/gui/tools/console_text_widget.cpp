@@ -8,32 +8,21 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
     QGroupBox(parent),
     mCommand(Q_NULLPTR)
 {
-    setTitle(tr("Console text"));
+    setTitle(tr("Console text (after command execution)"));
     QGridLayout* boxLayout = new QGridLayout(this);
 
-    mStartColor = new QComboBox(this);
-    mFinishColor = new QComboBox(this);
-    mStartColor->installEventFilter(this);
-    mFinishColor->installEventFilter(this);
-    mStartEdit = new QLineEdit(this);
-    mFinishEdit = new QLineEdit(this);
+    mColorBox = new QComboBox(this);
+    mColorBox->installEventFilter(this);
+    mTextEdit = new QLineEdit(this);
 
-    int row = 0;
-    boxLayout->addWidget(new QLabel(tr("Before"), this), row, 0);
-    boxLayout->addWidget(mStartEdit, row, 1);
-    boxLayout->addWidget(mStartColor, row, 2);
-
-    ++row;
-    boxLayout->addWidget(new QLabel(tr("After"), this), row, 0);
-    boxLayout->addWidget(mFinishEdit, row, 1);
-    boxLayout->addWidget(mFinishColor, row, 2);
+    boxLayout->addWidget(mTextEdit, 0, 0);
+    boxLayout->addWidget(mColorBox, 0, 1);
 
     setLayout(boxLayout);
 
     colorsList(); // just for colors list creation
 
-    setColors(mStartColor);
-    setColors(mFinishColor);
+    setColors(mColorBox);
 }
 
 ConsoleTextWidget::~ConsoleTextWidget()
@@ -53,7 +42,7 @@ void ConsoleTextWidget::setColors(QComboBox *box)
         pixmap.fill(color);
         QIcon icon(pixmap);
 
-        box->addItem(icon, "" /*colorName*/, QVariant(color.rgba()));
+        box->addItem(icon, colorName, QVariant(color.rgba()));
     }
 }
 
@@ -66,22 +55,14 @@ void ConsoleTextWidget::setCommand(Command* command)
         return;
     }
 
-    QColor startColor = mCommand->onStartConsoleTextColor();
-    QColor finishColor = mCommand->onFinishConsoleTextColor();
-    int startIndex = mStartColor->findData(QVariant(startColor.rgba()));
-    int finishIndex = mFinishColor->findData(QVariant(finishColor.rgba()));
+    QColor color = mCommand->consoleTextColor();
+    int index = mColorBox->findData(QVariant(color.rgba()));
 
-    mStartEdit->setText(mCommand->onStartConsoleText());
-    mFinishEdit->setText(mCommand->onFinishConsoleText());
+    mTextEdit->setText(mCommand->consoleText());
 
-    if (startIndex != -1)
+    if (index != -1)
     {
-        mStartColor->setCurrentIndex(startIndex);
-    }
-
-    if (finishIndex != -1)
-    {
-        mFinishColor->setCurrentIndex(finishIndex);
+        mColorBox->setCurrentIndex(index);
     }
 }
 
@@ -92,10 +73,9 @@ void ConsoleTextWidget::saveCommand()
         return;
     }
 
-    QColor startColor = QColor::fromRgba(mStartColor->itemData(mStartColor->currentIndex()).toUInt());
-    QColor finishColor = QColor::fromRgba(mFinishColor->itemData(mFinishColor->currentIndex()).toUInt());
+    QColor color = QColor::fromRgba(mColorBox->itemData(mColorBox->currentIndex()).toUInt());
 
-    mCommand->setConsoleMessageData(mStartEdit->text(), mFinishEdit->text(), startColor.rgba(), finishColor.rgba());
+    mCommand->setConsoleMessage(mTextEdit->text(), color.rgba());
 }
 
 bool ConsoleTextWidget::eventFilter(QObject *obj, QEvent *event)
@@ -156,6 +136,7 @@ const QStringList& ConsoleTextWidget::colorsList()
         colors.removeAll("peachpuff");
         colors.removeAll("seashell");
         colors.removeAll("snow");
+        colors.removeAll("transparent");
         colors.removeAll("wheat");
         colors.removeAll("white");
         colors.removeAll("whitesmoke");
@@ -276,8 +257,6 @@ const QStringList& ConsoleTextWidget::colorsList()
         //    steelblue	rgb( 70, 130, 180)
         //    teal	rgb( 0, 128, 128)
         //    tomato	rgb(255, 99, 71)
-
-
 
 //            // "mainstream" colors
 //            colors.append("black");

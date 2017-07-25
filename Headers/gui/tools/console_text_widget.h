@@ -26,10 +26,8 @@ private:
 
     void setColors(QComboBox* box);
 
-    QComboBox* mStartColor;
-    QComboBox* mFinishColor;
-    QLineEdit* mStartEdit;
-    QLineEdit* mFinishEdit;
+    QComboBox* mColorBox;
+    QLineEdit* mTextEdit;
 
     Command* mCommand;
 };
