@@ -12,9 +12,9 @@ CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
 {
     QGridLayout * layout = new QGridLayout(this);
 
-    mComboBox = new QComboBox(this);
-    mComboBox->installEventFilter(this);
-    layout->addWidget(mComboBox, 0, 0);
+    mBranchesList = new QListWidget(this);
+    mBranchesList->installEventFilter(this);
+    layout->addWidget(mBranchesList, 0, 0);
 
     mConsoleTextWidget = new ConsoleTextWidget(this);
     layout->addWidget(mConsoleTextWidget, 1, 0);
@@ -39,7 +39,7 @@ CmdSetStateEditDialog::~CmdSetStateEditDialog()
 void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Command*>& branches)
 {
     mCommand = command;
-    mComboBox->clear();
+    mBranchesList->clear();
     mBranches = branches;
 
     Command* nextCmd = Q_NULLPTR;
@@ -62,11 +62,11 @@ void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Comma
             mCurrentIndex = i;
         }
 
-        mComboBox->addItem(cmd->text());
+        mBranchesList->addItem(cmd->text());
         ++i;
     }
 
-    mComboBox->setCurrentIndex(mCurrentIndex);
+    mBranchesList->setCurrentRow(mCurrentIndex);
     mConsoleTextWidget->setCommand(mCommand);
 }
 
@@ -74,7 +74,7 @@ void CmdSetStateEditDialog::onAccept()
 {
     if (mCommand)
     {
-        int index = mComboBox->currentIndex();
+        int index = mBranchesList->currentIndex().row();
 
         if (mCommand->hasError() || index != mCurrentIndex)
         {
@@ -88,14 +88,14 @@ void CmdSetStateEditDialog::onAccept()
     accept();
 }
 
-bool CmdSetStateEditDialog::eventFilter(QObject *obj, QEvent *event)
-{
-    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
-    {
-        return true; // do not process wheel events if combo box is not "expanded/opened"
-    }
-    else
-    {
-        return QObject::eventFilter(obj, event); // standard event processing
-    }
-}
+//bool CmdSetStateEditDialog::eventFilter(QObject *obj, QEvent *event)
+//{
+//    if (event->type() == QEvent::Wheel && qobject_cast<QComboBox*>(obj))
+//    {
+//        return true; // do not process wheel events if combo box is not "expanded/opened"
+//    }
+//    else
+//    {
+//        return QObject::eventFilter(obj, event); // standard event processing
+//    }
+//}

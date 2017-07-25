@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-class QComboBox;
+class QListWidget;
 
 class CmdSetState;
 class Command;
@@ -23,10 +23,10 @@ private slots:
     void onAccept();
 
 private:
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    //bool eventFilter(QObject *obj, QEvent *event) override;
 
     int mCurrentIndex;
-    QComboBox* mComboBox;
+    QListWidget* mBranchesList;
     CmdSetState* mCommand;
     QList<Command*> mBranches;
     ConsoleTextWidget* mConsoleTextWidget;
