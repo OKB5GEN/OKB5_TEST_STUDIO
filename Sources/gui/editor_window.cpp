@@ -8,6 +8,7 @@
 #include "Headers/gui/tools/app_settings_dialog.h"
 #include "Headers/app_settings.h"
 #include "Headers/gui/tools/cyclogram_console.h"
+#include "Headers/gui/tools/commands_edit_toolbar.h"
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h"
@@ -62,7 +63,8 @@ static void writeRecentFiles(const QStringList &files, QSettings &settings)
 }
 
 EditorWindow::EditorWindow():
-    mScaleFactor(1.0)
+    mScaleFactor(1.0),
+    mCommandsEditToolbar(Q_NULLPTR)
 {
     mScrollArea = new QScrollArea(this);
     mSystemState = new SystemState(this);
@@ -328,19 +330,9 @@ void EditorWindow::createActions()
     exitAct->setShortcuts(QKeySequence::Quit);
     exitAct->setStatusTip(tr("Exit the application"));
 
-    // edit toolbar
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-    QToolBar *editToolBar = addToolBar(tr("Edit"));
-    editToolBar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+    createCommandsEditToolBar();
 
-    mDeleteAct = new QAction(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
-    mDeleteAct->setEnabled(false);
-    mDeleteAct->setStatusTip(tr("Delete selected command"));
-    connect(mDeleteAct, &QAction::triggered, this, &EditorWindow::deleteSelected);
     connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
-
-    editMenu->addAction(mDeleteAct);
-    editToolBar->addAction(mDeleteAct);
 
     /*
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -437,6 +429,26 @@ void EditorWindow::createActions()
     stopCyclogram();
 }
 
+void EditorWindow::createCommandsEditToolBar()
+{
+    //QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    if (mCommandsEditToolbar)
+    {
+        return;
+    }
+
+    mCommandsEditToolbar = new CommandsEditToolbar(this);
+    mCommandsEditToolbar->setIconSize(QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE));
+    mCommandsEditToolbar->setAllowedAreas(Qt::LeftToolBarArea);
+
+    addToolBar(Qt::LeftToolBarArea, mCommandsEditToolbar);
+
+    QAction * deleteAction = mCommandsEditToolbar->deleteAction();
+    connect(deleteAction, &QAction::triggered, this, &EditorWindow::deleteSelected);
+
+    connect(mCommandsEditToolbar, SIGNAL(currentCommandChanged(int)), mCyclogramWidget, SLOT(setCurrentCommandType(int)));
+}
+
 void EditorWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
@@ -511,7 +523,8 @@ void EditorWindow::loadFile(const QString &fileName)
     }
 
     mSaveAct->setDisabled(true);
-    mDeleteAct->setDisabled(true);
+
+    mCommandsEditToolbar->reset();
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -792,6 +805,8 @@ void EditorWindow::addSuprogramDialog(CmdSubProgram* command, SubProgramDialog* 
     connect(dialog, SIGNAL(destroyed(QObject*)), this, SLOT(onSubprogramDialogDestroyed(QObject*)));
 
     mOpenedSubprogramDialogs[command] = dialog;
+
+    connect(mCommandsEditToolbar, SIGNAL(currentCommandChanged(int)), dialog->cyclogramWidget(), SLOT(setCurrentCommandType(int)));
 }
 
 void EditorWindow::onSubprogramDestroyed(QObject* object)
@@ -893,5 +908,5 @@ void EditorWindow::deleteSelected()
 
 void EditorWindow::onCyclogramSelectionChanged(ShapeItem* item)
 {
-    mDeleteAct->setEnabled(item != Q_NULLPTR);
+    mCommandsEditToolbar->deleteAction()->setEnabled(item != Q_NULLPTR);
 }

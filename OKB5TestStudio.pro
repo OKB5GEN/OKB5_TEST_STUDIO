@@ -91,7 +91,8 @@ SOURCES += main.cpp\
     Sources/app_settings.cpp \
     Sources/gui/tools/app_settings_dialog.cpp \
     Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp \
-    Sources/gui/cyclogram/variables_select_window.cpp
+    Sources/gui/cyclogram/variables_select_window.cpp \
+    Sources/gui/tools/commands_edit_toolbar.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -166,7 +167,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/app_settings.h \
     Headers/gui/tools/app_settings_dialog.h \
     Headers/gui/cyclogram/dialogs/text_edit_dialog.h \
-    Headers/gui/cyclogram/variables_select_window.h
+    Headers/gui/cyclogram/variables_select_window.h \
+    Headers/gui/tools/commands_edit_toolbar.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 

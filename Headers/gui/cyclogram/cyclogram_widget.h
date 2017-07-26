@@ -38,6 +38,7 @@ public slots:
     void load(QSharedPointer<Cyclogram> cyclogram);
     void showValidationError(Command* cmd);
     void deleteSelectedItem();
+    void setCurrentCommandType(int command);
 
 protected:
     bool event(QEvent* event) Q_DECL_OVERRIDE;
@@ -103,7 +104,7 @@ private:
     ShapeItem* addNewBranch(ShapeItem* item);
 
     void showEditDialog(Command* command);
-    void onClickVP(const ValencyPoint& point);
+    void onClickVP(const ValencyPoint& point, const QPoint& pos);
     void showContextMenuForVP(const ValencyPoint& point, const QPoint& pos);
     void showContextMenuForCommand(ShapeItem* item, const QPoint& pos);
 
@@ -130,6 +131,8 @@ private:
 
     qreal mScale;
     QScrollArea* mParentScrollArea;
+
+    int mCurrentCommandType;
 
 signals:
     void selectionChanged(ShapeItem* item);

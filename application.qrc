@@ -5,7 +5,17 @@
         <file>resources/images/save.png</file>
         <file>resources/images/pause.png</file>
         <file>resources/images/play.png</file>
+        <file>resources/images/cmd_delay.png</file>
+        <file>resources/images/cmd_go_to_branch.png</file>
+        <file>resources/images/cmd_input.png</file>
+        <file>resources/images/cmd_output.png</file>
+        <file>resources/images/cmd_math.png</file>
+        <file>resources/images/cmd_module.png</file>
+        <file>resources/images/cmd_question.png</file>
+        <file>resources/images/cmd_subprogram.png</file>
+        <file>resources/images/cmd_parallel_process.png</file>
         <file>resources/images/settings.png</file>
+        <file>resources/images/select.png</file>
         <file>resources/images/stop.png</file>
         <file>resources/images/step_forward.png</file>
         <file>resources/images/monitor_auto.png</file>

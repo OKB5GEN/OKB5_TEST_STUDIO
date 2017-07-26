@@ -12,6 +12,7 @@ class QScrollArea;
 class CyclogramWidget;
 class Cyclogram;
 class CyclogramConsole;
+class CommandsEditToolbar;
 class VariablesWindow;
 class SystemState;
 class CyclogramChartDialog;
@@ -77,6 +78,8 @@ private:
     void closeAll();
     void createActions();
     void createStatusBar();
+    void createCommandsEditToolBar();
+
     void readSettings();
     void writeSettings();
     bool maybeSave();
@@ -102,7 +105,6 @@ private:
 
     QAction* mRunAct;
     QAction* mStopAct;
-    QAction* mDeleteAct;
     QAction* mSettingsAct;
     QAction* mShowVariablesAct;
     QAction* mAddMonitorAct;
@@ -120,6 +122,8 @@ private:
     qreal mScaleFactor;
 
     CyclogramConsole* mCyclogramConsole;
+
+    CommandsEditToolbar* mCommandsEditToolbar;
 
     int mSnapshotsCouner; // hack for force data snapshot save
 

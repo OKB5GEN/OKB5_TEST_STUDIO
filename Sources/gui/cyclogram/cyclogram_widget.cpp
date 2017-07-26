@@ -57,7 +57,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mDraggingShape(Q_NULLPTR),
     mPressedShape(Q_NULLPTR),
     mItemToCopy(Q_NULLPTR),
-    mMouseButtonState(Qt::NoButton)
+    mMouseButtonState(Qt::NoButton),
+    mCurrentCommandType(-1)
 {
     onAppSettingsChanged();
 
@@ -398,7 +399,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void CyclogramWidget::onClickVP(const ValencyPoint& point)
+void CyclogramWidget::onClickVP(const ValencyPoint& point, const QPoint& pos)
 {
     clearSelection();
 
@@ -411,15 +412,26 @@ void CyclogramWidget::onClickVP(const ValencyPoint& point)
     }
     else // add some command via dialog (TODO tempotary)
     {
-        ShapeAddDialog dialog(this);
-
-        dialog.setValencyPoint(point);
-        dialog.exec();
-
-        if (dialog.result() == QDialog::Accepted)
+        if (mCurrentCommandType != -1)
         {
-            addNewCommand(dialog.shapeType(), point, dialog.param());
+            addNewCommand(DRAKON::IconType(mCurrentCommandType), point, CmdQuestion::IF); //TODO not SWITCH_STATE
         }
+        else // TODO show context menu?
+        {
+            showContextMenuForVP(point, pos);
+        }
+
+        //TODO else?
+
+//        ShapeAddDialog dialog(this);
+
+//        dialog.setValencyPoint(point);
+//        dialog.exec();
+
+//        if (dialog.result() == QDialog::Accepted)
+//        {
+//            addNewCommand(dialog.shapeType(), point, dialog.param());
+//        }
     }
 }
 
@@ -849,6 +861,8 @@ void CyclogramWidget::showSubprogramWidget()
         subProgramDialog = new SubProgramDialog(mCurSubprogram, mCyclogram.lock(), mMainWindow);
         mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
 
+        subProgramDialog->cyclogramWidget()->setCurrentCommandType(mCurrentCommandType);
+
         QString title = updateWindowTitle(subProgramDialog);
         subProgramDialog->cyclogramWidget()->setWindowTitle(title);
         subProgramDialog->show();
@@ -975,7 +989,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         {
             if (isOverVP)
             {
-                onClickVP(point);
+                onClickVP(point, mapToGlobal(event->pos()));
             }
             else // if no valency point click, check command shape click
             {
@@ -2126,4 +2140,9 @@ void CyclogramWidget::dragLeaveEvent(QDragLeaveEvent* event)
 void CyclogramWidget::dropEvent(QDropEvent* event)
 {
     LOG_DEBUG(QString("DROP event"));
+}
+
+void CyclogramWidget::setCurrentCommandType(int command)
+{
+    mCurrentCommandType = command;
 }
