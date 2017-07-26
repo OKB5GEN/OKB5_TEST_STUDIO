@@ -18,8 +18,8 @@
 namespace
 {
     static const int SIZE_ADJUST = 100;
-    static const int MAX_DIALOG_WIDTH = 1600;
-    static const int MAX_DIALOG_HEIGHT = 800;
+    static const int DEFAULT_MAX_DIALOG_WIDTH = 1600;
+    static const int DEFAULT_MAX_DIALOG_HEIGHT = 800;
 }
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow):
@@ -31,8 +31,6 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
 
     mScrollArea = new QScrollArea(this);
     mScrollArea->setBackgroundRole(QPalette::Dark);
-
-    setMaximumSize(QSize(MAX_DIALOG_WIDTH, MAX_DIALOG_HEIGHT));
 
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setMainWindow(mainWindow);
@@ -75,6 +73,12 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     setAttribute(Qt::WA_DeleteOnClose);
 
     updateSize();
+
+    QSize size = this->size();
+    if (size.width() > DEFAULT_MAX_DIALOG_WIDTH || size.height() > DEFAULT_MAX_DIALOG_HEIGHT)
+    {
+        resize(QSize(qMin(size.width(), DEFAULT_MAX_DIALOG_WIDTH), qMin(size.height(), DEFAULT_MAX_DIALOG_HEIGHT)));
+    }
 
     onCyclogramModified();
     onCyclogramSelectionChanged(mCyclogramWidget->selectedItem());
