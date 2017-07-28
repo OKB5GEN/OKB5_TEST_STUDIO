@@ -481,7 +481,8 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
     menu.addAction(tr("Add MODULE COMMAND"))->setData(int(DRAKON::ACTION_MODULE));
     menu.addAction(tr("Add MATH COMMAND"))->setData(int(DRAKON::ACTION_MATH));
     menu.addAction(tr("Add SUBPROGRAM"))->setData(int(DRAKON::SUBPROGRAM));
-    menu.addAction(tr("Add QUESTION"))->setData(int(DRAKON::QUESTION));
+    QAction* questionAct = menu.addAction(tr("Add QUESTION"));
+    questionAct->setData(int(DRAKON::QUESTION));
     menu.addAction(tr("Add DELAY"))->setData(int(DRAKON::DELAY));
     menu.addAction(tr("Add OUTPUT"))->setData(int(DRAKON::OUTPUT));
 
@@ -512,13 +513,13 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
     int command = action->data().toInt();
     if (command == DRAKON::QUESTION) //TODO remove
     {
-        if (point.canBeLanded())
+        if (action == questionAct)
         {
-            param = CmdQuestion::SWITCH_STATE;
+            param = CmdQuestion::IF;
         }
         else
         {
-            param = CmdQuestion::IF;
+            param = CmdQuestion::SWITCH_STATE;
         }
 
 //      mParam = CmdQuestion::CYCLE; //TODO
