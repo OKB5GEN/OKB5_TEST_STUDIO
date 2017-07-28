@@ -3,7 +3,6 @@
 #include <QFile>
 
 #include "Headers/gui/cyclogram/cyclogram_widget.h"
-#include "Headers/gui/cyclogram/dialogs/shape_add_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/text_edit_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/command_error_dialog.h"
 #include "Headers/app_settings.h"
