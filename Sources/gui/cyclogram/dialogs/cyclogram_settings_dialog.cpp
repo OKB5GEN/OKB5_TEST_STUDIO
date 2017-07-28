@@ -35,7 +35,7 @@ CyclogramSettingsDialog::CyclogramSettingsDialog(QWidget * parent):
     layout->addWidget(filePathBox, 1, 0, 1, 2);
 
     mCyclogramDescription = new QTextEdit(this);
-    mCyclogramDescription->setText(tr("Type cyclogram description here"));
+    mCyclogramDescription->setPlaceholderText(tr("Type subprogram description here"));
 
     QGroupBox* descriptionGroupBox = new QGroupBox(tr("Description"), this);
     QVBoxLayout* boxLayout = new QVBoxLayout();

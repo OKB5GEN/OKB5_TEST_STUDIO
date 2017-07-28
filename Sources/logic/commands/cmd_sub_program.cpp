@@ -30,6 +30,7 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
     connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
+    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
 
     updateText();
 }
@@ -61,6 +62,7 @@ bool CmdSubProgram::load()
     connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
     connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
     connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
+    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
 
     mCyclogram = cyclogram;
 
@@ -572,4 +574,9 @@ bool CmdSubProgram::loadFromImpl(Command* other)
     mOutputParams = otherSubprogram->outputParams();
 
     return true;
+}
+
+void CmdSubProgram::onCyclogramModified()
+{
+    updateText();
 }

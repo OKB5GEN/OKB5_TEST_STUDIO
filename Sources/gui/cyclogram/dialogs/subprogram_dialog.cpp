@@ -47,15 +47,13 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     mVariablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
     mChartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
     mDeleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
-    mCyclogramSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Cyclogram Settings"), this);
-    mCommandSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Command Settings"), this);
+    mSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Settings"), this);
 
     connect(mSaveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(mVariablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
     connect(mChartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
     connect(mDeleteBtn, SIGNAL(clicked(bool)), mCyclogramWidget, SLOT(deleteSelectedItem()));
-    connect(mCyclogramSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCyclogramSettingsClick()));
-    connect(mCommandSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onCommandSettingsClick()));
+    connect(mSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onSettingsClick()));
 
     connect(mCommand->cyclogram().data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
     connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
@@ -64,8 +62,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     buttonLayout->addWidget(mVariablesBtn);
     buttonLayout->addWidget(mChartBtn);
     buttonLayout->addWidget(mDeleteBtn);
-    buttonLayout->addWidget(mCyclogramSettingsBtn);
-    buttonLayout->addWidget(mCommandSettingsBtn);
+    buttonLayout->addWidget(mSettingsBtn);
     buttonLayout->addStretch();
 
     layout->addWidget(mScrollArea);
@@ -186,7 +183,7 @@ void SubProgramDialog::updateSize()
     resize(defaultSize);
 }
 
-void SubProgramDialog::onCommandSettingsClick()
+void SubProgramDialog::onSettingsClick()
 {
     QString filePathBefore = mCommand->filePath();
 

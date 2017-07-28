@@ -448,7 +448,7 @@ void ShapeItem::updateToolTip()
     case DRAKON::SUBPROGRAM:
         {
             CmdSubProgram* cmd = qobject_cast<CmdSubProgram*>(mCommand);
-            mToolTip = tr("Subprogram (embedded another cyclogram call.") + "\n";
+            mToolTip = tr("Subprogram (embedded another cyclogram call).") + "\n\n";
             mToolTip += tr("Description: ") + "\n";
             mToolTip += cmd->cyclogram()->setting(Cyclogram::SETTING_DESCRIPTION).toString();
         }

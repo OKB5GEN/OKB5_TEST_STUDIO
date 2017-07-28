@@ -38,7 +38,7 @@ private slots:
     void onVariablesClick();
     void onChartClick();
     void onCyclogramSettingsClick();
-    void onCommandSettingsClick();
+    void onSettingsClick();
 
     void updateTitle(const QString& newTitle);
 
@@ -57,8 +57,7 @@ private:
     QPushButton* mVariablesBtn;
     QPushButton* mChartBtn;
     QPushButton* mDeleteBtn;
-    QPushButton* mCyclogramSettingsBtn;
-    QPushButton* mCommandSettingsBtn;
+    QPushButton* mSettingsBtn;
 
     QWeakPointer<Cyclogram> mCallingCyclogram;
 };

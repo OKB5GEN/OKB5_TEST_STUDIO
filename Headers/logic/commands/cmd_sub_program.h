@@ -49,6 +49,7 @@ private slots:
     void onVariableRemoved(const QString& name) override;
     void execute();
     void onCyclogramFinished(const QString& error);
+    void onCyclogramModified();
 
 signals:
     void commandStarted(Command* cmd);

@@ -7,6 +7,8 @@
 class QLineEdit;
 class QCheckBox;
 class QTableWidget;
+class QTextEdit;
+class QLabel;
 
 class CmdSubProgram;
 class Cyclogram;
@@ -20,13 +22,14 @@ public:
     CmdSubProgramEditDialog(QWidget * parent);
     ~CmdSubProgramEditDialog();
 
-    void setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> cyclogram);
+    void setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram);
 
 private slots:
     void onAccept();
     void openFile();
     void onInputCheckBoxStateChanged(int state);
     void onOutputCheckBoxStateChanged(int state);
+    void onShowExtendedSettings(bool checked);
 
 private:
     void setupUI();
@@ -41,6 +44,11 @@ private:
 
     QTableWidget* mInParams;
     QTableWidget* mOutParams;
+
+    // extended settings
+    QTextEdit* mCyclogramDescription;
+    QPushButton* mShowExtendedSettings;
+    QLabel* mDescriptionHeader;
 
     ConsoleTextWidget* mConsoleTextWidget;
 

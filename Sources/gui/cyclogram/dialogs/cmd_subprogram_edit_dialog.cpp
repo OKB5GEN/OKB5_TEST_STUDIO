@@ -32,18 +32,36 @@ void CmdSubProgramEditDialog::setupUI()
 
     // Cyclogram file
     QGroupBox* filePathBox = new QGroupBox(tr("Settings"), this);
-    QHBoxLayout* fileNameLayout = new QHBoxLayout(filePathBox);
+    QGridLayout* fileNameLayout = new QGridLayout(filePathBox);
     mFileNameStr = new QLineEdit(filePathBox);
     mFileNameStr->setBackgroundRole(QPalette::Dark);
     QPushButton* browseButton = new QPushButton(filePathBox);
     connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(openFile()));
 
     browseButton->setText(tr("Browse"));
-    fileNameLayout->addWidget(new QLabel(tr("Name:"), this));
-    fileNameLayout->addWidget(mSubprogramNameStr);
-    fileNameLayout->addWidget(new QLabel(tr("File:"), this));
-    fileNameLayout->addWidget(mFileNameStr);
-    fileNameLayout->addWidget(browseButton);
+
+    fileNameLayout->addWidget(new QLabel(tr("Name:"), this), 0, 0);
+    fileNameLayout->addWidget(mSubprogramNameStr, 0, 1);
+    fileNameLayout->addWidget(new QLabel(tr("File:"), this), 0, 2);
+    fileNameLayout->addWidget(mFileNameStr, 0, 3);
+    fileNameLayout->addWidget(browseButton, 0, 4);
+
+    // extended settings
+    mShowExtendedSettings = new QPushButton(tr("Show extended settings"), this);
+    mShowExtendedSettings->setCheckable(true);
+    connect(mShowExtendedSettings, SIGNAL(toggled(bool)), this, SLOT(onShowExtendedSettings(bool)));
+    fileNameLayout->addWidget(mShowExtendedSettings, 0, 5);
+
+    mCyclogramDescription = new QTextEdit(this);
+    mCyclogramDescription->setPlaceholderText(tr("Type subprogram description here"));
+
+    mDescriptionHeader = new QLabel(tr("Description:"), this);
+
+    fileNameLayout->addWidget(mDescriptionHeader, 1, 0, 1, 1);
+    fileNameLayout->addWidget(mCyclogramDescription, 1, 1, 1, 5);
+
+    onShowExtendedSettings(false);
+
     filePathBox->setLayout(fileNameLayout);
 
     layout->addWidget(filePathBox, 0, 0, 1, 2);
@@ -96,10 +114,10 @@ void CmdSubProgramEditDialog::setupUI()
     setLayout(layout);
 }
 
-void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> cyclogram)
+void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram)
 {
     mCommand = command;
-    mCallingCyclogram = cyclogram;
+    mCallingCyclogram = callingCyclogram;
 
     if (!mCommand)
     {
@@ -109,6 +127,10 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<
 
     mSubprogramNameStr->setText(mCommand->name());
     mFileNameStr->setText(mCommand->filePath());
+
+    auto cmdCyclogram = mCommand->cyclogram();
+    mCyclogramDescription->setPlainText(cmdCyclogram->setting(Cyclogram::SETTING_DESCRIPTION).toString());
+
     updateUI();
 
     mConsoleTextWidget->setCommand(mCommand);
@@ -130,6 +152,14 @@ void CmdSubProgramEditDialog::onAccept()
 
     mCommand->setFilePath(mFileNameStr->text());
     mCommand->setName(mSubprogramNameStr->text());
+
+    auto cmdCyclogram = mCommand->cyclogram();
+    QString curCyclogramDecr = cmdCyclogram->setting(Cyclogram::SETTING_DESCRIPTION).toString();
+    QString newCyclogramDescr = mCyclogramDescription->toPlainText();
+    if (curCyclogramDecr != newCyclogramDescr)
+    {
+        cmdCyclogram->setSetting(Cyclogram::SETTING_DESCRIPTION, newCyclogramDescr);
+    }
 
     QMap<QString, QVariant> input;
     QMap<QString, QVariant> output;
@@ -501,4 +531,11 @@ bool CmdSubProgramEditDialog::eventFilter(QObject *obj, QEvent *event)
     {
         return QObject::eventFilter(obj, event); // standard event processing
     }
+}
+
+void CmdSubProgramEditDialog::onShowExtendedSettings(bool checked)
+{
+    mShowExtendedSettings->setText(checked ? tr("Hide extended settings") : tr("Show extended settings"));
+    mCyclogramDescription->setVisible(checked);
+    mDescriptionHeader->setVisible(checked);
 }
