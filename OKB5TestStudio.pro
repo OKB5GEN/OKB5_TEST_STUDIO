@@ -28,7 +28,6 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.cpp \
     Sources/gui/cyclogram/dialogs/command_error_dialog.cpp \
     Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp \
-    Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp \
     Sources/gui/cyclogram/cyclogram_widget.cpp \
     Sources/gui/cyclogram/shape_item.cpp \
     Sources/gui/cyclogram/valency_point.cpp \
@@ -107,7 +106,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.h \
     Headers/gui/cyclogram/dialogs/command_error_dialog.h \
     Headers/gui/cyclogram/dialogs/cyclogram_end_dialog.h \
-    Headers/gui/cyclogram/dialogs/shape_add_dialog.h \
     Headers/logic/command.h \
     Headers/logic/cyclogram.h \
     Headers/logic/variable_controller.h \
