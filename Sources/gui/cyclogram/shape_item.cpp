@@ -1291,8 +1291,12 @@ void ShapeItem::remove()
         if (!down && !right && !underArrow)
         {
             mRect.setBottom(mRect.top());
-            mParentShape->replaceChildShape(0, this); // update shape connections
-            mParentShape->onChildRectChanged(this);
+            if (mParentShape)
+            {
+                mParentShape->replaceChildShape(0, this); // update shape connections
+                mParentShape->onChildRectChanged(this);
+            }
+
             return;
         }
 
