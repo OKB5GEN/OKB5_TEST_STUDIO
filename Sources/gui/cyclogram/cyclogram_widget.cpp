@@ -574,16 +574,25 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
     //DRAKON::TERMINATOR - this type of command can not be copied
     //DRAKON::BRANCH_BEGIN - this type of command is copied as entire branch
 
-    int TODO1; // QUESTION command paste, need get param for it
-
     // create command and load it from another
-    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy, -1/*param*/);
+    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy, CmdQuestion::IF);
     newCmd->copyFrom(commandToCopy);
 
     if (!newCmd)
     {
         LOG_ERROR(QString("Command copy not created"));
         return;
+    }
+
+    if (typeToCopy == DRAKON::QUESTION) // TODO temporary hack for QUESTION-SWITCH_STATE copying
+    {
+        CmdQuestion* from = qobject_cast<CmdQuestion*>(commandToCopy);
+        CmdQuestion* to = qobject_cast<CmdQuestion*>(newCmd);
+
+        if (from->questionType() == CmdQuestion::SWITCH_STATE) // "switch state" -> "if"
+        {
+            to->setQuestionType(CmdQuestion::IF);
+        }
     }
 
     ShapeItem* newShape = addCommand(newCmd, point);
@@ -980,8 +989,15 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
                 }
                 else
                 {
-                    copyCommandTo(mPressedShape, point);
-                    deleteCommand(mPressedShape);
+                    if (canBeMoved(mPressedShape, point))
+                    {
+                        copyCommandTo(mPressedShape, point);
+                        deleteCommand(mPressedShape);
+                    }
+                    else
+                    {
+                        QMessageBox::warning(this, tr("Error"), tr("Selected command can not be moved here"));
+                    }
                 }
             }
         }
@@ -2145,4 +2161,25 @@ void CyclogramWidget::dropEvent(QDropEvent* event)
 void CyclogramWidget::setCurrentCommandType(int command)
 {
     mCurrentCommandType = command;
+}
+
+bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint &point) const
+{
+    // only "empty" question command can be moved
+    if (item && item->command()->type() == DRAKON::QUESTION)
+    {
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(item->command());
+        CmdQuestion::QuestionType type = questionCmd->questionType();
+
+        Command* down = questionCmd->nextCommand(ValencyPoint::Down);
+        Command* right = questionCmd->nextCommand(ValencyPoint::Right);
+        Command* underArrow = questionCmd->nextCommand(ValencyPoint::UnderArrow);
+
+        bool isLanded = (underArrow == Q_NULLPTR);
+        bool isEmptyCommand = (down == underArrow && right == underArrow);
+
+        return (isEmptyCommand && !isLanded);
+    }
+
+    return true;
 }
