@@ -419,18 +419,6 @@ void CyclogramWidget::onClickVP(const ValencyPoint& point, const QPoint& pos)
         {
             showContextMenuForVP(point, pos);
         }
-
-        //TODO else?
-
-//        ShapeAddDialog dialog(this);
-
-//        dialog.setValencyPoint(point);
-//        dialog.exec();
-
-//        if (dialog.result() == QDialog::Accepted)
-//        {
-//            addNewCommand(dialog.shapeType(), point, dialog.param());
-//        }
     }
 }
 
@@ -1097,18 +1085,33 @@ int CyclogramWidget::commandAt(const QPoint &pos)
 
 bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
 {
-    for (int i = mCommands.size() - 1; i >= 0; --i)
+    //TODO optimize for drag-and-drop
+    foreach (ShapeItem* item, mCommands)
     {
-        const QList<ValencyPoint>& points = mCommands[i]->valencyPoints();
-        for (int j = 0, sz = points.size(); j < sz; ++j)
+        foreach (const ValencyPoint& pt, item->valencyPoints())
         {
-            if (points[j].path().contains((pos / mScale) - mCommands[i]->position()))
+            if (pt.path().contains((pos / mScale) - item->position()))
             {
-                point = points[j];
+                point = pt;
                 return true;
             }
         }
     }
+
+//    for (int i = mCommands.size() - 1; i >= 0; --i)
+//    {
+//        ShapeItem* item = mCommands[i];
+
+//        const QList<ValencyPoint>& points = item->valencyPoints();
+//        for (int j = 0, sz = points.size(); j < sz; ++j)
+//        {
+//            if (points[j].path().contains((pos / mScale) - item->position()))
+//            {
+//                point = points[j];
+//                return true;
+//            }
+//        }
+//    }
 
     return false;
 }
