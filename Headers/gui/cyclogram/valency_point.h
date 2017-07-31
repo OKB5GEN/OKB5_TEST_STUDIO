@@ -19,6 +19,8 @@ public:
 
     ValencyPoint();
 
+    static QPainterPath createPath();
+
     void setOwner(ShapeItem* owner);
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);

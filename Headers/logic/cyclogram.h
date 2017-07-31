@@ -50,7 +50,7 @@ public:
     Command* last() const;
     Command* current() const;
     Command* createCommand(DRAKON::IconType type, int param = -1);
-    Command* createBranchCopy(Command* branch, const ValencyPoint& point);
+    Command* createBranchCopy(Command* branch);
 
     QString generateBranchName(const QString& templateName) const;
 

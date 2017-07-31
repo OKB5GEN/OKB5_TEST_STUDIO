@@ -14,6 +14,7 @@
 #include "Headers/logic/commands/cmd_state_start.h"
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
+#include "Headers/gui/cyclogram/valency_point.h"
 
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logger/Logger.h"
@@ -51,6 +52,14 @@ ShapeItem::ShapeItem(QObject* parent):
 
     mActiveColor = QColor::fromRgba(0xff7f7f7f);
     mAdditionalColor = QColor::fromRgba(0x00ffffff);
+}
+
+ShapeItem::~ShapeItem()
+{
+    foreach (ValencyPoint* point, mValencyPoints)
+    {
+        delete point;
+    }
 }
 
 QPainterPath ShapeItem::path() const
@@ -172,23 +181,22 @@ Command* ShapeItem::command() const
     return mCommand;
 }
 
-const QList<ValencyPoint>& ShapeItem::valencyPoints() const
+const QList<ValencyPoint*>& ShapeItem::valencyPoints() const
 {
     return mValencyPoints;
 }
 
-ValencyPoint ShapeItem::valencyPoint(int role) const
+ValencyPoint* ShapeItem::valencyPoint(int role) const
 {
-    for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+    foreach (ValencyPoint* point, mValencyPoints)
     {
-        if (role == mValencyPoints[i].role())
+        if (role == point->role())
         {
-            return mValencyPoints[i];
+            return point;
         }
     }
 
-    int TODO; // make point not found notification
-    return ValencyPoint();
+    return Q_NULLPTR;
 }
 
 void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
@@ -716,22 +724,22 @@ void ShapeItem::createPath()
                 }
 
                 // update valency point positions
-                for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+                foreach (ValencyPoint* point, mValencyPoints)
                 {
-                    ValencyPoint::Role role = mValencyPoints[i].role();
-                    bool canBeLanded = mValencyPoints[i].canBeLanded();
-
+                    ValencyPoint::Role role = point->role();
                     if (role == ValencyPoint::Right)
                     {
-                        mValencyPoints[i] = createValencyPoint(QPointF(xOffset, H / 2), role);
-                        mValencyPoints[i].setCanBeLanded(canBeLanded);
+                        QPainterPath path = point->createPath();
+                        path.translate(QPointF(xOffset, H / 2));
+                        point->setPath(path);
                     }
                     else if (role == ValencyPoint::UnderArrow)
                     {
                         if (underArrow)
                         {
-                            mValencyPoints[i] = createValencyPoint(QPointF(W / 2, yOffset + h / 2), role);
-                            mValencyPoints[i].setCanBeLanded(canBeLanded);
+                            QPainterPath path = point->createPath();
+                            path.translate(QPointF(W / 2, yOffset + h / 2));
+                            point->setPath(path);
                         }
                         else // question with "landed" right/down branches, or question, added to down/right branch of another question
                         {
@@ -1342,7 +1350,7 @@ void ShapeItem::remove()
 
                     // Link "down" branch end shape to "under arrow" branch begin shape
                     // There's no nedd to link commands, because they are already linked
-                    ValencyPoint::Role role;
+                    int role; //ValencyPoint::Role
                     ShapeItem* parentShape = down->findShape(underArrow->command(), role);
                     parentShape->setChildShape(underArrow, role);
 
@@ -1424,7 +1432,7 @@ void ShapeItem::removeQuestionBranch(ShapeItem* branch)
     emit needToDelete(branch);
 }
 
-ShapeItem* ShapeItem::findShape(Command* cmd, ValencyPoint::Role& role)
+ShapeItem* ShapeItem::findShape(Command* cmd, int& role)
 {
     if (mChildShapes.size() == 1)
     {
@@ -1513,26 +1521,17 @@ void ShapeItem::pullUp()
     setRect(rect, false);
 }
 
-ValencyPoint ShapeItem::createValencyPoint(const QPointF& point, ValencyPoint::Role role)
+ValencyPoint* ShapeItem::createValencyPoint(const QPointF& point, int role)
 {
-    QPainterPath path;
-
-    qreal crossSize = 0.6;
-    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 3;
-    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
-    path.moveTo(0, -radius * crossSize);
-    path.lineTo(0, radius * crossSize);
-    path.moveTo(-radius * crossSize, 0);
-    path.lineTo(radius * crossSize, 0);
-
+    QPainterPath path = ValencyPoint::createPath();
     path.translate(point);
 
-    ValencyPoint vPoint;
-    vPoint.setPath(path);
-    vPoint.setColor(QColor::fromRgba(0xff00ff00));
-    vPoint.setRole(role);
-    vPoint.setOwner(this);
-    vPoint.setCanBeLanded(false); // false by default
+    ValencyPoint* vPoint = new ValencyPoint();
+    vPoint->setPath(path);
+    vPoint->setColor(QColor::fromRgba(0xff00ff00));
+    vPoint->setRole(ValencyPoint::Role(role));
+    vPoint->setOwner(this);
+    vPoint->setCanBeLanded(false); // false by default
 
     return vPoint;
 }
@@ -1551,7 +1550,6 @@ void ShapeItem::createValencyPoints(Command* cmd)
     // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
     // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
 
-    mValencyPoints.clear();
     qreal W = itemSize().width();
     qreal H = itemSize().height();
     //qreal w = cellSize().width();
@@ -1569,12 +1567,12 @@ void ShapeItem::createValencyPoints(Command* cmd)
     case DRAKON::OUTPUT:
     case DRAKON::PARALLEL_PROCESS:
         {
-            ValencyPoint point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+            ValencyPoint* point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
             mValencyPoints.push_back(point);
 
             if (type == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(cmd))
             {
-                ValencyPoint point = createValencyPoint(QPointF(W, 0), ValencyPoint::Right);
+                ValencyPoint* point = createValencyPoint(QPointF(W, 0), ValencyPoint::Right);
                 mValencyPoints.push_back(point);
             }
         }
@@ -1585,29 +1583,29 @@ void ShapeItem::createValencyPoints(Command* cmd)
             CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
             if (questionCmd)
             {
-                ValencyPoint rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
+                ValencyPoint* rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
                 mValencyPoints.push_back(rightPoint);
 
                 if (questionCmd->questionType() == CmdQuestion::IF)
                 {
-                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
                     mValencyPoints.push_back(downPoint);
 
-                    ValencyPoint underArrowPoint = createValencyPoint(QPointF(W / 2, H + h / 2), ValencyPoint::UnderArrow);
+                    ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, H + h / 2), ValencyPoint::UnderArrow);
                     mValencyPoints.push_back(underArrowPoint);
 
                 }
                 else if (questionCmd->questionType() == CmdQuestion::CYCLE)
                 {
-                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H), ValencyPoint::Down);
+                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H), ValencyPoint::Down);
                     mValencyPoints.push_back(downPoint);
 
-                    ValencyPoint underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
+                    ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
                     mValencyPoints.push_back(underArrowPoint);
                 }
                 else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
                 {
-                    ValencyPoint downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
                     mValencyPoints.push_back(downPoint);
                 }
             }
@@ -1622,11 +1620,11 @@ void ShapeItem::updateFlags()
 {
     if (mCommand->type() == DRAKON::BRANCH_BEGIN)
     {
-        for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+        foreach (ValencyPoint* point, mValencyPoints)
         {
-            if (mValencyPoints[i].role() == ValencyPoint::Down)
+            if (point->role() == ValencyPoint::Down)
             {
-                mValencyPoints[i].setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
+                point->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
                 return;
             }
         }
@@ -1638,7 +1636,7 @@ void ShapeItem::updateFlags()
     }
 
     ValencyPoint::Role role = mCommand->role();
-    ValencyPoint point = mParentShape->valencyPoint(role);
+    ValencyPoint* parentPoint = mParentShape->valencyPoint(role);
 
     if (mCommand->type() == DRAKON::QUESTION)
     {
@@ -1649,30 +1647,30 @@ void ShapeItem::updateFlags()
         }
         else if (question->questionType() == CmdQuestion::IF)
         {
-            for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+            foreach (ValencyPoint* point, mValencyPoints)
             {
-                ValencyPoint::Role pointRole = mValencyPoints[i].role();
+                ValencyPoint::Role pointRole = point->role();
                 if (pointRole == ValencyPoint::Down || pointRole == ValencyPoint::Right)
                 {
-                    mValencyPoints[i].setCanBeLanded(false);
+                    point->setCanBeLanded(false);
                 }
                 else if (pointRole == ValencyPoint::UnderArrow)
                 {
-                    mValencyPoints[i].setCanBeLanded(point.canBeLanded());
+                    point->setCanBeLanded(parentPoint->canBeLanded());
                 }
             }
         }
         else if (question->questionType() == CmdQuestion::SWITCH_STATE)
         {
-            for (int i = 0, sz = mValencyPoints.size(); i < sz; ++i)
+            foreach (ValencyPoint* point, mValencyPoints)
             {
-                mValencyPoints[i].setCanBeLanded(true);
+                point->setCanBeLanded(true);
             }
         }
     }
     else
     {
-        mValencyPoints[0].setCanBeLanded(point.canBeLanded());
+        mValencyPoints.front()->setCanBeLanded(parentPoint->canBeLanded());
     }
 }
 

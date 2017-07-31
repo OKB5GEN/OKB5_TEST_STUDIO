@@ -76,37 +76,37 @@ private:
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
 
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
-    ShapeItem* addNewCommand(DRAKON::IconType type, const ValencyPoint& point, int param = -1);
-    ShapeItem* addCommand(Command* cmd, const ValencyPoint& point);
+    ShapeItem* addNewCommand(DRAKON::IconType type, const ValencyPoint* point, int param = -1);
+    ShapeItem* addCommand(Command* cmd, const ValencyPoint* point);
     bool canBeDeleted(ShapeItem* item, QString& error) const;
-    bool canBeMoved(ShapeItem* item, const ValencyPoint& point) const;
+    bool canBeMoved(ShapeItem* item, const ValencyPoint* point) const;
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 
     const ShapeItem* findBranch(const Command* command) const;
 
-    void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& point);
-    void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point);
-    void moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& point);
+    void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point);
+    void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint* point);
+    void moveBranchTo(ShapeItem* branchToMove, const ValencyPoint* point);
     ShapeItem* copyBranch(Command* branchCmd, const QPoint& cell);
 
-    int commandAt(const QPoint &pos);
-    bool hasValencyPointAt(const QPoint &pos, ValencyPoint& point);
+    ShapeItem* shapeAt(const QPoint &pos) const;
+    ValencyPoint* valencyPointAt(const QPoint &pos) const;
 
     void drawItems(QList<ShapeItem*>& items, QPainter& painter);
 
     void moveItemTo(const QPoint &pos);
 
-    QPoint calculateNewCommandCell(const ValencyPoint& point);
-    void updateWidgetShapes(ShapeItem* newShape, const ValencyPoint& point);
+    QPoint calculateNewCommandCell(const ValencyPoint* point);
+    void updateWidgetShapes(ShapeItem* newShape, const ValencyPoint* point);
 
     ShapeItem* findExpandedItem(ShapeItem* newItem) const;
     ShapeItem* findNextBranch(const QPoint& cell) const;
     ShapeItem* addNewBranch(ShapeItem* item);
 
     void showEditDialog(Command* command);
-    void onClickVP(const ValencyPoint& point, const QPoint& pos);
-    void showContextMenuForVP(const ValencyPoint& point, const QPoint& pos);
+    void onClickVP(const ValencyPoint* point, const QPoint& pos);
+    void showContextMenuForVP(const ValencyPoint* point, const QPoint& pos);
     void showContextMenuForCommand(ShapeItem* item, const QPoint& pos);
 
     int mMouseButtonState;

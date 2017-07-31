@@ -1,6 +1,7 @@
 #include <QtWidgets>
 
 #include "Headers/gui/cyclogram/valency_point.h"
+#include "Headers/gui/cyclogram/shape_item.h"
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),
@@ -57,4 +58,19 @@ void ValencyPoint::setCanBeLanded(bool canBeLanded)
 bool ValencyPoint::canBeLanded() const
 {
     return mCanBeLanded;
+}
+
+QPainterPath ValencyPoint::createPath()
+{
+    QPainterPath path;
+
+    qreal crossSize = 0.6;
+    qreal radius = qMin(ShapeItem::cellSize().width(), ShapeItem::cellSize().height()) / 3;
+    path.addEllipse(QRectF(-radius, -radius, radius * 2, radius * 2));
+    path.moveTo(0, -radius * crossSize);
+    path.lineTo(0, radius * crossSize);
+    path.moveTo(-radius * crossSize, 0);
+    path.lineTo(radius * crossSize, 0);
+
+    return path;
 }

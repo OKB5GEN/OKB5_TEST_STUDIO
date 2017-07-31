@@ -113,13 +113,14 @@ bool CyclogramWidget::event(QEvent *event)
     {
         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
 
-        ValencyPoint point;
-        int index = commandAt(helpEvent->pos());
-        if (index != -1)
+        ValencyPoint* point = valencyPointAt(helpEvent->pos());
+        ShapeItem* item = shapeAt(helpEvent->pos());
+
+        if (item)
         {
-            QToolTip::showText(helpEvent->globalPos(), mCommands[index]->toolTip());
+            QToolTip::showText(helpEvent->globalPos(), item->toolTip());
         }
-        else if (hasValencyPointAt(helpEvent->pos(), point))
+        else if (point)
         {
             QToolTip::showText(helpEvent->globalPos(), tr("Click to add command"));
         }
@@ -366,10 +367,10 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
     {
         painter.translate(shapeItem->position());
 
-        foreach (ValencyPoint point, shapeItem->valencyPoints())
+        foreach (ValencyPoint* point, shapeItem->valencyPoints())
         {
-            painter.setBrush(point.color());
-            painter.drawPath(point.path());
+            painter.setBrush(point->color());
+            painter.drawPath(point->path());
         }
 
         painter.translate(-shapeItem->position());
@@ -389,23 +390,23 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
 
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
-        int index = commandAt(event->pos());
-        if (index >= 0)
+        ShapeItem* item = shapeAt(event->pos());
+        if (item)
         {
-            mPressedShape = mCommands[index];
+            mPressedShape = item;
             mPreviousPosition = event->pos();
         }
     }
 }
 
-void CyclogramWidget::onClickVP(const ValencyPoint& point, const QPoint& pos)
+void CyclogramWidget::onClickVP(const ValencyPoint* point, const QPoint& pos)
 {
     clearSelection();
 
-    ShapeItem* item = point.owner();
+    ShapeItem* item = point->owner();
     DRAKON::IconType type = item->command()->type();
 
-    if (type == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right)
+    if (type == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right)
     {
         addNewCommand(type, point); // just add new branch immediately
     }
@@ -422,13 +423,13 @@ void CyclogramWidget::onClickVP(const ValencyPoint& point, const QPoint& pos)
     }
 }
 
-void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoint& pos)
+void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoint& pos)
 {
     clearSelection();
 
-    ShapeItem* item = point.owner();
+    ShapeItem* item = point->owner();
     DRAKON::IconType type = item->command()->type();
-    if (type == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right)
+    if (type == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right)
     {
         QMenu menu(this);
         QAction* addNewBranchAction = menu.addAction(tr("Add BRANCH"));
@@ -474,7 +475,7 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
     menu.addAction(tr("Add DELAY"))->setData(int(DRAKON::DELAY));
     menu.addAction(tr("Add OUTPUT"))->setData(int(DRAKON::OUTPUT));
 
-    if (point.canBeLanded())
+    if (point->canBeLanded())
     {
         menu.addAction(tr("Add SWITCH STATE"))->setData(int(DRAKON::QUESTION)); //TODO remove and add "Add GO_TO_BRANCH"
         //TODO cycle?
@@ -516,11 +517,11 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint& point, const QPoi
     addNewCommand(DRAKON::IconType(command), point, param);
 }
 
-void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& point)
+void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point)
 {
     Command* commandToCopy = itemToCopy->command();
     DRAKON::IconType typeToCopy = commandToCopy->type();
-    bool isBranchRightVP = (point.owner()->command()->type() == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right);
+    bool isBranchRightVP = (point->owner()->command()->type() == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right);
 
     if (isBranchRightVP)
     {
@@ -548,7 +549,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
 
     if (typeToCopy == DRAKON::GO_TO_BRANCH)
     {
-        point.canBeLanded();
+        point->canBeLanded();
         int TODO; // can be pasted only to points that can be landed
         canBePasted = false;
     }
@@ -587,10 +588,10 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint& p
     update();
 }
 
-void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& point)
+void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint* point)
 {
     auto cyclogram = mCyclogram.lock();
-    Command* newBranchCmd = cyclogram->createBranchCopy(itemToCopy->command(), point);
+    Command* newBranchCmd = cyclogram->createBranchCopy(itemToCopy->command());
 
     if (!newBranchCmd)
     {
@@ -599,10 +600,10 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& po
     }
 
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
-    cyclogram->changeCommandsOrder(newBranchCmd, point.owner()->command());
+    cyclogram->changeCommandsOrder(newBranchCmd, point->owner()->command());
 
-    QRect ownerRect = point.owner()->rect();
-    QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
+    QRect ownerRect = point->owner()->rect();
+    QPoint cell(point->owner()->cell().x() + ownerRect.width(), 1);
 
     ShapeItem* newBranchCopy = copyBranch(newBranchCmd, cell);
     mRootShape->addChildShape(newBranchCopy);
@@ -658,9 +659,9 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint& po
     onNeedUpdate();
 }
 
-void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& point)
+void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint* point)
 {
-    bool canBeMoved = (point.owner()->command()->type() == DRAKON::BRANCH_BEGIN && point.role() == ValencyPoint::Right);
+    bool canBeMoved = (point->owner()->command()->type() == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right);
     if (!canBeMoved)
     {
         QMessageBox::warning(this, tr("Error"), tr("Selected branch can not be moved here"));
@@ -676,10 +677,10 @@ void CyclogramWidget::moveBranchTo(ShapeItem* branchToMove, const ValencyPoint& 
 
     // save branches order by moving the newly added branch start after the branch-owner of the valency point
     auto cyclogram = mCyclogram.lock();
-    cyclogram->changeCommandsOrder(branchToMove->command(), point.owner()->command());
+    cyclogram->changeCommandsOrder(branchToMove->command(), point->owner()->command());
 
-    QRect ownerRect = point.owner()->rect();
-    QPoint cell(point.owner()->cell().x() + ownerRect.width(), 1);
+    QRect ownerRect = point->owner()->rect();
+    QPoint cell(point->owner()->cell().x() + ownerRect.width(), 1);
 
     int oldCell = branchToMove->cell().x();
     int xOffset = cell.x() - oldCell;
@@ -909,13 +910,13 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
             return; // to not edit cyclogram while it is executed
         }
 
-        int index = commandAt(event->pos());
-        if (index == -1)
+        ShapeItem* item = shapeAt(event->pos());
+        if (!item)
         {
             return;
         }
 
-        showEditDialog(mCommands[index]->command());
+        showEditDialog(item->command());
     }
 }
 
@@ -963,12 +964,11 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     // move dragging item to valency point with left mouse button
     if (isLeftBtnPressed)
     {
-        ValencyPoint point;
-        bool isOverVP = hasValencyPointAt(event->pos(), point);
+        ValencyPoint* point = valencyPointAt(event->pos());
 
         if (mDraggingShape) // drag-and-drop with LMB
         {
-            if (isOverVP)
+            if (point)
             {
                 // try to move dragging shape to valency point above
                 if (mPressedShape->command()->type() == DRAKON::BRANCH_BEGIN)
@@ -991,16 +991,15 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         }
         else // just usual click
         {
-            if (isOverVP)
+            if (point)
             {
                 onClickVP(point, mapToGlobal(event->pos()));
             }
             else // if no valency point click, check command shape click
             {
-                int index = commandAt(event->pos());
-                if (index >= 0)
+                ShapeItem* clickedItem = shapeAt(event->pos());
+                if (clickedItem)
                 {
-                    ShapeItem* clickedItem = mCommands[index];
                     mPreviousPosition = event->pos();
 
                     if (!mSelectedShape || mSelectedShape != clickedItem)
@@ -1021,12 +1020,11 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     // copy dragging item to valency point with right mouse button
     if (isRightBtnPressed)
     {
-        ValencyPoint point;
-        bool isOverVP = hasValencyPointAt(event->pos(), point);
+        ValencyPoint* point = valencyPointAt(event->pos());
 
         if (mDraggingShape) // drag-and-drop with RMB,  try to copy dragging shape to valency point above
         {
-            if (isOverVP)
+            if (point)
             {
                 copyCommandTo(mPressedShape, point);
             }
@@ -1035,19 +1033,17 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         {
             clearSelection();
 
-            if (isOverVP)
+            if (point)
             {
                 showContextMenuForVP(point, mapToGlobal(event->pos()));
             }
             else // if no valency point click, check command shape click
             {
-                int index = commandAt(event->pos());
-                if (index < 0)
+                ShapeItem* clickedItem = shapeAt(event->pos());
+                if (!clickedItem)
                 {
                     return;
                 }
-
-                ShapeItem* clickedItem = mCommands[index];
 
                 clearSelection(false);
                 setSelectedItem(clickedItem);
@@ -1069,34 +1065,46 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     updateCursor(event->pos());
 }
 
-int CyclogramWidget::commandAt(const QPoint &pos)
+ShapeItem* CyclogramWidget::shapeAt(const QPoint &pos) const
 {
-    for (int i = mCommands.size() - 1; i >= 0; --i)
+    foreach (ShapeItem* item, mCommands)
     {
-        ShapeItem* item = mCommands[i];
         if (item->path().contains((pos / mScale) - item->position()))
         {
-            return i;
+            return item;
         }
     }
 
-    return -1;
+    return Q_NULLPTR;
+
+//    TODO from back is to check click from "highest" shape under cursor, i guess it is not applicable for now
+//    for (int i = mCommands.size() - 1; i >= 0; --i)
+//    {
+//        ShapeItem* item = mCommands[i];
+//        if (item->path().contains((pos / mScale) - item->position()))
+//        {
+//            return i;
+//        }
+//    }
+
+//    return -1;
 }
 
-bool CyclogramWidget::hasValencyPointAt(const QPoint &pos, ValencyPoint& point)
+ValencyPoint* CyclogramWidget::valencyPointAt(const QPoint &pos) const
 {
     //TODO optimize for drag-and-drop
     foreach (ShapeItem* item, mCommands)
     {
-        foreach (const ValencyPoint& pt, item->valencyPoints())
+        foreach (ValencyPoint* point, item->valencyPoints())
         {
-            if (pt.path().contains((pos / mScale) - item->position()))
+            if (point->path().contains((pos / mScale) - item->position()))
             {
-                point = pt;
-                return true;
+                return point;
             }
         }
     }
+
+    return Q_NULLPTR;
 
 //    for (int i = mCommands.size() - 1; i >= 0; --i)
 //    {
@@ -1148,8 +1156,8 @@ void CyclogramWidget::updateCursor(const QPoint& pos)
         return;
     }
 
-    ValencyPoint point;
-    if (hasValencyPointAt(pos, point))
+    ValencyPoint* point = valencyPointAt(pos);
+    if (point)
     {
         if (curShape == Qt::ArrowCursor)
         {
@@ -1822,12 +1830,12 @@ void CyclogramWidget::drawChildren(ShapeItem* item, const QList<Command*>& stopD
     }
 }
 
-ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPoint& point, int param /*= -1*/)
+ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPoint* point, int param /*= -1*/)
 {
-    ValencyPoint::Role role = point.role();
+    ValencyPoint::Role role = point->role();
     if (type == DRAKON::BRANCH_BEGIN && role == ValencyPoint::Right)
     {
-        return addNewBranch(point.owner());
+        return addNewBranch(point->owner());
     }
 
     // 1. Create new command
@@ -1850,10 +1858,10 @@ ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPo
     return newShape;
 }
 
-ShapeItem* CyclogramWidget::addCommand(Command* cmd, const ValencyPoint &point)
+ShapeItem* CyclogramWidget::addCommand(Command* cmd, const ValencyPoint* point)
 {
-    ValencyPoint::Role role = point.role();
-    ShapeItem* owner = point.owner();
+    ValencyPoint::Role role = point->role();
+    ShapeItem* owner = point->owner();
     Command* pointCmd = owner->command();
 
     // 2. Update command tree connections in logic
@@ -1874,10 +1882,10 @@ ShapeItem* CyclogramWidget::addCommand(Command* cmd, const ValencyPoint &point)
     return newShape;
 }
 
-void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint& point)
+void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint* point)
 {
-    ValencyPoint::Role role = point.role();
-    ShapeItem* owner = point.owner();
+    ValencyPoint::Role role = point->role();
+    ShapeItem* owner = point->owner();
     Command* pointCmd = owner->command();
     ShapeItem* prevChildShape = owner->childShape(role);
 
@@ -2081,10 +2089,10 @@ ShapeItem* CyclogramWidget::selectedItem() const
     return mSelectedShape;
 }
 
-QPoint CyclogramWidget::calculateNewCommandCell(const ValencyPoint& point)
+QPoint CyclogramWidget::calculateNewCommandCell(const ValencyPoint* point)
 {
-    ValencyPoint::Role role = point.role();
-    ShapeItem* owner = point.owner();
+    ValencyPoint::Role role = point->role();
+    ShapeItem* owner = point->owner();
     Command* pointCmd = owner->command();
     ShapeItem* prevChildShape = owner->childShape(role);
 
@@ -2166,7 +2174,7 @@ void CyclogramWidget::setCurrentCommandType(int command)
     mCurrentCommandType = command;
 }
 
-bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint &point) const
+bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint* point) const
 {
     // only "empty" question command can be moved
     if (item && item->command()->type() == DRAKON::QUESTION)

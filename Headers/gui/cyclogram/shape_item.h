@@ -6,9 +6,8 @@
 #include <QPoint>
 #include <QFont>
 
-#include "Headers/gui/cyclogram/valency_point.h"
-
 class Command;
+class ValencyPoint;
 
 class ShapeItem: public QObject
 {
@@ -16,6 +15,7 @@ class ShapeItem: public QObject
 
 public:
     ShapeItem(QObject* parent);
+    ~ShapeItem();
 
     void setPath(const QPainterPath &path);
     void setTextPath(const QPainterPath &path);
@@ -48,8 +48,8 @@ public:
     QString toolTip() const;
     QPoint cell() const;
     Command* command() const;
-    const QList<ValencyPoint>& valencyPoints() const;
-    ValencyPoint valencyPoint(int role) const;
+    const QList<ValencyPoint*>& valencyPoints() const;
+    ValencyPoint* valencyPoint(int role) const;
     QRect rect() const;
     ShapeItem* parentShape() const;
     ShapeItem* childShape(int index) const;
@@ -75,11 +75,11 @@ private slots:
 
 private:
     void createPath();
-    ValencyPoint createValencyPoint(const QPointF& point, ValencyPoint::Role role);
+    ValencyPoint* createValencyPoint(const QPointF& point, int role);
     void createValencyPoints(Command* cmd);
 
     void removeQuestionBranch(ShapeItem* branch);
-    ShapeItem* findShape(Command* cmd, ValencyPoint::Role& role);
+    ShapeItem* findShape(Command* cmd, int& role);
 
     void updateCyclogramRect(ShapeItem* changedBranch);
     bool canSetRect(const QRect& rect) const;
@@ -98,7 +98,7 @@ private:
     QColor mAdditionalColor;        // color for filling additional path background (hack for connection lines coloring)
     QColor mActiveColor;            // color for filling shape background in command active state (being executed)
     QString mToolTip;               // tooltip text for shape
-    QList<ValencyPoint> mValencyPoints; // valency points list for this command
+    QList<ValencyPoint*> mValencyPoints; // valency points list for this command
 
     QFont mFont; // font for writing texts
 

@@ -718,7 +718,7 @@ void Cyclogram::onAppSettingsChanged()
     }
 }
 
-Command* Cyclogram::createBranchCopy(Command* branch, const ValencyPoint& point)
+Command* Cyclogram::createBranchCopy(Command* branch)
 {
     Command* newBranch = Q_NULLPTR;
 
