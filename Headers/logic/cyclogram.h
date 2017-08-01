@@ -49,7 +49,7 @@ public:
     Command* first() const;
     Command* last() const;
     Command* current() const;
-    Command* createCommand(DRAKON::IconType type, int param = -1);
+    Command* createCommand(DRAKON::IconType type);
     Command* createBranchCopy(Command* branch);
 
     QString generateBranchName(const QString& templateName) const;

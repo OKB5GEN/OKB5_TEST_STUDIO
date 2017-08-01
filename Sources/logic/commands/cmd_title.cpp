@@ -53,3 +53,7 @@ void CmdTitle::readCustomAttributes(QXmlStreamReader* reader)
     }
 }
 
+bool CmdTitle::canBeCopied() const
+{
+    return false;
+}

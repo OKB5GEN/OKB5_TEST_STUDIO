@@ -12,6 +12,8 @@
         <file>resources/images/cmd_math.png</file>
         <file>resources/images/cmd_module.png</file>
         <file>resources/images/cmd_question.png</file>
+        <file>resources/images/cmd_select_state.png</file>
+        <file>resources/images/cmd_cycle.png</file>
         <file>resources/images/cmd_subprogram.png</file>
         <file>resources/images/cmd_parallel_process.png</file>
         <file>resources/images/settings.png</file>

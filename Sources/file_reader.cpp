@@ -146,7 +146,7 @@ void FileReader::readVariables()
 void FileReader::readCommands()
 {
     QMetaEnum commandTypes = QMetaEnum::fromType<DRAKON::IconType>();
-    QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+    //QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
     auto cyclogram = mCyclogram.lock();
 
     // read file, create commands and create links data
@@ -158,7 +158,7 @@ void FileReader::readCommands()
             QString str;
             //qint64 commandID;
             DRAKON::IconType type;
-            CmdQuestion::QuestionType questionType;
+            //CmdQuestion::QuestionType questionType;
 
             if (attributes.hasAttribute("type"))
             {
@@ -166,13 +166,13 @@ void FileReader::readCommands()
                 type = DRAKON::IconType(commandTypes.keyToValue(qPrintable(str)));
             }
 
-            if (type == DRAKON::QUESTION && attributes.hasAttribute("cmd_type")) //TODO move to question command loading
-            {
-                str = attributes.value("cmd_type").toString();
-                questionType = CmdQuestion::QuestionType(questionTypes.keyToValue(qPrintable(str)));
-            }
+//            if (type == DRAKON::QUESTION && attributes.hasAttribute("cmd_type")) //TODO move to question command loading
+//            {
+//                str = attributes.value("cmd_type").toString();
+//                questionType = CmdQuestion::QuestionType(questionTypes.keyToValue(qPrintable(str)));
+//            }
 
-            Command* command = cyclogram->createCommand(type, questionType);
+            Command* command = cyclogram->createCommand(type/*, questionType*/);
             if (command)
             {
                 command->read(&mXML); // read command custom data

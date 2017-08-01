@@ -82,6 +82,7 @@ public:
     SystemState* systemState() const;
 
     bool copyFrom(Command* other);
+    virtual bool canBeCopied() const;
 
 signals:
     void finished(Command* nextCmd);

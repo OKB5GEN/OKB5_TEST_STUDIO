@@ -15,6 +15,9 @@
 #include "Headers/logic/commands/cmd_output.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_sub_program.h"
+#include "Headers/logic/commands/cmd_select_state.h"
+#include "Headers/logic/commands/cmd_cycle.h"
+#include "Headers/logic/commands/cmd_condition.h"
 
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
@@ -398,7 +401,7 @@ void Cyclogram::deleteCommandImpl(Command* cmd, bool silent)
     setModified(true, !silent, false); // modified on command deletion
 }
 
-Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
+Command* Cyclogram::createCommand(DRAKON::IconType type)
 {
     Command* cmd = Q_NULLPTR;
 
@@ -439,11 +442,19 @@ Command* Cyclogram::createCommand(DRAKON::IconType type, int param /*= -1*/)
         }
         break;
 
-    case DRAKON::QUESTION:
+    case DRAKON::CONDITION:
         {
-            CmdQuestion* tmp = new CmdQuestion(this);
-            tmp->setQuestionType(CmdQuestion::QuestionType(param));
-            cmd = tmp;
+            cmd = new CmdCondition(this);
+        }
+        break;
+    case DRAKON::SELECT_STATE:
+        {
+            cmd = new CmdSelectState(this);
+        }
+        break;
+    case DRAKON::CYCLE:
+        {
+            cmd = new CmdCycle(this);
         }
         break;
     case DRAKON::ACTION_MODULE:
@@ -740,109 +751,89 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
 
     QMap<Command*, Command*> existingMapping = alreadyCreatedCommands;
 
-    if (from->type() == DRAKON::QUESTION)
+    //CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(from);
+    if (from->type() == DRAKON::CYCLE) //IF-CYCLE
     {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(from);
-        if (questionCmd->questionType() == CmdQuestion::CYCLE) //IF-CYCLE
-        {
-            int TODO; // depending on role and shape type
-        }
-        else // IF-QUESTION
-        {
-            Command* down = from->nextCommand(ValencyPoint::Down);
-            Command* right = from->nextCommand(ValencyPoint::Right);
-            Command* underArrow = from->nextCommand(ValencyPoint::UnderArrow);
+        int TODO; // depending on role and shape type
 
-            if (underArrow)
+        return;
+    }
+    else if (from->type() == DRAKON::CONDITION || from->type() == DRAKON::SELECT_STATE)
+    {
+        Command* down = from->nextCommand(ValencyPoint::Down);
+        Command* right = from->nextCommand(ValencyPoint::Right);
+        Command* underArrow = from->nextCommand(ValencyPoint::UnderArrow);
+
+        if (underArrow)
+        {
+            Command* newUnderArrowCmd = Q_NULLPTR;
+
+            auto it = existingMapping.find(underArrow);
+            if (it == existingMapping.end()) // command was not created, create command copy
             {
-                Command* newUnderArrowCmd = Q_NULLPTR;
+                Command* cmd = underArrow;
+                newUnderArrowCmd = createCommand(cmd->type());
+                newUnderArrowCmd->copyFrom(cmd);
+                existingMapping[underArrow] = newUnderArrowCmd;
 
-                auto it = existingMapping.find(underArrow);
-                if (it == existingMapping.end()) // command was not created, create command copy
+                to->replaceCommand(newUnderArrowCmd, ValencyPoint::UnderArrow);
+
+                // move creation further to "under arrow" hierarchy
+                if (newUnderArrowCmd->type() != DRAKON::GO_TO_BRANCH)
                 {
-                    Command* cmd = underArrow;
+                    copyCommandTree(newUnderArrowCmd, cmd, existingMapping);
+                }
+                else // stop copy on branch end
+                {
+                    newUnderArrowCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
+                }
+            }
+            else
+            {
+                newUnderArrowCmd = it.value();
+                // do not create further hierarchy, because it is already created
+                to->replaceCommand(newUnderArrowCmd, from->role());
+            }
 
-                    int param = -1;
-                    if (cmd->type() == DRAKON::QUESTION)
-                    {
-                        param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
-                    }
+            if (down)
+            {
+                Command* cmd = down;
 
-                    newUnderArrowCmd = createCommand(cmd->type(), param);
-                    newUnderArrowCmd->copyFrom(cmd);
-                    existingMapping[underArrow] = newUnderArrowCmd;
-
-                    to->replaceCommand(newUnderArrowCmd, ValencyPoint::UnderArrow);
-
-                    // move creation further to "under arrow" hierarchy
-                    if (newUnderArrowCmd->type() != DRAKON::GO_TO_BRANCH)
-                    {
-                        copyCommandTree(newUnderArrowCmd, cmd, existingMapping);
-                    }
-                    else // stop copy on branch end
-                    {
-                        newUnderArrowCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
-                    }
+                if (cmd == underArrow) // straight line without down command
+                {
+                    to->replaceCommand(newUnderArrowCmd, ValencyPoint::Down); // just replace to the same command
                 }
                 else
                 {
-                    newUnderArrowCmd = it.value();
-                    // do not create further hierarchy, because it is already created
-                    to->replaceCommand(newUnderArrowCmd, from->role());
-                }
+                    Command* newDownCmd = createCommand(cmd->type());
+                    newDownCmd->copyFrom(cmd);
+                    to->replaceCommand(newDownCmd, ValencyPoint::Down);
 
-                if (down)
-                {
-                    Command* cmd = down;
-
-                    if (cmd == underArrow) // straight line without down command
-                    {
-                        to->replaceCommand(newUnderArrowCmd, ValencyPoint::Down); // just replace to the same command
-                    }
-                    else
-                    {
-                        int param = -1;
-                        if (cmd->type() == DRAKON::QUESTION)
-                        {
-                            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
-                        }
-
-                        Command* newDownCmd = createCommand(cmd->type(), param);
-                        newDownCmd->copyFrom(cmd);
-                        to->replaceCommand(newDownCmd, ValencyPoint::Down);
-
-                        copyCommandTree(newDownCmd, cmd, existingMapping);
-                    }
-                }
-
-                if (right)
-                {
-                    Command* cmd = right;
-                    if (cmd == underArrow) // straight line without right command
-                    {
-                        to->replaceCommand(newUnderArrowCmd, ValencyPoint::Right); // just replace to the same command
-                    }
-                    else
-                    {
-                        int param = -1;
-                        if (cmd->type() == DRAKON::QUESTION)
-                        {
-                            param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
-                        }
-
-                        Command* newRightCmd = createCommand(cmd->type(), param);
-                        newRightCmd->copyFrom(cmd);
-                        to->replaceCommand(newRightCmd, ValencyPoint::Right);
-
-                        copyCommandTree(newRightCmd, cmd, existingMapping);
-                    }
+                    copyCommandTree(newDownCmd, cmd, existingMapping);
                 }
             }
-            else // "switch state"?
+
+            if (right)
             {
-                int i = 0;
-                int TODO;
+                Command* cmd = right;
+                if (cmd == underArrow) // straight line without right command
+                {
+                    to->replaceCommand(newUnderArrowCmd, ValencyPoint::Right); // just replace to the same command
+                }
+                else
+                {
+                    Command* newRightCmd = createCommand(cmd->type());
+                    newRightCmd->copyFrom(cmd);
+                    to->replaceCommand(newRightCmd, ValencyPoint::Right);
+
+                    copyCommandTree(newRightCmd, cmd, existingMapping);
+                }
             }
+        }
+        else // "switch state"?
+        {
+            int i = 0;
+            int TODO;
         }
 
         return;
@@ -863,13 +854,7 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
         auto iter = existingMapping.find(cmd);
         if (iter == existingMapping.end())// command was not created, create command copy
         {
-            int param = -1;
-            if (cmd->type() == DRAKON::QUESTION)
-            {
-                param = int(qobject_cast<CmdQuestion*>(cmd)->questionType());
-            }
-
-            newNextCmd = createCommand(cmd->type(), param);
+            newNextCmd = createCommand(cmd->type());
             newNextCmd->copyFrom(cmd);
 
             to->replaceCommand(newNextCmd, ValencyPoint::Down);

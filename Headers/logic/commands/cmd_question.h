@@ -8,15 +8,6 @@ class CmdQuestion: public Command
     Q_OBJECT
 
 public:
-    enum QuestionType
-    {
-        IF,
-        CYCLE,
-        SWITCH_STATE
-    };
-
-    Q_ENUM(QuestionType)
-
     enum Orientation
     {
         YesDown,
@@ -66,13 +57,12 @@ public:
         OperandType type;
     };
 
-    CmdQuestion(QObject* parent);
+    CmdQuestion(int commandID, int pointsCount, QObject* parent);
 
     void run() override;
 
     void setData(Operation operation, Orientation orientation, const OperandData& left, const OperandData& right);
 
-    void setQuestionType(QuestionType type);
     void setOperation(Operation operation);
     void setOrientation(Orientation orientation);
     void setOperand(OperandID operand, qreal value);
@@ -83,13 +73,14 @@ public:
     OperandType operandType(OperandID operand) const;
     QString variableName(OperandID operand) const;
     qreal value(OperandID operand) const;
-    QuestionType questionType() const;
+
+    bool canBeCopied() const override;
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
-    void insertCommand(Command* newCmd, ValencyPoint::Role role) override;
     bool loadFromImpl(Command* other) override;
+    void updateText() override;
 
 private slots:
     void onNameChanged(const QString& newName, const QString& oldName) override;
@@ -97,28 +88,8 @@ private slots:
     void execute();
 
 private:
-    void updateText() override;
-
-    void insertInCycle(Command* newCmd, ValencyPoint::Role role);
-    void insertInIf(Command* newCmd, ValencyPoint::Role role);
-    void insertInSwitchState(Command* newCmd, ValencyPoint::Role role);
-
-    void insertCycleToCycle(Command* newCmd, ValencyPoint::Role role);
-    void insertCycleToIf(Command* newCmd, ValencyPoint::Role role);
-    void insertCycleToSwitchState(Command* newCmd, ValencyPoint::Role role);
-
-    void insertIfToCycle(Command* newCmd, ValencyPoint::Role role);
-    void insertIfToIf(Command* newCmd, ValencyPoint::Role role);
-    void insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role);
-
-    void insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role role);
-    void insertSwitchStateToIf(Command* newCmd, ValencyPoint::Role role);
-    void insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::Role role);
-
     Operation mOperation;
     Orientation mOrientation;
     OperandData mOperands[OperandsCount];
-
-    QuestionType mQuestionType;
 };
 #endif // CMD_QUESTION_H

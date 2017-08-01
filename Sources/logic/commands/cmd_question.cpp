@@ -19,8 +19,8 @@ CmdQuestion::OperandData::OperandData()
 
 //=================================
 
-CmdQuestion::CmdQuestion(QObject* parent):
-    Command(DRAKON::QUESTION, 3, parent),
+CmdQuestion::CmdQuestion(int commandID, int pointsCount, QObject* parent):
+    Command(DRAKON::IconType(commandID), pointsCount, parent),
     mOperation(Equal),
     mOrientation(YesDown)
 {
@@ -337,19 +337,9 @@ void CmdQuestion::setData(Operation operation, Orientation orientation, const Op
     }
 }
 
-CmdQuestion::QuestionType CmdQuestion::questionType() const
-{
-    return mQuestionType;
-}
-
-void CmdQuestion::setQuestionType(CmdQuestion::QuestionType type)
-{
-    mQuestionType = type;
-}
-
 void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 {
-    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+//    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
     QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();
     QMetaEnum operation = QMetaEnum::fromType<CmdQuestion::Operation>();
     QMetaEnum operandId = QMetaEnum::fromType<CmdQuestion::OperandID>();
@@ -357,7 +347,7 @@ void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 
     writer->writeAttribute("operation", operation.valueToKey(mOperation));
     writer->writeAttribute("orientation", orientation.valueToKey(mOrientation));
-    writer->writeAttribute("cmd_type", cmdType.valueToKey(mQuestionType));
+//    writer->writeAttribute("cmd_type", cmdType.valueToKey(mQuestionType));
 
     for (int i = 0; i < OperandsCount; ++i)
     {
@@ -372,7 +362,7 @@ void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
 
 void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
 {
-    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
+//    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
     QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();
     QMetaEnum operation = QMetaEnum::fromType<CmdQuestion::Operation>();
     QMetaEnum operandId = QMetaEnum::fromType<CmdQuestion::OperandID>();
@@ -391,11 +381,11 @@ void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
         mOrientation = Orientation(orientation.keyToValue(qPrintable(str)));
     }
 
-    if (attributes.hasAttribute("cmd_type"))
-    {
-        QString str = attributes.value("cmd_type").toString();
-        mQuestionType = QuestionType(cmdType.keyToValue(qPrintable(str)));
-    }
+//    if (attributes.hasAttribute("cmd_type"))
+//    {
+//        QString str = attributes.value("cmd_type").toString();
+//        mQuestionType = QuestionType(cmdType.keyToValue(qPrintable(str)));
+//    }
 
     while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
     {
@@ -440,484 +430,484 @@ void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
     updateText();
 }
 
-void CmdQuestion::insertCommand(Command* newCmd, ValencyPoint::Role role)
-{
-    if (questionType() == CmdQuestion::CYCLE)
-    {
-        insertInCycle(newCmd, role);
-    }
-    else if (questionType() == CmdQuestion::IF)
-    {
-        insertInIf(newCmd, role);
-    }
-    else if (questionType() == CmdQuestion::SWITCH_STATE)
-    {
-        insertInSwitchState(newCmd, role);
-    }
-}
-
-void CmdQuestion::insertInCycle(Command* newCmd, ValencyPoint::Role role)
-{
-    if (newCmd->type() == DRAKON::QUESTION)
-    {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-
-        if (questionCmd->questionType() == CmdQuestion::CYCLE)
-        {
-            insertCycleToCycle(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::IF)
-        {
-            insertIfToCycle(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
-        {
-            insertSwitchStateToCycle(newCmd, role);
-        }
-
-        return;
-    }
-
-    // simple command insertion in QUESTION-CYCLE
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // update "under arrow" branch
-        Command* cmd = (underArrow == this) ? this : underArrow;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-        // update "right" branch
-        if (right == this)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(cmd, newCmd, right);
-        }
-    }
-    else
-    {
-        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-        mNextCommands[role] = newCmd;
-    }
-}
-
-void CmdQuestion::insertInIf(Command* newCmd, ValencyPoint::Role role)
-{
-    if (newCmd->type() == DRAKON::QUESTION)
-    {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-
-        if (questionCmd->questionType() == CmdQuestion::CYCLE)
-        {
-            insertCycleToIf(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::IF)
-        {
-            insertIfToIf(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
-        {
-            insertSwitchStateToIf(newCmd, role);
-        }
-
-        return;
-    }
-
-    // simple command insertion
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // recursively replace references to current "under arrow" command with new "under arrow" command
-        if (down == underArrow)
-        {
-            mNextCommands[ValencyPoint::Down] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, down);
-        }
-
-        if (right == underArrow)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, right);
-        }
-
-        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
-    }
-    else
-    {
-        Command* existing = mNextCommands[role];
-        Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    }
-
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertInSwitchState(Command* newCmd, ValencyPoint::Role role)
-{
-    if (newCmd->type() == DRAKON::QUESTION)
-    {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-
-        if (questionCmd->questionType() == CmdQuestion::CYCLE)
-        {
-            insertCycleToSwitchState(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::IF)
-        {
-            insertIfToSwitchState(newCmd, role);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
-        {
-            insertSwitchStateToSwitchState(newCmd, role);
-        }
-
-        return;
-    }
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        LOG_WARNING(QString("Unexpected valency point!"));
-        return;
-    }
-
-    // simple command insertion
-    newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertCycleToCycle(Command* newCmd, ValencyPoint::Role role)
-{
-    int TODO; // need check + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
-
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // update "under arrow" branch
-        Command* cmd = (underArrow == this) ? this : underArrow;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-
-        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-        // update "right" branch
-        if (right == this)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(cmd, newCmd, right);
-        }
-    }
-    else
-    {
-        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-
-        mNextCommands[role] = newCmd;
-    }
-}
-
-void CmdQuestion::insertCycleToIf(Command* newCmd, ValencyPoint::Role role)
-{
-    int TODO; // need check + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
-
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // recursively replace references to current "under arrow" command with new "under arrow" command
-        if (down == underArrow)
-        {
-            mNextCommands[ValencyPoint::Down] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, down);
-        }
-
-        if (right == underArrow)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, right);
-        }
-
-        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
-        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
-    }
-    else
-    {
-        Command* existing = mNextCommands[role];
-        Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    }
-
-    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertCycleToSwitchState(Command* newCmd, ValencyPoint::Role role)
-{
-    int TODO; // need check
-    //  + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
-    // эту функцию вообще не проверял, пока циклов нет пофиг
-
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // recursively replace references to current "under arrow" command with new "under arrow" command
-        if (down == underArrow)
-        {
-            mNextCommands[ValencyPoint::Down] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, down);
-        }
-
-        if (right == underArrow)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, right);
-        }
-
-        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
-        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
-    }
-    else
-    {
-        Command* existing = mNextCommands[role];
-        Command* cmd = (existing == underArrow) ? underArrow : existing;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    }
-
-    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
-    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertIfToCycle(Command* newCmd, ValencyPoint::Role role)
-{
-    int TODO; // need check
-    //  + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
-
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // update "under arrow" branch
-        Command* cmd = (underArrow == this) ? this : underArrow;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-        newCmd->replaceCommand(cmd, ValencyPoint::Right);
-        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-
-        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-        // update "right" branch
-        if (right == this)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(cmd, newCmd, right);
-        }
-    }
-    else
-    {
-        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
-        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
-        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
-
-        mNextCommands[role] = newCmd;
-    }
-}
-
-void CmdQuestion::insertIfToIf(Command* newCmd, ValencyPoint::Role role)
-{
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    Command* cmd = Q_NULLPTR;
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        cmd = underArrow;
-
-        // recursively replace references to current "under arrow" command with new "under arrow" command
-        if (down == underArrow)
-        {
-            mNextCommands[ValencyPoint::Down] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, down);
-        }
-
-        if (right == underArrow)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, right);
-        }
-    }
-    else
-    {
-        Command* existing = mNextCommands[role];
-        cmd = (existing == underArrow) ? underArrow : existing;
-    }
-
-    // old "under arrow" command now become "under arrow, etc" command for new command
-    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    newCmd->replaceCommand(cmd, ValencyPoint::Right);
-    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role)
-{
-    if (role == ValencyPoint::UnderArrow)
-    {
-        LOG_WARNING(QString("Unexpected valency point 2"));
-        return;
-    }
-
-    Command* cmd = mNextCommands[role];
-
-    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    newCmd->replaceCommand(cmd, ValencyPoint::Right);
-    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role role)
-{
-    int TODO; // need check
-    // switch state может быть добавлен только в down
-
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // update "under arrow" branch
-        Command* cmd = (underArrow == this) ? this : underArrow;
-
-        newCmd->replaceCommand(cmd, ValencyPoint::Down);
-        newCmd->replaceCommand(cmd, ValencyPoint::Right);
-        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
-
-        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
-
-        // update "right" branch
-        if (right == this)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(cmd, newCmd, right);
-        }
-    }
-    else
-    {
-        LOG_WARNING(QString("Unexpected valency point 3"));
-    }
-}
-
-void CmdQuestion::insertSwitchStateToIf(Command* newCmd, ValencyPoint::Role role)
-{
-    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
-    Command* right = nextCommand(ValencyPoint::Right);
-    Command* down = nextCommand(ValencyPoint::Down);
-
-    Command* cmd = underArrow;
-
-    if (role == ValencyPoint::UnderArrow)
-    {
-        // recursively replace references to current "under arrow" command with new "under arrow" command
-        if (down == underArrow)
-        {
-            mNextCommands[ValencyPoint::Down] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, down);
-        }
-
-        if (right == underArrow)
-        {
-            mNextCommands[ValencyPoint::Right] = newCmd;
-        }
-        else
-        {
-            replaceReferences(underArrow, newCmd, right);
-        }
-    }
-
-    // old "under arrow" command now become "down" command for new command
-    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    mNextCommands[role] = newCmd;
-}
-
-void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::Role role)
-{
-    if (role == ValencyPoint::UnderArrow)
-    {
-        LOG_WARNING(QString("Unexpected valency point"));
-        return;
-    }
-
-    Command* cmd = nextCommand(role);
-
-    // old "down/right" command now become "down" command for new command
-    newCmd->replaceCommand(cmd, ValencyPoint::Down);
-    mNextCommands[role] = newCmd;
-}
+//void CmdQuestion::insertCommand(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (questionType() == CmdQuestion::CYCLE)
+//    {
+//        insertInCycle(newCmd, role);
+//    }
+//    else if (questionType() == CmdQuestion::IF)
+//    {
+//        insertInIf(newCmd, role);
+//    }
+//    else if (questionType() == CmdQuestion::SWITCH_STATE)
+//    {
+//        insertInSwitchState(newCmd, role);
+//    }
+//}
+
+//void CmdQuestion::insertInCycle(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (newCmd->type() == DRAKON::QUESTION)
+//    {
+//        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+//        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+//        {
+//            insertCycleToCycle(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::IF)
+//        {
+//            insertIfToCycle(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+//        {
+//            insertSwitchStateToCycle(newCmd, role);
+//        }
+
+//        return;
+//    }
+
+//    // simple command insertion in QUESTION-CYCLE
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // update "under arrow" branch
+//        Command* cmd = (underArrow == this) ? this : underArrow;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+//        // update "right" branch
+//        if (right == this)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(cmd, newCmd, right);
+//        }
+//    }
+//    else
+//    {
+//        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+//        mNextCommands[role] = newCmd;
+//    }
+//}
+
+//void CmdQuestion::insertInIf(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (newCmd->type() == DRAKON::QUESTION)
+//    {
+//        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+//        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+//        {
+//            insertCycleToIf(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::IF)
+//        {
+//            insertIfToIf(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+//        {
+//            insertSwitchStateToIf(newCmd, role);
+//        }
+
+//        return;
+//    }
+
+//    // simple command insertion
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // recursively replace references to current "under arrow" command with new "under arrow" command
+//        if (down == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Down] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, down);
+//        }
+
+//        if (right == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, right);
+//        }
+
+//        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+//    }
+//    else
+//    {
+//        Command* existing = mNextCommands[role];
+//        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    }
+
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertInSwitchState(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (newCmd->type() == DRAKON::QUESTION)
+//    {
+//        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
+
+//        if (questionCmd->questionType() == CmdQuestion::CYCLE)
+//        {
+//            insertCycleToSwitchState(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::IF)
+//        {
+//            insertIfToSwitchState(newCmd, role);
+//        }
+//        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+//        {
+//            insertSwitchStateToSwitchState(newCmd, role);
+//        }
+
+//        return;
+//    }
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        LOG_WARNING(QString("Unexpected valency point!"));
+//        return;
+//    }
+
+//    // simple command insertion
+//    newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertCycleToCycle(Command* newCmd, ValencyPoint::Role role)
+//{
+//    int TODO; // need check + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
+
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // update "under arrow" branch
+//        Command* cmd = (underArrow == this) ? this : underArrow;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+//        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+
+//        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+//        // update "right" branch
+//        if (right == this)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(cmd, newCmd, right);
+//        }
+//    }
+//    else
+//    {
+//        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+//        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+//        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+
+//        mNextCommands[role] = newCmd;
+//    }
+//}
+
+//void CmdQuestion::insertCycleToIf(Command* newCmd, ValencyPoint::Role role)
+//{
+//    int TODO; // need check + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
+
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // recursively replace references to current "under arrow" command with new "under arrow" command
+//        if (down == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Down] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, down);
+//        }
+
+//        if (right == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, right);
+//        }
+
+//        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
+//        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+//    }
+//    else
+//    {
+//        Command* existing = mNextCommands[role];
+//        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    }
+
+//    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+//    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertCycleToSwitchState(Command* newCmd, ValencyPoint::Role role)
+//{
+//    int TODO; // need check
+//    //  + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
+//    // эту функцию вообще не проверял, пока циклов нет пофиг
+
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // recursively replace references to current "under arrow" command with new "under arrow" command
+//        if (down == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Down] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, down);
+//        }
+
+//        if (right == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, right);
+//        }
+
+//        // old "under arrow" command now become "down" command for new command, "right" and "under arrow" link command to itself
+//        newCmd->replaceCommand(underArrow, ValencyPoint::Down);
+//    }
+//    else
+//    {
+//        Command* existing = mNextCommands[role];
+//        Command* cmd = (existing == underArrow) ? underArrow : existing;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    }
+
+//    newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+//    newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertIfToCycle(Command* newCmd, ValencyPoint::Role role)
+//{
+//    int TODO; // need check
+//    //  + хз как разруливать дальнейшие добавления даже простых команд во вложенный under arrow? (может replace references этим занимается)
+
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // update "under arrow" branch
+//        Command* cmd = (underArrow == this) ? this : underArrow;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//        newCmd->replaceCommand(cmd, ValencyPoint::Right);
+//        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+
+//        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+//        // update "right" branch
+//        if (right == this)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(cmd, newCmd, right);
+//        }
+//    }
+//    else
+//    {
+//        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Down);
+//        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::Right);
+//        newCmd->replaceCommand(mNextCommands[role], ValencyPoint::UnderArrow);
+
+//        mNextCommands[role] = newCmd;
+//    }
+//}
+
+//void CmdQuestion::insertIfToIf(Command* newCmd, ValencyPoint::Role role)
+//{
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    Command* cmd = Q_NULLPTR;
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        cmd = underArrow;
+
+//        // recursively replace references to current "under arrow" command with new "under arrow" command
+//        if (down == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Down] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, down);
+//        }
+
+//        if (right == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, right);
+//        }
+//    }
+//    else
+//    {
+//        Command* existing = mNextCommands[role];
+//        cmd = (existing == underArrow) ? underArrow : existing;
+//    }
+
+//    // old "under arrow" command now become "under arrow, etc" command for new command
+//    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+//    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertIfToSwitchState(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        LOG_WARNING(QString("Unexpected valency point 2"));
+//        return;
+//    }
+
+//    Command* cmd = mNextCommands[role];
+
+//    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    newCmd->replaceCommand(cmd, ValencyPoint::Right);
+//    newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertSwitchStateToCycle(Command* newCmd, ValencyPoint::Role role)
+//{
+//    int TODO; // need check
+//    // switch state может быть добавлен только в down
+
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // update "under arrow" branch
+//        Command* cmd = (underArrow == this) ? this : underArrow;
+
+//        newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//        newCmd->replaceCommand(cmd, ValencyPoint::Right);
+//        newCmd->replaceCommand(cmd, ValencyPoint::UnderArrow);
+
+//        mNextCommands[ValencyPoint::UnderArrow] = newCmd;
+
+//        // update "right" branch
+//        if (right == this)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(cmd, newCmd, right);
+//        }
+//    }
+//    else
+//    {
+//        LOG_WARNING(QString("Unexpected valency point 3"));
+//    }
+//}
+
+//void CmdQuestion::insertSwitchStateToIf(Command* newCmd, ValencyPoint::Role role)
+//{
+//    Command* underArrow = nextCommand(ValencyPoint::UnderArrow);
+//    Command* right = nextCommand(ValencyPoint::Right);
+//    Command* down = nextCommand(ValencyPoint::Down);
+
+//    Command* cmd = underArrow;
+
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        // recursively replace references to current "under arrow" command with new "under arrow" command
+//        if (down == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Down] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, down);
+//        }
+
+//        if (right == underArrow)
+//        {
+//            mNextCommands[ValencyPoint::Right] = newCmd;
+//        }
+//        else
+//        {
+//            replaceReferences(underArrow, newCmd, right);
+//        }
+//    }
+
+//    // old "under arrow" command now become "down" command for new command
+//    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    mNextCommands[role] = newCmd;
+//}
+
+//void CmdQuestion::insertSwitchStateToSwitchState(Command* newCmd, ValencyPoint::Role role)
+//{
+//    if (role == ValencyPoint::UnderArrow)
+//    {
+//        LOG_WARNING(QString("Unexpected valency point"));
+//        return;
+//    }
+
+//    Command* cmd = nextCommand(role);
+
+//    // old "down/right" command now become "down" command for new command
+//    newCmd->replaceCommand(cmd, ValencyPoint::Down);
+//    mNextCommands[role] = newCmd;
+//}
 
 bool CmdQuestion::loadFromImpl(Command* other)
 {
@@ -930,9 +920,14 @@ bool CmdQuestion::loadFromImpl(Command* other)
 
     mOperation = otherQuestion->operation();
     mOrientation = otherQuestion->orientation();
-    mQuestionType = otherQuestion->questionType();
+    //mQuestionType = otherQuestion->questionType();
     mOperands[Left] = otherQuestion->mOperands[Left];
     mOperands[Right] = otherQuestion->mOperands[Right];
 
     return true;
+}
+
+bool CmdQuestion::canBeCopied() const
+{
+    return false;
 }

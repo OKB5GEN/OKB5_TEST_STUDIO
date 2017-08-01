@@ -204,25 +204,21 @@ void Command::insertCommand(Command* newCmd, ValencyPoint::Role role)
 {
     Command* next = nextCommand();
 
-    if (newCmd->type() == DRAKON::QUESTION)
+    if (newCmd->type() == DRAKON::CYCLE)
     {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(newCmd);
-        if (questionCmd->questionType() == CmdQuestion::CYCLE)
-        {
-            questionCmd->replaceCommand(next, ValencyPoint::Down);
-            questionCmd->replaceCommand(questionCmd, ValencyPoint::UnderArrow);
-            questionCmd->replaceCommand(questionCmd, ValencyPoint::Right);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::IF) // by default IF-type command refers with all branches to command below
-        {
-            questionCmd->replaceCommand(next, ValencyPoint::UnderArrow);
-            questionCmd->replaceCommand(next, ValencyPoint::Down);
-            questionCmd->replaceCommand(next, ValencyPoint::Right);
-        }
-        else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
-        {
-            questionCmd->replaceCommand(next, ValencyPoint::Down);
-        }
+        newCmd->replaceCommand(next, ValencyPoint::Down);
+        newCmd->replaceCommand(newCmd, ValencyPoint::UnderArrow);
+        newCmd->replaceCommand(newCmd, ValencyPoint::Right);
+    }
+    else if (newCmd->type() == DRAKON::CONDITION)
+    {
+        newCmd->replaceCommand(next, ValencyPoint::UnderArrow);
+        newCmd->replaceCommand(next, ValencyPoint::Down);
+        newCmd->replaceCommand(next, ValencyPoint::Right);
+    }
+    else if (newCmd->type() == DRAKON::SELECT_STATE)
+    {
+        newCmd->replaceCommand(next, ValencyPoint::Down);
     }
     else
     {
@@ -456,4 +452,9 @@ bool Command::loadFromImpl(Command* other)
 int Command::executionDelay() const
 {
     return mExecutionDelay;
+}
+
+bool Command::canBeCopied() const
+{
+    return true;
 }

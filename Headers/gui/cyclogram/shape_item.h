@@ -75,7 +75,6 @@ private slots:
 
 private:
     void createPath();
-    ValencyPoint* createValencyPoint(const QPointF& point, int role);
     void createValencyPoints(Command* cmd);
 
     void removeQuestionBranch(ShapeItem* branch);

@@ -76,7 +76,7 @@ private:
     void drawChildren(ShapeItem* item, const QList<Command*>& stopDrawingCommands, bool drawGoToBranch);
 
     ShapeItem* addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape);
-    ShapeItem* addNewCommand(DRAKON::IconType type, const ValencyPoint* point, int param = -1);
+    ShapeItem* addNewCommand(DRAKON::IconType type, const ValencyPoint* point);
     ShapeItem* addCommand(Command* cmd, const ValencyPoint* point);
     bool canBeDeleted(ShapeItem* item, QString& error) const;
     bool canBeMoved(ShapeItem* item, const ValencyPoint* point) const;

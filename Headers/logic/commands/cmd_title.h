@@ -21,6 +21,8 @@ public:
     void setTitleType(TitleType type);
     TitleType titleType() const;
 
+    bool canBeCopied() const override;
+
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;

@@ -3,6 +3,7 @@
 
 #include <QPainterPath>
 #include <QColor>
+#include <QSet>
 
 class ShapeItem;
 
@@ -25,20 +26,26 @@ public:
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);
     void setRole(Role role);
-    void setCanBeLanded(bool canBeLanded);
+
+    void removeInsertableCommand(int commandID);
+    void addInsertableCommand(int commandID);
+    void setInsertableCommand(int commandID);
+    void setInsertableCommands(const QSet<int>& commands);
+    const QSet<int>& insertableCommands() const;
+    bool canBeInserted(int commandID) const;
 
     QPainterPath path() const;
     QColor color() const;
     ShapeItem* owner() const;
     Role role() const;
-    bool canBeLanded() const;
 
 private:
     ShapeItem* mOwner = Q_NULLPTR;
     QPainterPath mPath;
     QColor mColor;
     Role mRole;
-    bool mCanBeLanded;
+
+    QSet<int> mInsertableCommands;
 };
 
 #endif // VALENCY_POINT_H

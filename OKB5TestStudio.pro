@@ -91,7 +91,10 @@ SOURCES += main.cpp\
     Sources/gui/tools/app_settings_dialog.cpp \
     Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp \
     Sources/gui/cyclogram/variables_select_window.cpp \
-    Sources/gui/tools/commands_edit_toolbar.cpp
+    Sources/gui/tools/commands_edit_toolbar.cpp \
+    Sources/logic/commands/cmd_condition.cpp \
+    Sources/logic/commands/cmd_cycle.cpp \
+    Sources/logic/commands/cmd_select_state.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -166,7 +169,10 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/tools/app_settings_dialog.h \
     Headers/gui/cyclogram/dialogs/text_edit_dialog.h \
     Headers/gui/cyclogram/variables_select_window.h \
-    Headers/gui/tools/commands_edit_toolbar.h
+    Headers/gui/tools/commands_edit_toolbar.h \
+    Headers/logic/commands/cmd_condition.h \
+    Headers/logic/commands/cmd_cycle.h \
+    Headers/logic/commands/cmd_select_state.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 

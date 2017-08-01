@@ -2,12 +2,17 @@
 
 #include "Headers/gui/cyclogram/valency_point.h"
 #include "Headers/gui/cyclogram/shape_item.h"
+#include "Headers/shape_types.h"
 
 ValencyPoint::ValencyPoint() :
     mOwner(Q_NULLPTR),
-    mRole(Down),
-    mCanBeLanded(false)
+    mRole(Down)
 {
+    // by default all commands are isertable
+    for (int i = 0; i < DRAKON::SHAPES_COUNT; ++i)
+    {
+        mInsertableCommands.insert(i);
+    }
 }
 
 QPainterPath ValencyPoint::path() const
@@ -50,16 +55,6 @@ ValencyPoint::Role ValencyPoint::role() const
     return mRole;
 }
 
-void ValencyPoint::setCanBeLanded(bool canBeLanded)
-{
-    mCanBeLanded = canBeLanded;
-}
-
-bool ValencyPoint::canBeLanded() const
-{
-    return mCanBeLanded;
-}
-
 QPainterPath ValencyPoint::createPath()
 {
     QPainterPath path;
@@ -73,4 +68,35 @@ QPainterPath ValencyPoint::createPath()
     path.lineTo(radius * crossSize, 0);
 
     return path;
+}
+
+const QSet<int>& ValencyPoint::insertableCommands() const
+{
+    return mInsertableCommands;
+}
+
+void ValencyPoint::addInsertableCommand(int commandID)
+{
+    mInsertableCommands.insert(commandID);
+}
+
+void ValencyPoint::removeInsertableCommand(int commandID)
+{
+    mInsertableCommands.remove(commandID);
+}
+
+void ValencyPoint::setInsertableCommands(const QSet<int>& commands)
+{
+    mInsertableCommands = commands;
+}
+
+bool ValencyPoint::canBeInserted(int commandID) const
+{
+    return mInsertableCommands.contains(commandID);
+}
+
+void ValencyPoint::setInsertableCommand(int commandID)
+{
+    mInsertableCommands.clear();
+    mInsertableCommands.insert(commandID);
 }

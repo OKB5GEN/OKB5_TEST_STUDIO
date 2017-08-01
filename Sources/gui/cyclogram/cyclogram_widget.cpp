@@ -408,13 +408,14 @@ void CyclogramWidget::onClickVP(const ValencyPoint* point, const QPoint& pos)
 
     if (type == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right)
     {
-        addNewCommand(type, point); // just add new branch immediately
+        showContextMenuForVP(point, pos);
+        //addNewCommand(type, point); // just add new branch immediately
     }
     else // add some command via dialog (TODO tempotary)
     {
         if (mCurrentCommandType != -1)
         {
-            addNewCommand(DRAKON::IconType(mCurrentCommandType), point, CmdQuestion::IF); //TODO not SWITCH_STATE
+            addNewCommand(DRAKON::IconType(mCurrentCommandType), point);
         }
         else // TODO show context menu?
         {
@@ -427,62 +428,28 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
 {
     clearSelection();
 
-    ShapeItem* item = point->owner();
-    DRAKON::IconType type = item->command()->type();
-    if (type == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right)
-    {
-        QMenu menu(this);
-        QAction* addNewBranchAction = menu.addAction(tr("Add BRANCH"));
-        addNewBranchAction->setData(int(DRAKON::BRANCH_BEGIN));
-
-        menu.addSeparator();
-        QAction* pasteAction = menu.addAction(tr("Paste"));
-        pasteAction->setEnabled(mItemToCopy != Q_NULLPTR);
-
-        QAction* action = menu.exec(pos);
-        if (!action)
-        {
-            return;
-        }
-
-        if (action == addNewBranchAction)
-        {
-            addNewCommand(DRAKON::BRANCH_BEGIN, point);
-        }
-
-        if (action == pasteAction)
-        {
-            if (mItemToCopy->command()->type() == DRAKON::BRANCH_BEGIN)
-            {
-                copyBranchTo(mItemToCopy, point);
-            }
-            else
-            {
-                QMessageBox::warning(this, tr("Error"), tr("Selected command can not be copied here"));
-            }
-            //copyCommandTo(mItemToCopy, point);
-        }
-
-        return;
-    }
+    QMap<int, QString> actionTexts;
+    actionTexts[DRAKON::BRANCH_BEGIN] = tr("Add BRANCH");
+    actionTexts[DRAKON::ACTION_MATH] = tr("Add MATH COMMAND");
+    actionTexts[DRAKON::DELAY] = tr("Add DELAY");
+    actionTexts[DRAKON::CONDITION] = tr("Add CONDITION");
+    actionTexts[DRAKON::CYCLE] = tr("Add CYCLE");
+    actionTexts[DRAKON::SELECT_STATE] = tr("Add SELECT STATE");
+    actionTexts[DRAKON::ACTION_MODULE] = tr("Add MODULE COMMAND");
+    actionTexts[DRAKON::SUBPROGRAM] = tr("Add SUBPROGRAM");
+    actionTexts[DRAKON::OUTPUT] = tr("Add OUTPUT");
+    actionTexts[DRAKON::PARALLEL_PROCESS] = tr("Add PARALLEL PROCESS");
 
     QMenu menu(this);
-    menu.addAction(tr("Add MODULE COMMAND"))->setData(int(DRAKON::ACTION_MODULE));
-    menu.addAction(tr("Add MATH COMMAND"))->setData(int(DRAKON::ACTION_MATH));
-    menu.addAction(tr("Add SUBPROGRAM"))->setData(int(DRAKON::SUBPROGRAM));
-    QAction* questionAct = menu.addAction(tr("Add QUESTION")); //TODO cycle?
-    questionAct->setData(int(DRAKON::QUESTION));
-    menu.addAction(tr("Add DELAY"))->setData(int(DRAKON::DELAY));
-    menu.addAction(tr("Add OUTPUT"))->setData(int(DRAKON::OUTPUT));
 
-    if (point->canBeLanded())
+    foreach (int command, point->insertableCommands())
     {
-        menu.addAction(tr("Add SWITCH STATE"))->setData(int(DRAKON::QUESTION)); //TODO remove and add "Add GO_TO_BRANCH"
+        QAction* action = menu.addAction(actionTexts.value(command));
+        action->setData(command);
     }
 
     menu.addSeparator();
     QAction* pasteAction = menu.addAction(tr("Paste"));
-
     pasteAction->setEnabled(mItemToCopy != Q_NULLPTR);
 
     QAction* action = menu.exec(pos);
@@ -493,27 +460,26 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
 
     if (action == pasteAction)
     {
-        copyCommandTo(mItemToCopy, point);
-        return;
-    }
-
-    int param = -1;
-    int command = action->data().toInt();
-    if (command == DRAKON::QUESTION) //TODO remove
-    {
-        if (action == questionAct)
+        if (!point->canBeInserted(mItemToCopy->command()->type()))
         {
-            param = CmdQuestion::IF;
+            QMessageBox::warning(this, tr("Error"), tr("Selected command can not be copied here"));
+            return;
+        }
+
+        if (mItemToCopy->command()->type() == DRAKON::BRANCH_BEGIN)
+        {
+            copyBranchTo(mItemToCopy, point);
         }
         else
         {
-            param = CmdQuestion::SWITCH_STATE;
+            copyCommandTo(mItemToCopy, point);
         }
 
-//      mParam = CmdQuestion::CYCLE; //TODO
+        return;
     }
 
-    addNewCommand(DRAKON::IconType(command), point, param);
+    int command = action->data().toInt();
+    addNewCommand(DRAKON::IconType(command), point);
 }
 
 void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point)
@@ -548,7 +514,7 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* p
 
     if (typeToCopy == DRAKON::GO_TO_BRANCH)
     {
-        point->canBeLanded();
+        //point->canBeLanded();
         int TODO; // can be pasted only to points that can be landed
         canBePasted = false;
     }
@@ -563,24 +529,13 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* p
     //DRAKON::BRANCH_BEGIN - this type of command is copied as entire branch
 
     // create command and load it from another
-    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy, CmdQuestion::IF);
+    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy);
     newCmd->copyFrom(commandToCopy);
 
     if (!newCmd)
     {
         LOG_ERROR(QString("Command copy not created"));
         return;
-    }
-
-    if (typeToCopy == DRAKON::QUESTION) // TODO temporary hack for QUESTION-SWITCH_STATE copying
-    {
-        CmdQuestion* from = qobject_cast<CmdQuestion*>(commandToCopy);
-        CmdQuestion* to = qobject_cast<CmdQuestion*>(newCmd);
-
-        if (from->questionType() == CmdQuestion::SWITCH_STATE) // "switch state" -> "if"
-        {
-            to->setQuestionType(CmdQuestion::IF);
-        }
     }
 
     ShapeItem* newShape = addCommand(newCmd, point);
@@ -786,11 +741,7 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
     menu.addAction(deleteText);
     menu.addAction(copyText);
 
-    bool enableCopyAction = true;
-    if (type == DRAKON::TERMINATOR || type == DRAKON::QUESTION) //TODO temporary disable question command copy
-    {
-        enableCopyAction = false; // no copy action available, cyclogram can have only one start and one end
-    }
+    bool enableCopyAction = item->command()->canBeCopied();
 
     if (type == DRAKON::BRANCH_BEGIN)
     {
@@ -1561,7 +1512,9 @@ void CyclogramWidget::showEditDialog(Command *command)
         }
         break;
 
-    case DRAKON::QUESTION:
+    case DRAKON::CONDITION:
+    case DRAKON::SELECT_STATE:
+    case DRAKON::CYCLE:
         {
             CmdQuestionEditDialog* d = new CmdQuestionEditDialog(this);
             d->setCommand(qobject_cast<CmdQuestion*>(command));
@@ -1738,98 +1691,96 @@ void CyclogramWidget::drawChildren(ShapeItem* item, const QList<Command*>& stopD
     }
     else if (cmd->nextCommands().size() == 3)
     {
-        if (cmd->type() == DRAKON::QUESTION)
+        //CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
+
+        if (cmd->type() == DRAKON::CONDITION || cmd->type() == DRAKON::SELECT_STATE)
         {
-            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
-            if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            Command* down = cmd->nextCommand(ValencyPoint::Down);
+            Command* right = cmd->nextCommand(ValencyPoint::Right);
+            Command* underArrow = cmd->nextCommand(ValencyPoint::UnderArrow);
+
+            QList<Command*> stopList = stopDrawingCommands;
+
+            if (underArrow)
             {
-                int TODO; // depending on role and shape type
+                stopList.push_back(underArrow);
             }
-            else // IF-QUESTION
+
+            QRect downRect;
+            QRect rightRect;
+            QRect underArrowRect;
+
+            if (down && down != underArrow)
             {
-                Command* down = cmd->nextCommand(ValencyPoint::Down);
-                Command* right = cmd->nextCommand(ValencyPoint::Right);
-                Command* underArrow = cmd->nextCommand(ValencyPoint::UnderArrow);
+                QPoint cell = item->cell();
+                cell.setY(cell.y() + 1);
 
-                QList<Command*> stopList = stopDrawingCommands;
+                ShapeItem* shape = addShape(down, cell, item);
+                item->setChildShape(shape, ValencyPoint::Down);
 
-                if (underArrow)
+                if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                 {
-                    stopList.push_back(underArrow);
+                    drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
                 }
 
-                QRect downRect;
-                QRect rightRect;
-                QRect underArrowRect;
+                downRect = shape->rect();
+            }
+
+            if (right && right != underArrow)
+            {
+                QPoint cell = item->cell();
+                cell.setY(cell.y() + 1);
 
                 if (down && down != underArrow)
                 {
-                    QPoint cell = item->cell();
-                    cell.setY(cell.y() + 1);
-
-                    ShapeItem* shape = addShape(down, cell, item);
-                    item->setChildShape(shape, ValencyPoint::Down);
-
-                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
-                    {
-                        drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
-                    }
-
-                    downRect = shape->rect();
+                    cell.setX(cell.x() + downRect.width());
                 }
-
-                if (right && right != underArrow)
+                else
                 {
-                    QPoint cell = item->cell();
-                    cell.setY(cell.y() + 1);
-
-                    if (down && down != underArrow)
-                    {
-                        cell.setX(cell.x() + downRect.width());
-                    }
-                    else
-                    {
-                        cell.setX(cell.x() + 1);
-                    }
-
-                    ShapeItem* shape = addShape(right, cell, item);
-                    item->setChildShape(shape, ValencyPoint::Right);
-
-                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
-                    {
-                        drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
-                    }
-
-                    rightRect = shape->rect();
+                    cell.setX(cell.x() + 1);
                 }
 
-                if (underArrow)
+                ShapeItem* shape = addShape(right, cell, item);
+                item->setChildShape(shape, ValencyPoint::Right);
+
+                if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
                 {
-                    int maxHeight = qMax(downRect.height(), rightRect.height());
-                    QPoint cell = item->cell();
-                    cell.setY(cell.y() + maxHeight + 1);
-
-                    ShapeItem* shape = addShape(underArrow, cell, item);
-                    item->setChildShape(shape, ValencyPoint::UnderArrow);
-
-                    if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
-                    {
-                        drawChildren(shape, stopDrawingCommands, drawGoToBranch);
-                    }
-
-                    underArrowRect = shape->rect();
+                    drawChildren(shape, stopList, drawGoToBranch && underArrow == Q_NULLPTR);
                 }
 
-                QRect newRect = downRect.united(rightRect);
-                newRect = newRect.united(underArrowRect);
-                newRect.setTop(newRect.top() - 1);
-                item->setRect(newRect, false);
+                rightRect = shape->rect();
             }
+
+            if (underArrow)
+            {
+                int maxHeight = qMax(downRect.height(), rightRect.height());
+                QPoint cell = item->cell();
+                cell.setY(cell.y() + maxHeight + 1);
+
+                ShapeItem* shape = addShape(underArrow, cell, item);
+                item->setChildShape(shape, ValencyPoint::UnderArrow);
+
+                if (shape->command()->type() != DRAKON::GO_TO_BRANCH)
+                {
+                    drawChildren(shape, stopDrawingCommands, drawGoToBranch);
+                }
+
+                underArrowRect = shape->rect();
+            }
+
+            QRect newRect = downRect.united(rightRect);
+            newRect = newRect.united(underArrowRect);
+            newRect.setTop(newRect.top() - 1);
+            item->setRect(newRect, false);
+        }
+        else //TODO DRAKON::CYCLE
+        {
+            int TODO; // depending on role and shape type
         }
     }
 }
 
-ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPoint* point, int param /*= -1*/)
+ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPoint* point)
 {
     ValencyPoint::Role role = point->role();
     if (type == DRAKON::BRANCH_BEGIN && role == ValencyPoint::Right)
@@ -1838,7 +1789,7 @@ ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPo
     }
 
     // 1. Create new command
-    Command* newCmd = mCyclogram.lock()->createCommand(type, param);
+    Command* newCmd = mCyclogram.lock()->createCommand(type);
     if (!newCmd)
     {
         return Q_NULLPTR;
@@ -1846,10 +1797,9 @@ ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPo
 
     ShapeItem* newShape = addCommand(newCmd, point);
 
-    if (type == DRAKON::QUESTION && param == CmdQuestion::SWITCH_STATE)
+    if (type == DRAKON::SELECT_STATE)
     {
-        ShapeItem* goToBranchItem = addNewCommand(DRAKON::GO_TO_BRANCH, newShape->valencyPoint(ValencyPoint::Right));
-        //goToBranchItem->command()->replaceCommand(newBranchItem->command());
+        /*ShapeItem* goToBranchItem =*/ addNewCommand(DRAKON::GO_TO_BRANCH, newShape->valencyPoint(ValencyPoint::Right));
     }
 
     update();
@@ -1892,17 +1842,10 @@ void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint
     if (prevChildShape)
     {
         // 3.3.1 update shape connections
-        if (newShape->command()->type() == DRAKON::QUESTION)
+        DRAKON::IconType type = newShape->command()->type();
+        if (type == DRAKON::CONDITION)
         {
-            CmdQuestion* command = qobject_cast<CmdQuestion*>(newShape->command());
-            if (command->questionType() == CmdQuestion::CYCLE || command->questionType() == CmdQuestion::SWITCH_STATE)
-            {
-                newShape->setChildShape(prevChildShape, ValencyPoint::Down);
-            }
-            else
-            {
-                newShape->setChildShape(prevChildShape, ValencyPoint::UnderArrow);
-            }
+            newShape->setChildShape(prevChildShape, ValencyPoint::UnderArrow);
         }
         else
         {
@@ -1922,7 +1865,10 @@ void CyclogramWidget::updateWidgetShapes(ShapeItem* newShape, const ValencyPoint
     {
         // simple command in the end of the one of the QUESTION branches
         // if owner is expanded and hadn't child shapes before, push the expansion to new shape
-        if (pointCmd->type() != DRAKON::QUESTION && owner->rect().height() > 1)
+        if (pointCmd->type() != DRAKON::CONDITION
+           && pointCmd->type() != DRAKON::SELECT_STATE
+           && pointCmd->type() != DRAKON::CYCLE
+           && owner->rect().height() > 1)
         {
             // update owner cell
             QPoint ownerCell = owner->cell();
@@ -2104,10 +2050,10 @@ QPoint CyclogramWidget::calculateNewCommandCell(const ValencyPoint* point)
     }
     else // question branch end command
     {
-        if (pointCmd->type() == DRAKON::QUESTION)
+        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(pointCmd);
+        if (questionCmd)
         {
-            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(pointCmd);
-            if (questionCmd->questionType() == CmdQuestion::CYCLE)
+            if (questionCmd->type() == DRAKON::CYCLE)
             {
                 int TODO; // depending on role and shape type
             }
@@ -2175,21 +2121,26 @@ void CyclogramWidget::setCurrentCommandType(int command)
 
 bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint* point) const
 {
-    // only "empty" question command can be moved
-    if (item && item->command()->type() == DRAKON::QUESTION)
+    if (!item)
     {
-        CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(item->command());
-        CmdQuestion::QuestionType type = questionCmd->questionType();
-
-        Command* down = questionCmd->nextCommand(ValencyPoint::Down);
-        Command* right = questionCmd->nextCommand(ValencyPoint::Right);
-        Command* underArrow = questionCmd->nextCommand(ValencyPoint::UnderArrow);
-
-        bool isLanded = (underArrow == Q_NULLPTR);
-        bool isEmptyCommand = (down == underArrow && right == underArrow);
-
-        return (isEmptyCommand && !isLanded);
+        return true;
     }
 
-    return true;
+    CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(item->command());
+
+    if (!questionCmd)
+    {
+        return true;
+    }
+
+    Command* cmd = item->command();
+
+    Command* down = cmd->nextCommand(ValencyPoint::Down);
+    Command* right = cmd->nextCommand(ValencyPoint::Right);
+    Command* underArrow = cmd->nextCommand(ValencyPoint::UnderArrow);
+
+    bool isLanded = (underArrow == Q_NULLPTR);
+    bool isEmptyCommand = (down == underArrow && right == underArrow);
+
+    return (isEmptyCommand && !isLanded);
 }

@@ -227,7 +227,7 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
         else if (commands.size() == 3)
         {
             CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
-            if (question->questionType() == CmdQuestion::CYCLE)
+            if (question->type() == DRAKON::CYCLE)
             {
                 int TODO;
             }
@@ -367,7 +367,9 @@ void ShapeItem::onTextChanged(const QString& text)
 
         switch (mCommand->type())
         {
-        case DRAKON::QUESTION:
+        case DRAKON::CYCLE:
+        case DRAKON::SELECT_STATE:
+        case DRAKON::CONDITION:
             {
                 CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
                 bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
@@ -439,10 +441,22 @@ void ShapeItem::updateToolTip()
             mToolTip = tr("Time delay (%1 ms).").arg(cmd->delay()) + "\n";
         }
         break;
-    case DRAKON::QUESTION:
+    case DRAKON::CONDITION:
         {
             CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
             mToolTip = tr("Question (condition check)") + "\n";
+        }
+        break;
+    case DRAKON::SELECT_STATE:
+        {
+            CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+            mToolTip = tr("Question (condition check)") + "\n";
+        }
+        break;
+    case DRAKON::CYCLE:
+        {
+            CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+            mToolTip = tr("Cycle condition check") + "\n";
         }
         break;
     case DRAKON::ACTION_MODULE:
@@ -664,7 +678,8 @@ void ShapeItem::createPath()
             path.lineTo(W - w - w / 2, h + h / 2);
         }
         break;
-    case DRAKON::QUESTION:
+    case DRAKON::CONDITION:
+    case DRAKON::SELECT_STATE:
         {
             CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());
 
@@ -677,94 +692,105 @@ void ShapeItem::createPath()
             path.lineTo(w, H / 2);
 
             QPainterPath addPath;
-            if (questionCmd->questionType() == CmdQuestion::IF || questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
+            ShapeItem* down = mChildShapes[ValencyPoint::Down];
+            ShapeItem* right = mChildShapes[ValencyPoint::Right];
+            ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+
+            QRect downRect;
+            QRect rightRect;
+            int xOffset = W;
+
+            if (down)
             {
-                ShapeItem* down = mChildShapes[ValencyPoint::Down];
-                ShapeItem* right = mChildShapes[ValencyPoint::Right];
-                ShapeItem* underArrow = mChildShapes[ValencyPoint::UnderArrow];
+                downRect = down->rect();
+                xOffset += W * (downRect.width() - 1);
+            }
 
-                QRect downRect;
-                QRect rightRect;
-                int xOffset = W;
+            if (right)
+            {
+                rightRect = right->rect();
+                xOffset += W / 2;
+            }
 
-                if (down)
+            int yOffset = H * (qMax(downRect.height(), rightRect.height()) + 1);
+
+            // if underArrow && !down && !right, i.e. by default
+            addPath.moveTo(W - w, H / 2);
+            addPath.lineTo(xOffset, H / 2);
+            addPath.lineTo(xOffset, H);
+
+            if (!right && down)
+            {
+                addPath.lineTo(xOffset, yOffset);
+            }
+
+            if (right && !down)
+            {
+                addPath.moveTo(W / 2, H);
+                addPath.lineTo(W / 2, yOffset);
+            }
+
+            if (questionCmd->type() == DRAKON::CONDITION)
+            {
+                addPath.moveTo(xOffset, yOffset);
+                addPath.lineTo(W / 2, yOffset);
+            }
+
+            // update valency point positions
+            foreach (ValencyPoint* point, mValencyPoints)
+            {
+                ValencyPoint::Role role = point->role();
+                if (role == ValencyPoint::Right)
                 {
-                    downRect = down->rect();
-                    xOffset += W * (downRect.width() - 1);
+                    QPainterPath path = point->createPath();
+                    path.translate(QPointF(xOffset, H / 2));
+                    point->setPath(path);
                 }
-
-                if (right)
+                else if (role == ValencyPoint::UnderArrow)
                 {
-                    rightRect = right->rect();
-                    xOffset += W / 2;
-                }
-
-                int yOffset = H * (qMax(downRect.height(), rightRect.height()) + 1);
-
-                // if underArrow && !down && !right, i.e. by default
-                addPath.moveTo(W - w, H / 2);
-                addPath.lineTo(xOffset, H / 2);
-                addPath.lineTo(xOffset, H);
-
-                if (!right && down)
-                {
-                    addPath.lineTo(xOffset, yOffset);
-                }
-
-                if (right && !down)
-                {
-                    addPath.moveTo(W / 2, H);
-                    addPath.lineTo(W / 2, yOffset);
-                }
-
-                if (questionCmd->questionType() == CmdQuestion::IF)
-                {
-                    addPath.moveTo(xOffset, yOffset);
-                    addPath.lineTo(W / 2, yOffset);
-                }
-
-                // update valency point positions
-                foreach (ValencyPoint* point, mValencyPoints)
-                {
-                    ValencyPoint::Role role = point->role();
-                    if (role == ValencyPoint::Right)
+                    if (underArrow)
                     {
                         QPainterPath path = point->createPath();
-                        path.translate(QPointF(xOffset, H / 2));
+                        path.translate(QPointF(W / 2, yOffset + h / 2));
                         point->setPath(path);
                     }
-                    else if (role == ValencyPoint::UnderArrow)
+                    else // question with "landed" right/down branches, or question, added to down/right branch of another question
                     {
-                        if (underArrow)
-                        {
-                            QPainterPath path = point->createPath();
-                            path.translate(QPointF(W / 2, yOffset + h / 2));
-                            point->setPath(path);
-                        }
-                        else // question with "landed" right/down branches, or question, added to down/right branch of another question
-                        {
-                            int TODO;
-                        }
+                        int TODO;
                     }
                 }
             }
-            else if (questionCmd->questionType() == CmdQuestion::CYCLE)
-            {
-                int TODO; // very complex logics for QUESTION-CYCLE connections drawing will be here
 
-                addPath.moveTo(W - w, H / 2);
-                addPath.lineTo(W, H / 2);
-                addPath.lineTo(W, 0);
-                addPath.lineTo(W / 2, 0);
+            mAdditionalPath = addPath;
+        }
+        break;
+    case DRAKON::CYCLE:
+        {
+            //CmdQuestion * questionCmd = qobject_cast<CmdQuestion*>(command());
 
-                QPainterPath arrowPath;
-                QPoint pos(W / 2, 0);
-                arrowPath.moveTo(pos);
-                arrowPath.lineTo(QPoint(pos.x() + w, pos.y() + h / 4));
-                arrowPath.lineTo(QPoint(pos.x() + w, pos.y() - h / 4));
-                arrowPath.lineTo(pos);
-                mArrowPath = arrowPath;
-            }
+            path.moveTo(w, H / 2);
+            path.lineTo(w * 2, H - h);
+            path.lineTo(W - 2 * w, H - h);
+            path.lineTo(W - w, H / 2);
+            path.lineTo(W - 2 * w, h);
+            path.lineTo(w * 2, h);
+            path.lineTo(w, H / 2);
+
+            QPainterPath addPath;
+            int TODO; // very complex logics for QUESTION-CYCLE connections drawing will be here
+
+            addPath.moveTo(W - w, H / 2);
+            addPath.lineTo(W, H / 2);
+            addPath.lineTo(W, 0);
+            addPath.lineTo(W / 2, 0);
+
+            QPainterPath arrowPath;
+            QPoint pos(W / 2, 0);
+            arrowPath.moveTo(pos);
+            arrowPath.lineTo(QPoint(pos.x() + w, pos.y() + h / 4));
+            arrowPath.lineTo(QPoint(pos.x() + w, pos.y() - h / 4));
+            arrowPath.lineTo(pos);
+            mArrowPath = arrowPath;
 
             mAdditionalPath = addPath;
         }
@@ -854,7 +880,7 @@ void ShapeItem::pushDown()
         ShapeItem* right = mChildShapes[ValencyPoint::Right];
 
         CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
-        if (question->questionType() == CmdQuestion::CYCLE)
+        if (question->type() == DRAKON::CYCLE)
         {
             int TODO;
         }
@@ -959,7 +985,7 @@ void ShapeItem::onChildRectChanged(ShapeItem * shape)
     {
         CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
 
-        if (cmd->questionType() == CmdQuestion::CYCLE)
+        if (cmd->type() == DRAKON::CYCLE)
         {
             if (mChildShapes[ValencyPoint::UnderArrow] == shape)
             {
@@ -1310,7 +1336,7 @@ void ShapeItem::remove()
 
         CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
 
-        if (cmd->questionType() == CmdQuestion::CYCLE)
+        if (cmd->type() == DRAKON::CYCLE)
         {
             int TODO;
         }
@@ -1453,7 +1479,7 @@ ShapeItem* ShapeItem::findShape(Command* cmd, int& role)
     {
         CmdQuestion* command = qobject_cast<CmdQuestion*>(mCommand);
 
-        if (command->questionType() == CmdQuestion::CYCLE)
+        if (command->type() == DRAKON::CYCLE)
         {
             int TODO;
         }
@@ -1521,21 +1547,6 @@ void ShapeItem::pullUp()
     setRect(rect, false);
 }
 
-ValencyPoint* ShapeItem::createValencyPoint(const QPointF& point, int role)
-{
-    QPainterPath path = ValencyPoint::createPath();
-    path.translate(point);
-
-    ValencyPoint* vPoint = new ValencyPoint();
-    vPoint->setPath(path);
-    vPoint->setColor(QColor::fromRgba(0xff00ff00));
-    vPoint->setRole(ValencyPoint::Role(role));
-    vPoint->setOwner(this);
-    vPoint->setCanBeLanded(false); // false by default
-
-    return vPoint;
-}
-
 void ShapeItem::createValencyPoints(Command* cmd)
 {
     //
@@ -1549,6 +1560,34 @@ void ShapeItem::createValencyPoints(Command* cmd)
     // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
     // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
     // 8. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
+
+    QSet<int> defaultInsertable({DRAKON::ACTION_MATH,
+                                 DRAKON::DELAY,
+                                 DRAKON::CONDITION,
+                                 DRAKON::SELECT_STATE,
+                                 DRAKON::CYCLE,
+                                 DRAKON::ACTION_MODULE,
+                                 DRAKON::SUBPROGRAM,
+                                 DRAKON::OUTPUT,
+                                 DRAKON::PARALLEL_PROCESS
+                               });
+
+    auto createValencyPoint = [this, &defaultInsertable](const QPointF& pos, int role)
+    {
+        QPainterPath path = ValencyPoint::createPath();
+        path.translate(pos);
+
+        ValencyPoint* vPoint = new ValencyPoint();
+        vPoint->setPath(path);
+        vPoint->setColor(QColor::fromRgba(0xff00ff00));
+        vPoint->setRole(ValencyPoint::Role(role));
+        vPoint->setOwner(this);
+        //vPoint->setCanBeLanded(false); // false by default
+        vPoint->setInsertableCommands(defaultInsertable);
+
+        return vPoint;
+    };
+
 
     qreal W = itemSize().width();
     qreal H = itemSize().height();
@@ -1568,49 +1607,51 @@ void ShapeItem::createValencyPoints(Command* cmd)
     case DRAKON::PARALLEL_PROCESS:
         {
             ValencyPoint* point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+
             mValencyPoints.push_back(point);
 
             if (type == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(cmd))
             {
                 ValencyPoint* point = createValencyPoint(QPointF(W, 0), ValencyPoint::Right);
+                point->setInsertableCommand(DRAKON::BRANCH_BEGIN);
                 mValencyPoints.push_back(point);
             }
         }
         break;
-
-    case DRAKON::QUESTION:
+    case DRAKON::CONDITION:
         {
-            CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(cmd);
-            if (questionCmd)
-            {
-                ValencyPoint* rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
-                mValencyPoints.push_back(rightPoint);
+            ValencyPoint* rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
+            mValencyPoints.push_back(rightPoint);
 
-                if (questionCmd->questionType() == CmdQuestion::IF)
-                {
-                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
-                    mValencyPoints.push_back(downPoint);
+            ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+            mValencyPoints.push_back(downPoint);
 
-                    ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, H + h / 2), ValencyPoint::UnderArrow);
-                    mValencyPoints.push_back(underArrowPoint);
-
-                }
-                else if (questionCmd->questionType() == CmdQuestion::CYCLE)
-                {
-                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H), ValencyPoint::Down);
-                    mValencyPoints.push_back(downPoint);
-
-                    ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
-                    mValencyPoints.push_back(underArrowPoint);
-                }
-                else if (questionCmd->questionType() == CmdQuestion::SWITCH_STATE)
-                {
-                    ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
-                    mValencyPoints.push_back(downPoint);
-                }
-            }
+            ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, H + h / 2), ValencyPoint::UnderArrow);
+            mValencyPoints.push_back(underArrowPoint);
         }
         break;
+    case DRAKON::SELECT_STATE:
+        {
+            ValencyPoint* rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
+            mValencyPoints.push_back(rightPoint);
+
+            ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
+            mValencyPoints.push_back(downPoint);
+        }
+        break;
+    case DRAKON::CYCLE:
+        {
+            ValencyPoint* rightPoint = createValencyPoint(QPointF(W, H / 2), ValencyPoint::Right);
+            mValencyPoints.push_back(rightPoint);
+
+            ValencyPoint* downPoint = createValencyPoint(QPointF(W / 2, H - h /2), ValencyPoint::Down);
+            mValencyPoints.push_back(downPoint);
+
+            ValencyPoint* underArrowPoint = createValencyPoint(QPointF(W / 2, h / 2), ValencyPoint::UnderArrow);
+            mValencyPoints.push_back(underArrowPoint);
+        }
+        break;
+
     default:
         break;
     }
@@ -1618,59 +1659,59 @@ void ShapeItem::createValencyPoints(Command* cmd)
 
 void ShapeItem::updateCanBeLandedFlag()
 {
-    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
-    {
-        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
-        if (down)
-        {
-            down->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
-        }
+//    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
+//    {
+//        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+//        if (down)
+//        {
+//            down->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
+//        }
 
-        return;
-    }
+//        return;
+//    }
 
-    if (!mParentShape || mValencyPoints.empty())
-    {
-        return;
-    }
+//    if (!mParentShape || mValencyPoints.empty())
+//    {
+//        return;
+//    }
 
-    ValencyPoint::Role role = mCommand->role();
-    ValencyPoint* parentPoint = mParentShape->valencyPoint(role);
+//    ValencyPoint::Role role = mCommand->role();
+//    ValencyPoint* parentPoint = mParentShape->valencyPoint(role);
 
-    if (mCommand->type() == DRAKON::QUESTION)
-    {
-        CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
-        if (question->questionType() == CmdQuestion::CYCLE)
-        {
-            int TODO;
-        }
-        else if (question->questionType() == CmdQuestion::IF)
-        {
-            foreach (ValencyPoint* point, mValencyPoints)
-            {
-                ValencyPoint::Role pointRole = point->role();
-                if (pointRole == ValencyPoint::Down || pointRole == ValencyPoint::Right)
-                {
-                    point->setCanBeLanded(false);
-                }
-                else if (pointRole == ValencyPoint::UnderArrow)
-                {
-                    point->setCanBeLanded(parentPoint->canBeLanded());
-                }
-            }
-        }
-        else if (question->questionType() == CmdQuestion::SWITCH_STATE)
-        {
-            foreach (ValencyPoint* point, mValencyPoints)
-            {
-                point->setCanBeLanded(true);
-            }
-        }
-    }
-    else
-    {
-        mValencyPoints.front()->setCanBeLanded(parentPoint->canBeLanded());
-    }
+//    if (mCommand->type() == DRAKON::QUESTION)
+//    {
+//        CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
+//        if (question->questionType() == CmdQuestion::CYCLE)
+//        {
+//            int TODO;
+//        }
+//        else if (question->questionType() == CmdQuestion::IF)
+//        {
+//            foreach (ValencyPoint* point, mValencyPoints)
+//            {
+//                ValencyPoint::Role pointRole = point->role();
+//                if (pointRole == ValencyPoint::Down || pointRole == ValencyPoint::Right)
+//                {
+//                    point->setCanBeLanded(false);
+//                }
+//                else if (pointRole == ValencyPoint::UnderArrow)
+//                {
+//                    point->setCanBeLanded(parentPoint->canBeLanded());
+//                }
+//            }
+//        }
+//        else if (question->questionType() == CmdQuestion::SWITCH_STATE)
+//        {
+//            foreach (ValencyPoint* point, mValencyPoints)
+//            {
+//                point->setCanBeLanded(true);
+//            }
+//        }
+//    }
+//    else
+//    {
+//        mValencyPoints.front()->setCanBeLanded(parentPoint->canBeLanded());
+//    }
 }
 
 const QList<ShapeItem*>& ShapeItem::childShapes() const
