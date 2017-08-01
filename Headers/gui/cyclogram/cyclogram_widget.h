@@ -83,6 +83,9 @@ private:
     void deleteCommand(ShapeItem* item);
     void deleteBranch(ShapeItem* item);
 
+    void onDragStart();
+    void onDragFinish();
+
     const ShapeItem* findBranch(const Command* command) const;
 
     void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point);
@@ -111,7 +114,7 @@ private:
 
     int mMouseButtonState;
 
-    QList<ShapeItem*> mCommands;
+    QList<ShapeItem*> mShapes;
     ShapeItem* mSihlouetteArrow;
     ShapeItem* mSihlouetteLine;
 

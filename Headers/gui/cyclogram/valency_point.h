@@ -21,11 +21,16 @@ public:
     ValencyPoint();
 
     static QPainterPath createPath();
+    static QColor allowedColor();
+    static QColor forbiddenColor();
 
     void setOwner(ShapeItem* owner);
     void setPath(const QPainterPath &path);
     void setColor(const QColor &color);
     void setRole(Role role);
+
+    void setCurrentCommandType(int type);
+    void setPressed(bool pressed);
 
     void removeInsertableCommand(int commandID);
     void addInsertableCommand(int commandID);

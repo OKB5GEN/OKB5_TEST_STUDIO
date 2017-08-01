@@ -1579,7 +1579,7 @@ void ShapeItem::createValencyPoints(Command* cmd)
 
         ValencyPoint* vPoint = new ValencyPoint();
         vPoint->setPath(path);
-        vPoint->setColor(QColor::fromRgba(0xff00ff00));
+        vPoint->setColor(ValencyPoint::allowedColor());
         vPoint->setRole(ValencyPoint::Role(role));
         vPoint->setOwner(this);
         //vPoint->setCanBeLanded(false); // false by default

@@ -95,8 +95,8 @@ void CyclogramWidget::clear(bool onDestroy)
 
     clearSelection();
 
-    qDeleteAll(mCommands);
-    mCommands.clear();
+    qDeleteAll(mShapes);
+    mShapes.clear();
 
     if (!onDestroy && mCyclogram.data())
     {
@@ -335,7 +335,7 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
     sihlouetteItems.push_back(mSihlouetteArrow);
 
     drawItems(sihlouetteItems, painter);
-    drawItems(mCommands, painter);
+    drawItems(mShapes, painter);
 
 //    if (mMovingItem)
 //    {
@@ -893,6 +893,7 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
         commandCopy->copyFrom(mPressedShape->command());
 
         mDraggingShape = addShape(commandCopy, mPressedShape->cell(), 0/*mRootShape*/);
+        onDragStart();
     }
 
     if (mDraggingShape)
@@ -1007,6 +1008,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     mPressedShape = 0;
     if (mDraggingShape)
     {
+        onDragFinish();
         deleteCommand(mDraggingShape);
         mDraggingShape = 0;
     }
@@ -1017,7 +1019,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 
 ShapeItem* CyclogramWidget::shapeAt(const QPoint &pos) const
 {
-    foreach (ShapeItem* item, mCommands)
+    foreach (ShapeItem* item, mShapes)
     {
         if (item->path().contains((pos / mScale) - item->position()))
         {
@@ -1043,7 +1045,7 @@ ShapeItem* CyclogramWidget::shapeAt(const QPoint &pos) const
 ValencyPoint* CyclogramWidget::valencyPointAt(const QPoint &pos) const
 {
     //TODO optimize for drag-and-drop
-    foreach (ShapeItem* item, mCommands)
+    foreach (ShapeItem* item, mShapes)
     {
         foreach (ValencyPoint* point, item->valencyPoints())
         {
@@ -1135,7 +1137,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
 
     shapeItem->updateCanBeLandedFlag();
 
-    mCommands.append(shapeItem);
+    mShapes.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
     connect(shapeItem, SIGNAL(needToDelete(ShapeItem*)), this, SLOT(onNeedToDelete(ShapeItem*)));
 
@@ -1151,7 +1153,7 @@ void CyclogramWidget::drawSilhouette()
 
     QPainterPath silhouette;
 
-    foreach (ShapeItem* shapeItem, mCommands)
+    foreach (ShapeItem* shapeItem, mShapes)
     {
         if (shapeItem->command()->type() == DRAKON::GO_TO_BRANCH)
         {
@@ -1321,7 +1323,7 @@ const ShapeItem* CyclogramWidget::findBranch(const Command* command) const
         return Q_NULLPTR;
     }
 
-    foreach (const ShapeItem* item, mCommands)
+    foreach (const ShapeItem* item, mShapes)
     {
         if (item->command() == command)
         {
@@ -1356,11 +1358,11 @@ void CyclogramWidget::clearSelection(bool needUpdate)
 
 void CyclogramWidget::removeShape(Command* command)
 {
-    for (int i = 0, sz = mCommands.size(); i < sz; ++i)
+    for (int i = 0, sz = mShapes.size(); i < sz; ++i)
     {
-        if (mCommands[i]->command() == command)
+        if (mShapes[i]->command() == command)
         {
-            ShapeItem* tmp = mCommands.takeAt(i);
+            ShapeItem* tmp = mShapes.takeAt(i);
             tmp->deleteLater();
             break;
         }
@@ -1396,7 +1398,7 @@ void CyclogramWidget::onNeedUpdate()
 ShapeItem* CyclogramWidget::findExpandedItem(ShapeItem* newItem) const
 {
     ShapeItem* expandedItem = Q_NULLPTR;
-    foreach (ShapeItem* item, mCommands)
+    foreach (ShapeItem* item, mShapes)
     {
         if (item == newItem) // skip added item
         {
@@ -1432,7 +1434,7 @@ ShapeItem* CyclogramWidget::findNextBranch(const QPoint& cell) const
     ShapeItem* item = Q_NULLPTR;
     int column = INT_MAX;
 
-    foreach (ShapeItem* it, mCommands)
+    foreach (ShapeItem* it, mShapes)
     {
         if (it->command()->type() == DRAKON::BRANCH_BEGIN)
         {
@@ -1482,7 +1484,7 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdStateStartEditDialog* d = new CmdStateStartEditDialog(this);
             QList<Command*> commands;
-            foreach (ShapeItem* it, mCommands)
+            foreach (ShapeItem* it, mShapes)
             {
                 if (it->command()->type() == DRAKON::BRANCH_BEGIN && it->command() != command)
                 {
@@ -1499,7 +1501,7 @@ void CyclogramWidget::showEditDialog(Command *command)
         {
             CmdSetStateEditDialog* d = new CmdSetStateEditDialog(this);
             QList<Command*> commands;
-            foreach (ShapeItem* it, mCommands)
+            foreach (ShapeItem* it, mShapes)
             {
                 if (it->command()->type() == DRAKON::BRANCH_BEGIN)
                 {
@@ -1572,16 +1574,14 @@ void CyclogramWidget::showEditDialog(Command *command)
 
 void CyclogramWidget::showValidationError(Command* cmd)
 {
-    CommandErrorDialog* dialog = new CommandErrorDialog(this);
-    dialog->setText(cmd->text());
-    dialog->exec();
+    CommandErrorDialog dialog(this);
+    dialog.setText(cmd->text());
+    dialog.exec();
 
-    if (dialog->result() == QDialog::Accepted)
+    if (dialog.result() == QDialog::Accepted)
     {
         showEditDialog(cmd);
     }
-
-    dialog->deleteLater();
 }
 
 void CyclogramWidget::drawCyclogram(ShapeItem* item)
@@ -1942,7 +1942,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
     int min = rect.left();
     int max = rect.right() + 1;
 
-    foreach (ShapeItem* it, mCommands)
+    foreach (ShapeItem* it, mShapes)
     {
         Command* cmd = it->command();
         if (cmd->type() == DRAKON::GO_TO_BRANCH)
@@ -1964,7 +1964,7 @@ void CyclogramWidget::deleteBranch(ShapeItem* item)
 
     // 3. Shift left all branches to the right of the being deleted by the rect of the deleted
     int xOffset = min - max;
-    foreach (ShapeItem* it, mCommands)
+    foreach (ShapeItem* it, mShapes)
     {
         if (it->cell().x() >= max)
         {
@@ -2117,6 +2117,8 @@ void CyclogramWidget::dropEvent(QDropEvent* event)
 void CyclogramWidget::setCurrentCommandType(int command)
 {
     mCurrentCommandType = command;
+
+    onDragFinish();
 }
 
 bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint* point) const
@@ -2126,11 +2128,12 @@ bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint* point) con
         return true;
     }
 
+    bool canBeInserted = point->canBeInserted(item->command()->type());
     CmdQuestion* questionCmd = qobject_cast<CmdQuestion*>(item->command());
 
     if (!questionCmd)
     {
-        return true;
+        return canBeInserted;
     }
 
     Command* cmd = item->command();
@@ -2142,5 +2145,31 @@ bool CyclogramWidget::canBeMoved(ShapeItem *item, const ValencyPoint* point) con
     bool isLanded = (underArrow == Q_NULLPTR);
     bool isEmptyCommand = (down == underArrow && right == underArrow);
 
-    return (isEmptyCommand && !isLanded);
+    return (isEmptyCommand && !isLanded && canBeInserted);
+}
+
+void CyclogramWidget::onDragStart()
+{
+    foreach (ShapeItem* item, mShapes)
+    {
+        foreach (ValencyPoint* valencyPoint, item->valencyPoints())
+        {
+            valencyPoint->setCurrentCommandType(mDraggingShape->command()->type());
+        }
+    }
+
+    update();
+}
+
+void CyclogramWidget::onDragFinish()
+{
+    foreach (ShapeItem* item, mShapes)
+    {
+        foreach (ValencyPoint* valencyPoint, item->valencyPoints())
+        {
+            valencyPoint->setCurrentCommandType(mCurrentCommandType);
+        }
+    }
+
+    update();
 }

@@ -100,3 +100,30 @@ void ValencyPoint::setInsertableCommand(int commandID)
     mInsertableCommands.clear();
     mInsertableCommands.insert(commandID);
 }
+
+void ValencyPoint::setCurrentCommandType(int type)
+{
+    if (type == -1)
+    {
+        setColor(ValencyPoint::allowedColor());
+    }
+    else
+    {
+        setColor(canBeInserted(type) ? ValencyPoint::allowedColor() : ValencyPoint::forbiddenColor());
+    }
+}
+
+QColor ValencyPoint::allowedColor()
+{
+    return QColor::fromRgba(0xff00ff00);
+}
+
+QColor ValencyPoint::forbiddenColor()
+{
+    return QColor::fromRgba(0xffff0000);
+}
+
+void ValencyPoint::setPressed(bool pressed)
+{
+    //setColor(pressed);
+}
