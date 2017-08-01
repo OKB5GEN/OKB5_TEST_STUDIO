@@ -1548,7 +1548,7 @@ void ShapeItem::createValencyPoints(Command* cmd)
     // 5. BRANCH_BEGIN shapes' valency point in top-right corner is for adding new branches only
     // 6. BRANCH_BEGIN shape, that contains "END" TERMINATOR doesn't have top-right valency point
     // 7. QUESTION shape CYCLE contains 3 valency points: below, above and at top-right corner
-    // 7. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
+    // 8. QUESTION shape IF contains 3 valency points: bottom below arrow, bottom above arrow and at bottom-right corner
 
     qreal W = itemSize().width();
     qreal H = itemSize().height();
@@ -1616,18 +1616,17 @@ void ShapeItem::createValencyPoints(Command* cmd)
     }
 }
 
-void ShapeItem::updateFlags()
+void ShapeItem::updateCanBeLandedFlag()
 {
     if (mCommand->type() == DRAKON::BRANCH_BEGIN)
     {
-        foreach (ValencyPoint* point, mValencyPoints)
+        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+        if (down)
         {
-            if (point->role() == ValencyPoint::Down)
-            {
-                point->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
-                return;
-            }
+            down->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
         }
+
+        return;
     }
 
     if (!mParentShape || mValencyPoints.empty())

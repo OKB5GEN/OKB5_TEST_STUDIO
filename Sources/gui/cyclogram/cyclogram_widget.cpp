@@ -470,7 +470,7 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
     menu.addAction(tr("Add MODULE COMMAND"))->setData(int(DRAKON::ACTION_MODULE));
     menu.addAction(tr("Add MATH COMMAND"))->setData(int(DRAKON::ACTION_MATH));
     menu.addAction(tr("Add SUBPROGRAM"))->setData(int(DRAKON::SUBPROGRAM));
-    QAction* questionAct = menu.addAction(tr("Add QUESTION"));
+    QAction* questionAct = menu.addAction(tr("Add QUESTION")); //TODO cycle?
     questionAct->setData(int(DRAKON::QUESTION));
     menu.addAction(tr("Add DELAY"))->setData(int(DRAKON::DELAY));
     menu.addAction(tr("Add OUTPUT"))->setData(int(DRAKON::OUTPUT));
@@ -478,7 +478,6 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
     if (point->canBeLanded())
     {
         menu.addAction(tr("Add SWITCH STATE"))->setData(int(DRAKON::QUESTION)); //TODO remove and add "Add GO_TO_BRANCH"
-        //TODO cycle?
     }
 
     menu.addSeparator();
@@ -1183,7 +1182,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
 
-    shapeItem->updateFlags();
+    shapeItem->updateCanBeLandedFlag();
 
     mCommands.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));

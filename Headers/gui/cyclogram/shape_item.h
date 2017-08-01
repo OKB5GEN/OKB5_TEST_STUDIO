@@ -36,7 +36,7 @@ public:
 
     void remove();
     void adjust();
-    void updateFlags();
+    void updateCanBeLandedFlag();
 
     QPainterPath path() const;
     QPainterPath textPath() const;

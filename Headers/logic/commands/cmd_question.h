@@ -57,7 +57,7 @@ public:
 
     Q_ENUM(OperandType)
 
-    struct OperandData
+    struct OperandData // TODO replace by QVariant
     {
         OperandData();
 
