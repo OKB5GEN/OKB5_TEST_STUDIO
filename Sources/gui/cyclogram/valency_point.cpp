@@ -125,5 +125,11 @@ QColor ValencyPoint::forbiddenColor()
 
 void ValencyPoint::setPressed(bool pressed)
 {
-    //setColor(pressed);
+    static QColor colorBefore;
+    if (pressed)
+    {
+        colorBefore = mColor;
+    }
+
+    setColor(pressed ? mColor.darker() : colorBefore);
 }

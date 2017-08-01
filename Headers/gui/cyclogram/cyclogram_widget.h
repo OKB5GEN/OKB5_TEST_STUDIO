@@ -125,6 +125,8 @@ private:
     ShapeItem * mPressedShape;
     ShapeItem * mItemToCopy;
 
+    ValencyPoint* mPressedVP;
+
     ShapeItem* mRootShape;
 
     QWeakPointer<Cyclogram> mCyclogram;

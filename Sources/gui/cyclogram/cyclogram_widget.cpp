@@ -57,7 +57,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mPressedShape(Q_NULLPTR),
     mItemToCopy(Q_NULLPTR),
     mMouseButtonState(Qt::NoButton),
-    mCurrentCommandType(-1)
+    mCurrentCommandType(-1),
+    mPressedVP(Q_NULLPTR)
 {
     onAppSettingsChanged();
 
@@ -395,6 +396,13 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
         {
             mPressedShape = item;
             mPreviousPosition = event->pos();
+        }
+
+        mPressedVP = valencyPointAt(event->pos());
+        if (mPressedVP)
+        {
+            mPressedVP->setPressed(true);
+            //update();
         }
     }
 }
@@ -911,6 +919,12 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 
     bool isRightBtnPressed = ((mMouseButtonState & Qt::RightButton) > 0);
     bool isLeftBtnPressed = ((mMouseButtonState & Qt::LeftButton) > 0);
+
+    if (mPressedVP && (isLeftBtnPressed || isRightBtnPressed))
+    {
+        mPressedVP->setPressed(false);
+        mPressedVP = 0;
+    }
 
     // move dragging item to valency point with left mouse button
     if (isLeftBtnPressed)
