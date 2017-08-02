@@ -65,6 +65,7 @@ private slots:
     void onAppSettingsChanged();
 
 private:
+    void drawCommandText(const QString& text, QPainter& painter);
     void updateCursor(const QPoint& pos);
     void setSelectedItem(ShapeItem* item);
 

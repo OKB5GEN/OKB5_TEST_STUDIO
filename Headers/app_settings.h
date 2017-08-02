@@ -29,6 +29,8 @@ public:
         MAX_BUP_ALLOWED_VOLTAGE, //Power unit
         MAX_BUP_ALLOWED_CURRENT, //Power unit
         MAX_MKO_REPEAT_REQUESTS, // MKO resensing
+        CYCLOGRAM_FONT_SIZE, // Font size for texts in cyclogram commands
+        CYCLOGRAM_FONT_FAMILY // Font family for texts in cyclogram commands
     };
 
     Q_ENUM(SettingID)

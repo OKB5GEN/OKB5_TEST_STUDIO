@@ -251,7 +251,7 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
 
 void CyclogramWidget::deleteSelectedItem()
 {
-    if (!mSelectedShape || mDraggingShape)
+    if (!mSelectedShape || mDraggingShape) // ignore while there is not selected command of drag-and-drop is in progress
     {
         return;
     }
@@ -355,7 +355,12 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
         painter.setBrush(shapeItem->color());
         painter.drawPath(shapeItem->path());
         painter.setBrush(QColor::fromRgba(0xff000000));
-        painter.drawPath(shapeItem->textPath());
+
+        if (shapeItem->command() && !shapeItem->command()->text().isEmpty())
+        {
+            drawCommandText(shapeItem->command()->text(), painter);
+        }
+
         painter.setBrush(shapeItem->additionalColor());
         painter.drawPath(shapeItem->additionalPath());
         painter.setBrush(QColor::fromRgba(0xff000000));
@@ -2191,4 +2196,79 @@ void CyclogramWidget::onDragFinish()
     }
 
     update();
+}
+
+void CyclogramWidget::drawCommandText(const QString& text, QPainter& painter)
+{
+    qreal w = ShapeItem::cellSize().width();
+    qreal h = ShapeItem::cellSize().height();
+    qreal W = ShapeItem::itemSize().width();
+    qreal H = ShapeItem::itemSize().height();
+
+    QRectF textClipRect(w, h, W - 2 * w, H - 2 * h);
+    qreal visibleWidth = textClipRect.width() * 2; //TODO to avoid clipping
+
+    QFont font;
+    font.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
+    font.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
+    painter.setFont(font);
+
+    QFontMetrics fm(font);
+    QRect wholeTextRect = fm.boundingRect(text);
+
+    QStringList words = text.split(" ");
+    if (words.isEmpty())
+    {
+        return;
+    }
+
+    QStringList lines;
+    QString line;
+
+    foreach (QString word, words)
+    {
+        if (word.isEmpty())
+        {
+            continue;
+        }
+
+        QString tmp = line;
+
+        if (!tmp.isEmpty())
+        {
+            tmp.append(" ");
+        }
+
+        tmp.append(word);
+
+        if (fm.boundingRect(tmp).width() < textClipRect.width())
+        {
+            line = tmp;
+            continue;
+        }
+
+        if (!line.isEmpty())
+        {
+            lines.append(line);
+        }
+
+        line = word;
+    }
+
+    if (!line.isEmpty())
+    {
+        lines.append(line);
+    }
+
+    qreal textOriginY = qreal(wholeTextRect.height()) * qreal(1 - lines.size()) / 2;
+    int lineIndex = 0;
+
+    foreach (QString l, lines)
+    {
+        qreal offsetY = textOriginY + qreal(lineIndex) * qreal(wholeTextRect.height()) ;
+        qreal x = w + (textClipRect.width() - visibleWidth) / 2;
+        qreal y = h + offsetY;
+        painter.drawText(QRectF(x, y, visibleWidth, textClipRect.height()), Qt::AlignCenter, l);
+        ++lineIndex;
+    }
 }

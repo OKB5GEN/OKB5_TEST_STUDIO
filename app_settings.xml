@@ -19,4 +19,6 @@
     <setting name="MAX_BUP_ALLOWED_VOLTAGE" value="36"/>
     <setting name="MAX_BUP_ALLOWED_CURRENT" value="2"/>
     <setting name="MAX_MKO_REPEAT_REQUESTS" value="10"/>
+    <setting name="CYCLOGRAM_FONT_SIZE" value="10"/>
+    <setting name="CYCLOGRAM_FONT_FAMILY" value="Verdana"/>
 </app_settings>
