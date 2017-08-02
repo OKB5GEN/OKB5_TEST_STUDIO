@@ -25,6 +25,7 @@ private slots:
 
 private:
     void addMessage(const QColor& color, const QString& message);
+    QString replaceMacro(Command* command);
 
     QTextEdit* mTextEdit;
 };

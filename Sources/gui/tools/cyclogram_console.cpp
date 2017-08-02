@@ -51,10 +51,33 @@ void CyclogramConsole::onCommandFinished(Command* command)
         return;
     }
 
-    // replace macroses to variables values
+    QString message = replaceMacro(command);
+    addMessage(command->consoleTextColor(), message);
+}
+
+void CyclogramConsole::addMessage(const QColor& color, const QString& message)
+{
+    mTextEdit->setTextColor(color);
+
+    QDateTime timeStamp = QDateTime::currentDateTimeUtc();
+    QString msg = timeStamp.toString(QLatin1String("HH:mm:ss.zzz"));
+    msg += ": ";
+    msg += message;
+
+    mTextEdit->append(msg);
+}
+
+void CyclogramConsole::clear()
+{
+    mTextEdit->clear();
+}
+
+QString CyclogramConsole::replaceMacro(Command* command)
+{
     QString message = command->consoleText();
     QStringList tokens = message.split(DELIMITER);
     message.clear();
+
     int i = 0;
     foreach (QString token, tokens)
     {
@@ -80,22 +103,5 @@ void CyclogramConsole::onCommandFinished(Command* command)
         ++i;
     }
 
-    addMessage(command->consoleTextColor(), message);
-}
-
-void CyclogramConsole::addMessage(const QColor& color, const QString& message)
-{
-    mTextEdit->setTextColor(color);
-
-    QDateTime timeStamp = QDateTime::currentDateTimeUtc();
-    QString msg = timeStamp.toString(QLatin1String("HH:mm:ss.zzz"));
-    msg += ": ";
-    msg += message;
-
-    mTextEdit->append(msg);
-}
-
-void CyclogramConsole::clear()
-{
-    mTextEdit->clear();
+    return message;
 }

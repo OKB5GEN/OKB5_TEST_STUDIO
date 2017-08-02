@@ -251,7 +251,7 @@ void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
 
 void CyclogramWidget::deleteSelectedItem()
 {
-    if (!mSelectedShape)
+    if (!mSelectedShape || mDraggingShape)
     {
         return;
     }
@@ -1936,6 +1936,11 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
+    if (mItemToCopy == item)
+    {
+        mItemToCopy = 0;
+    }
+
     if (mDraggingShape != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         deleteBranch(item);
