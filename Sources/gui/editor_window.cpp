@@ -588,6 +588,8 @@ void EditorWindow::runCyclogram()
     mSnapshotsCouner = 0;
     auto cyclogram = mCyclogram.lock();
 
+    mCyclogramWidget->clearSelection();
+
     Command* errorCmd = cyclogram->validate();
     if (errorCmd)
     {

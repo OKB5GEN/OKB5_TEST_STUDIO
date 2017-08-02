@@ -39,6 +39,7 @@ public slots:
     void showValidationError(Command* cmd);
     void deleteSelectedItem();
     void setCurrentCommandType(int command);
+    void clearSelection(bool needUpdate = true);
 
 protected:
     bool event(QEvent* event) Q_DECL_OVERRIDE;
@@ -68,7 +69,6 @@ private:
     void setSelectedItem(ShapeItem* item);
 
     void drawSilhouette();
-    void clearSelection(bool needUpdate = true);
     QString updateWindowTitle(QWidget* dialog);
     void updateScale(const QPoint& cursorPos, int numSteps);
 

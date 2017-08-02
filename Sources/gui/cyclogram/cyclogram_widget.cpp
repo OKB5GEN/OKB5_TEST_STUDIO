@@ -402,7 +402,7 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
         if (mPressedVP)
         {
             mPressedVP->setPressed(true);
-            //update();
+            update();
         }
     }
 }
