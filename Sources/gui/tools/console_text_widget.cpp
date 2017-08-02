@@ -23,6 +23,8 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
     colorsList(); // just for colors list creation
 
     setColors(mColorBox);
+
+    setMinimumWidth(500);
 }
 
 ConsoleTextWidget::~ConsoleTextWidget()

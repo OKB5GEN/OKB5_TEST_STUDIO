@@ -1,10 +1,14 @@
 #include "Headers/gui/tools/cyclogram_console.h"
 #include "Headers/logger/Logger.h"
 #include "Headers/logic/command.h"
-
-//#include "Headers/gui/tools/console_text_widget.h"
+#include "Headers/logic/variable_controller.h"
 
 #include <QtWidgets>
+
+namespace
+{
+    static const QString DELIMITER = "%";
+}
 
 CyclogramConsole::CyclogramConsole(QWidget * parent):
     QWidget(parent)
@@ -42,13 +46,40 @@ void CyclogramConsole::onCommandStarted(Command* command)
 
 void CyclogramConsole::onCommandFinished(Command* command)
 {
-    QString message = command->consoleText();
-    if (message.isEmpty())
+    if (command->consoleText().isEmpty())
     {
         return;
     }
 
-    //TODO parse text to find variable links/ьфскщыуы
+    // replace macroses to variables values
+    QString message = command->consoleText();
+    QStringList tokens = message.split(DELIMITER);
+    message.clear();
+    int i = 0;
+    foreach (QString token, tokens)
+    {
+        if (i % 2 == 0)
+        {
+            message.append(token);
+        }
+        else
+        {
+            VariableController* vc = command->variableController();
+            if (vc->isVariableExist(token))
+            {
+                message.append(QString::number(vc->currentValue(token)));
+            }
+            else
+            {
+                message.append(DELIMITER);
+                message.append(token);
+                message.append(DELIMITER);
+            }
+        }
+
+        ++i;
+    }
+
     addMessage(command->consoleTextColor(), message);
 }
 
