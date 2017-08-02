@@ -56,42 +56,42 @@
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="QUESTION" id="1492067932363" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067932363" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Variable" value="0" variable="Mmax"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067932367" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067937231" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067937231" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Steps"/>
             <operand id="Right" type="Variable" value="0" variable="Smax"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067937234" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067940979" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067940979" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxV"/>
             <operand id="Right" type="Variable" value="0" variable="Vmax"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067940983" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067945158" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067945158" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxI"/>
             <operand id="Right" type="Variable" value="0" variable="Imax"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067945162" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067949657" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067949657" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Variable" value="0" variable="Mmin"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067949659" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067953024" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067953024" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Steps"/>
             <operand id="Right" type="Variable" value="0" variable="Smin"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067953028" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067956741" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067956741" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxV"/>
             <operand id="Right" type="Variable" value="0" variable="Vmin"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492067956745" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1492067961087" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492067961087" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxI"/>
             <operand id="Right" type="Variable" value="0" variable="Imin"/>
         </command>
@@ -136,7 +136,7 @@
             <operand id="Operand1" type="Number" value="8" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="QUESTION" id="1499764822269" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="NotEqual" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1499764822269" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="NotEqual" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Number" value="5" variable=""/>
         </command>

@@ -22,12 +22,12 @@
                 <param name="Phys.status" type="10" value="PActive"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493812415310" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493812415310" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493812415314"/>
-        <command type="QUESTION" id="1493812421301" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493812421301" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="LActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>

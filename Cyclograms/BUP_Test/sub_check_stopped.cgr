@@ -98,7 +98,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="QUESTION" id="1492066416396" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492066416396" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="StepsPrev"/>
             <operand id="Right" type="Variable" value="0" variable="StepsCur"/>
         </command>
@@ -108,7 +108,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="Nst"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
         </command>
-        <command type="QUESTION" id="1492066536488" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492066536488" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Nst"/>
             <operand id="Right" type="Variable" value="0" variable="NstMax"/>
         </command>
@@ -133,7 +133,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="N"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
         </command>
-        <command type="QUESTION" id="1492066922923" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492066922923" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="N"/>
             <operand id="Right" type="Variable" value="0" variable="DestN"/>
         </command>

@@ -10,12 +10,12 @@
         <variable name="U" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1491891253282" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491891253283" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1491891253284" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891253285" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="End"/>
-        <command type="TERMINATOR" id="1491891253286" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FINISH" cmd_type="END"/>
-        <command type="SUBPROGRAM" id="1491891401632" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
+        <command type="TERMINATOR" id="1491891253282" console_text="" console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491891253283" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491891253284" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891253285" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491891253286" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1491891401632" console_text="" console_text_color="ff000000" name="SetSysState" file="BUP_TEST/sub_set_system_state.cgr">
             <input_params>
                 <param name="OK" type="6" value="0"/>
                 <param name="U" type="10" value="U"/>
@@ -26,28 +26,28 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="BRANCH_BEGIN" id="1491891404569" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test1"/>
-        <command type="GO_TO_BRANCH" id="1491891404572" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891406747" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test2"/>
-        <command type="GO_TO_BRANCH" id="1491891406750" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891419261" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test3"/>
-        <command type="GO_TO_BRANCH" id="1491891419264" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891421567" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test4"/>
-        <command type="GO_TO_BRANCH" id="1491891421569" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891431793" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test5"/>
-        <command type="GO_TO_BRANCH" id="1491891431796" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891434147" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test6"/>
-        <command type="GO_TO_BRANCH" id="1491891434150" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891448692" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="OK"/>
-        <command type="GO_TO_BRANCH" id="1491891448695" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891451414" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FAIL"/>
-        <command type="GO_TO_BRANCH" id="1491891451417" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891548089" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="BRANCH_BEGIN" id="1491891404569" console_text="" console_text_color="ff000000" name="Test1"/>
+        <command type="GO_TO_BRANCH" id="1491891404572" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891406747" console_text="" console_text_color="ff000000" name="Test2"/>
+        <command type="GO_TO_BRANCH" id="1491891406750" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891419261" console_text="" console_text_color="ff000000" name="Test3"/>
+        <command type="GO_TO_BRANCH" id="1491891419264" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891421567" console_text="" console_text_color="ff000000" name="Test4"/>
+        <command type="GO_TO_BRANCH" id="1491891421569" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891431793" console_text="" console_text_color="ff000000" name="Test5"/>
+        <command type="GO_TO_BRANCH" id="1491891431796" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891434147" console_text="" console_text_color="ff000000" name="Test6"/>
+        <command type="GO_TO_BRANCH" id="1491891434150" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891448692" console_text="" console_text_color="ff000000" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1491891448695" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491891451414" console_text="" console_text_color="ff000000" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1491891451417" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891548089" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891548094" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891646132" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491891548094" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491891646132" console_text="" console_text_color="ff000000" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -70,12 +70,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491891686240" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491891686240" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891686244" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891705619" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="GO_TO_BRANCH" id="1491891686244" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491891705619" console_text="" console_text_color="ff000000" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="10000"/>
@@ -111,12 +111,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491891736336" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491891736336" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891736341" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891773395" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491891736341" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491891773395" console_text="" console_text_color="ff000000" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -139,7 +139,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891777155" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891777155" console_text="" console_text_color="ff000000" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="5000"/>
@@ -153,7 +153,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891781150" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891781150" console_text="" console_text_color="ff000000" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="50"/>
@@ -167,7 +167,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891786550" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891786550" console_text="" console_text_color="ff000000" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="5000"/>
@@ -181,17 +181,17 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="ACTION_MATH" id="1491891810046" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1491891810046" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1491891813255" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1491891813255" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="SUBPROGRAM" id="1491891817376" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891817376" console_text="" console_text_color="ff000000" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -214,32 +214,32 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491891824978" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491891824978" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891824982" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891830395" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891824982" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891830395" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891830399" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891834277" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891830399" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891834277" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891834281" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891840119" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891834281" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891840119" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891840122" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891844034" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891840122" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891844034" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891844038" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891851123" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
+        <command type="GO_TO_BRANCH" id="1491891844038" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491891851123" console_text="" console_text_color="ff000000" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="MaxI" type="6" value="0"/>
@@ -272,7 +272,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891854276" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
+        <command type="SUBPROGRAM" id="1491891854276" console_text="" console_text_color="ff000000" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="MaxI" type="6" value="400"/>
@@ -305,7 +305,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891860453" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891860453" console_text="" console_text_color="ff000000" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="1333"/>
@@ -341,7 +341,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891865958" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891865958" console_text="" console_text_color="ff000000" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="10000"/>
@@ -377,7 +377,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891871062" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891871062" console_text="" console_text_color="ff000000" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="1333"/>
@@ -413,32 +413,32 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491891920264" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491891920264" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891920268" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891929186" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891920268" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891929186" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891929190" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891934723" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891929190" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891934723" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891934727" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891939038" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891934727" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891939038" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891939042" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="QUESTION" id="1491891945656" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="GO_TO_BRANCH" id="1491891939042" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1491891945656" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491891945660" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491893788257" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
+        <command type="GO_TO_BRANCH" id="1491891945660" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491893788257" console_text="" console_text_color="ff000000" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
             <input_params/>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -446,7 +446,7 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491991092223" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491991092223" console_text="" console_text_color="ff000000" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -469,12 +469,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491991186019" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491991186019" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491991186025" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491991254104" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check12" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491991186025" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491991254104" console_text="" console_text_color="ff000000" name="Check12" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -498,12 +498,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491991270534" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491991270534" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491991270540" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491995677225" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491991270540" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491995677225" console_text="" console_text_color="ff000000" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -526,12 +526,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491995683235" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491995683235" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491995683239" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996271432" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491995683239" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491996271432" console_text="" console_text_color="ff000000" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
@@ -545,12 +545,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491996318484" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491996318484" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491996318489" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996354186" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check22" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491996318489" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491996354186" console_text="" console_text_color="ff000000" name="Check22" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -574,12 +574,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491996388558" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491996388558" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491996388564" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996983811" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491996388564" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491996983811" console_text="" console_text_color="ff000000" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
@@ -593,12 +593,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997026353" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997026353" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997026359" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997071373" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check32" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491997026359" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997071373" console_text="" console_text_color="ff000000" name="Check32" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -622,12 +622,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997105384" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997105384" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997105389" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997137287" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check42" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491997105389" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997137287" console_text="" console_text_color="ff000000" name="Check42" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -651,12 +651,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997141672" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997141672" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997141677" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997328827" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491997141677" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997328827" console_text="" console_text_color="ff000000" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
@@ -670,12 +670,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997331965" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997331965" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997331970" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997335316" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check52" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491997331970" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997335316" console_text="" console_text_color="ff000000" name="Check52" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -699,12 +699,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997338557" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997338557" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997338563" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997514909" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491997338563" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997514909" console_text="" console_text_color="ff000000" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -727,12 +727,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997517710" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997517710" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997517716" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997521906" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check62" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491997517716" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997521906" console_text="" console_text_color="ff000000" name="Check62" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -756,14 +756,14 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997525074" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997525074" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997525080" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491997762659" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Test7"/>
-        <command type="GO_TO_BRANCH" id="1491997762662" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997801170" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491997525080" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491997762659" console_text="" console_text_color="ff000000" name="Test7"/>
+        <command type="GO_TO_BRANCH" id="1491997762662" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997801170" console_text="" console_text_color="ff000000" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -786,12 +786,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997804977" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997804977" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997804982" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997826826" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check71" file="BUP_TEST/sub_check_dest_angle.cgr">
+        <command type="GO_TO_BRANCH" id="1491997804982" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997826826" console_text="" console_text_color="ff000000" name="Check71" file="BUP_TEST/sub_check_dest_angle.cgr">
             <input_params>
                 <param name="OK" type="6" value="0"/>
             </input_params>
@@ -801,12 +801,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997831242" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997831242" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997831248" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997835422" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="GO_TO_BRANCH" id="1491997831248" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997835422" console_text="" console_text_color="ff000000" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -829,12 +829,12 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997839728" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997839728" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997839732" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997844543" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Check72" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="GO_TO_BRANCH" id="1491997839732" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1491997844543" console_text="" console_text_color="ff000000" name="Check72" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -858,11 +858,11 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1491997848282" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1491997848282" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1491997848288" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1491997848288" console_text="" console_text_color="ff000000"/>
     </commands>
     <tree>
         <item id="1491891253282" down="1491891253283" right="-1" under_arrow="-1"/>

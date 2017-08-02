@@ -22,12 +22,12 @@
                 <param name="Phys.status" type="10" value="BP1_PA"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493897713569" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897713569" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP1_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493897713575"/>
-        <command type="QUESTION" id="1493897719245" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897719245" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP1_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
@@ -50,22 +50,22 @@
                 <param name="Phys.status" type="10" value="STM_PA"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493897746499" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897746499" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP2_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493897746503"/>
-        <command type="QUESTION" id="1493897751743" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897751743" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP2_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493897751746"/>
-        <command type="QUESTION" id="1493897755741" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897755741" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="STM_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493897755744"/>
-        <command type="QUESTION" id="1493897761903" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493897761903" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="STM_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>

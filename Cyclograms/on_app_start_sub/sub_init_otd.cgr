@@ -23,7 +23,7 @@
                 <param name="Phys.status" type="10" value="PActive"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493724128025" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493724128025" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
@@ -62,7 +62,7 @@
                 <param name="Module address" type="10" value="AddrD"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493796692933" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493796692933" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="AddrC"/>
             <operand id="Right" type="Variable" value="0" variable="AddrD"/>
         </command>
@@ -75,12 +75,12 @@
                 <param name="Module ready flag" type="10" value="IsReady"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493796761760" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493796761760" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="IsReady"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1493796761764"/>
-        <command type="QUESTION" id="1493796844900" operation="Greater" orientation="YesDown" cmd_type="IF">
+        <command type="CONDITION" id="1493796844900" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="HasErr"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>

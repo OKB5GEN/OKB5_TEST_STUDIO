@@ -46,12 +46,12 @@
                 <param name="Velocity (Psy)" type="10" value="PsyV"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1492065249901" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492065249901" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="NuM"/>
             <operand id="Right" type="Variable" value="0" variable="DestMode"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492065249906"/>
-        <command type="QUESTION" id="1492065255959" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492065255959" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PsyM"/>
             <operand id="Right" type="Variable" value="0" variable="DestMode"/>
         </command>
@@ -66,12 +66,12 @@
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="QUESTION" id="1492065327338" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492065327338" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="NuS"/>
             <operand id="Right" type="Variable" value="0" variable="DestSteps"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492065327342"/>
-        <command type="QUESTION" id="1492065331294" operation="Equal" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1492065331294" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PsyS"/>
             <operand id="Right" type="Variable" value="0" variable="DestSteps"/>
         </command>

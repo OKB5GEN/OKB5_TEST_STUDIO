@@ -27,7 +27,7 @@
                 <param name="Phys.status" type="10" value="PActive"/>
             </output_params>
         </command>
-        <command type="QUESTION" id="1493369544813" operation="Greater" orientation="YesDown" cmd_type="SWITCH_STATE">
+        <command type="SELECT_STATE" id="1493369544813" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
