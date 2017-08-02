@@ -65,7 +65,7 @@ private slots:
     void onAppSettingsChanged();
 
 private:
-    void drawCommandText(const QString& text, QPainter& painter);
+    void drawCommandText(ShapeItem* item, QPainter& painter);
     void updateCursor(const QPoint& pos);
     void setSelectedItem(ShapeItem* item);
 
@@ -140,6 +140,7 @@ private:
     QScrollArea* mParentScrollArea;
 
     int mCurrentCommandType;
+    QFont mFont;
 
 signals:
     void selectionChanged(ShapeItem* item);

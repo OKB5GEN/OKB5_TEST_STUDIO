@@ -47,8 +47,8 @@ ShapeItem::ShapeItem(QObject* parent):
     mCell(QPoint(0, 0)),
     mRect(QRect(0, 0, 0, 0))
 {
-    mFont.setPointSize(11);
-    mFont.setFamily("Verdana");
+    mFont.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
+    mFont.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
 
     mActiveColor = QColor::fromRgba(0xff7f7f7f);
     mAdditionalColor = QColor::fromRgba(0x00ffffff);
@@ -115,11 +115,6 @@ QString ShapeItem::toolTip() const
 void ShapeItem::setPath(const QPainterPath &path)
 {
     mPath = path;
-}
-
-void ShapeItem::setTextPath(const QPainterPath &path)
-{
-    mTextPath = path;
 }
 
 void ShapeItem::setToolTip(const QString &toolTip)
@@ -353,17 +348,18 @@ void ShapeItem::removeChildShape(ShapeItem* item)
 
 void ShapeItem::onTextChanged(const QString& text)
 {
-    QPainterPath textPath;
-    QFontMetrics fm(mFont);
-    QRect textRect = fm.boundingRect(text);
-    qreal x = (itemSize().width() - textRect.width()) / 2;
-    qreal y = (itemSize().height() + textRect.height()) / 2;
-    textPath.addText(x, y, mFont, text);
-    mTextPath = textPath;
+//    QPainterPath textPath;
+//    QFontMetrics fm(mFont);
+//    QRect textRect = fm.boundingRect(text);
+//    qreal x = (itemSize().width() - textRect.width()) / 2;
+//    qreal y = (itemSize().height() + textRect.height()) / 2;
+//    textPath.addText(x, y, mFont, text);
+//    mTextPath = textPath;
 
     if (mCommand)
     {
         updateToolTip();
+        updateMulilineText();
 
         switch (mCommand->type())
         {
@@ -1657,8 +1653,8 @@ void ShapeItem::createValencyPoints(Command* cmd)
     }
 }
 
-void ShapeItem::updateCanBeLandedFlag()
-{
+//void ShapeItem::updateCanBeLandedFlag()
+//{
 //    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
 //    {
 //        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
@@ -1712,9 +1708,88 @@ void ShapeItem::updateCanBeLandedFlag()
 //    {
 //        mValencyPoints.front()->setCanBeLanded(parentPoint->canBeLanded());
 //    }
-}
+//}
 
 const QList<ShapeItem*>& ShapeItem::childShapes() const
 {
     return mChildShapes;
+}
+
+const QStringList& ShapeItem::multilineText() const
+{
+    return mMultilineText;
+}
+
+void ShapeItem::updateMulilineText()
+{
+    mMultilineText.clear();
+
+    QStringList words = mCommand->text().split(" ");
+    if (words.isEmpty())
+    {
+        return;
+    }
+
+    qreal w = ShapeItem::cellSize().width();
+    qreal h = ShapeItem::cellSize().height();
+    qreal W = ShapeItem::itemSize().width();
+    qreal H = ShapeItem::itemSize().height();
+
+    QRectF textClipRect(w, h, W - 2 * w, H - 2 * h);
+
+    QFontMetrics fm(mFont);
+    QString line;
+
+    foreach (QString word, words)
+    {
+        if (word.isEmpty())
+        {
+            continue;
+        }
+
+        QString tmp = line;
+
+        if (!tmp.isEmpty())
+        {
+            tmp.append(" ");
+        }
+
+        tmp.append(word);
+
+        if (fm.boundingRect(tmp).width() < textClipRect.width())
+        {
+            line = tmp;
+            continue;
+        }
+
+        if (!line.isEmpty())
+        {
+            mMultilineText.append(line);
+        }
+
+        line = word;
+    }
+
+    if (!line.isEmpty())
+    {
+        mMultilineText.append(line);
+    }
+}
+
+void ShapeItem::onAppSettingsChanged()
+{
+    QString newFontFamily = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString();
+    int newFontSize = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt();
+
+    if (newFontFamily != mFont.family())
+    {
+        mFont.setFamily(newFontFamily);
+    }
+
+    if (newFontSize != mFont.pointSize())
+    {
+        mFont.setPointSize(newFontSize);
+    }
+
+    updateMulilineText();
 }

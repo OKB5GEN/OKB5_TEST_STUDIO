@@ -330,6 +330,7 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.scale(mScale, mScale);
+    painter.setFont(mFont);
 
     QList<ShapeItem*> sihlouetteItems;
     sihlouetteItems.push_back(mSihlouetteLine);
@@ -355,10 +356,11 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
         painter.setBrush(shapeItem->color());
         painter.drawPath(shapeItem->path());
         painter.setBrush(QColor::fromRgba(0xff000000));
+        painter.drawPath(shapeItem->textPath());
 
         if (shapeItem->command() && !shapeItem->command()->text().isEmpty())
         {
-            drawCommandText(shapeItem->command()->text(), painter);
+            drawCommandText(shapeItem, painter);
         }
 
         painter.setBrush(shapeItem->additionalColor());
@@ -1154,7 +1156,7 @@ ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
 
-    shapeItem->updateCanBeLandedFlag();
+    //shapeItem->updateCanBeLandedFlag();
 
     mShapes.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
@@ -2026,9 +2028,17 @@ void CyclogramWidget::setParentScrollArea(QScrollArea* scroll)
 
 void CyclogramWidget::onAppSettingsChanged()
 {
+    mFont.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
+    mFont.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
+
     ShapeItem::itemSize(true);
     ShapeItem::cellSize(true);
     ShapeItem::origin(true);
+
+    foreach (ShapeItem* item, mShapes)
+    {
+        item->onAppSettingsChanged();
+    }
 }
 
 QString CyclogramWidget::delimiter()
@@ -2198,7 +2208,7 @@ void CyclogramWidget::onDragFinish()
     update();
 }
 
-void CyclogramWidget::drawCommandText(const QString& text, QPainter& painter)
+void CyclogramWidget::drawCommandText(ShapeItem* item, QPainter& painter)
 {
     qreal w = ShapeItem::cellSize().width();
     qreal h = ShapeItem::cellSize().height();
@@ -2208,64 +2218,16 @@ void CyclogramWidget::drawCommandText(const QString& text, QPainter& painter)
     QRectF textClipRect(w, h, W - 2 * w, H - 2 * h);
     qreal visibleWidth = textClipRect.width() * 2; //TODO to avoid clipping
 
-    QFont font;
-    font.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
-    font.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
-    painter.setFont(font);
+    QFontMetrics fm(mFont);
+    QRect wholeTextRect = fm.boundingRect(item->command()->text());
 
-    QFontMetrics fm(font);
-    QRect wholeTextRect = fm.boundingRect(text);
-
-    QStringList words = text.split(" ");
-    if (words.isEmpty())
-    {
-        return;
-    }
-
-    QStringList lines;
-    QString line;
-
-    foreach (QString word, words)
-    {
-        if (word.isEmpty())
-        {
-            continue;
-        }
-
-        QString tmp = line;
-
-        if (!tmp.isEmpty())
-        {
-            tmp.append(" ");
-        }
-
-        tmp.append(word);
-
-        if (fm.boundingRect(tmp).width() < textClipRect.width())
-        {
-            line = tmp;
-            continue;
-        }
-
-        if (!line.isEmpty())
-        {
-            lines.append(line);
-        }
-
-        line = word;
-    }
-
-    if (!line.isEmpty())
-    {
-        lines.append(line);
-    }
-
+    QStringList lines = item->multilineText();
     qreal textOriginY = qreal(wholeTextRect.height()) * qreal(1 - lines.size()) / 2;
     int lineIndex = 0;
 
     foreach (QString l, lines)
     {
-        qreal offsetY = textOriginY + qreal(lineIndex) * qreal(wholeTextRect.height()) ;
+        qreal offsetY = textOriginY + qreal(lineIndex) * qreal(wholeTextRect.height());
         qreal x = w + (textClipRect.width() - visibleWidth) / 2;
         qreal y = h + offsetY;
         painter.drawText(QRectF(x, y, visibleWidth, textClipRect.height()), Qt::AlignCenter, l);

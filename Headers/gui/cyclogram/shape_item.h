@@ -18,7 +18,6 @@ public:
     ~ShapeItem();
 
     void setPath(const QPainterPath &path);
-    void setTextPath(const QPainterPath &path);
     void setToolTip(const QString &toolTip);
     void setColor(const QColor &color);
     void setCell(const QPoint &cell);
@@ -36,7 +35,6 @@ public:
 
     void remove();
     void adjust();
-    void updateCanBeLandedFlag();
 
     QPainterPath path() const;
     QPainterPath textPath() const;
@@ -46,6 +44,7 @@ public:
     QColor color() const;
     QColor additionalColor() const;
     QString toolTip() const;
+    const QStringList& multilineText() const;
     QPoint cell() const;
     Command* command() const;
     const QList<ValencyPoint*>& valencyPoints() const;
@@ -64,6 +63,9 @@ public:
 
     void onChildRectChanged(ShapeItem * shape);
 
+public slots:
+    void onAppSettingsChanged();
+
 signals:
     void changed();
     void needToDelete(ShapeItem* shape);
@@ -74,6 +76,7 @@ private slots:
     void setActive(bool active);
 
 private:
+    void updateMulilineText();
     void createPath();
     void createValencyPoints(Command* cmd);
 
@@ -87,7 +90,7 @@ private:
     void updateToolTip();
 
     QPainterPath mPath;             // shape path
-    QPainterPath mTextPath;         // path for text iside shape
+    QPainterPath mTextPath;         // optional path
     QPainterPath mAdditionalPath;   // path for some not-interactive display (arrow line)
     QPainterPath mArrowPath;        // path for arrow drawing (arrow triangle)
     QPoint mPosition;               // top-left corner of the shape in window coordinates
@@ -103,10 +106,12 @@ private:
 
     bool mActive;
 
-    Command* mCommand = Q_NULLPTR; // data pointer for the command logics
-    ShapeItem* mParentShape = Q_NULLPTR;
+    Command* mCommand; // data pointer for the command logics
+    ShapeItem* mParentShape;
 
     QList<ShapeItem*> mChildShapes;
+
+    QStringList mMultilineText;
 };
 
 #endif //SHAPE_ITEM_H
