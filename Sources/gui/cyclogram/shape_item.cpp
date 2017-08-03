@@ -47,19 +47,14 @@ ShapeItem::ShapeItem(QObject* parent):
     mCell(QPoint(0, 0)),
     mRect(QRect(0, 0, 0, 0))
 {
-    mFont.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
-    mFont.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
-
     mActiveColor = QColor::fromRgba(0xff7f7f7f);
     mAdditionalColor = QColor::fromRgba(0x00ffffff);
 }
 
 ShapeItem::~ShapeItem()
 {
-    foreach (ValencyPoint* point, mValencyPoints)
-    {
-        delete point;
-    }
+    qDeleteAll(mValencyPoints);
+    mValencyPoints.clear();
 }
 
 QPainterPath ShapeItem::path() const
@@ -348,47 +343,33 @@ void ShapeItem::removeChildShape(ShapeItem* item)
 
 void ShapeItem::onTextChanged(const QString& text)
 {
-//    QPainterPath textPath;
-//    QFontMetrics fm(mFont);
-//    QRect textRect = fm.boundingRect(text);
-//    qreal x = (itemSize().width() - textRect.width()) / 2;
-//    qreal y = (itemSize().height() + textRect.height()) / 2;
-//    textPath.addText(x, y, mFont, text);
-//    mTextPath = textPath;
-
-    if (mCommand)
+    if (!mCommand)
     {
-        updateToolTip();
-        updateMulilineText();
+        return;
+    }
 
-        switch (mCommand->type())
-        {
-        case DRAKON::CYCLE:
-        case DRAKON::SELECT_STATE:
-        case DRAKON::CONDITION:
-            {
-                CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
-                bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
+    updateToolTip();
+    updateMulilineText();
 
-                QPainterPath additionalText;
-                QFont font;
-                font.setPointSize(8);
-                font.setFamily("Verdana");
+    CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
+    if (cmd)
+    {
+        bool yesDown = (cmd->orientation() == CmdQuestion::YesDown);
 
-                qreal x1 = itemSize().width() - cellSize().width();
-                qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1; // TODO magic
-                additionalText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
+        QPainterPath yesNoText;
+        QFont font;
+        font.setPointSize(8);
+        font.setFamily("Verdana");
 
-                qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
-                qreal y2 = itemSize().height() - cellSize().height() * 0.5; // TODO magic
-                additionalText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
+        qreal x1 = itemSize().width() - cellSize().width();
+        qreal y1 = itemSize().height() / 2 - cellSize().width() * 0.1; // TODO magic
+        yesNoText.addText(x1, y1, font, yesDown ? tr("No") : tr("Yes"));
 
-                mTextPath.addPath(additionalText);
-            }
-            break;
-        default:
-            break;
-        }
+        qreal x2 = itemSize().width() / 2 + cellSize().width() / 3;
+        qreal y2 = itemSize().height() - cellSize().height() * 0.5; // TODO magic
+        yesNoText.addText(x2, y2, font, yesDown ? tr("Yes") : tr("No"));
+
+        mTextPath = yesNoText;
     }
 
     emit changed();
@@ -1737,7 +1718,10 @@ void ShapeItem::updateMulilineText()
 
     QRectF textClipRect(w, h, W - 2 * w, H - 2 * h);
 
-    QFontMetrics fm(mFont);
+    QFont font;
+    font.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
+    font.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
+    QFontMetrics fm(font);
     QString line;
 
     foreach (QString word, words)
@@ -1778,18 +1762,16 @@ void ShapeItem::updateMulilineText()
 
 void ShapeItem::onAppSettingsChanged()
 {
-    QString newFontFamily = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString();
-    int newFontSize = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt();
+    createPath();
 
-    if (newFontFamily != mFont.family())
+    qDeleteAll(mValencyPoints);
+    mValencyPoints.clear();
+
+    if (mChildShapes.empty() && mParentShape)
     {
-        mFont.setFamily(newFontFamily);
+        mParentShape->onChildRectChanged(this);
     }
 
-    if (newFontSize != mFont.pointSize())
-    {
-        mFont.setPointSize(newFontSize);
-    }
-
-    updateMulilineText();
+    createValencyPoints(mCommand);
+    onTextChanged(mCommand->text());
 }

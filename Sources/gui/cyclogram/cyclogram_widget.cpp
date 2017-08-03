@@ -58,7 +58,8 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mItemToCopy(Q_NULLPTR),
     mMouseButtonState(Qt::NoButton),
     mCurrentCommandType(-1),
-    mPressedVP(Q_NULLPTR)
+    mPressedVP(Q_NULLPTR),
+    mRootShape(Q_NULLPTR)
 {
     onAppSettingsChanged();
 
@@ -1213,20 +1214,21 @@ void CyclogramWidget::drawSilhouette()
 
     if (!mSihlouetteArrow)
     {
-        // draw arrow
-        QPainterPath arrow;
-        QPoint pos;
-        pos.setX(topLeft.x() + ShapeItem::itemSize().width() / 2);
-        pos.setY(topLeft.y());
-        arrow.moveTo(pos);
-        arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
-        arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
-        arrow.lineTo(pos);
-
         mSihlouetteArrow = new ShapeItem(this);
-        mSihlouetteArrow->setPath(arrow);
         mSihlouetteArrow->setColor(QColor::fromRgba(0xff000000));
     }
+
+    // draw arrow
+    QPainterPath arrow;
+    QPoint pos;
+    pos.setX(topLeft.x() + ShapeItem::itemSize().width() / 2);
+    pos.setY(topLeft.y());
+    arrow.moveTo(pos);
+    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() + ShapeItem::cellSize().height() / 4));
+    arrow.lineTo(QPoint(pos.x() - ShapeItem::cellSize().width(), pos.y() - ShapeItem::cellSize().height() / 4));
+    arrow.lineTo(pos);
+
+    mSihlouetteArrow->setPath(arrow);
 }
 
 void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
@@ -1264,8 +1266,6 @@ void CyclogramWidget::load(QSharedPointer<Cyclogram> cyclogram)
     mRootShape->adjust();
 
     onNeedUpdate();
-
-    //mRealWidgetSize = this->size();
 }
 
 void CyclogramWidget::onCyclogramStateChanged(int state)
@@ -2038,6 +2038,12 @@ void CyclogramWidget::onAppSettingsChanged()
     foreach (ShapeItem* item, mShapes)
     {
         item->onAppSettingsChanged();
+    }
+
+    if (mRootShape)
+    {
+        mRootShape->setCell(mRootShape->cell());
+        onNeedUpdate();
     }
 }
 

@@ -102,8 +102,6 @@ private:
     QString mToolTip;               // tooltip text for shape
     QList<ValencyPoint*> mValencyPoints; // valency points list for this command
 
-    QFont mFont; // font for writing texts
-
     bool mActive;
 
     Command* mCommand; // data pointer for the command logics

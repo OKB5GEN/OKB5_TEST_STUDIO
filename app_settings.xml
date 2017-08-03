@@ -5,12 +5,12 @@
     <setting name="CYCLOGRAM_WIDGET_SCALE_MAX" value="1.0"/>
     <setting name="CYCLOGRAM_WIDGET_SCALE_DEFAULT" value="1.0"/>
     <setting name="CYCLOGRAM_WIDGET_SCALE_STEP" value="0.025"/>
-    <setting name="CELL_WIDTH" value="22"/>
-    <setting name="CELL_HEIGHT" value="22"/>
+    <setting name="CELL_WIDTH" value="24"/>
+    <setting name="CELL_HEIGHT" value="24"/>
     <setting name="CELLS_PER_ITEM_V" value="4"/>
     <setting name="CELLS_PER_ITEM_H" value="8"/>
-    <setting name="APP_START_CYCLOGRAM_FILE" value="on_app_start.cgr"/>
-    <setting name="APP_FINISH_CYCLOGRAM_FILE" value="on_app_finish.cgr"/>
+    <setting name="APP_START_CYCLOGRAM_FILE" value=""/>
+    <setting name="APP_FINISH_CYCLOGRAM_FILE" value=""/>
     <setting name="COMMAND_EXECUTION_DELAY" value="50"/>
     <setting name="MODULE_RESPONSE_WAIT_TIMEOUT" value="20000"/>
     <setting name="DEFAULT_RESPONSE_WAIT_TIME" value="10000"/>

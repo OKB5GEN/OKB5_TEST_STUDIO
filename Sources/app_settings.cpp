@@ -194,8 +194,8 @@ void AppSettings::loadTexts()
     mSettingsNames[CYCLOGRAM_WIDGET_SCALE_STEP] = tr("Cyclogram widget scale change step");
     mSettingsNames[CELL_WIDTH] = tr("Cyclogram widget cell width");
     mSettingsNames[CELL_HEIGHT] = tr("Cyclogram widget cell height");
-    mSettingsNames[CELLS_PER_ITEM_V] = tr("Command shape width");
-    mSettingsNames[CELLS_PER_ITEM_H] = tr("Command shape height");
+    mSettingsNames[CELLS_PER_ITEM_H] = tr("Command shape width");
+    mSettingsNames[CELLS_PER_ITEM_V] = tr("Command shape height");
     mSettingsNames[APP_START_CYCLOGRAM_FILE] = tr("Application start cyclogram file");
     mSettingsNames[APP_FINISH_CYCLOGRAM_FILE] = tr("Application finish cyclogram file");
     mSettingsNames[COMMAND_EXECUTION_DELAY] = tr("Command execution delay");
@@ -215,8 +215,8 @@ void AppSettings::loadTexts()
     mSettingsComments[CYCLOGRAM_WIDGET_SCALE_STEP] = tr("Float. 100% = 1.0");
     mSettingsComments[CELL_WIDTH] = tr("Integer. Pixels count");
     mSettingsComments[CELL_HEIGHT] = tr("Integer. Pixels count");
-    mSettingsComments[CELLS_PER_ITEM_V] = tr("Integer. Cells width count");
-    mSettingsComments[CELLS_PER_ITEM_H] = tr("Integer. Cells height count");
+    mSettingsComments[CELLS_PER_ITEM_H] = tr("Integer. Cells width count");
+    mSettingsComments[CELLS_PER_ITEM_V] = tr("Integer. Cells height count");
     mSettingsComments[APP_START_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application START (file path relative to APP_FOLDER/cyclograms/");
     mSettingsComments[APP_FINISH_CYCLOGRAM_FILE] = tr("String. Cyclogram file need to be launched at application FINISH (file path relative to APP_FOLDER/cyclograms/");
     mSettingsComments[COMMAND_EXECUTION_DELAY] = tr("Integer. Milliseconds. Cyclogram command forced execution delay for visuzalization");
