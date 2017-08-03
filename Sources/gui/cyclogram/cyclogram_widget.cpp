@@ -419,24 +419,13 @@ void CyclogramWidget::onClickVP(const ValencyPoint* point, const QPoint& pos)
 {
     clearSelection();
 
-    ShapeItem* item = point->owner();
-    DRAKON::IconType type = item->command()->type();
-
-    if (type == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right)
+    if (mCurrentCommandType != -1)
+    {
+        addNewCommand(DRAKON::IconType(mCurrentCommandType), point);
+    }
+    else
     {
         showContextMenuForVP(point, pos);
-        //addNewCommand(type, point); // just add new branch immediately
-    }
-    else // add some command via dialog (TODO tempotary)
-    {
-        if (mCurrentCommandType != -1)
-        {
-            addNewCommand(DRAKON::IconType(mCurrentCommandType), point);
-        }
-        else // TODO show context menu?
-        {
-            showContextMenuForVP(point, pos);
-        }
     }
 }
 

@@ -6,6 +6,7 @@ CommandsEditToolbar::CommandsEditToolbar(QWidget* parent):
 {
     mSelectAct = addCustomAction(":/resources/images/select", tr("Select"), -1);
     QAction* addModuleCmdAction = addCustomAction(":/resources/images/cmd_module", tr("Add module command"), DRAKON::ACTION_MODULE);
+    QAction* addBranchCmdAction = addCustomAction(":/resources/images/cmd_branch", tr("Add cyclogram branch"), DRAKON::BRANCH_BEGIN);
     QAction* addMathCmdAction = addCustomAction(":/resources/images/cmd_math", tr("Add math command"), DRAKON::ACTION_MATH);
     QAction* addQuestionCmdAction = addCustomAction(":/resources/images/cmd_question", tr("Add question command"), DRAKON::CONDITION);
     QAction* addCycleCmdAction = addCustomAction(":/resources/images/cmd_cycle", tr("Add cycle command"), DRAKON::CYCLE);
@@ -93,7 +94,6 @@ void CommandsEditToolbar::onActionTriggered(bool checked)
 
         action->blockSignals(false);
     }
-
 
     emit currentCommandChanged(command);
 }

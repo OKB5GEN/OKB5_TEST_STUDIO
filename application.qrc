@@ -5,6 +5,7 @@
         <file>resources/images/save.png</file>
         <file>resources/images/pause.png</file>
         <file>resources/images/play.png</file>
+        <file>resources/images/cmd_branch.png</file>
         <file>resources/images/cmd_delay.png</file>
         <file>resources/images/cmd_go_to_branch.png</file>
         <file>resources/images/cmd_input.png</file>
