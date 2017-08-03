@@ -477,10 +477,7 @@ void CmdActionModuleEditDialog::addOKBCommonCommands()
 
 void CmdActionModuleEditDialog::addCommand(int commandID, const QMap<QString, QVariant>& implicitParams)
 {
-    QString fullText = mCommand->commandName(commandID, implicitParams, true);
-    fullText += " (";
-    fullText += mCommand->commandName(commandID, implicitParams);
-    fullText += ")";
+    QString fullText = mCommand->commandName(commandID, implicitParams);
 
     QListWidgetItem* item = new QListWidgetItem();
     item->setText(fullText);

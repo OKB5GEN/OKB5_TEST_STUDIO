@@ -25,8 +25,7 @@ public:
     QString moduleName(bool isFullName) const;
     static QString moduleName(int moduleId, bool isFullName);
 
-    QString commandFullName(uint32_t commandID) const;
-    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams, bool isFullName = false) const;
+    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams = QMap<QString, QVariant>()) const;
 
 protected:
     bool loadFromImpl(Command* other) override;
