@@ -5,6 +5,7 @@
     <setting name="CYCLOGRAM_WIDGET_SCALE_MAX" value="1.0"/>
     <setting name="CYCLOGRAM_WIDGET_SCALE_DEFAULT" value="1.0"/>
     <setting name="CYCLOGRAM_WIDGET_SCALE_STEP" value="0.025"/>
+    <setting name="CYCLOGRAM_H_SCROLL_SPEED" value="100"/>
     <setting name="CELL_WIDTH" value="24"/>
     <setting name="CELL_HEIGHT" value="24"/>
     <setting name="CELLS_PER_ITEM_V" value="4"/>

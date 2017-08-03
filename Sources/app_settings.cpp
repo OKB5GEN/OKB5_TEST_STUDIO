@@ -208,6 +208,7 @@ void AppSettings::loadTexts()
     mSettingsNames[MAX_MKO_REPEAT_REQUESTS] = tr("Max requests repeat count");
     mSettingsNames[CYCLOGRAM_FONT_SIZE] = tr("Commands text font size");
     mSettingsNames[CYCLOGRAM_FONT_FAMILY] = tr("Commands text font family");
+    mSettingsNames[CYCLOGRAM_H_SCROLL_SPEED] = tr("Cyclogram horizontal scroll speed");
 
     mSettingsComments[CYCLOGRAM_WIDGET_SCALE_MIN] = tr("Float. 100% = 1.0");
     mSettingsComments[CYCLOGRAM_WIDGET_SCALE_MAX] = tr("Float. 100% = 1.0");
@@ -229,6 +230,7 @@ void AppSettings::loadTexts()
     mSettingsComments[MAX_MKO_REPEAT_REQUESTS] = tr("Interger. Maximum request repeat count if MKO responds with error 'Response not ready'");
     mSettingsComments[CYCLOGRAM_FONT_SIZE] = tr("Integer. Commands text font size");
     mSettingsComments[CYCLOGRAM_FONT_FAMILY] = tr("String. Commands text font family");
+    mSettingsComments[CYCLOGRAM_H_SCROLL_SPEED] = tr("Integer. Cyclogram horizontal scroll speed with mouse wheel + shift button. Pixels per step");
 }
 
 QString AppSettings::settingName(SettingID id) const

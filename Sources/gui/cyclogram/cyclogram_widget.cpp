@@ -150,30 +150,15 @@ void CyclogramWidget::wheelEvent(QWheelEvent *event)
 
         updateScale(event->pos(), event->delta() / QWheelEvent::DefaultDeltasPerStep);
     }
+    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    {
+        event->accept();
 
-//    if (QApplication::keyboardModifiers() & Qt::AltModifier)
-//    {
-//        if (mParentScrollArea)
-//        {
-//            int vMin = mParentScrollArea->verticalScrollBar()->minimum();
-//            int vCur = mParentScrollArea->verticalScrollBar()->value();
-//            int vMax = mParentScrollArea->verticalScrollBar()->maximum();
-//            int hMin = mParentScrollArea->horizontalScrollBar()->minimum();
-//            int hCur = mParentScrollArea->horizontalScrollBar()->value();
-//            int hMax = mParentScrollArea->horizontalScrollBar()->maximum();
-//            QSize widgetSize = this->size();
-//            QSize viewportSize = mParentScrollArea->viewport()->size();
-//            LOG_INFO(QString("Scale=%1").arg(mScale));
-//            LOG_INFO(QString("Cursor pos (viewport)(x=%1, y=%2)").arg(event->pos().x()).arg(event->pos().y()));
-//            LOG_INFO(QString("Cursor pos (widget)  (x=%1, y=%2)").arg(event->pos().x() / mScale).arg(event->pos().y() / mScale));
-//            LOG_INFO(QString("Vertical (min=%1, cur=%2, max=%3)").arg(vMin).arg(vCur).arg(vMax));
-//            LOG_INFO(QString("Horizontal (min=%1, cur=%2, max=%3)").arg(hMin).arg(hCur).arg(hMax));
-//            LOG_INFO(QString("Widget size (w=%1, h=%2)").arg(widgetSize.width()).arg(widgetSize.height()));
-//            LOG_INFO(QString("Viewport size (w=%1, h=%2)").arg(viewportSize.width()).arg(viewportSize.height()));
-//            LOG_INFO(QString("============================="));
-//            event->accept();
-//        }
-//    }
+        QScrollBar* scrollBar = mParentScrollArea->horizontalScrollBar();
+        int currentValue = scrollBar->value();
+        int numSteps = event->delta() / QWheelEvent::DefaultDeltasPerStep;
+        scrollBar->setValue(currentValue - numSteps * mScrollSpeed);
+    }
 }
 
 void CyclogramWidget::updateScale(const QPoint& cursorPos, int numSteps)
@@ -2019,6 +2004,8 @@ void CyclogramWidget::onAppSettingsChanged()
 {
     mFont.setPointSize(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_SIZE).toInt());
     mFont.setFamily(AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_FONT_FAMILY).toString());
+
+    mScrollSpeed = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_H_SCROLL_SPEED).toDouble();
 
     ShapeItem::itemSize(true);
     ShapeItem::cellSize(true);

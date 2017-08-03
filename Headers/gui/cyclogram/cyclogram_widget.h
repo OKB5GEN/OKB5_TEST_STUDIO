@@ -138,6 +138,7 @@ private:
 
     qreal mScale;
     QScrollArea* mParentScrollArea;
+    qreal mScrollSpeed;
 
     int mCurrentCommandType;
     QFont mFont;
