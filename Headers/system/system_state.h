@@ -74,6 +74,8 @@ public:
     QString paramName(int module, int command, int param, bool isInputParam) const;
     int paramsCount(int module, int command, bool isInputParam) const;
 
+    static bool isSetter(ModuleCommands::CommandID command);
+
     bool isImplicit(const QString& name) const;
     ParamID paramID(const QString& name) const;
     QString paramName(ParamID param) const;

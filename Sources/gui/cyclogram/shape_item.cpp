@@ -2,6 +2,7 @@
 
 #include "Headers/gui/cyclogram/shape_item.h"
 #include "Headers/logic/command.h"
+#include "Headers/system/system_state.h"
 #include "Headers/app_settings.h"
 #include "Headers/logic/commands/cmd_title.h"
 #include "Headers/logic/commands/cmd_question.h"
@@ -351,6 +352,11 @@ void ShapeItem::onTextChanged(const QString& text)
     updateToolTip();
     updateMulilineText();
 
+    if (mCommand->type() == DRAKON::ACTION_MODULE)
+    {
+        createPath();
+    }
+
     CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
     if (cmd)
     {
@@ -543,7 +549,7 @@ void ShapeItem::setActive(bool active)
 
 void ShapeItem::createPath()
 {
-    DRAKON::IconType type = command()->type();
+    DRAKON::IconType type = mCommand->type();
     QPainterPath path;
 
     QPoint cell = mCell;
@@ -600,9 +606,32 @@ void ShapeItem::createPath()
         }
         break;
     case DRAKON::ACTION_MATH:
-    case DRAKON::ACTION_MODULE:
         {
             path.addRect(QRect(w, h, W - 2 * w, H - 2 * h));
+        }
+        break;
+    case DRAKON::ACTION_MODULE:
+        {
+            CmdActionModule* moduleCmd = qobject_cast<CmdActionModule*>(mCommand);
+            bool isSetter = SystemState::isSetter(ModuleCommands::CommandID(moduleCmd->operation()));
+            if (isSetter)
+            {
+                path.moveTo(w, h);
+                path.lineTo(w, H - h);
+                path.lineTo(W - (w * 3 / 2), H - h);
+                path.lineTo(W - w, H / 2);
+                path.lineTo(W - (w * 3 / 2), h);
+                path.lineTo(w, h);
+            }
+            else
+            {
+                path.moveTo(w, h);
+                path.lineTo(w, H - h);
+                path.lineTo(W - w, H - h);
+                path.lineTo(W - w * 3 / 2, H / 2);
+                path.lineTo(W - w, h);
+                path.lineTo(w, h);
+            }
         }
         break;
     case DRAKON::SUBPROGRAM:

@@ -331,10 +331,10 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
     switch (commandID)
     {
     case ModuleCommands::GET_MODULE_STATUS:
-        text += tr("Module status (Get)");
+        text += tr("Module status");
         break;
     case ModuleCommands::SET_MODULE_LOGIC_STATUS:
-        text += tr("Logical status (Set)");
+        text += tr("Logical status");
         break;
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
@@ -366,11 +366,11 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text += tr(" ON (Set)");
+                text += tr(" ON");
             }
             else
             {
-                text += tr(" OFF (Set)");
+                text += tr(" OFF");
             }
         }
         break;
@@ -396,69 +396,66 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
             if (state == ModuleCommands::POWER_ON)
             {
-                text += tr(" ON (Set)");
+                text += tr(" ON");
             }
             else
             {
-                text += tr(" OFF (Set)");
+                text += tr(" OFF");
             }
         }
         break;
     case ModuleCommands::GET_FUSE_STATE:
-        text += tr("Fuse state (Get)");
+        text += tr("Fuse state");
         break;
     case ModuleCommands::GET_CHANNEL_TELEMETRY:
-        text += tr("Channel telemetry (Get)");
+        text += tr("Channel telemetry");
         break;
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
             QString paramName = mSystemState->paramName(SystemState::SENSOR_NUMBER);
             int sensorID = inputParams.value(paramName).toInt();
-            text += tr("Temperature PT-100 #%1 (Get)").arg(sensorID);
+            text += tr("Temperature PT-100 #%1").arg(sensorID);
         }
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-        text += tr("Temperature DS1820 line 1 (Get)");
+        text += tr("Temperature DS1820 line 1");
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
-        text += tr("Temperature DS1820 line 2 (Get)");
+        text += tr("Temperature DS1820 line 2");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_1:
-        text += tr("DS1820 count at line 1 (Get)");
+        text += tr("DS1820 count at line 1");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
-        text += tr("DS1820 count at line 2 (Get)");
+        text += tr("DS1820 count at line 2)");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_1:
-        text += tr("Start DS1820 measurement at line 1 (Set)");
+        text += tr("Start DS1820 measurement at line 1");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_2:
-        text += tr("Start DS1820 measurement at line 2 (Set)");
+        text += tr("Start DS1820 measurement at line 2");
         break;
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
-        text += tr("Voltage (max power) (Set)");
+        text += tr("Voltage (max power)");
         break;
     case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
-        text += tr("Voltage and current (Get)");
+        text += tr("Voltage and current");
         break;
     case ModuleCommands::SEND_TEST_ARRAY:
     case ModuleCommands::RECEIVE_TEST_ARRAY:
         {
-            QString mode = (commandID == ModuleCommands::SEND_TEST_ARRAY) ? tr("Set") : tr("Get");
-            text += tr("Test array (%1)").arg(mode);
+            text += tr("Test array");
         }
         break;
     case ModuleCommands::SEND_COMMAND_ARRAY:
     case ModuleCommands::RECEIVE_COMMAND_ARRAY:
         {
-            QString mode = (commandID == ModuleCommands::SEND_COMMAND_ARRAY) ? tr("Set") : tr("Get");
-            text += tr("Command array (%1)").arg(mode);
+            text += tr("Command array");
         }
         break;
     case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
     case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
         {
-            QString mode = (commandID == ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL) ? tr("Set") : tr("Get");
             QString line;
             QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
             int channel = inputParams.value(paramName).toInt();
@@ -471,13 +468,12 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 line += QString("υ");
             }
 
-            text += tr("Test array (line %1) (%2)").arg(line).arg(mode);
+            text += tr("Test array (line %1)").arg(line);
         }
         break;
     case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
     case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
-            QString mode = (commandID == ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL) ? tr("Set") : tr("Get");
             QString line;
             QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
             int channel = inputParams.value(paramName).toInt();
@@ -490,7 +486,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 line += QString("υ");
             }
 
-            text += tr("Command array (line %1) (%2)").arg(line).arg(mode);
+            text += tr("Command array (line %1)").arg(line);
         }
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
@@ -507,65 +503,61 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 kitName += tr("reserve");
             }
 
-            text += tr("Angle sensor power supply via %1 kit (Set)").arg(kitName);
+            text += tr("Angle sensor power supply via %1 kit").arg(kitName);
         }
         break;
     case ModuleCommands::START_MKO:
-        text += tr("Enable (Set)");
+        text += tr("Enable");
         break;
     case ModuleCommands::STOP_MKO:
-        text += tr("Disable (Set)");
+        text += tr("Disable");
         break;
     case ModuleCommands::GET_DEVICE_CLASS:
-        text += tr("Device class (Get)");
+        text += tr("Device class");
         break;
     case ModuleCommands::GET_NOMINAL_CURRENT:
-        text += tr("Nominal current (Get)");
+        text += tr("Nominal current");
         break;
     case ModuleCommands::GET_NOMINAL_VOLTAGE:
-        text += tr("Nominal voltage (Get)");
+        text += tr("Nominal voltage");
         break;
     case ModuleCommands::GET_NOMINAL_POWER:
-        text += tr("Nominal power (Get)");
-        break;
-    case ModuleCommands::GET_OVP_THRESHOLD:
-        text += tr("OVP threshold (Get)");
-        break;
-    case ModuleCommands::GET_OCP_THRESHOLD:
-        text += tr("OCP threshold (Get)");
+        text += tr("Nominal power");
         break;
     case ModuleCommands::SET_OVP_THRESHOLD:
-        text += tr("OVP threshold (Set)");
+    case ModuleCommands::GET_OVP_THRESHOLD:
+        text += tr("OVP threshold");
         break;
     case ModuleCommands::SET_OCP_THRESHOLD:
-        text += tr("OCP threshold (Set)");
+    case ModuleCommands::GET_OCP_THRESHOLD:
+        text += tr("OCP threshold");
         break;
     case ModuleCommands::SET_SET_VALUE_U:
-        text += tr("Voltage (Set)");
+        text += tr("Voltage");
         break;
     case ModuleCommands::SET_SET_VALUE_I:
-        text += tr("Current (Set)");
+        text += tr("Current");
         break;
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
-        text += tr("Power output ON (Set)");
+        text += tr("Power output ON");
         break;
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
-        text += tr("Power output OFF (Set)");
+        text += tr("Power output OFF");
         break;
     case ModuleCommands::PSC_ACKNOWLEDGE_ALARMS:
-        text += tr("Acknowledge alarms (Set)");
+        text += tr("Acknowledge alarms");
         break;
     case ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL:
-        text += tr("Remote control ON (Set)");
+        text += tr("Remote control ON");
         break;
     case ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL:
-        text += tr("Manual control ON (Set)");
+        text += tr("Manual control ON");
         break;
     case ModuleCommands::PSC_TRACKING_ON:
-        text += tr("Tracking ON (Set)");
+        text += tr("Tracking ON");
         break;
     case ModuleCommands::PSC_TRACKING_OFF:
-        text += tr("Tracking OFF (Set)");
+        text += tr("Tracking OFF");
         break;
     case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         {
@@ -586,7 +578,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 break;
             }
 
-            text += tr("MKO %1 kit power supply state (Get)").arg(kitName);
+            text += tr("MKO %1 kit power supply state").arg(kitName);
         }
         break;
     case ModuleCommands::GET_POWER_CHANNEL_STATE:
@@ -614,8 +606,6 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
             default:
                 break;
             }
-
-            text += tr(" (Get)");
         }
         break;
     case ModuleCommands::GET_MODULE_ADDRESS:
@@ -637,20 +627,20 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 break;
             }
 
-            text += tr("Module %1 address (Get)").arg(addressType);
+            text += tr("Module %1 address").arg(addressType);
         }
         break;
     case ModuleCommands::RESET_LINE_1:
-        text += tr("DS1820 reset line 1 (Set)");
+        text += tr("DS1820 reset line 1");
         break;
     case ModuleCommands::RESET_LINE_2:
-        text += tr("DS1820 reset line 2 (Set)");
+        text += tr("DS1820 reset line 2");
         break;
     case ModuleCommands::GET_STATUS_WORD:
-        text += tr("Status word (Get)");
+        text += tr("Status word");
         break;
     case ModuleCommands::RESET_ERROR:
-        text += tr("Reset error (Set)");
+        text += tr("Reset error");
         break;
     default:
         {

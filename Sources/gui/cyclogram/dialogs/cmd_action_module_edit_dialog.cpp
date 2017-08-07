@@ -22,9 +22,6 @@ CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
     setupUI();
     setWindowTitle(tr("Module operation"));
 
-    //adjustSize();
-    //setFixedSize(sizeHint());
-
     setMinimumSize(QSize(1300, 650));
 }
 
@@ -60,8 +57,12 @@ void CmdActionModuleEditDialog::setupUI()
 
     modulesBoxLayout->addWidget(mModules);
 
-    mCommands = new QListWidget(this);
-    commandsBoxLayout->addWidget(mCommands);
+    mSetCommands = new QListWidget(this);
+    mGetCommands = new QListWidget(this);
+    commandsBoxLayout->addWidget(new QLabel(tr("Set module state"), this));
+    commandsBoxLayout->addWidget(mSetCommands);
+    commandsBoxLayout->addWidget(new QLabel(tr("Get module state"), this));
+    commandsBoxLayout->addWidget(mGetCommands);
 
     mInParams = new QTableWidget(this);
     QStringList headers;
@@ -104,7 +105,8 @@ void CmdActionModuleEditDialog::setupUI()
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     connect(mModules, SIGNAL(currentRowChanged(int)), this, SLOT(onModuleChanged(int)));
-    connect(mCommands, SIGNAL(currentRowChanged(int)), this, SLOT(onCommandChanged(int)));
+    connect(mSetCommands, SIGNAL(currentRowChanged(int)), this, SLOT(onCommandChanged(int)));
+    connect(mGetCommands, SIGNAL(currentRowChanged(int)), this, SLOT(onCommandChanged(int)));
 
     setLayout(mainLayout);
 }
@@ -170,7 +172,8 @@ void CmdActionModuleEditDialog::addPowerUnitCommonCommands()
 void CmdActionModuleEditDialog::onModuleChanged(int index)
 {
     mModuleID = index;
-    mCommands->clear();
+    mSetCommands->clear();
+    mGetCommands->clear();
 
     SystemState* sysState = mCommand->systemState();
 
@@ -404,13 +407,16 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     // if current command module corresponds to currently opened module tab, select command in the list
     if (mModuleID != mCommand->module())
     {
-        mCommands->setCurrentRow(0);
+        mSetCommands->setCurrentRow(0);
         return;
     }
 
-    for (int i = 0; i < mCommands->count(); ++i)
+    ModuleCommands::CommandID cmd = ModuleCommands::CommandID(mCommand->operation());
+    QListWidget* commandsWidget = SystemState::isSetter(cmd) ? mSetCommands : mGetCommands;
+
+    for (int i = 0; i < commandsWidget->count(); ++i)
     {
-        QListWidgetItem* item = mCommands->item(i);
+        QListWidgetItem* item = commandsWidget->item(i);
         int commandID = item->data(Qt::UserRole).toInt();
 
         if (commandID != mCommand->operation())
@@ -422,7 +428,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         QMap<QString, QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
         if (implicitParams.empty())
         {
-            mCommands->setCurrentRow(i);
+            commandsWidget->setCurrentRow(i);
             break;
         }
 
@@ -445,7 +451,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
         if (allEqual)
         {
-            mCommands->setCurrentRow(i);
+            commandsWidget->setCurrentRow(i);
             break;
         }
     }
@@ -488,7 +494,14 @@ void CmdActionModuleEditDialog::addCommand(int commandID, const QMap<QString, QV
         item->setData(Qt::UserRole + 1, QVariant(implicitParams));
     }
 
-    mCommands->addItem(item);
+    if (SystemState::isSetter(ModuleCommands::CommandID(commandID)))
+    {
+        mSetCommands->addItem(item);
+    }
+    else
+    {
+        mGetCommands->addItem(item);
+    }
 }
 
 void CmdActionModuleEditDialog::onCommandChanged(int index)
@@ -503,7 +516,25 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         return;
     }
 
-    mCommandID = mCommands->item(index)->data(Qt::UserRole).toInt();
+    QListWidget* commandsListWidget = Q_NULLPTR;
+    if (QObject::sender() == mSetCommands)
+    {
+        commandsListWidget = mSetCommands;
+        mGetCommands->clearSelection();
+    }
+    else if (QObject::sender() == mGetCommands)
+    {
+        commandsListWidget = mGetCommands;
+        mSetCommands->clearSelection();
+    }
+
+    if (!commandsListWidget)
+    {
+        LOG_ERROR(QString("CmdActionModuleEditDialog::onCommandChanged: invalid command sender!"));
+        return;
+    }
+
+    mCommandID = commandsListWidget->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
     int inCount = system->paramsCount(mModuleID, mCommandID, true);
     int outCount = system->paramsCount(mModuleID, mCommandID, false);
@@ -728,8 +759,20 @@ void CmdActionModuleEditDialog::onAccept()
     }
 
     // add implicit params to command input params
-    QListWidgetItem* item = mCommands->currentItem();
-    QMap<QString,QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
+    QList<QListWidgetItem*> items = mSetCommands->selectedItems();
+    if (items.isEmpty())
+    {
+        items = mGetCommands->selectedItems();
+    }
+
+    if (items.isEmpty() || items.size() > 1)
+    {
+        LOG_ERROR(QString("Invalid commands selection"));
+        reject();
+        return;
+    }
+
+    QMap<QString,QVariant> implicitParams = items.back()->data(Qt::UserRole + 1).toMap();
     for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
     {
         input[it.key()] = it.value();

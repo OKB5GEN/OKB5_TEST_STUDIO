@@ -38,7 +38,8 @@ private:
     CmdActionModule* mCommand;
 
     QListWidget * mModules;
-    QListWidget * mCommands;
+    QListWidget * mSetCommands;
+    QListWidget * mGetCommands;
     QTableWidget* mInParams;
     QTableWidget* mOutParams;
 

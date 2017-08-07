@@ -1032,3 +1032,88 @@ bool SystemState::isImplicit(const QString &name) const
 
     return false;
 }
+
+bool SystemState::isSetter(ModuleCommands::CommandID command)
+{
+    switch (command)
+    {
+    //case ModuleCommands::GET_MODULE_ADDRESS:
+    //case ModuleCommands::GET_STATUS_WORD:
+    case ModuleCommands::RESET_ERROR:
+    case ModuleCommands::SOFT_RESET:
+    //case ModuleCommands::GET_SOWFTWARE_VERSION:
+    case ModuleCommands::ECHO:
+    case ModuleCommands::SET_POWER_CHANNEL_STATE:
+    //case ModuleCommands::GET_FUSE_STATE:
+    //case ModuleCommands::GET_CHANNEL_TELEMETRY:
+    case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
+    case ModuleCommands::SET_PACKET_SIZE_CAN:
+    case ModuleCommands::ADD_BYTES_CAN:
+    case ModuleCommands::SEND_PACKET_CAN:
+    //case ModuleCommands::CHECK_RECV_DATA_CAN:
+    case ModuleCommands::RECV_DATA_CAN:
+    case ModuleCommands::CLEAN_BUFFER_CAN:
+    case ModuleCommands::SET_PACKET_SIZE_RS485:
+    case ModuleCommands::ADD_BYTES_RS485:
+    case ModuleCommands::SEND_PACKET_RS485:
+    //case ModuleCommands::CHECK_RECV_DATA_RS485:
+    case ModuleCommands::RECV_DATA_RS485:
+    case ModuleCommands::CLEAN_BUFFER_RS485:
+    //case ModuleCommands::GET_TEMPERATURE_PT100:
+    //case ModuleCommands::GET_DS1820_COUNT_LINE_1:
+    //case ModuleCommands::GET_DS1820_COUNT_LINE_2:
+    //case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+    //case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+    //case ModuleCommands::GET_POWER_CHANNEL_STATE:
+    //case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
+    case ModuleCommands::SET_MODE_RS485:
+    case ModuleCommands::SET_SPEED_RS485:
+    case ModuleCommands::RESET_LINE_1:
+    case ModuleCommands::RESET_LINE_2:
+    case ModuleCommands::START_MEASUREMENT_LINE_1:
+    case ModuleCommands::START_MEASUREMENT_LINE_2:
+    //case ModuleCommands::GET_DS1820_ADDR_LINE_1:
+    //case ModuleCommands::GET_DS1820_ADDR_LINE_2:
+    case ModuleCommands::SET_TECH_INTERFACE:
+    //case ModuleCommands::GET_TECH_INTERFACE:
+    case ModuleCommands::RECV_DATA_SSI:
+    case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
+    //case ModuleCommands::GET_VOLTAGE_AND_CURRENT:
+    //case ModuleCommands::GET_DEVICE_CLASS:
+    //case ModuleCommands::GET_NOMINAL_CURRENT:
+    //case ModuleCommands::GET_NOMINAL_VOLTAGE:
+    //case ModuleCommands::GET_NOMINAL_POWER:
+    //case ModuleCommands::GET_OVP_THRESHOLD:
+    //case ModuleCommands::GET_OCP_THRESHOLD:
+    case ModuleCommands::SET_OVP_THRESHOLD:
+    case ModuleCommands::SET_OCP_THRESHOLD:
+    case ModuleCommands::SET_SET_VALUE_U:
+    case ModuleCommands::SET_SET_VALUE_I:
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
+    case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
+    case ModuleCommands::PSC_ACKNOWLEDGE_ALARMS:
+    case ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL:
+    case ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL:
+    case ModuleCommands::PSC_TRACKING_ON:
+    case ModuleCommands::PSC_TRACKING_OFF:
+    case ModuleCommands::SEND_TEST_ARRAY:
+    //case ModuleCommands::RECEIVE_TEST_ARRAY:
+    case ModuleCommands::SEND_COMMAND_ARRAY:
+    //case ModuleCommands::RECEIVE_COMMAND_ARRAY:
+    case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
+    //case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
+    //case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
+    case ModuleCommands::SEND_TO_ANGLE_SENSOR:
+    case ModuleCommands::START_MKO:
+    case ModuleCommands::STOP_MKO:
+    //case ModuleCommands::GET_MODULE_STATUS:
+    case ModuleCommands::SET_MODULE_LOGIC_STATUS:
+        return true;
+
+    default:
+        break;
+    }
+
+    return false;
+}
