@@ -30,6 +30,7 @@ namespace
     static const int TOOLBAR_ICON_SIZE = 48;
     static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir";
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
+    static const QString LAST_OPENED_FILE_NAME = "LastOpenedFileName";
 }
 
 static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
@@ -82,14 +83,11 @@ EditorWindow::EditorWindow():
     createActions();
     createStatusBar();
 
-    readSettings();
-
     QGuiApplication::setFallbackSessionManagementEnabled(false);
     connect(qApp, &QGuiApplication::commitDataRequest, this, &EditorWindow::commitData);
 
-    setNewCyclogram(CyclogramManager::createCyclogram());
+    readSettings();
 
-    setCurrentFile(QString());
     setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -170,6 +168,8 @@ void EditorWindow::newFile()
 
     setNewCyclogram(cyclogram);
     setCurrentFile(QString());
+
+    saveLastOpenedFile(QString());
 
     cyclogram->setModified(true, true, false);
 }
@@ -468,6 +468,20 @@ void EditorWindow::readSettings()
     {
         restoreGeometry(geometry);
     }
+
+    // open last opened file
+    QString fileName = settings.value(LAST_OPENED_FILE_NAME).toString();;
+    if (!fileName.isEmpty())
+    {
+        openFile(Cyclogram::defaultStorePath() + fileName);
+    }
+
+    auto cyclogram = mCyclogram.lock();
+    if (!cyclogram)
+    {
+        setNewCyclogram(CyclogramManager::createCyclogram());
+        setCurrentFile(QString());
+    }
 }
 
 void EditorWindow::writeSettings()
@@ -479,7 +493,7 @@ void EditorWindow::writeSettings()
 bool EditorWindow::maybeSave()
 {
     auto cyclogram = mCyclogram.lock();
-    if (!cyclogram->isModified())
+    if (!cyclogram || !cyclogram->isModified())
     {
         return true;
     }
@@ -518,6 +532,7 @@ void EditorWindow::loadFile(const QString &fileName)
     }
     else
     {
+        saveLastOpenedFile(fileName);
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File loaded"), 2000);
     }
@@ -525,6 +540,21 @@ void EditorWindow::loadFile(const QString &fileName)
     mSaveAct->setDisabled(true);
 
     mCommandsEditToolbar->reset();
+}
+
+void EditorWindow::saveLastOpenedFile(const QString& fileName)
+{
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+
+    QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
+    if (tokens.size() == 2)
+    {
+        settings.setValue(LAST_OPENED_FILE_NAME, tokens.at(1));
+    }
+    else
+    {
+        settings.setValue(LAST_OPENED_FILE_NAME, QString());
+    }
 }
 
 bool EditorWindow::saveFile(const QString &fileName)
@@ -542,9 +572,10 @@ bool EditorWindow::saveFile(const QString &fileName)
     if (writer.writeFile(&file))
     {
         // save last save dir
-        QSettings settings;
+        QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
         QString savePath = QFileInfo(fileName).absoluteDir().path();
         settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
+        saveLastOpenedFile(fileName);
 
         setCurrentFile(fileName);
         statusBar()->showMessage(tr("File saved"), 2000);

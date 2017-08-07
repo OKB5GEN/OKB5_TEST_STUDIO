@@ -89,6 +89,8 @@ private:
 
     void setNewCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
+    void saveLastOpenedFile(const QString& fileName);
+
     // recent files functionality
     static bool hasRecentFiles();
     void prependToRecentFiles(const QString &fileName);
