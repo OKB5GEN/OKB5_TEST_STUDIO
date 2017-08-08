@@ -19,8 +19,8 @@
         <command type="ACTION_MODULE" id="1493724109576" module="OTD" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="Logic.status" type="10" value="LActive"/>
-                <param name="Phys.status" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
+                <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493724128025" operation="Greater" orientation="YesDown">
@@ -36,30 +36,30 @@
         <command type="GO_TO_BRANCH" id="1493724351619"/>
         <command type="ACTION_MODULE" id="1493724384673" module="OTD" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
-                <param name="Logic.status" type="6" value="1"/>
+                <param name="STATUS_LOGICAL" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493724432484" module="OTD" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
-                <param name="Logic.status" type="6" value="0"/>
+                <param name="STATUS_LOGICAL" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493796620335" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="6" value="1"/>
+                <param name="MODULE_ADDRESS" type="6" value="1"/>
             </input_params>
             <output_params>
-                <param name="Module address" type="10" value="AddrC"/>
+                <param name="MODULE_ADDRESS" type="10" value="AddrC"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493796667143" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="6" value="2"/>
+                <param name="MODULE_ADDRESS" type="6" value="2"/>
             </input_params>
             <output_params>
-                <param name="Module address" type="10" value="AddrD"/>
+                <param name="MODULE_ADDRESS" type="10" value="AddrD"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493796692933" operation="Equal" orientation="YesDown">
@@ -70,9 +70,9 @@
         <command type="ACTION_MODULE" id="1493796727119" module="OTD" command="GET_STATUS_WORD">
             <input_params/>
             <output_params>
-                <param name="Module after reset flag" type="10" value="IsReset"/>
-                <param name="Module has errors flag" type="10" value="HasErr"/>
-                <param name="Module ready flag" type="10" value="IsReady"/>
+                <param name="MODULE_AFTER_RESET" type="10" value="IsReset"/>
+                <param name="MODULE_HAS_ERRORS" type="10" value="HasErr"/>
+                <param name="MODULE_READY" type="10" value="IsReady"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493796761760" operation="Greater" orientation="YesDown">

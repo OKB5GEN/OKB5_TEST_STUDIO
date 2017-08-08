@@ -10,18 +10,18 @@ class DRAKON: public QObject
 public:
     enum IconType
     {
-        TERMINATOR,
-        BRANCH_BEGIN,
-        GO_TO_BRANCH,
-        ACTION_MATH,
-        DELAY,
-        CONDITION,
-        CYCLE,
-        SELECT_STATE,
         ACTION_MODULE,
         SUBPROGRAM,
+        BRANCH_BEGIN,
+        GO_TO_BRANCH,
+        SELECT_STATE,
+        CONDITION,
+        CYCLE,
+        ACTION_MATH,
+        DELAY,
         OUTPUT,
         PARALLEL_PROCESS,
+        TERMINATOR,
 
         // NOT IMPLEMENTED (NOT PLANNED YET)
 //        SWITCH,

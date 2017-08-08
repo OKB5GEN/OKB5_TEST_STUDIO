@@ -1574,8 +1574,8 @@ void ShapeItem::createValencyPoints(Command* cmd)
                                  DRAKON::CYCLE,
                                  DRAKON::ACTION_MODULE,
                                  DRAKON::SUBPROGRAM,
-                                 DRAKON::OUTPUT,
-                                 DRAKON::PARALLEL_PROCESS
+                                 DRAKON::OUTPUT//,
+                                 //DRAKON::PARALLEL_PROCESS
                                });
 
     auto createValencyPoint = [this, &defaultInsertable](const QPointF& pos, int role)

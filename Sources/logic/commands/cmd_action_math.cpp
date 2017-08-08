@@ -194,7 +194,7 @@ void CmdActionMath::updateText()
     bool isValid = true;
 
     mText += mOperands[Result].variable;
-    mText += "=";
+    mText += " = ";
 
     switch (mOperands[Operand1].type)
     {
@@ -215,16 +215,16 @@ void CmdActionMath::updateText()
         switch (mOperation)
         {
         case Add:
-            mText += "+";
+            mText += " + ";
             break;
         case Subtract:
-            mText += "-";
+            mText += " - ";
             break;
         case Multiply:
-            mText += "*";
+            mText += " * ";
             break;
         case Divide:
-            mText += ":";
+            mText += " : ";
             break;
         default:
             break;

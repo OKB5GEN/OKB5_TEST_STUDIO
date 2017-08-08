@@ -35,15 +35,15 @@
         <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
         <command type="ACTION_MODULE" id="1492065923408" module="MKO" command="SEND_COMMAND_ARRAY">
             <input_params>
-                <param name="Max current (Nu)" type="10" value="MaxI"/>
-                <param name="Max current (Psy)" type="10" value="MaxI"/>
-                <param name="Mode (Nu)" type="10" value="Mode"/>
-                <param name="Mode (Psy)" type="10" value="Mode"/>
-                <param name="Steps (Nu)" type="10" value="Steps"/>
-                <param name="Steps (Psy)" type="10" value="Steps"/>
-                <param name="Velocity (Nu)" type="10" value="MaxV"/>
-                <param name="Velocity (Psy)" type="10" value="MaxV"/>
-                <param name="Subaddress" type="2" value="0"/>
+                <param name="CURRENT_NU" type="10" value="MaxI"/>
+                <param name="CURRENT_PSY" type="10" value="MaxI"/>
+                <param name="MODE_NU" type="10" value="Mode"/>
+                <param name="MODE_PSY" type="10" value="Mode"/>
+                <param name="STEPS_NU" type="10" value="Steps"/>
+                <param name="STEPS_PSY" type="10" value="Steps"/>
+                <param name="VELOCITY_NU" type="10" value="MaxV"/>
+                <param name="VELOCITY_PSY" type="10" value="MaxV"/>
+                <param name="SUBADDRESS" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
@@ -51,41 +51,41 @@
         <command type="GO_TO_BRANCH" id="1492066042377"/>
         <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY">
             <input_params>
-                <param name="Subaddress" type="2" value="0"/>
+                <param name="SUBADDRESS" type="2" value="0"/>
             </input_params>
             <output_params>
-                <param name="Angle (Nu)" type="10" value="NuA"/>
-                <param name="Angle (Psy)" type="10" value="PsyA"/>
-                <param name="Max current (Nu)" type="10" value="NuI"/>
-                <param name="Max current (Psy)" type="10" value="PsyI"/>
-                <param name="Mode (Nu)" type="10" value="NuM"/>
-                <param name="Mode (Psy)" type="10" value="PsyM"/>
-                <param name="Steps (Nu)" type="10" value="NuS"/>
-                <param name="Steps (Psy)" type="10" value="PsyS"/>
-                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
-                <param name="Temperature, °C" type="10" value="T"/>
-                <param name="Velocity (Nu)" type="10" value="NuV"/>
-                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+                <param name="ANGLE_NU" type="10" value="NuA"/>
+                <param name="ANGLE_PSY" type="10" value="PsyA"/>
+                <param name="CURRENT_NU" type="10" value="NuI"/>
+                <param name="CURRENT_PSY" type="10" value="PsyI"/>
+                <param name="MODE_NU" type="10" value="NuM"/>
+                <param name="MODE_PSY" type="10" value="PsyM"/>
+                <param name="STEPS_NU" type="10" value="NuS"/>
+                <param name="STEPS_PSY" type="10" value="PsyS"/>
+                <param name="SENSOR_FLAG" type="10" value="TSF"/>
+                <param name="TEMPERATURE" type="10" value="T"/>
+                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="VELOCITY_PSY" type="10" value="PsyV"/>
             </output_params>
         </command>
         <command type="DELAY" id="1492066130784" delay="10000"/>
         <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY">
             <input_params>
-                <param name="Subaddress" type="2" value="0"/>
+                <param name="SUBADDRESS" type="2" value="0"/>
             </input_params>
             <output_params>
-                <param name="Angle (Nu)" type="10" value="NuA"/>
-                <param name="Angle (Psy)" type="10" value="PsyA"/>
-                <param name="Max current (Nu)" type="10" value="NuI"/>
-                <param name="Max current (Psy)" type="10" value="PsyI"/>
-                <param name="Mode (Nu)" type="10" value="NuM"/>
-                <param name="Mode (Psy)" type="10" value="PsyM"/>
-                <param name="Steps (Nu)" type="10" value="NuS"/>
-                <param name="Steps (Psy)" type="10" value="PsyS"/>
-                <param name="Temp.Sensor Flag" type="10" value="TSF"/>
-                <param name="Temperature, °C" type="10" value="T"/>
-                <param name="Velocity (Nu)" type="10" value="NuV"/>
-                <param name="Velocity (Psy)" type="10" value="PsyV"/>
+                <param name="ANGLE_NU" type="10" value="NuA"/>
+                <param name="ANGLE_PSY" type="10" value="PsyA"/>
+                <param name="CURRENT_NU" type="10" value="NuI"/>
+                <param name="CURRENT_PSY" type="10" value="PsyI"/>
+                <param name="MODE_NU" type="10" value="NuM"/>
+                <param name="MODE_PSY" type="10" value="PsyM"/>
+                <param name="STEPS_NU" type="10" value="NuS"/>
+                <param name="STEPS_PSY" type="10" value="PsyS"/>
+                <param name="SENSOR_FLAG" type="10" value="TSF"/>
+                <param name="TEMPERATURE" type="10" value="T"/>
+                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="VELOCITY_PSY" type="10" value="PsyV"/>
             </output_params>
         </command>
         <command type="ACTION_MATH" id="1492066322026" operation="Assign">

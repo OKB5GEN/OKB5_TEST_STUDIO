@@ -32,15 +32,15 @@
         <command type="GO_TO_BRANCH" id="1492067755764" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
         <command type="ACTION_MODULE" id="1492067766840" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="MKO" command="SEND_COMMAND_ARRAY">
             <input_params>
-                <param name="Max current (Nu)" type="10" value="MaxI"/>
-                <param name="Max current (Psy)" type="10" value="MaxI"/>
-                <param name="Mode (Nu)" type="10" value="Mode"/>
-                <param name="Mode (Psy)" type="10" value="Mode"/>
-                <param name="Steps (Nu)" type="10" value="Steps"/>
-                <param name="Steps (Psy)" type="10" value="Steps"/>
-                <param name="Subaddress" type="6" value="0"/>
-                <param name="Velocity (Nu)" type="10" value="MaxV"/>
-                <param name="Velocity (Psy)" type="10" value="MaxV"/>
+                <param name="CURRENT_NU" type="10" value="MaxI"/>
+                <param name="CURRENT_PSY" type="10" value="MaxI"/>
+                <param name="MODE_NU" type="10" value="Mode"/>
+                <param name="MODE_PSY" type="10" value="Mode"/>
+                <param name="STEPS_NU" type="10" value="Steps"/>
+                <param name="STEPS_PSY" type="10" value="Steps"/>
+                <param name="SUBADDRESS" type="6" value="0"/>
+                <param name="VELOCITY_NU" type="10" value="MaxV"/>
+                <param name="VELOCITY_PSY" type="10" value="MaxV"/>
             </input_params>
             <output_params/>
         </command>

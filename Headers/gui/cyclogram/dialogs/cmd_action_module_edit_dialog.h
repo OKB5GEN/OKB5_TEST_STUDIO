@@ -30,7 +30,7 @@ private slots:
 
 private:
     void setupUI();
-    void addCommand(int commandID, const QMap<QString, QVariant>& implicitParams = QMap<QString,QVariant>());
+    void addCommand(int commandID, const QMap<uint32_t, QVariant>& implicitInputParams = QMap<uint32_t, QVariant>());
     void addOKBCommonCommands();
     void addPowerUnitCommonCommands();
     bool eventFilter(QObject *obj, QEvent *event) override;

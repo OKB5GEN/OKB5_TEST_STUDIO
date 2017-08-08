@@ -230,22 +230,22 @@ void CmdQuestion::updateText()
     switch (mOperation)
     {
     case Greater:
-        mText += ">";
+        mText += " > ";
         break;
     case Less:
-        mText += "<";
+        mText += " < ";
         break;
     case Equal:
-        mText += "==";
+        mText += " == ";
         break;
     case GreaterOrEqual:
-        mText += ">=";
+        mText += " >= ";
         break;
     case LessOrEqual:
-        mText += "<=";
+        mText += " <= ";
         break;
     case NotEqual:
-        mText += "!=";
+        mText += " != ";
         break;
     default:
         isValid = false;

@@ -15,17 +15,17 @@ public:
 
     void run() override;
 
-    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out);
+    void setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<uint32_t, QVariant>& in, const QMap<uint32_t, QVariant>& out);
 
     uint32_t operation() const;
     ModuleCommands::ModuleID module() const;
-    const QMap<QString, QVariant>& inputParams() const;
-    const QMap<QString, QVariant>& outputParams() const;
+    const QMap<uint32_t, QVariant>& inputParams() const;
+    const QMap<uint32_t, QVariant>& outputParams() const;
 
     QString moduleName(bool isFullName) const;
     static QString moduleName(int moduleId, bool isFullName);
 
-    QString commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams = QMap<QString, QVariant>()) const;
+    QString commandName(uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams = QMap<uint32_t, QVariant>()) const;
 
 protected:
     bool loadFromImpl(Command* other) override;
@@ -46,7 +46,7 @@ private:
     ModuleCommands::ModuleID mModule;
     uint32_t mOperation;
 
-    QMap<QString, QVariant> mInputParams;
-    QMap<QString, QVariant> mOutputParams;
+    QMap<uint32_t, QVariant> mInputParams;
+    QMap<uint32_t, QVariant> mOutputParams;
 };
 #endif // CMD_ACTION_MODULE_H

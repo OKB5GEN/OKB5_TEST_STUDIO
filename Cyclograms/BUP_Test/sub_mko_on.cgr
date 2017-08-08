@@ -12,23 +12,23 @@
         <command type="TERMINATOR" id="1491893961476" name="FINISH" cmd_type="END"/>
         <command type="ACTION_MODULE" id="1492075429516" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="2" value="1"/>
-                <param name="Power State" type="2" value="1"/>
+                <param name="CHANNEL_ID" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1492075441193" delay="200"/>
         <command type="ACTION_MODULE" id="1492075934308" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="2" value="1"/>
-                <param name="Power State" type="2" value="0"/>
+                <param name="CHANNEL_ID" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1492075938267" delay="3000"/>
         <command type="ACTION_MODULE" id="1492075940971" module="MKO" command="START_MKO" implicit_params="0">
             <input_params>
-                <param name="Subaddress" type="2" value="0"/>
+                <param name="SUBADDRESS" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>

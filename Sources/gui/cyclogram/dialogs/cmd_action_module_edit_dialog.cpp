@@ -188,37 +188,35 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         {
             addPowerUnitCommonCommands();
 
-            // hack for power supply commands mofin from STM to Power Unit >>>
-            QMap<QString, QVariant> implicitParams;
-            QString channelIDName = sysState->paramName(SystemState::CHANNEL_ID);
-            QString powerStateName = sysState->paramName(SystemState::POWER_STATE);
+            // hack for power supply commands moving from STM to Power Unit >>>
+            QMap<uint32_t, QVariant> implicitParams;
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
             addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
             addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_MAIN));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             addCommand(ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 1, 2, 3, 4 only?
@@ -230,50 +228,48 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addPowerUnitCommonCommands();
 
             // hack for power supply commands mofin from STM to Power Unit >>>
-            QMap<QString, QVariant> implicitParams;
-            QString channelIDName = sysState->paramName(SystemState::CHANNEL_ID);
-            QString powerStateName = sysState->paramName(SystemState::POWER_STATE);
+            QMap<uint32_t, QVariant> implicitParams;
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
             addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
             addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
             addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
             addCommand(ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 5, 6, 7, 8 only?
@@ -282,15 +278,15 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::MKO:
         {
-            QMap<QString, QVariant> implicitParamsPsy;
-            QMap<QString, QVariant> implicitParamsNu;
-            QMap<QString, QVariant> implicitParamsAngleSensorMain;
-            QMap<QString, QVariant> implicitParamsAngleSensorReserve;
-            QString paramName = sysState->paramName(SystemState::SUBADDRESS);
-            implicitParamsPsy[paramName] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
-            implicitParamsNu[paramName] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
-            implicitParamsAngleSensorMain[paramName] = QVariant(int(ModuleMKO::PS_FROM_MAIN_KIT));
-            implicitParamsAngleSensorReserve[paramName] = QVariant(int(ModuleMKO::PS_FROM_RESERVE_KIT));
+            QMap<uint32_t, QVariant> implicitParamsPsy;
+            QMap<uint32_t, QVariant> implicitParamsNu;
+            QMap<uint32_t, QVariant> implicitParamsAngleSensorMain;
+            QMap<uint32_t, QVariant> implicitParamsAngleSensorReserve;
+
+            implicitParamsPsy[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::PSY_CHANNEL_SUBADDRESS));
+            implicitParamsNu[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::NU_CHANNEL_SUBADDRESS));
+            implicitParamsAngleSensorMain[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::PS_FROM_MAIN_KIT));
+            implicitParamsAngleSensorReserve[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::PS_FROM_RESERVE_KIT));
 
             addCommand(ModuleCommands::START_MKO);
             addCommand(ModuleCommands::STOP_MKO);
@@ -313,36 +309,34 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             addCommand(ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorReserve);
 
             // hack for power supply commands mofin from STM to MKO >>>
-            QMap<QString, QVariant> implicitParams;
-            QString channelIDName = sysState->paramName(SystemState::CHANNEL_ID);
-            QString powerStateName = sysState->paramName(SystemState::POWER_STATE);
+            QMap<uint32_t, QVariant> implicitParams;
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
             addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
             addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_ON));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
             addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_1));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
-            implicitParams[channelIDName] = QVariant(int(ModuleCommands::MKO_2));
-            implicitParams[powerStateName] = QVariant(int(ModuleCommands::POWER_OFF));
+            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
+            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
             addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
         }
         break;
@@ -357,11 +351,10 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::OTD:
         {
-            QMap<QString, QVariant> implicitParams1;
-            QMap<QString, QVariant> implicitParams2;
-            QString sensorID = sysState->paramName(SystemState::SENSOR_NUMBER);
-            implicitParams1[sensorID] = QVariant(int(1));
-            implicitParams2[sensorID] = QVariant(int(2));
+            QMap<uint32_t, QVariant> implicitParams1;
+            QMap<uint32_t, QVariant> implicitParams2;
+            implicitParams1[SystemState::SENSOR_NUMBER] = QVariant(int(1));
+            implicitParams2[SystemState::SENSOR_NUMBER] = QVariant(int(2));
 
             addOKBCommonCommands();
 
@@ -424,7 +417,9 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             continue;
         }
 
-        const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
+        QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+
+        const QMap<uint32_t, QVariant>& inputParams = mCommand->inputParams();
         QMap<QString, QVariant> implicitParams = item->data(Qt::UserRole + 1).toMap();
         if (implicitParams.empty())
         {
@@ -435,7 +430,8 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
         bool allEqual = true;
         for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
         {
-            auto iter = inputParams.find(it.key());
+            uint32_t id = params.keyToValue(qPrintable(it.key()));
+            auto iter = inputParams.find(id);
             if (iter == inputParams.end())
             {
                 allEqual = false;
@@ -459,17 +455,13 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
 void CmdActionModuleEditDialog::addOKBCommonCommands()
 {
-    SystemState* sysState = mCommand->systemState();
+    QMap<uint32_t, QVariant> implicitParams;
 
-    QMap<QString, QVariant> implicitParams;
-    QString addressName = sysState->paramName(SystemState::MODULE_ADDRESS);
-
-    implicitParams.clear();
-    implicitParams[addressName] = QVariant(int(ModuleCommands::CURRENT));
+    implicitParams[SystemState::MODULE_ADDRESS] = QVariant(int(ModuleCommands::CURRENT));
     addCommand(ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
 
     implicitParams.clear();
-    implicitParams[addressName] = QVariant(int(ModuleCommands::DEFAULT));
+    implicitParams[SystemState::MODULE_ADDRESS] = QVariant(int(ModuleCommands::DEFAULT));
     addCommand(ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
 
     addCommand(ModuleCommands::GET_STATUS_WORD);
@@ -481,17 +473,26 @@ void CmdActionModuleEditDialog::addOKBCommonCommands()
     //3. Echo
 }
 
-void CmdActionModuleEditDialog::addCommand(int commandID, const QMap<QString, QVariant>& implicitParams)
+void CmdActionModuleEditDialog::addCommand(int commandID, const QMap<uint32_t, QVariant>& implicitInputParams)
 {
-    QString fullText = mCommand->commandName(commandID, implicitParams);
+    QString fullText = mCommand->commandName(commandID, implicitInputParams);
 
     QListWidgetItem* item = new QListWidgetItem();
     item->setText(fullText);
     item->setData(Qt::UserRole, QVariant(commandID));
 
-    if (!implicitParams.isEmpty())
+    if (!implicitInputParams.isEmpty())
     {
-        item->setData(Qt::UserRole + 1, QVariant(implicitParams));
+        QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+        QMap<QString, QVariant> impl;
+
+        for (auto it = implicitInputParams.begin(); it != implicitInputParams.end(); ++it)
+        {
+            QString str = params.valueToKey(it.key());
+            impl[str] = it.value();
+        }
+
+        item->setData(Qt::UserRole + 1, QVariant(impl));
     }
 
     if (SystemState::isSetter(ModuleCommands::CommandID(commandID)))
@@ -536,23 +537,27 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
     mCommandID = commandsListWidget->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
-    int inCount = system->paramsCount(mModuleID, mCommandID, true);
-    int outCount = system->paramsCount(mModuleID, mCommandID, false);
+    QSet<uint32_t> inParams = system->inputParams(mModuleID, mCommandID);
+    QSet<uint32_t> outParams = system->outputParams(mModuleID, mCommandID);
 
-    mInParams->setRowCount(inCount);
-    mOutParams->setRowCount(outCount);
+    mInParams->setRowCount(inParams.size());
+    mOutParams->setRowCount(outParams.size());
 
-    //mInParams->setVisible(inCount > 0);
-    //mOutParams->setVisible(outCount > 0);
-
-    for (int i = 0; i < inCount; ++i)
+    int i = 0;
+    for (auto it = inParams.begin(); it != inParams.end(); ++it)
     {
+        QString name = system->paramData(SystemState::ParamID(*it)).name;
+
+        QTableWidgetItem* item = new QTableWidgetItem(name);
+        item->setData(Qt::UserRole, *it);
+        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+        mInParams->setItem(i, 0, item);
+
         // param name
-        QString name = system->paramName(mModuleID, mCommandID, i, true);
-        QLabel* text = new QLabel(mInParams);
-        text->setTextInteractionFlags(Qt::NoTextInteraction);
-        text->setText(name);
-        mInParams->setCellWidget(i, 0, text);
+//        QLabel* text = new QLabel(mInParams);
+//        text->setTextInteractionFlags(Qt::NoTextInteraction);
+//        text->setText(name);
+//        mInParams->setCellWidget(i, 0, text);
 
         // "use variable input" button
         QCheckBox* varSelectBtn = new QCheckBox(mInParams);
@@ -593,6 +598,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         default:
             break;
         }
+
         valueEdit->setText(defaultValue);
 
         mInParams->setCellWidget(i, 4, valueEdit);
@@ -601,9 +607,11 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
-            const QMap<QString, QVariant>& inputParams = mCommand->inputParams();
-            auto it = inputParams.find(name);
-            if (it != inputParams.end() && !system->isImplicit(name))
+            const QMap<uint32_t, QVariant>& inputParams = mCommand->inputParams();
+            QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+            uint32_t id = params.keyToValue(qPrintable(name));
+            auto it = inputParams.find(id);
+            if (it != inputParams.end() && !system->isImplicit(SystemState::ParamID(id)))
             {
                 if (it.value().type() == QMetaType::QString)
                 {
@@ -628,15 +636,25 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         valueSelectBtn->setChecked(!isVariable);
         comboBox->setEnabled(isVariable);
         varSelectBtn->setChecked(isVariable);
+
+        ++i;
     }
 
-    for (int i = 0; i < outCount; ++i)
+    i = 0;
+    for (auto it = outParams.begin(); it != outParams.end(); ++it)
     {
-        QString name = system->paramName(mModuleID, mCommandID, i, false);
-        QLabel* text = new QLabel(mOutParams);
-        text->setTextInteractionFlags(Qt::NoTextInteraction);
-        text->setText(name);
-        mOutParams->setCellWidget(i, 0, text);
+//        QString name = system->paramName(mModuleID, mCommandID, i, false);
+//        QLabel* text = new QLabel(mOutParams);
+//        text->setTextInteractionFlags(Qt::NoTextInteraction);
+//        text->setText(name);
+//        mOutParams->setCellWidget(i, 0, text);
+
+        QString name = system->paramData(SystemState::ParamID(*it)).name;
+
+        QTableWidgetItem* item = new QTableWidgetItem(name);
+        item->setData(Qt::UserRole, *it);
+        item->setFlags(item->flags() ^ Qt::ItemIsEditable);
+        mOutParams->setItem(i, 0, item);
 
         QComboBox* comboBox = new QComboBox(mOutParams);
         comboBox->installEventFilter(this);
@@ -648,9 +666,12 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
-            const QMap<QString, QVariant>& outputParams = mCommand->outputParams();
-            auto it = outputParams.find(name);
-            if (it != outputParams.end() && !system->isImplicit(name))
+            const QMap<uint32_t, QVariant>& outputParams = mCommand->outputParams();
+            QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+            uint32_t id = params.keyToValue(qPrintable(name));
+
+            auto it = outputParams.find(id);
+            if (it != outputParams.end() && !system->isImplicit(SystemState::ParamID(id)))
             {
                 int index = comboBox->findText(it.value().toString()); // output params are always variables
                 if (index != -1) // add default variable name, corresponding to this paramID
@@ -663,19 +684,19 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         }
         else
         {
-            QString defaultParamName = system->paramDefaultVarName(system->paramID(name));
+            QString defaultParamName = system->paramData(SystemState::ParamID(*it)).variable;
             QString defaultVarName = CmdActionModule::moduleName(mModuleID, false) + "_" + defaultParamName;
 
             comboBox->addItem(defaultVarName);
             comboBox->addItem(TextEditDialog::addVarText());
             comboBox->setCurrentIndex(comboBox->count() - 2); // set default genarated name by default
         }
+
+        ++i;
     }
 
     mInParams->resizeColumnToContents(1);
     mInParams->resizeColumnToContents(3);
-
-    //adjustSize();
 }
 
 void CmdActionModuleEditDialog::onAccept()
@@ -686,21 +707,20 @@ void CmdActionModuleEditDialog::onAccept()
         return;
     }
 
-    QMap<QString, QVariant> input;
-    QMap<QString, QVariant> output;
+    QMap<uint32_t, QVariant> input;
+    QMap<uint32_t, QVariant> output;
 
     SystemState* system = mCommand->systemState();
-    int inCount = system->paramsCount(mModuleID, mCommandID, true);
-    int outCount = system->paramsCount(mModuleID, mCommandID, false);
+    QSet<uint32_t> inParams = system->inputParams(mModuleID, mCommandID);
+    QSet<uint32_t> outParams = system->outputParams(mModuleID, mCommandID);
+
+    int inCount = inParams.size();
+    int outCount = outParams.size();
 
     for (int i = 0; i < inCount; ++i)
     {
-        QLabel* label = qobject_cast<QLabel*>(mInParams->cellWidget(i, 0));
-        QString name;
-        if (label)
-        {
-            name = label->text();
-        }
+        QTableWidgetItem* item = mInParams->item(i, 0);
+        uint32_t id = item->data(Qt::UserRole).toInt();
 
         QCheckBox* varSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 1));
         //QCheckBox* valueSelectBtn = qobject_cast<QCheckBox*>(mInParams->cellWidget(i, 3));
@@ -713,7 +733,7 @@ void CmdActionModuleEditDialog::onAccept()
             QComboBox* comboBox = qobject_cast<QComboBox*>(mInParams->cellWidget(i, 2));
             if (comboBox)
             {
-                input[name] = comboBox->currentText();
+                input[id] = comboBox->currentText();
             }
         }
         else
@@ -721,19 +741,15 @@ void CmdActionModuleEditDialog::onAccept()
             QLineEdit* valueText = qobject_cast<QLineEdit*>(mInParams->cellWidget(i, 4));
             if (valueText)
             {
-                input[name] = valueText->text().toDouble();
+                input[id] = valueText->text().toDouble();
             }
         }
     }
 
     for (int i = 0; i < outCount; ++i)
     {
-        QString name;
-        QLabel* label = qobject_cast<QLabel*>(mOutParams->cellWidget(i, 0));
-        if (label)
-        {
-            name = label->text();
-        }
+        QTableWidgetItem* item = mOutParams->item(i, 0);
+        uint32_t id = item->data(Qt::UserRole).toInt();
 
         QComboBox* comboBox = qobject_cast<QComboBox*>(mOutParams->cellWidget(i, 1));
         if (comboBox)
@@ -750,12 +766,14 @@ void CmdActionModuleEditDialog::onAccept()
                 }
 
                 vc->addVariable(variableName, value);
-                QString desc = system->paramDefaultDesc(system->paramID(name));
+                QString desc = system->paramData(SystemState::ParamID(id)).description;
                 vc->setDescription(variableName, desc);
             }
 
-            output[name] = variableName;
+            output[id] = variableName;
         }
+
+        ++i;
     }
 
     // add implicit params to command input params
@@ -772,10 +790,12 @@ void CmdActionModuleEditDialog::onAccept()
         return;
     }
 
-    QMap<QString,QVariant> implicitParams = items.back()->data(Qt::UserRole + 1).toMap();
+    QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+    QMap<QString, QVariant> implicitParams = items.back()->data(Qt::UserRole + 1).toMap();
     for (auto it = implicitParams.begin(); it != implicitParams.end(); ++it)
     {
-        input[it.key()] = it.value();
+        uint32_t id = params.keyToValue(qPrintable(it.key()));
+        input[id] = it.value();
     }
 
     mCommand->setParams((ModuleCommands::ModuleID)mModuleID, (ModuleCommands::CommandID)mCommandID, input, output);

@@ -26,8 +26,8 @@
         <command type="ACTION_MODULE" id="1493724109576" module="STM" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="Logic.status" type="10" value="LActive"/>
-                <param name="Phys.status" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
+                <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493724128025" operation="Greater" orientation="YesDown">
@@ -45,70 +45,70 @@
         <command type="GO_TO_BRANCH" id="1493724351619"/>
         <command type="ACTION_MODULE" id="1493724384673" module="STM" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
-                <param name="Logic.status" type="6" value="1"/>
+                <param name="STATUS_LOGICAL" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493724432484" module="STM" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
-                <param name="Logic.status" type="6" value="0"/>
+                <param name="STATUS_LOGICAL" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493726855068" module="STM" command="GET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="1"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_BUPM"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_BUPM"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726868563" module="STM" command="GET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="2"/>
+                <param name="CHANNEL_ID" type="6" value="2"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_BUPR"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_BUPR"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726894719" module="STM" command="GET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="4"/>
+                <param name="CHANNEL_ID" type="6" value="4"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_H1"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_H1"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726906786" module="STM" command="GET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="5"/>
+                <param name="CHANNEL_ID" type="6" value="5"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_H2"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_H2"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726915844" module="STM" command="GET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="6"/>
+                <param name="CHANNEL_ID" type="6" value="6"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_POW"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_POW"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726930091" module="STM" command="GET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="1"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_MKOM"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_MKOM"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493726942334" module="STM" command="GET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="2"/>
+                <param name="CHANNEL_ID" type="6" value="2"/>
             </input_params>
             <output_params>
-                <param name="Relay state" type="10" value="IsOn_MKOR"/>
+                <param name="RELAY_STATE" type="10" value="IsOn_MKOR"/>
             </output_params>
         </command>
         <command type="CONDITION" id="1493726969692" operation="Greater" orientation="YesDown">
@@ -134,35 +134,35 @@
         <command type="ACTION_MODULE" id="1493726999125" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="Channel" type="6" value="1"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493727002107" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="2"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="2"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493727004964" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="4"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="4"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493727007277" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="5"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="5"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493727012604" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="6"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="6"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
@@ -176,48 +176,48 @@
         </command>
         <command type="ACTION_MODULE" id="1493727202555" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="1"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="1"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493727204823" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="2"/>
-                <param name="Power State" type="6" value="1"/>
+                <param name="CHANNEL_ID" type="6" value="2"/>
+                <param name="POWER_STATE" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493728392996" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="1"/>
-                <param name="Power State" type="6" value="0"/>
+                <param name="CHANNEL_ID" type="6" value="1"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1493728427252" delay="2000"/>
         <command type="ACTION_MODULE" id="1493728440331" module="STM" command="SET_MKO_POWER_CHANNEL_STATE">
             <input_params>
-                <param name="Channel" type="6" value="2"/>
-                <param name="Power State" type="6" value="0"/>
+                <param name="CHANNEL_ID" type="6" value="2"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="DELAY" id="1493728450074" delay="2000"/>
         <command type="ACTION_MODULE" id="1493796620335" module="STM" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="6" value="1"/>
+                <param name="MODULE_ADDRESS" type="6" value="1"/>
             </input_params>
             <output_params>
-                <param name="Module address" type="10" value="AddrC"/>
+                <param name="MODULE_ADDRESS" type="10" value="AddrC"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493796667143" module="STM" command="GET_MODULE_ADDRESS">
             <input_params>
-                <param name="Module address" type="6" value="2"/>
+                <param name="MODULE_ADDRESS" type="6" value="2"/>
             </input_params>
             <output_params>
-                <param name="Module address" type="10" value="AddrD"/>
+                <param name="MODULE_ADDRESS" type="10" value="AddrD"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493796692933" operation="Equal" orientation="YesDown">
@@ -228,9 +228,9 @@
         <command type="ACTION_MODULE" id="1493796727119" module="STM" command="GET_STATUS_WORD">
             <input_params/>
             <output_params>
-                <param name="Module after reset flag" type="10" value="IsReset"/>
-                <param name="Module has errors flag" type="10" value="HasErr"/>
-                <param name="Module ready flag" type="10" value="IsReady"/>
+                <param name="MODULE_AFTER_RESET" type="10" value="IsReset"/>
+                <param name="MODULE_HAS_ERRORS" type="10" value="HasErr"/>
+                <param name="MODULE_READY" type="10" value="IsReady"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493796761760" operation="Greater" orientation="YesDown">

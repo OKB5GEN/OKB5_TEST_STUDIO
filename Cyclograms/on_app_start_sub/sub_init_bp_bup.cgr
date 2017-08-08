@@ -23,8 +23,8 @@
         <command type="ACTION_MODULE" id="1493369532085" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="Logic.status" type="10" value="LActive"/>
-                <param name="Phys.status" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
+                <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493369544813" operation="Greater" orientation="YesDown">
@@ -52,70 +52,70 @@
         </command>
         <command type="ACTION_MODULE" id="1493369642029" module="POWER_UNIT_BUP" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
-                <param name="Logic.status" type="6" value="1"/>
+                <param name="STATUS_LOGICAL" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493374542245" module="POWER_UNIT_BUP" command="GET_DEVICE_CLASS">
             <input_params/>
             <output_params>
-                <param name="Device class" type="10" value="Class"/>
+                <param name="DEVICE_CLASS" type="10" value="Class"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374606206" module="POWER_UNIT_BUP" command="GET_NOMINAL_VOLTAGE">
             <input_params/>
             <output_params>
-                <param name="Voltage, V" type="10" value="Unom"/>
+                <param name="VOLTAGE, V" type="10" value="Unom"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374618887" module="POWER_UNIT_BUP" command="GET_NOMINAL_CURRENT">
             <input_params/>
             <output_params>
-                <param name="Current, A" type="10" value="Inom"/>
+                <param name="CURRENT" type="10" value="Inom"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374630849" module="POWER_UNIT_BUP" command="GET_NOMINAL_POWER">
             <input_params/>
             <output_params>
-                <param name="Power, W" type="10" value="Pnom"/>
+                <param name="POWER" type="10" value="Pnom"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374718052" module="POWER_UNIT_BUP" command="GET_VOLTAGE_AND_CURRENT">
             <input_params/>
             <output_params>
-                <param name="Current, A" type="10" value="I"/>
-                <param name="Voltage, V" type="10" value="U"/>
+                <param name="CURRENT" type="10" value="I"/>
+                <param name="VOLTAGE" type="10" value="U"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374767469" module="POWER_UNIT_BUP" command="GET_OVP_THRESHOLD">
             <input_params/>
             <output_params>
-                <param name="Voltage, V" type="10" value="Uovp"/>
+                <param name="VOLTAGE" type="10" value="Uovp"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493374778886" module="POWER_UNIT_BUP" command="GET_OCP_THRESHOLD">
             <input_params/>
             <output_params>
-                <param name="Current, A" type="10" value="Iocp"/>
+                <param name="CURRENT" type="10" value="Iocp"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493376439131" module="POWER_UNIT_BUP" command="SET_OCP_THRESHOLD">
             <input_params>
-                <param name="Current, A" type="6" value="2"/>
+                <param name="CURRENT" type="6" value="2"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493376448964" module="POWER_UNIT_BUP" command="SET_OVP_THRESHOLD">
             <input_params>
-                <param name="Voltage, V" type="6" value="36"/>
+                <param name="VOLTAGE" type="6" value="36"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493377240756" module="POWER_UNIT_BUP" command="GET_VOLTAGE_AND_CURRENT">
             <input_params/>
             <output_params>
-                <param name="Current, A" type="10" value="I"/>
-                <param name="Voltage, V" type="10" value="U"/>
+                <param name="CURRENT" type="10" value="I"/>
+                <param name="VOLTAGE" type="10" value="U"/>
             </output_params>
         </command>
         <command type="ACTION_MODULE" id="1493377703523" module="POWER_UNIT_BUP" command="PSC_ACKNOWLEDGE_ALARMS">

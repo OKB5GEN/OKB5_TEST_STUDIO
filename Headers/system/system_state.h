@@ -1,8 +1,7 @@
 #ifndef SYSTEM_STATE_H
 #define SYSTEM_STATE_H
 
-#include <QMap>
-#include <QStringList>
+#include <QSet>
 
 #include "Headers/system/abstract_module.h"
 #include "Headers/module_commands.h"
@@ -22,6 +21,19 @@ class SystemState: public QObject
     Q_OBJECT
 
 public:
+    struct Param
+    {
+        QString name; // localized name (TODO on locale change)
+        QString variable; // default/generated name
+        QString description; // default/generated description
+    };
+
+    struct Command
+    {
+        QSet<uint32_t> inputParams;
+        QSet<uint32_t> outputParams;
+    };
+
     enum ParamID // command parameters
     {
         VOLTAGE,
@@ -68,22 +80,20 @@ public:
     SystemState(QObject* parent);
     ~SystemState();
 
+    static bool isSetter(ModuleCommands::CommandID command);
+
     void onApplicationStart();
     void onApplicationFinish();
 
-    QString paramName(int module, int command, int param, bool isInputParam) const;
-    int paramsCount(int module, int command, bool isInputParam) const;
-
-    static bool isSetter(ModuleCommands::CommandID command);
-
-    bool isImplicit(const QString& name) const;
-    ParamID paramID(const QString& name) const;
-    QString paramName(ParamID param) const;
-    QString paramDefaultVarName(ParamID param) const;
-    QString paramDefaultDesc(ParamID param) const;
-
     void sendCommand(CmdActionModule* command);
     void stop();
+
+    QSet<uint32_t> inputParams(int module, int command) const;
+    QSet<uint32_t> outputParams(int module, int command) const;
+
+    Param paramData(ParamID param) const;
+
+    bool isImplicit(ParamID param) const;
 
 private slots:
     void processResponse(const Transaction& response);
@@ -112,6 +122,11 @@ private:
 
     AbstractModule* moduleByID(ModuleCommands::ModuleID moduleID) const;
 
+    void updateParams();
+
+    void addParam(uint32_t id, const QString& name, const QString& variable, const QString& description);
+    void addCommand(uint32_t id, std::initializer_list<uint32_t> input, std::initializer_list<uint32_t> output, QMap<uint32_t, Command>* commands);
+
     ModuleMKO* mMKO;
     ModuleOTD* mOTD;
     ModuleDriveSimulator* mDS;
@@ -120,14 +135,10 @@ private:
     ModulePower* mPowerBUP;
     ModulePower* mPowerPNA;
 
-    QMap<int, QStringList> mInParams[ModuleCommands::MODULES_COUNT];
-    QMap<int, QStringList> mOutParams[ModuleCommands::MODULES_COUNT];
+    QMap<uint32_t, Command> mCommands[ModuleCommands::MODULES_COUNT];
+    QMap<uint32_t, Param> mParams;
 
     CmdActionModule* mCurCommand;
-    //TODO unite strings and data to command params. Commands move to config
-    QMap<ParamID, QString> mParamNames;
-    QMap<ParamID, QString> mDefaultVariables;
-    QMap<ParamID, QString> mDefaultDescriptions;
 
     QTimer* mProtectionTimer; //TODO parallel process (сейчас SystemState не может обрабатывать команды параллельно!)
 };

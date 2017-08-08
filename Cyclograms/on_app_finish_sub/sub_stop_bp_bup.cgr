@@ -23,8 +23,8 @@
         <command type="ACTION_MODULE" id="1493369532085" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="Logic.status" type="10" value="LActive"/>
-                <param name="Phys.status" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
+                <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
             </output_params>
         </command>
         <command type="SELECT_STATE" id="1493369544813" operation="Greater" orientation="YesDown">

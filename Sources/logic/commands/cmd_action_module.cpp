@@ -54,12 +54,12 @@ void CmdActionModule::onCommandFinished(bool success)
     }
 }
 
-void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<QString, QVariant>& in, const QMap<QString, QVariant>& out)
+void CmdActionModule::setParams(ModuleCommands::ModuleID module, uint32_t operation, const QMap<uint32_t, QVariant>& in, const QMap<uint32_t, QVariant>& out)
 {
     ModuleCommands::ModuleID moduleBefore = mModule;
     uint32_t operationBefore = mOperation;
-    QMap<QString, QVariant> inBefore = mInputParams;
-    QMap<QString, QVariant> outBefore = mOutputParams;
+    QMap<uint32_t, QVariant> inBefore = mInputParams;
+    QMap<uint32_t, QVariant> outBefore = mOutputParams;
 
     mModule = module;
     mOperation = operation;
@@ -117,12 +117,12 @@ ModuleCommands::ModuleID CmdActionModule::module() const
     return mModule;
 }
 
-const QMap<QString, QVariant>& CmdActionModule::inputParams() const
+const QMap<uint32_t, QVariant>& CmdActionModule::inputParams() const
 {
     return mInputParams;
 }
 
-const QMap<QString, QVariant>& CmdActionModule::outputParams() const
+const QMap<uint32_t, QVariant>& CmdActionModule::outputParams() const
 {
     return mOutputParams;
 }
@@ -148,18 +148,18 @@ void CmdActionModule::updateText()
         }
     }
 
-    if (mInputParams.size() < mSystemState->paramsCount(mModule, mOperation, true))
+    if (mInputParams.size() < mSystemState->inputParams(mModule, mOperation).size())
     {
         isValid = false;
     }
 
-    if (mOutputParams.size() < mSystemState->paramsCount(mModule, mOperation, false))
+    if (mOutputParams.size() < mSystemState->outputParams(mModule, mOperation).size())
     {
         isValid = false;
     }
 
     mText += moduleNameImpl();
-    mText += ": "; // TODO Set/Get
+    mText += ": ";
     mText += commandName(mOperation, mInputParams);
 
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
@@ -193,8 +193,7 @@ QString CmdActionModule::moduleNameImpl() const
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
     case ModuleCommands::GET_POWER_CHANNEL_STATE:
         {
-            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = mInputParams.value(paramName).toInt();
+            int channel = mInputParams.value(SystemState::CHANNEL_ID).toInt();
 
             switch (channel)
             {
@@ -211,8 +210,7 @@ QString CmdActionModule::moduleNameImpl() const
         break;
     case ModuleCommands::GET_FUSE_STATE:
         {
-            QString paramName = mSystemState->paramName(SystemState::FUSE_ID);
-            int fuse = mInputParams.value(paramName).toInt();
+            int fuse = mInputParams.value(SystemState::FUSE_ID).toInt();
 
             if (fuse >= 1 && fuse <= 4)
             {
@@ -322,7 +320,7 @@ QString CmdActionModule::moduleName(int moduleId, bool isFullName)
     return text;
 }
 
-QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVariant>& inputParams) const
+QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams) const
 {
     // DCU - Drive Control Unit - БУП
     // DAD - Directional Antenna Drive - ПНА
@@ -338,10 +336,8 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
-            QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
-            QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
-            int channel = inputParams.value(paramName1).toInt();
-            int state = inputParams.value(paramName2).toInt();
+            int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = inputParams.value(SystemState::POWER_STATE).toInt();
 
             switch (channel)
             {
@@ -377,10 +373,8 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
-            QString paramName1 = mSystemState->paramName(SystemState::CHANNEL_ID);
-            QString paramName2 = mSystemState->paramName(SystemState::POWER_STATE);
-            int channel = inputParams.value(paramName1).toInt();
-            int state = inputParams.value(paramName2).toInt();
+            int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
+            int state = inputParams.value(SystemState::POWER_STATE).toInt();
 
             switch (channel)
             {
@@ -412,8 +406,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::GET_TEMPERATURE_PT100:
         {
-            QString paramName = mSystemState->paramName(SystemState::SENSOR_NUMBER);
-            int sensorID = inputParams.value(paramName).toInt();
+            int sensorID = inputParams.value(SystemState::SENSOR_NUMBER).toInt();
             text += tr("Temperature PT-100 #%1").arg(sensorID);
         }
         break;
@@ -427,7 +420,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         text += tr("DS1820 count at line 1");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
-        text += tr("DS1820 count at line 2)");
+        text += tr("DS1820 count at line 2");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_1:
         text += tr("Start DS1820 measurement at line 1");
@@ -455,28 +448,21 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL:
     case ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL:
-        {
-            QString line;
-            QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
-            int channel = inputParams.value(paramName).toInt();
-            if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
-            {
-                line += QString("ψ");
-            }
-            else
-            {
-                line += QString("υ");
-            }
-
-            text += tr("Test array (line %1)").arg(line);
-        }
-        break;
     case ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL:
     case ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL:
         {
+            QString arrayType;
+            if (commandID == ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL || commandID == ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL)
+            {
+                arrayType = tr("Test");
+            }
+            else
+            {
+                arrayType = tr("Command");
+            }
+
             QString line;
-            QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
-            int channel = inputParams.value(paramName).toInt();
+            int channel = inputParams.value(SystemState::SUBADDRESS).toInt();
             if (channel == ModuleMKO::PSY_CHANNEL_SUBADDRESS)
             {
                 line += QString("ψ");
@@ -486,13 +472,12 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
                 line += QString("υ");
             }
 
-            text += tr("Command array (line %1)").arg(line);
+            text += tr("%1 array (line %2)").arg(arrayType).arg(line);
         }
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
-            QString paramName = mSystemState->paramName(SystemState::SUBADDRESS);
-            int source = inputParams.value(paramName).toInt();
+            int source = inputParams.value(SystemState::SUBADDRESS).toInt();
             QString kitName;
             if (source == ModuleMKO::PS_FROM_MAIN_KIT)
             {
@@ -561,8 +546,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::GET_MKO_POWER_CHANNEL_STATE:
         {
-            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = inputParams.value(paramName).toInt();
+            int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
 
             QString kitName;
             switch (channel)
@@ -583,8 +567,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::GET_POWER_CHANNEL_STATE:
         {
-            QString paramName = mSystemState->paramName(SystemState::CHANNEL_ID);
-            int channel = inputParams.value(paramName).toInt();
+            int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
 
             switch (channel)
             {
@@ -610,8 +593,7 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<QString, QVa
         break;
     case ModuleCommands::GET_MODULE_ADDRESS:
         {
-            QString paramName = mSystemState->paramName(SystemState::MODULE_ADDRESS);
-            int address = inputParams.value(paramName).toInt();
+            int address = inputParams.value(SystemState::MODULE_ADDRESS).toInt();
 
             QString addressType;
             switch (address)
@@ -662,12 +644,14 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
     QMetaEnum command = QMetaEnum::fromType<ModuleCommands::CommandID>();
     writer->writeAttribute("command", command.valueToKey(mOperation));
 
+    QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+
     // input params
     writer->writeStartElement("input_params");
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
         writer->writeStartElement("param");
-        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("name", params.valueToKey(it.key()));
         writer->writeAttribute("type", QString::number(int(it.value().type())));
         writer->writeAttribute("value", it.value().toString());
         writer->writeEndElement();
@@ -680,7 +664,7 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
     for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
     {
         writer->writeStartElement("param");
-        writer->writeAttribute("name", it.key());
+        writer->writeAttribute("name", params.valueToKey(it.key()));
         writer->writeAttribute("type", QString::number(int(it.value().type())));
         writer->writeAttribute("value", it.value().toString());
         writer->writeEndElement();
@@ -706,6 +690,8 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
         mOperation = ModuleCommands::CommandID(command.keyToValue(qPrintable(str)));
     }
 
+    QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
+
     while (!(reader->tokenType() == QXmlStreamReader::EndElement && reader->name() == "command"))
     {
         if (reader->tokenType() == QXmlStreamReader::StartElement)
@@ -719,11 +705,12 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                     if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
                     {
                         attributes = reader->attributes();
-                        QString name;
+                        uint32_t id;
 
                         if (attributes.hasAttribute("name"))
                         {
-                            name = attributes.value("name").toString();
+                            QString str = attributes.value("name").toString();
+                            id = params.keyToValue(qPrintable(str));
                         }
 
                         int metaType = QMetaType::UnknownType;
@@ -737,16 +724,16 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                         {
                             if (metaType == QMetaType::QString)
                             {
-                                mInputParams[name] = attributes.value("value").toString();
+                                mInputParams[id] = attributes.value("value").toString();
                             }
                             else //if (metaType == QMetaType::Double)
                             {
-                                mInputParams[name] = attributes.value("value").toDouble();
+                                mInputParams[id] = attributes.value("value").toDouble();
                             }
 //                            else
 //                            {
 //                                LOG_ERROR(QString("Unexpected input param '%1' type %2").arg(name).arg(metaType));
-//                                mInputParams[name] = QVariant();
+//                                mInputParams[id] = QVariant();
 //                            }
                         }
                     }
@@ -761,44 +748,36 @@ void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
                     if (reader->tokenType() == QXmlStreamReader::StartElement && reader->name() == "param")
                     {
                         attributes = reader->attributes();
-                        QString name;
+                        uint32_t id;
 
                         if (attributes.hasAttribute("name"))
                         {
-                            name = attributes.value("name").toString();
+                            QString str = attributes.value("name").toString();
+                            id = params.keyToValue(qPrintable(str));
                         }
 
-                        if (attributes.hasAttribute("variable")) // for backward compatibility TODO remove
-                        {
-                            QString variable;
-                            variable = attributes.value("variable").toString();
-                            mOutputParams[name] = variable;
-                        }
-                        else
-                        {
-                            int metaType = QMetaType::UnknownType;
+                        int metaType = QMetaType::UnknownType;
 
-                            if (attributes.hasAttribute("type"))
+                        if (attributes.hasAttribute("type"))
+                        {
+                            metaType = attributes.value("type").toInt();
+                        }
+
+                        if (attributes.hasAttribute("value"))
+                        {
+                            if (metaType == QMetaType::QString)
                             {
-                                metaType = attributes.value("type").toInt();
+                                mOutputParams[id] = attributes.value("value").toString();
                             }
-
-                            if (attributes.hasAttribute("value"))
+                            else //if (metaType == QMetaType::Double)
                             {
-                                if (metaType == QMetaType::QString)
-                                {
-                                    mOutputParams[name] = attributes.value("value").toString();
-                                }
-                                else //if (metaType == QMetaType::Double)
-                                {
-                                    mOutputParams[name] = attributes.value("value").toDouble();
-                                }
+                                mOutputParams[id] = attributes.value("value").toDouble();
+                            }
 //                                else
 //                                {
 //                                    LOG_ERROR(QString("Unexpected output param '%1' type %2").arg(name).arg(metaType));
 //                                    mOutputParams[name] = QVariant();
 //                                }
-                            }
                         }
                     }
 

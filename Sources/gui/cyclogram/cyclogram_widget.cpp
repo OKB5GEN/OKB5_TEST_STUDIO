@@ -432,10 +432,14 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
 
     QMenu menu(this);
 
-    foreach (int command, point->insertableCommands())
+    for (int command = 0; command < DRAKON::SHAPES_COUNT; ++command)
     {
-        QAction* action = menu.addAction(actionTexts.value(command));
-        action->setData(command);
+        auto it = point->insertableCommands().find(command);
+        if (it != point->insertableCommands().end())
+        {
+            QAction* action = menu.addAction(actionTexts.value(command));
+            action->setData(command);
+        }
     }
 
     menu.addSeparator();
