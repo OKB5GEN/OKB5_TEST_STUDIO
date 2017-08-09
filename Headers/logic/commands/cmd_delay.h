@@ -19,13 +19,17 @@ public:
     void resume() override;
 #endif
 
+    void setDelay(const QString& variable);
     void setDelay(int hours, int minutes, int seconds, int msec);
     int delay() const; // milliseconds
+    const QString& variable() const; // milliseconds
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader) override;
     bool loadFromImpl(Command* other) override;
+    void onNameChanged(const QString& newName, const QString& oldName) override;
+    void onVariableRemoved(const QString& name) override;
 
 private slots:
     void finish();
@@ -37,5 +41,6 @@ private:
     QTimer* mTimer;
     int mDelay; // msec
     int mTimeLeft;
+    QString mVariable;
 };
 #endif // CMD_DELAY_H

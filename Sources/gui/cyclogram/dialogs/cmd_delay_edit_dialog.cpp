@@ -1,6 +1,8 @@
 #include "Headers/gui/cyclogram/dialogs/cmd_delay_edit_dialog.h"
 #include "Headers/logic/commands/cmd_delay.h"
 #include "Headers/gui/tools/console_text_widget.h"
+#include "Headers/logic/variable_controller.h"
+#include "Headers/logger/Logger.h"
 
 #include <QtWidgets>
 
@@ -12,23 +14,37 @@ CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
     mSeconds(0),
     mMSeconds(0)
 {
-    QGridLayout * layout = new QGridLayout(this);
+    QGridLayout * mainLayout = new QGridLayout(this);
 
-    mHSpin = addItem(layout, tr("Hours"), 0, 23, SLOT(onHoursChanged(int)));
-    mMSpin = addItem(layout, tr("Minutes"), 1, 59, SLOT(onMinutesChanged(int)));
-    mSSpin = addItem(layout, tr("Seconds"), 2, 59, SLOT(onSecondsChanged(int)));
-    mMSSpin = addItem(layout, tr("Milliseconds"), 3, 999, SLOT(onMilliSecondsChanged(int)));
+    QGroupBox* directValueBox = new QGroupBox(tr("Direct value"), this);
+    QGridLayout * directValLayout = new QGridLayout(directValueBox);
+    mHSpin = addItem(directValLayout, tr("Hours"), 0, 23, SLOT(onHoursChanged(int)));
+    mMSpin = addItem(directValLayout, tr("Minutes"), 1, 59, SLOT(onMinutesChanged(int)));
+    mSSpin = addItem(directValLayout, tr("Seconds"), 2, 59, SLOT(onSecondsChanged(int)));
+    mMSSpin = addItem(directValLayout, tr("Milliseconds"), 3, 999, SLOT(onMilliSecondsChanged(int)));
+    QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    directValLayout->addItem(spacer, 4, 0, -1, -1);
+    directValueBox->setLayout(directValLayout);
+    mainLayout->addWidget(directValueBox, 0, 0);
+
+    QGroupBox* variableBox = new QGroupBox(tr("Variable"), this);
+    QVBoxLayout* varLayout = new QVBoxLayout(variableBox);
+    mVariablesList = new QListWidget(this);
+    mVariablesList->setSelectionMode(QAbstractItemView::SingleSelection);
+    varLayout->addWidget(mVariablesList);
+    variableBox->setLayout(varLayout);
+    mainLayout->addWidget(variableBox, 0, 1);
 
     mConsoleTextWidget = new ConsoleTextWidget(this);
-    layout->addWidget(mConsoleTextWidget, 4, 0, 1, 3);
+    mainLayout->addWidget(mConsoleTextWidget, 1, 0, 1, 2);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
-    layout->addWidget(buttonBox, 5, 2);
+    mainLayout->addWidget(buttonBox, 2, 1);
 
     connect(buttonBox, SIGNAL(accepted()), this, SLOT(onAccept()));
     connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-    setLayout(layout);
+    setLayout(mainLayout);
     setWindowTitle(tr("Set Delay"));
 
     adjustSize();
@@ -44,7 +60,24 @@ void CmdDelayEditDialog::setCommand(CmdDelay* command)
 {
     mCommand = command;
 
-    if (mCommand)
+    if (!mCommand)
+    {
+        return;
+    }
+
+    mVariablesList->clear();
+    auto variablesNames = mCommand->variableController()->variablesData();
+    mVariablesList->addItems(variablesNames.keys());
+
+    if (!mCommand->variable().isEmpty())
+    {
+        auto varList = mVariablesList->findItems(mCommand->variable(), Qt::MatchExactly);
+        if (!varList.isEmpty())
+        {
+            mVariablesList->setItemSelected(varList.front(), true);
+        }
+    }
+    else
     {
         int delay = mCommand->delay();
         mHours = delay / 3600 / 1000;
@@ -59,29 +92,33 @@ void CmdDelayEditDialog::setCommand(CmdDelay* command)
         mMSpin->setValue(mMinutes);
         mSSpin->setValue(mSeconds);
         mMSSpin->setValue(mMSeconds);
-
-        mConsoleTextWidget->setCommand(mCommand);
     }
+
+    mConsoleTextWidget->setCommand(mCommand);
 }
 
 void CmdDelayEditDialog::onHoursChanged(int hours)
 {
     mHours = hours;
+    mVariablesList->clearSelection();
 }
 
 void CmdDelayEditDialog::onMinutesChanged(int minutes)
 {
     mMinutes = minutes;
+    mVariablesList->clearSelection();
 }
 
 void CmdDelayEditDialog::onSecondsChanged(int seconds)
 {
     mSeconds = seconds;
+    mVariablesList->clearSelection();
 }
 
 void CmdDelayEditDialog::onMilliSecondsChanged(int mseconds)
 {
     mMSeconds = mseconds;
+    mVariablesList->clearSelection();
 }
 
 QSpinBox* CmdDelayEditDialog::addItem(QGridLayout* layout, const QString& text, int row, int max, const char* onChange)
@@ -114,11 +151,24 @@ QSpinBox* CmdDelayEditDialog::addItem(QGridLayout* layout, const QString& text, 
 
 void CmdDelayEditDialog::onAccept()
 {
-    if (mCommand)
+    if (!mCommand)
+    {
+        LOG_ERROR(QString("CmdDelayEditDialog::onAccept: No command!"));
+        reject();
+        return;
+    }
+
+    auto selected = mVariablesList->selectedItems();
+    if (selected.isEmpty())
     {
         mCommand->setDelay(mHours, mMinutes, mSeconds, mMSeconds);
-        mConsoleTextWidget->saveCommand();
     }
+    else
+    {
+        mCommand->setDelay(selected.front()->text());
+    }
+
+    mConsoleTextWidget->saveCommand();
 
     accept();
 }

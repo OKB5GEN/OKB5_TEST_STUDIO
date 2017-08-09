@@ -5,6 +5,7 @@
 
 class QGridLayout;
 class QSpinBox;
+class QListWidget;
 
 class CmdDelay;
 class ConsoleTextWidget;
@@ -40,6 +41,8 @@ private:
     QSpinBox* mMSpin;
     QSpinBox* mSSpin;
     QSpinBox* mMSSpin;
+
+    QListWidget* mVariablesList;
 
     ConsoleTextWidget* mConsoleTextWidget;
 };

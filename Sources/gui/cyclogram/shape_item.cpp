@@ -421,19 +421,20 @@ void ShapeItem::updateToolTip()
     case DRAKON::DELAY:
         {
             CmdDelay* cmd = qobject_cast<CmdDelay*>(mCommand);
-            mToolTip = tr("Time delay (%1 ms).").arg(cmd->delay()) + "\n";
+            QString text = cmd->variable().isEmpty() ? QString::number(cmd->delay()) : cmd->variable();
+            mToolTip = tr("Time delay (%1 ms).").arg(text) + "\n";
         }
         break;
     case DRAKON::CONDITION:
         {
             CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
-            mToolTip = tr("Question (condition check)") + "\n";
+            mToolTip = tr("Condition check without execution moving to another branch") + "\n";
         }
         break;
     case DRAKON::SELECT_STATE:
         {
             CmdQuestion* cmd = qobject_cast<CmdQuestion*>(mCommand);
-            mToolTip = tr("Question (condition check)") + "\n";
+            mToolTip = tr("Condition check with possible execution moving to another branch") + "\n";
         }
         break;
     case DRAKON::CYCLE:

@@ -1,4 +1,5 @@
 #include "Headers/logic/commands/cmd_delay.h"
+#include "Headers/logic/variable_controller.h"
 #include "Headers/logger/Logger.h"
 
 #include <QTimer>
@@ -14,7 +15,7 @@ CmdDelay::CmdDelay(QObject* parent):
     mTimer->setSingleShot(true);
 
     connect(mTimer, SIGNAL(timeout()), this, SLOT(finish()));
-    setDelay(0, 0, 0, 0);
+    setDelay(0);
 }
 
 void CmdDelay::run()
@@ -24,7 +25,18 @@ void CmdDelay::run()
         return;
     }
 
-    if (mDelay > 0)
+    int delay = 0;
+    if (!mVariable.isEmpty())
+    {
+        delay = mVarCtrl->currentValue(mVariable);
+    }
+
+    if (delay <= 0)
+    {
+        delay = mDelay;
+    }
+
+    if (delay > 0)
     {
         if (mTimeLeft > 0) // resume execution
         {
@@ -32,7 +44,7 @@ void CmdDelay::run()
         }
         else
         {
-            mTimer->start(mDelay);
+            mTimer->start(delay);
         }
     }
     else
@@ -74,9 +86,16 @@ int CmdDelay::delay() const
 
 void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 {
+    if (hasError())
+    {
+        setErrorStatus(false);
+    }
+
+    mVariable.clear();
+
     QString text;
     mDelay = (hours * 3600 + minutes * 60 + seconds) * 1000 + msec;
-    text = tr("Wait:");
+
     if (hours > 0)
     {
         text += QString::number(hours);
@@ -127,7 +146,16 @@ void CmdDelay::setDelay(int hours, int minutes, int seconds, int msec)
 void CmdDelay::setText(const QString& text)
 {
     QString textBefore = mText;
-    mText = text;
+
+    if (text != tr("Invalid cmd"))
+    {
+        mText = tr("Wait ") + text;
+    }
+    else
+    {
+        mText = text;
+    }
+
     if (textBefore != mText)
     {
         emit dataChanged(mText);
@@ -136,6 +164,7 @@ void CmdDelay::setText(const QString& text)
 
 void CmdDelay::writeCustomAttributes(QXmlStreamWriter* writer)
 {
+    writer->writeAttribute("variable", mVariable);
     writer->writeAttribute("delay", QString::number(mDelay));
 }
 
@@ -148,7 +177,20 @@ void CmdDelay::readCustomAttributes(QXmlStreamReader* reader)
         delay = attributes.value("delay").toInt();
     }
 
-    setDelay(delay);
+    QString variable;
+    if (attributes.hasAttribute("variable"))
+    {
+        variable = attributes.value("variable").toString();
+    }
+
+    if (variable.isEmpty())
+    {
+        setDelay(delay);
+    }
+    else
+    {
+        setDelay(variable);
+    }
 }
 
 void CmdDelay::setDelay(int msec)
@@ -178,6 +220,72 @@ bool CmdDelay::loadFromImpl(Command* other)
         return false;
     }
 
-    setDelay(otherDelay->delay());
+    if (!otherDelay->variable().isEmpty())
+    {
+        setDelay(otherDelay->variable());
+    }
+    else
+    {
+        setDelay(otherDelay->delay());
+    }
+
     return true;
+}
+
+void CmdDelay::setDelay(const QString& variable)
+{
+    mVariable = variable;
+    mDelay = 0;
+
+    bool isExist = mVarCtrl->isVariableExist(mVariable);
+
+    if (hasError() && isExist)
+    {
+        setErrorStatus(false);
+    }
+
+    if (!hasError() && !isExist)
+    {
+        setErrorStatus(true);
+    }
+
+    if (hasError())
+    {
+        setText(tr("Invalid cmd"));
+    }
+    else
+    {
+        setText(mVariable + QString(" ") + tr("ms"));
+    }
+}
+
+const QString& CmdDelay::variable() const
+{
+    return mVariable;
+}
+
+void CmdDelay::onNameChanged(const QString& newName, const QString& oldName)
+{
+    if (mVariable.isEmpty())
+    {
+        return;
+    }
+
+    if (mVariable == oldName)
+    {
+        setDelay(newName);
+    }
+}
+
+void CmdDelay::onVariableRemoved(const QString& name)
+{
+    if (mVariable.isEmpty())
+    {
+        return;
+    }
+
+    if (mVariable == name)
+    {
+        setDelay(0);
+    }
 }
