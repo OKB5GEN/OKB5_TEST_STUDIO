@@ -41,7 +41,7 @@ private:
     QString moduleNameImpl() const;
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
-    void readCustomAttributes(QXmlStreamReader* reader) override;
+    void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;
 
     ModuleCommands::ModuleID mModule;
     uint32_t mOperation;

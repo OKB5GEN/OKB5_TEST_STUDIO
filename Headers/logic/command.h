@@ -11,6 +11,7 @@ class QXmlStreamReader;
 
 class VariableController;
 class SystemState;
+class Version;
 
 class Command: public QObject
 {
@@ -41,7 +42,7 @@ public:
     qint64 id() const;
 
     void write(QXmlStreamWriter* writer);
-    void read(QXmlStreamReader* reader);
+    void read(QXmlStreamReader* reader, const Version& fileVersion);
 
     void setConsoleMessage(const QString& text, uint32_t colorARGB);
     void setConsoleText(const QString& text);
@@ -100,7 +101,7 @@ protected:
     void replaceReferences(Command* oldCmd, Command* newCmd, Command* tree);
 
     virtual void writeCustomAttributes(QXmlStreamWriter* writer);
-    virtual void readCustomAttributes(QXmlStreamReader* reader);
+    virtual void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion);
     virtual void updateText();
 
     virtual bool loadFromImpl(Command* other);

@@ -309,7 +309,7 @@ void CmdActionMath::writeCustomAttributes(QXmlStreamWriter* writer)
     }
 }
 
-void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader)
+void CmdActionMath::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QMetaEnum operation = QMetaEnum::fromType<CmdActionMath::Operation>();
     QMetaEnum operandType = QMetaEnum::fromType<CmdActionMath::OperandType>();

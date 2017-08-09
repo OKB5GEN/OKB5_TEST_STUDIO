@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
-<cyclogram version="1.0">
+<cyclogram version="0.1.0">
     <variables>
         <variable name="BP1_LA" value="0" desc=""/>
         <variable name="BP1_PA" value="0" desc=""/>

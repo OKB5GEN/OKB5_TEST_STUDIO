@@ -313,7 +313,7 @@ void CmdSubProgram::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeEndElement();
 }
 
-void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader)
+void CmdSubProgram::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QXmlStreamAttributes attributes = reader->attributes();
     if (attributes.hasAttribute("file"))

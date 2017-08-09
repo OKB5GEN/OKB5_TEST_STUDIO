@@ -76,7 +76,7 @@ public:
 
 protected:
 //    void writeCustomAttributes(QXmlStreamWriter* writer) override;
-//    void readCustomAttributes(QXmlStreamReader* reader) override;
+//    void readCustomAttributes(QXmlStreamReader* reader, const AppVersion& fileVersion) override;
     void insertCommand(Command* newCmd, ValencyPoint::Role role) override;
 //    bool loadFromImpl(Command* other) override;
 

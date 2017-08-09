@@ -2,6 +2,7 @@
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logic/command.h"
+#include "Headers/app_settings.h"
 
 FileWriter::FileWriter(QSharedPointer<Cyclogram> cyclogram)
     : mCyclogram(cyclogram)
@@ -16,7 +17,7 @@ bool FileWriter::writeFile(QIODevice *device)
     mXML.writeStartDocument();
     mXML.writeDTD("<!DOCTYPE cyclogram>");
     mXML.writeStartElement("cyclogram");
-    mXML.writeAttribute("version", "1.0");
+    mXML.writeAttribute("version", AppSettings::instance().version().toString());
 
     writeSettings();
     writeVariables();

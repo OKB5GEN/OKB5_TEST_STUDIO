@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
-<cyclogram version="1.0">
+<cyclogram version="0.1.0">
     <variables>
         <variable name="Class" value="0" desc="Device Class"/>
         <variable name="I" value="0" desc="Current, A"/>

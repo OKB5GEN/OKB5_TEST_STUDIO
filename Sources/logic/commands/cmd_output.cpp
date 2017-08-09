@@ -35,7 +35,7 @@ void CmdOutput::writeCustomAttributes(QXmlStreamWriter* writer)
 //    writer->writeAttribute("delay", QString::number(mDelay));
 }
 
-void CmdOutput::readCustomAttributes(QXmlStreamReader* reader)
+void CmdOutput::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
 //    QXmlStreamAttributes attributes = reader->attributes();
 //    int delay = 0;

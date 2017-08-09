@@ -74,7 +74,7 @@ private:
     void updateText() override;
 
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
-    void readCustomAttributes(QXmlStreamReader* reader) override;
+    void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;
 
     Operation mOperation;
     OperandData mOperands[OperandsCount];

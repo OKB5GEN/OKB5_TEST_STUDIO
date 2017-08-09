@@ -15,6 +15,7 @@ namespace
 
 AppSettings::AppSettings()
 {
+
 }
 
 AppSettings& AppSettings::instance()
@@ -241,4 +242,9 @@ QString AppSettings::settingName(SettingID id) const
 QString AppSettings::settingComment(SettingID id) const
 {
     return mSettingsComments.value(id, tr("Setting comment not found!"));
+}
+
+const Version& AppSettings::version() const
+{
+    return mVersion;
 }

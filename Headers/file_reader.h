@@ -7,6 +7,7 @@
 
 class Cyclogram;
 class Command;
+class Version;
 
 class FileReader
 {
@@ -17,11 +18,11 @@ public:
     QString errorString() const;
 
 private:
-    void readCyclogram();
-    void readSettings();
-    void readVariables();
-    void readCommands();
-    void readCommandsLinks();
+    void readCyclogram(const Version& fileVersion);
+    void readSettings(const Version& fileVersion);
+    void readVariables(const Version& fileVersion);
+    void readCommands(const Version& fileVersion);
+    void readCommandsLinks(const Version& fileVersion);
 
     QWeakPointer<Cyclogram> mCyclogram;
     QMap<qint64, Command*> mCommands;

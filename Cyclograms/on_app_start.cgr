@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
-<cyclogram version="1.0">
+<cyclogram version="0.1.0">
     <variables/>
     <commands>
         <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>

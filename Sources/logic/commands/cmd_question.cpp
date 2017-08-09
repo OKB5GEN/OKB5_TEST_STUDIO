@@ -360,7 +360,7 @@ void CmdQuestion::writeCustomAttributes(QXmlStreamWriter* writer)
     }
 }
 
-void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
+void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
 //    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
     QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();

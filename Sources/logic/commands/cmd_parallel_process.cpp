@@ -87,7 +87,7 @@ void CmdParallelProcess::writeCustomAttributes(QXmlStreamWriter* writer)
 //    writer->writeAttribute("delay", QString::number(mDelay));
 }
 
-void CmdParallelProcess::readCustomAttributes(QXmlStreamReader* reader)
+void CmdParallelProcess::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
 //    QXmlStreamAttributes attributes = reader->attributes();
 //    int delay = 0;

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVariant>
 
+#include "Headers/version.h"
+
 class AppSettings: public QObject
 {
     Q_OBJECT
@@ -50,6 +52,8 @@ public:
     void load();
     void save();
 
+    const Version& version() const;
+
 signals:
     void settingsChanged();
 
@@ -62,6 +66,8 @@ private:
 
     QMap<SettingID, QString> mSettingsNames;
     QMap<SettingID, QString> mSettingsComments;
+
+    Version mVersion;
 };
 
 #endif // APP_SETTINGS_H

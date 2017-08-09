@@ -36,7 +36,7 @@ void CmdTitle::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeAttribute("cmd_type", type.valueToKey(mTitleType));
 }
 
-void CmdTitle::readCustomAttributes(QXmlStreamReader* reader)
+void CmdTitle::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QMetaEnum type = QMetaEnum::fromType<CmdTitle::TitleType>();
 

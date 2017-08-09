@@ -370,7 +370,7 @@ CmdCondition::CmdCondition(QObject* parent):
 //    }
 //}
 
-//void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader)
+//void CmdQuestion::readCustomAttributes(QXmlStreamReader* reader, const AppVersion& fileVersion)
 //{
 //    QMetaEnum cmdType = QMetaEnum::fromType<CmdQuestion::QuestionType>();
 //    QMetaEnum orientation = QMetaEnum::fromType<CmdQuestion::Orientation>();

@@ -26,7 +26,7 @@ public:
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
-    void readCustomAttributes(QXmlStreamReader* reader) override;
+    void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;
     bool loadFromImpl(Command* other) override;
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;

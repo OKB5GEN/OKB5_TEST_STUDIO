@@ -3,7 +3,8 @@
 #include "Headers/logic/variable_controller.h"
 #include "Headers/module_commands.h"
 #include "Headers/shape_types.h"
-
+#include "Headers/version.h"
+#include "Headers/app_settings.h"
 #include "Headers/logic/command.h"
 #include "Headers/logic/commands/cmd_question.h"
 #include "Headers/logic/commands/cmd_title.h"
@@ -23,13 +24,22 @@ bool FileReader::read(QIODevice *device)
 
     if (mXML.readNextStartElement())
     {
-        if (mXML.name() == "cyclogram" && mXML.attributes().value("version") == "1.0")
+        if (mXML.name() == "cyclogram")
         {
-            readCyclogram();
+            Version fileVersion(mXML.attributes().value("version").toString());
+            const Version& appVersion = AppSettings::instance().version();
+            if (appVersion.versionCode() >= fileVersion.versionCode())
+            {
+                readCyclogram(fileVersion);
+            }
+            else
+            {
+                mXML.raiseError(QObject::tr("Incompatible cyclogram file version %1. Current application version is %2.").arg(fileVersion.toString()).arg(appVersion.toString()));
+            }
         }
         else
         {
-            mXML.raiseError(QObject::tr("The file is not an cyclogram version 1.0 file."));
+            mXML.raiseError(QObject::tr("The file is not an cyclogram file."));
         }
     }
 
@@ -44,7 +54,7 @@ QString FileReader::errorString() const
             .arg(mXML.columnNumber());
 }
 
-void FileReader::readCyclogram()
+void FileReader::readCyclogram(const Version& fileVersion)
 {
     while (!mXML.atEnd() && !mXML.hasError())
     {
@@ -56,25 +66,25 @@ void FileReader::readCyclogram()
 
             if (name == "settings")
             {
-                readSettings();
+                readSettings(fileVersion);
             }
             else if (name == "variables")
             {
-                readVariables();
+                readVariables(fileVersion);
             }
             else if (name == "commands")
             {
-                readCommands();
+                readCommands(fileVersion);
             }
             else if (name == "tree")
             {
-                readCommandsLinks();
+                readCommandsLinks(fileVersion);
             }
         }
     }
 }
 
-void FileReader::readSettings()
+void FileReader::readSettings(const Version& fileVersion)
 {
     auto cyclogram = mCyclogram.lock();
 
@@ -106,7 +116,7 @@ void FileReader::readSettings()
     }
 }
 
-void FileReader::readVariables()
+void FileReader::readVariables(const Version& fileVersion)
 {
     auto cyclogram = mCyclogram.lock();
 
@@ -143,10 +153,9 @@ void FileReader::readVariables()
     }
 }
 
-void FileReader::readCommands()
+void FileReader::readCommands(const Version& fileVersion)
 {
     QMetaEnum commandTypes = QMetaEnum::fromType<DRAKON::IconType>();
-    //QMetaEnum questionTypes = QMetaEnum::fromType<CmdQuestion::QuestionType>();
     auto cyclogram = mCyclogram.lock();
 
     // read file, create commands and create links data
@@ -156,9 +165,7 @@ void FileReader::readCommands()
         {
             QXmlStreamAttributes attributes = mXML.attributes();
             QString str;
-            //qint64 commandID;
             DRAKON::IconType type;
-            //CmdQuestion::QuestionType questionType;
 
             if (attributes.hasAttribute("type"))
             {
@@ -166,16 +173,10 @@ void FileReader::readCommands()
                 type = DRAKON::IconType(commandTypes.keyToValue(qPrintable(str)));
             }
 
-//            if (type == DRAKON::QUESTION && attributes.hasAttribute("cmd_type")) //TODO move to question command loading
-//            {
-//                str = attributes.value("cmd_type").toString();
-//                questionType = CmdQuestion::QuestionType(questionTypes.keyToValue(qPrintable(str)));
-//            }
-
-            Command* command = cyclogram->createCommand(type/*, questionType*/);
+            Command* command = cyclogram->createCommand(type);
             if (command)
             {
-                command->read(&mXML); // read command custom data
+                command->read(&mXML, fileVersion); // read command custom data
                 mCommands[command->id()] = command;
 
                 if (command->type() == DRAKON::TERMINATOR)
@@ -197,7 +198,7 @@ void FileReader::readCommands()
     }
 }
 
-void FileReader::readCommandsLinks()
+void FileReader::readCommandsLinks(const Version& fileVersion)
 {
     if (mCommands.empty()) //TODO validate file reading (temporary create default cyclogram)
     {

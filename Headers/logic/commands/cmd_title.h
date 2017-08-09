@@ -25,7 +25,7 @@ public:
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
-    void readCustomAttributes(QXmlStreamReader* reader) override;
+    void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;
 
 private:
     TitleType mTitleType;

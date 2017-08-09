@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
-<cyclogram version="1.0">
+<cyclogram version="0.1.0">
     <variables>
         <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
         <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>

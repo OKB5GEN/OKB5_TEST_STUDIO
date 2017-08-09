@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
-<cyclogram version="1.0">
+<cyclogram version="0.1.0">
     <variables>
         <variable name="DestMode" value="0" desc=""/>
         <variable name="DestSteps" value="0" desc=""/>

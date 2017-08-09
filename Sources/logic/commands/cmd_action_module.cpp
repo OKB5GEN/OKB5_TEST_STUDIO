@@ -673,7 +673,7 @@ void CmdActionModule::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeEndElement();
 }
 
-void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader)
+void CmdActionModule::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QXmlStreamAttributes attributes = reader->attributes();
     if (attributes.hasAttribute("module"))

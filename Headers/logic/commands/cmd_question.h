@@ -78,7 +78,7 @@ public:
 
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
-    void readCustomAttributes(QXmlStreamReader* reader) override;
+    void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;
     bool loadFromImpl(Command* other) override;
     void updateText() override;
 

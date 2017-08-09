@@ -338,7 +338,7 @@ void Command::write(QXmlStreamWriter* writer)
     writer->writeEndElement(); // close command tag
 }
 
-void Command::read(QXmlStreamReader* reader)
+void Command::read(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QXmlStreamAttributes attributes = reader->attributes();
 
@@ -358,14 +358,14 @@ void Command::read(QXmlStreamReader* reader)
         mConsoleTextColor = attributes.value("console_text_color").toULong(&ok, 16);
     }
 
-    readCustomAttributes(reader);
+    readCustomAttributes(reader, fileVersion);
 }
 
 void Command::writeCustomAttributes(QXmlStreamWriter* writer)
 {
 }
 
-void Command::readCustomAttributes(QXmlStreamReader* reader)
+void Command::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
 }
 

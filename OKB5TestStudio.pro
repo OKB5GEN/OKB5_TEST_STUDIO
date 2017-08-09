@@ -94,7 +94,8 @@ SOURCES += main.cpp\
     Sources/gui/tools/commands_edit_toolbar.cpp \
     Sources/logic/commands/cmd_condition.cpp \
     Sources/logic/commands/cmd_cycle.cpp \
-    Sources/logic/commands/cmd_select_state.cpp
+    Sources/logic/commands/cmd_select_state.cpp \
+    Sources/version.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -172,7 +173,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/gui/tools/commands_edit_toolbar.h \
     Headers/logic/commands/cmd_condition.h \
     Headers/logic/commands/cmd_cycle.h \
-    Headers/logic/commands/cmd_select_state.h
+    Headers/logic/commands/cmd_select_state.h \
+    Headers/version.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 

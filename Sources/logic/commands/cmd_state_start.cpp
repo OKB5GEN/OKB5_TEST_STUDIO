@@ -25,7 +25,7 @@ void CmdStateStart::writeCustomAttributes(QXmlStreamWriter* writer)
     writer->writeAttribute("name", mText);
 }
 
-void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader)
+void CmdStateStart::readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion)
 {
     QXmlStreamAttributes attributes = reader->attributes();
     if (attributes.hasAttribute("name"))
