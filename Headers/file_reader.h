@@ -17,6 +17,8 @@ public:
     bool read(QIODevice* device);
     QString errorString() const;
 
+    static Version fileVersion(const QString& fileName, bool* ok = Q_NULLPTR);
+
 private:
     void readCyclogram(const Version& fileVersion);
     void readSettings(const Version& fileVersion);

@@ -38,7 +38,7 @@ namespace
 
         if (xml.readNextStartElement())
         {
-            if (xml.name() == "system_config" && xml.attributes().value("version") == "1.0")
+            if (xml.name() == "system_config" && xml.attributes().value("version") == "1.0") //TODO file versioning
             {
                 while (!xml.atEnd() && !xml.hasError())
                 {

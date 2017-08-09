@@ -107,6 +107,19 @@ void CyclogramWidget::clear(bool onDestroy)
     }
 
     mCyclogram.clear();
+
+    if (mSihlouetteArrow)
+    {
+        delete mSihlouetteArrow;
+        mSihlouetteArrow = Q_NULLPTR;
+    }
+
+
+    if (mSihlouetteLine)
+    {
+        delete mSihlouetteLine;
+        mSihlouetteLine = Q_NULLPTR;
+    }
 }
 
 bool CyclogramWidget::event(QEvent *event)
@@ -318,6 +331,11 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
     painter.scale(mScale, mScale);
     painter.setFont(mFont);
 
+    if (mShapes.empty())
+    {
+        return;
+    }
+
     QList<ShapeItem*> sihlouetteItems;
     sihlouetteItems.push_back(mSihlouetteLine);
     sihlouetteItems.push_back(mSihlouetteArrow);
@@ -338,6 +356,11 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
     // draw commands shapes first
     foreach (ShapeItem* shapeItem, items)
     {
+//        if (!shapeItem)
+//        {
+//            continue;
+//        }
+
         painter.translate(shapeItem->position());
         painter.setBrush(shapeItem->color());
         painter.drawPath(shapeItem->path());

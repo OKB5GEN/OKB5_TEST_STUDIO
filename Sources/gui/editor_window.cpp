@@ -154,6 +154,8 @@ void EditorWindow::closeAll()
     }
 
     CyclogramManager::clear();
+
+    mCyclogramWidget->clear();
 }
 
 void EditorWindow::newFile()
@@ -559,6 +561,25 @@ void EditorWindow::saveLastOpenedFile(const QString& fileName)
 
 bool EditorWindow::saveFile(const QString &fileName)
 {
+    // check file version
+    bool ok;
+    Version fileVersion = FileReader::fileVersion(fileName, &ok);
+    const Version& appVersion = AppSettings::instance().version();
+
+    if (ok && fileVersion.versionCode() > appVersion.versionCode())
+    {
+        QMessageBox::StandardButton ret = QMessageBox::warning(this, tr("File version mismatch"),
+                                                               tr("Existing file version (%1) is newer than application version (%2).\nSome file data will be lost if you save this file.\nDo you still want to save this file?")
+                                                               .arg(fileVersion.toString())
+                                                               .arg(appVersion.toString()),
+                                                                QMessageBox::Save | /*QMessageBox::Discard |*/ QMessageBox::Cancel);
+
+        if (ret == QMessageBox::Cancel)
+        {
+            return false;
+        }
+    }
+
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
@@ -567,6 +588,7 @@ bool EditorWindow::saveFile(const QString &fileName)
                                    arg(QDir::toNativeSeparators(fileName), file.errorString()));
         return false;
     }
+
 
     FileWriter writer(mCyclogram.lock());
     if (writer.writeFile(&file))

@@ -41,7 +41,6 @@ Command::Command(DRAKON::IconType type, int childCmdCnt, QObject * parent):
 
 Command::~Command()
 {
-
 }
 
 void Command::run()

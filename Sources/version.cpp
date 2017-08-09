@@ -8,7 +8,7 @@ namespace
 
 Version::Version(const QString& str):
     mMajor(0),
-    mMinor(1),
+    mMinor(0),
     mPatch(0)
 {
     fromString(str);

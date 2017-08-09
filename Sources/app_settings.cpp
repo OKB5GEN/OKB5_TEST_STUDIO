@@ -13,7 +13,8 @@ namespace
     static const QString SETTINGS_FILE_NAME = "app_settings.xml";
 }
 
-AppSettings::AppSettings()
+AppSettings::AppSettings():
+    mVersion("0.1.0")
 {
 
 }
@@ -90,7 +91,7 @@ void AppSettings::load()
 
     if (xml.readNextStartElement())
     {
-        if (xml.name() == "app_settings" && xml.attributes().value("version") == "1.0")
+        if (xml.name() == "app_settings" && xml.attributes().value("version") == "1.0") //TODO file versioning
         {
             while (!xml.atEnd() && !xml.hasError())
             {
@@ -171,7 +172,7 @@ void AppSettings::save()
     xml.writeStartDocument();
     xml.writeDTD("<!DOCTYPE app_settings>");
     xml.writeStartElement("app_settings");
-    xml.writeAttribute("version", "1.0");
+    xml.writeAttribute("version", "1.0"); //TODO file versioning
 
     for (auto it = mSettings.begin(); it != mSettings.end(); ++it)
     {

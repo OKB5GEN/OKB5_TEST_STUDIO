@@ -11,7 +11,11 @@
 #include "Headers/gui/cyclogram/valency_point.h"
 #include "Headers/logger/Logger.h"
 
+#include "Headers/gui/editor_window.h"
+
 #include <QMetaEnum>
+#include <QMessageBox>
+#include <QFile>
 
 FileReader::FileReader(QSharedPointer<Cyclogram> cyclogram)
     : mCyclogram(cyclogram)
@@ -28,8 +32,28 @@ bool FileReader::read(QIODevice *device)
         {
             Version fileVersion(mXML.attributes().value("version").toString());
             const Version& appVersion = AppSettings::instance().version();
-            if (appVersion.versionCode() >= fileVersion.versionCode())
+
+            // Old app version can not read new files (absolutely incompatible file formats)
+            if (appVersion.major() >= fileVersion.major())
             {
+                // 1. Files with equal major version but different minor versions can be read in both directions,
+                // but in case of appVer < fileVer some functionality will be inaccesiible and will be lost in case of file save.
+                // Warn user about this.
+                // 2. It can happen if we need to do application rollback from one minor version to another.
+                // 3. Patch version must not affect on file format, its just hotfixes.
+                // If file format change requred for hotfix, minor and/or major versions have to be increased
+                if (appVersion.major() == fileVersion.major() && appVersion.minor() < fileVersion.minor())
+                {
+//                    QMessageBox::warning(EditorWindow::instance(),
+//                                         QObject::tr("File version mismatch"),
+//                                         QObject::tr("Application version (%1) is lower than file version (%2).\n Some file data can be lost if you change and save this file.\n Application update is recommended")
+//                                         .arg(appVersion.toString())
+//                                         .arg(fileVersion.toString()));
+                    LOG_WARNING(QString("Application version (%1) is lower than file version (%2).\n Some file data can be lost if you change and save this file.\n Application update is recommended")
+                                                                         .arg(appVersion.toString())
+                                                                         .arg(fileVersion.toString()));
+                }
+
                 readCyclogram(fileVersion);
             }
             else
@@ -272,4 +296,41 @@ void FileReader::readCommandsLinks(const Version& fileVersion)
             parentCmd->replaceCommand(nextCmd, ValencyPoint::Role(i));
         }
     }
+}
+
+Version FileReader::fileVersion(const QString& fileName, bool* ok)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        if (ok)
+        {
+            *ok = false;
+        }
+
+        return Version();
+    }
+
+    QXmlStreamReader xml;
+    xml.setDevice(&file);
+
+    if (xml.readNextStartElement())
+    {
+        if (xml.name() == "cyclogram" && xml.attributes().hasAttribute("version"))
+        {
+            if (ok)
+            {
+                *ok = true;
+            }
+
+            return Version(xml.attributes().value("version").toString());
+        }
+    }
+
+    if (ok)
+    {
+        *ok = false;
+    }
+
+    return Version();
 }
