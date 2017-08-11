@@ -51,6 +51,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileN
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
         LOG_ERROR(QString("Cannot open file %1: %2. Creating default cyclogram").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        sLoadingFiles.remove(fileName);
         p->createDefault();
         if (ok)
         {
@@ -65,6 +66,7 @@ QSharedPointer<Cyclogram> CyclogramManager::createCyclogram(const QString& fileN
     if (!reader.read(&file))
     {
         LOG_ERROR(QString("Parse error in file %1: %2. Creating default cyclogram").arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+        sLoadingFiles.remove(fileName);
         p->createDefault();
         if (ok)
         {

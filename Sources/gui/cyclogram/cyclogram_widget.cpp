@@ -1824,6 +1824,12 @@ ShapeItem* CyclogramWidget::addNewCommand(DRAKON::IconType type, const ValencyPo
         /*ShapeItem* goToBranchItem =*/ addNewCommand(DRAKON::GO_TO_BRANCH, newShape->valencyPoint(ValencyPoint::Right));
     }
 
+    if (type == DRAKON::SUBPROGRAM)
+    {
+        CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(newCmd);
+        subprogram->generateFileName();
+    }
+
     update();
 
     return newShape;

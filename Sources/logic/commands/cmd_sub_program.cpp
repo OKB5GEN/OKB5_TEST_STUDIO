@@ -4,6 +4,8 @@
 #include "Headers/logic/cyclogram.h"
 #include "Headers/logic/variable_controller.h"
 #include "Headers/logic/cyclogram_manager.h"
+#include "Headers/app_settings.h"
+#include "Headers/file_writer.h"
 
 #include <QTimer>
 #include <QXmlStreamWriter>
@@ -47,10 +49,9 @@ bool CmdSubProgram::load()
     auto cyclogram = mCyclogram.lock();
     cyclogram->setSystemState(mSystemState);
 
-    if (mFilePath.isEmpty()) // no file link is normal
+    if (mFilePath.isEmpty())
     {
-        setLoaded(true);
-        return true;
+        return false;
     }
 
     CyclogramManager::removeCyclogram(cyclogram);
@@ -185,6 +186,10 @@ void CmdSubProgram::updateText()
         QFileInfo fileInfo(fileName);
         isOK = fileInfo.exists();
     }
+    else
+    {
+        isOK = false;
+    }
 
     if (hasError())
     {
@@ -285,6 +290,8 @@ void CmdSubProgram::writeCustomAttributes(QXmlStreamWriter* writer)
 {
     writer->writeAttribute("name", mText);
     writer->writeAttribute("file", mFilePath);
+
+    saveFileIfNotExist();
 
     // input params
     writer->writeStartElement("input_params");
@@ -578,5 +585,42 @@ bool CmdSubProgram::loadFromImpl(Command* other)
 
 void CmdSubProgram::onCyclogramModified()
 {
+    updateText();
+}
+
+void CmdSubProgram::generateFileName()
+{
+    QString fileName = "Sub_" + QString::number(QDateTime::currentMSecsSinceEpoch()) + AppSettings::extension();
+    setFilePath(fileName, false);
+}
+
+void CmdSubProgram::saveFileIfNotExist()
+{
+    if (mFilePath.isEmpty())
+    {
+        LOG_ERROR(QString("Subprogram file path is empty!"));
+        return;
+    }
+
+    QString fileName = Cyclogram::defaultStorePath() + mFilePath;
+    if (QFileInfo(fileName).exists())
+    {
+        return;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text))
+    {
+        LOG_ERROR(QString("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+        return;
+    }
+
+    FileWriter writer(mCyclogram.lock());
+    if (!writer.writeFile(&file))
+    {
+        LOG_ERROR(QString("File '%1' not saved!").arg(fileName));
+        return;
+    }
+
     updateText();
 }

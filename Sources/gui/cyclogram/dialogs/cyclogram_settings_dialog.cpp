@@ -1,6 +1,7 @@
 #include "Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h"
 #include "Headers/logger/Logger.h"
 #include "Headers/logic/cyclogram.h"
+#include "Headers/app_settings.h"
 
 #include <QtWidgets>
 #include <QVariant>
@@ -115,7 +116,7 @@ void CyclogramSettingsDialog::openFile()
         }
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*%1)").arg(AppSettings::extension()));
     if (!fileName.isEmpty())
     {
         // load cyclogram

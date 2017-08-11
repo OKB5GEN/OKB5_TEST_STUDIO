@@ -14,9 +14,9 @@ public:
         SUBPROGRAM,
         BRANCH_BEGIN,
         GO_TO_BRANCH,
-        SELECT_STATE,
-        CONDITION,
-        CYCLE,
+        SELECT_STATE, // partially DRAKON icon
+        CONDITION, // partially DRAKON icon
+        CYCLE, // partially DRAKON icon
         ACTION_MATH,
         DELAY,
         OUTPUT,

@@ -144,13 +144,60 @@ void EditorWindow::closeEvent(QCloseEvent *event)
 
 void EditorWindow::closeAll()
 {
+    int maxDepth = -1;
+    QList<int> depths;
+
+//    foreach (QObject* object, mOpenedSubprogramDialogs)
+//    {
+//        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
+//        if (dialog)
+//        {
+//            dialog->close();
+//        }
+//    }
+
+    //TODO optimize
     foreach (QObject* object, mOpenedSubprogramDialogs)
     {
         SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
-        if (dialog)
+        QString title = dialog->windowTitle();
+        QStringList token = title.split(CyclogramWidget::delimiter());
+        int depth = token.size();
+
+        depths.append(depth);
+
+        if (depth > maxDepth)
         {
-            dialog->close();
+            maxDepth = depth;
         }
+    }
+
+    QSet<int> set = depths.toSet();
+    QList<int> sorted = QList<int>::fromSet(set);
+    qSort(sorted);
+
+    auto dialogs = mOpenedSubprogramDialogs.values();
+
+    while (!sorted.empty())
+    {
+        int depth = sorted.back();
+        for (auto it = dialogs.begin(); it != dialogs.end();)
+        {
+            SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(*it);
+            QString title = dialog->windowTitle();
+            QStringList token = title.split(CyclogramWidget::delimiter());
+
+            if (token.size() == depth)
+            {
+                dialog->closeSilent();
+                it = dialogs.erase(it);
+                continue;
+            }
+
+            ++it;
+        }
+
+        sorted.pop_back();
     }
 
     CyclogramManager::clear();
@@ -193,7 +240,7 @@ void EditorWindow::openFile(const QString& name)
 
     if (fileName.isEmpty())
     {
-        fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+        fileName = QFileDialog::getOpenFileName(this, tr("Open cyclogram file"), path, tr("OKB5 Cyclogram Files (*%1)").arg(AppSettings::extension()));
     }
 
     if (fileName.isEmpty())
@@ -237,7 +284,7 @@ bool EditorWindow::saveAs()
         path = QDir::currentPath();
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"), path, tr("OKB5 Cyclogram Files (*.cgr)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"), path, tr("OKB5 Cyclogram Files (*%1)").arg(AppSettings::extension()));
 
     if (fileName.isEmpty())
     {

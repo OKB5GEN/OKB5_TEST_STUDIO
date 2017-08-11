@@ -65,7 +65,7 @@ Cyclogram::Cyclogram(QObject * parent):
     QString cleanupCyclogram = setting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM).toString();
     if (cleanupCyclogram.isEmpty())
     {
-        setSetting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM, "on_cyclogram_finish.cgr", false); // set cleanup cyclogram by default
+        setSetting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM, QString("on_cyclogram_finish%1").arg(AppSettings::extension()), false); // set cleanup cyclogram by default
     }
 
     connect(mVarController, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(variablesChanged()));

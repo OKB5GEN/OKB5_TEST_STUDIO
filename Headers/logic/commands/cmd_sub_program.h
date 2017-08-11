@@ -19,6 +19,8 @@ public:
     void run() override;
     void restart();
 
+    void generateFileName();
+
 public:
     void setFilePath(const QString& filePath, bool reload = true);
     void setName(const QString& name);
@@ -57,6 +59,7 @@ signals:
 
 private:
     bool load();
+    void saveFileIfNotExist();
 
     void updateText() override;
 

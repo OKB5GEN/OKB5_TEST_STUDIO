@@ -46,6 +46,8 @@ public:
     QString settingName(SettingID id) const;
     QString settingComment(SettingID id) const;
 
+    static const QString& extension();
+
     void setSetting(const QString& key, const QVariant& value, bool sendSignal = true);
     void setSetting(SettingID id, const QVariant& value, bool sendSignal = true);
 

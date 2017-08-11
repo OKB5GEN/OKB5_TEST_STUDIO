@@ -249,3 +249,9 @@ const Version& AppSettings::version() const
 {
     return mVersion;
 }
+
+const QString& AppSettings::extension()
+{
+    static QString EXTENSION = ".cgr";
+    return EXTENSION;
+}
