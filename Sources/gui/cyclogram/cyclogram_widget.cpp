@@ -801,13 +801,13 @@ void CyclogramWidget::showSubprogramWidget()
 {
     if (!mCurSubprogram)
     {
-        LOG_WARNING(QString("Subprogram not set 1"));
+        LOG_WARNING(QString("Subprogram not set"));
         return;
     }
 
     if (!mCurSubprogram->loaded())
     {
-        LOG_ERROR(QString("Subprogram configuration error 1"));
+        LOG_ERROR(QString("Subprogram corrupted. Possibly its cyclogram file corrupted or not accesiible"));
         return;
     }
 

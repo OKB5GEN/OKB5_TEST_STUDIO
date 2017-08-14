@@ -576,6 +576,7 @@ bool CmdSubProgram::loadFromImpl(Command* other)
         return false;
     }
 
+    mText = other->text();
     setFilePath(otherSubprogram->filePath());
     mInputParams = otherSubprogram->inputParams();
     mOutputParams = otherSubprogram->outputParams();

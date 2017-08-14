@@ -176,9 +176,9 @@ CyclogramWidget* SubProgramDialog::cyclogramWidget() const
 
 void SubProgramDialog::updateSize()
 {
-    mScrollArea->resize(mCyclogramWidget->size());
+    //mScrollArea->resize(mCyclogramWidget->size());
 
-    QSize defaultSize = mScrollArea->size();
+    QSize defaultSize = mCyclogramWidget->size();//mScrollArea->size();
     defaultSize.setWidth(defaultSize.width() + SIZE_ADJUST);
     defaultSize.setHeight(defaultSize.height() + SIZE_ADJUST);
     resize(defaultSize);
@@ -244,6 +244,7 @@ void SubProgramDialog::updateTitle(const QString &newTitle)
 {
     setWindowTitle(newTitle + "[*]");
     mCyclogramWidget->setWindowTitle(newTitle);
+    onCyclogramModified();
 }
 
 void SubProgramDialog::onCyclogramModified()

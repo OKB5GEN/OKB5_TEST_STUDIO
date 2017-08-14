@@ -39,6 +39,8 @@ void CmdSubProgramEditDialog::setupUI()
     QPushButton* browseButton = new QPushButton(filePathBox);
     connect(browseButton, SIGNAL(clicked(bool)), this, SLOT(openFile()));
 
+    connect(mFileNameStr, SIGNAL(editingFinished()), this, SLOT(updateUI()));
+
     browseButton->setText(tr("Browse"));
 
     fileNameLayout->addWidget(new QLabel(tr("Name:"), this), 0, 0);
