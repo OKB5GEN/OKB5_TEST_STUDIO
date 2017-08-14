@@ -294,12 +294,10 @@ void SubProgramDialog::closeEvent(QCloseEvent *event)
     }
 }
 
-void SubProgramDialog::closeSilent()
+void SubProgramDialog::save()
 {
     if (command()->cyclogram()->isModified())
     {
         onSaveClick();
     }
-
-    close();
 }

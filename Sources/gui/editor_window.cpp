@@ -7,6 +7,7 @@
 #include "Headers/gui/tools/app_console.h"
 #include "Headers/gui/tools/app_settings_dialog.h"
 #include "Headers/app_settings.h"
+#include "Headers/gui/save_before_run_dialog.h"
 #include "Headers/gui/tools/cyclogram_console.h"
 #include "Headers/gui/tools/commands_edit_toolbar.h"
 #include "Headers/logic/cyclogram.h"
@@ -31,6 +32,7 @@ namespace
     static const QString SETTING_LAST_OPEN_FILE_DIR = "LastOpenFileDir";
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
     static const QString LAST_OPENED_FILE_NAME = "LastOpenedFileName";
+    static const QString SILENT_SAVE_BEFORE_START_FLAG = "SaveBeforeStart";
 }
 
 static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
@@ -142,19 +144,10 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void EditorWindow::closeAll()
+void EditorWindow::saveAll()
 {
     int maxDepth = -1;
     QList<int> depths;
-
-//    foreach (QObject* object, mOpenedSubprogramDialogs)
-//    {
-//        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
-//        if (dialog)
-//        {
-//            dialog->close();
-//        }
-//    }
 
     //TODO optimize
     foreach (QObject* object, mOpenedSubprogramDialogs)
@@ -189,7 +182,7 @@ void EditorWindow::closeAll()
 
             if (token.size() == depth)
             {
-                dialog->closeSilent();
+                dialog->save();
                 it = dialogs.erase(it);
                 continue;
             }
@@ -198,6 +191,22 @@ void EditorWindow::closeAll()
         }
 
         sorted.pop_back();
+    }
+
+    save();
+}
+
+void EditorWindow::closeAll()
+{
+    saveAll();
+
+    foreach (QObject* object, mOpenedSubprogramDialogs)
+    {
+        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
+        if (dialog)
+        {
+            dialog->close();
+        }
     }
 
     CyclogramManager::clear();
@@ -698,8 +707,10 @@ void EditorWindow::runCyclogram()
         return;
     }
 
-//    QString fileName = AppSettings::instance().settingValue(AppSettings::CYCLOGRAM_START_CYCLOGRAM_FILE).toString();
-//    runModalCyclogram(fileName, tr("Running pre-execution cyclogram..."));
+    if (hasUnsavedChanges() && !trySaveBeforeRun())
+    {
+        return;
+    }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     if (mCyclogram->state() == Cyclogram::STOPPED)
@@ -1011,4 +1022,45 @@ void EditorWindow::deleteSelected()
 void EditorWindow::onCyclogramSelectionChanged(ShapeItem* item)
 {
     mCommandsEditToolbar->deleteAction()->setEnabled(item != Q_NULLPTR);
+}
+
+bool EditorWindow::trySaveBeforeRun()
+{
+    // save cyclograms before run
+    QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
+    int saveBeforeStartFlag = settings.value(SILENT_SAVE_BEFORE_START_FLAG, 0).toInt();
+
+    if (saveBeforeStartFlag == 0)
+    {
+        SaveBeforeRunDialog dialog(this);
+        int result = dialog.exec();
+        if (result == QDialog::Accepted)
+        {
+            saveAll();
+            if (dialog.doNotAskAgain())
+            {
+                settings.setValue(SILENT_SAVE_BEFORE_START_FLAG, 1);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
+bool EditorWindow::hasUnsavedChanges() const
+{
+    foreach (QObject* object, mOpenedSubprogramDialogs)
+    {
+        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
+        if (dialog && dialog->command()->cyclogram()->isModified())
+        {
+            return true;
+        }
+    }
+
+    return mSaveAct->isEnabled();
 }

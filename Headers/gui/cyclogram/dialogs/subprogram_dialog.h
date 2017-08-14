@@ -29,7 +29,7 @@ public:
 public slots:
     void onCommandTextChanged(const QString& newText);
     void onParentWindowTitleChanged(const QString& newParentWindowTitle);
-    void closeSilent();
+    void save();
 
 protected:
     void closeEvent(QCloseEvent *event) override;

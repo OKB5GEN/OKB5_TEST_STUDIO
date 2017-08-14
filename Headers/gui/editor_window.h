@@ -76,6 +76,7 @@ private:
     void runModalCyclogram(const QString& shortFileName, const QString& text);
 
     void closeAll();
+    void saveAll();
     void createActions();
     void createStatusBar();
     void createCommandsEditToolBar();
@@ -91,12 +92,15 @@ private:
 
     void saveLastOpenedFile(const QString& fileName);
 
-    // recent files functionality
+    // recent files functionality TODO move to separate class (settings dependent? AppSettings?)
     static bool hasRecentFiles();
     void prependToRecentFiles(const QString &fileName);
     void setRecentFilesVisible(bool visible);
     void updateRecentFileActions();
     void openRecentFile();
+
+    bool trySaveBeforeRun();
+    bool hasUnsavedChanges() const;
 
     QWeakPointer<Cyclogram> mCyclogram;
     CyclogramWidget *mCyclogramWidget;
