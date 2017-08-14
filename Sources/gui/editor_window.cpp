@@ -102,7 +102,7 @@ void EditorWindow::onApplicationStart()
 
 void EditorWindow::openExistingFile()
 {
-    openFile(QString(""), false);
+    openFile(QString(""));
 }
 
 void EditorWindow::closeEvent(QCloseEvent *event)
@@ -144,7 +144,7 @@ void EditorWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void EditorWindow::saveAll(bool closeAfterSave)
+void EditorWindow::updateSubprogramDialogs(int updateOption)
 {
     int maxDepth = -1;
     QList<int> depths;
@@ -182,8 +182,17 @@ void EditorWindow::saveAll(bool closeAfterSave)
 
             if (token.size() == depth)
             {
-                dialog->save();
-                if (closeAfterSave)
+                if ((updateOption & EditorWindow::Save) != 0)
+                {
+                    dialog->save();
+                }
+                else
+                {
+                    dialog->command()->cyclogram()->setModified(false, false, true);
+                    dialog->setWindowModified(false);
+                }
+
+                if ((updateOption & EditorWindow::Close) != 0)
                 {
                     dialog->close();
                 }
@@ -197,36 +206,26 @@ void EditorWindow::saveAll(bool closeAfterSave)
 
         sorted.pop_back();
     }
-
-    save();
 }
 
-void EditorWindow::closeAll()
+void EditorWindow::closeAll(int options)
 {
-    saveAll(true);
-
-    foreach (QObject* object, mOpenedSubprogramDialogs)
-    {
-        SubProgramDialog* dialog = qobject_cast<SubProgramDialog*>(object);
-        if (dialog)
-        {
-            dialog->close();
-        }
-    }
-
+    updateSubprogramDialogs(EditorWindow::Close | options);
     CyclogramManager::clear();
-
     mCyclogramWidget->clear();
 }
 
 void EditorWindow::newFile()
 {
-    if (!maybeSave())
+    int ret = 0;
+    if (!maybeSave(&ret))
     {
         return;
     }
 
-    closeAll();
+    int options = (ret == QMessageBox::Save) ? EditorWindow::Save : 0;
+    closeAll(options);
+
     auto cyclogram = CyclogramManager::createCyclogram();
 
     setNewCyclogram(cyclogram);
@@ -237,9 +236,10 @@ void EditorWindow::newFile()
     cyclogram->setModified(true, true, false);
 }
 
-void EditorWindow::openFile(const QString& name, bool isAppStart)
+void EditorWindow::openFile(const QString& name)
 {
-    if (!maybeSave())
+    int ret = 0;
+    if (!maybeSave(&ret))
     {
         return;
     }
@@ -271,9 +271,11 @@ void EditorWindow::openFile(const QString& name, bool isAppStart)
         return;
     }
 
+    int options = (ret == QMessageBox::Save) ? EditorWindow::Save : 0;
+
     QString openPath = QFileInfo(fileName).absoluteDir().path();
     settings.setValue(SETTING_LAST_OPEN_FILE_DIR, openPath);
-    loadFile(fileName, isAppStart);
+    loadFile(fileName, options);
 }
 
 bool EditorWindow::save()
@@ -533,10 +535,10 @@ void EditorWindow::readSettings()
     }
 
     // open last opened file
-    QString fileName = settings.value(LAST_OPENED_FILE_NAME).toString();;
+    QString fileName = settings.value(LAST_OPENED_FILE_NAME).toString();
     if (!fileName.isEmpty())
     {
-        openFile(Cyclogram::defaultStorePath() + fileName, true);
+        openFile(Cyclogram::defaultStorePath() + fileName);
     }
 
     auto cyclogram = mCyclogram.lock();
@@ -553,7 +555,7 @@ void EditorWindow::writeSettings()
     settings.setValue("geometry", saveGeometry());
 }
 
-bool EditorWindow::maybeSave()
+bool EditorWindow::maybeSave(int* action)
 {
     auto cyclogram = mCyclogram.lock();
     if (!cyclogram || !cyclogram->isModified())
@@ -565,6 +567,12 @@ bool EditorWindow::maybeSave()
                                tr("The cyclogram has been modified.\n"
                                   "Do you want to save your changes?"),
                                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+
+    if (action)
+    {
+        *action = ret;
+    }
+
     switch (ret)
     {
     case QMessageBox::Save:
@@ -578,12 +586,9 @@ bool EditorWindow::maybeSave()
     return true;
 }
 
-void EditorWindow::loadFile(const QString &fileName, bool isAppStart)
+void EditorWindow::loadFile(const QString &fileName, int options)
 {
-    if (!isAppStart)
-    {
-        closeAll();
-    }
+    closeAll(options);
 
     bool ok = false;
     auto cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
@@ -1017,7 +1022,7 @@ void EditorWindow::openRecentFile()
 {
     if (const QAction *action = qobject_cast<const QAction *>(sender()))
     {
-        openFile(action->data().toString(), false);
+        openFile(action->data().toString());
     }
 }
 
@@ -1043,7 +1048,7 @@ bool EditorWindow::trySaveBeforeRun()
         int result = dialog.exec();
         if (result == QDialog::Accepted)
         {
-            saveAll(false);
+            updateSubprogramDialogs(EditorWindow::Save);
             if (dialog.doNotAskAgain())
             {
                 settings.setValue(SILENT_SAVE_BEFORE_START_FLAG, 1);

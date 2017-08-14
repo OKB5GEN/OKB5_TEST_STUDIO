@@ -27,7 +27,7 @@ class EditorWindow : public QMainWindow
 public:
     EditorWindow();
 
-    void loadFile(const QString &fileName, bool isAppStart);
+    void loadFile(const QString &fileName, int options);
     void onApplicationStart();
 
     SubProgramDialog* subprogramDialog(CmdSubProgram* command) const;
@@ -39,7 +39,7 @@ protected:
 private slots:
     void newFile();
     void openExistingFile();
-    void openFile(const QString& name, bool isAppStart);
+    void openFile(const QString& name);
     bool save();
     bool saveAs();
     void onSettings();
@@ -73,17 +73,24 @@ private:
         MAX_RECENT_FILES = 10
     };
 
+    enum UpdateOption
+    {
+        Save            = 0x01,
+        Close           = 0x02,
+        SaveAndClose    = (Save | Close),
+    };
+
     void runModalCyclogram(const QString& shortFileName, const QString& text);
 
-    void closeAll();
-    void saveAll(bool closeAfterSave);
+    void closeAll(int options);
+    void updateSubprogramDialogs(int updateOption);
     void createActions();
     void createStatusBar();
     void createCommandsEditToolBar();
 
     void readSettings();
     void writeSettings();
-    bool maybeSave();
+    bool maybeSave(int* action = Q_NULLPTR);
     bool saveFile(const QString &fileName);
     void setCurrentFile(const QString &fileName);
     QString strippedName(const QString &fullFileName);
