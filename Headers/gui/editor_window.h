@@ -27,7 +27,7 @@ class EditorWindow : public QMainWindow
 public:
     EditorWindow();
 
-    void loadFile(const QString &fileName);
+    void loadFile(const QString &fileName, bool isAppStart);
     void onApplicationStart();
 
     SubProgramDialog* subprogramDialog(CmdSubProgram* command) const;
@@ -39,7 +39,7 @@ protected:
 private slots:
     void newFile();
     void openExistingFile();
-    void openFile(const QString& name);
+    void openFile(const QString& name, bool isAppStart);
     bool save();
     bool saveAs();
     void onSettings();
@@ -76,7 +76,7 @@ private:
     void runModalCyclogram(const QString& shortFileName, const QString& text);
 
     void closeAll();
-    void saveAll();
+    void saveAll(bool closeAfterSave);
     void createActions();
     void createStatusBar();
     void createCommandsEditToolBar();

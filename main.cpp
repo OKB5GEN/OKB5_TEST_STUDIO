@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     EditorWindow mainWin;
 //    if (!parser.positionalArguments().isEmpty())
 //    {
-//        mainWin.loadFile(parser.positionalArguments().first());
+//        mainWin.loadFile(parser.positionalArguments().first(), true);
 //    }
 
     mainWin.show();
