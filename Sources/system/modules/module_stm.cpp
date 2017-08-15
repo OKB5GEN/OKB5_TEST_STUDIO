@@ -14,43 +14,12 @@ namespace
 ModuleSTM::ModuleSTM(QObject* parent):
     ModuleOKB(parent)
 {
-//    mPowerSupplyRelayStates[ModuleCommands::BUP_MAIN] = ModuleCommands::POWER_OFF;
-//    mPowerSupplyRelayStates[ModuleCommands::BUP_RESERVE] = ModuleCommands::POWER_OFF;
-//    mPowerSupplyRelayStates[ModuleCommands::UNKNOWN_3] = ModuleCommands::POWER_OFF;
-//    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_1] = ModuleCommands::POWER_OFF;
-//    mPowerSupplyRelayStates[ModuleCommands::HEATER_LINE_2] = ModuleCommands::POWER_OFF;
-//    mPowerSupplyRelayStates[ModuleCommands::DRIVE_CONTROL] = ModuleCommands::POWER_OFF;
-
-//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_1] = ModuleCommands::POWER_OFF;
-//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_2] = ModuleCommands::POWER_OFF;
-//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_3] = ModuleCommands::POWER_OFF;
-//    mMKOPowerSupplyRelayStates[ModuleCommands::MKO_4] = ModuleCommands::POWER_OFF;
 }
 
 ModuleSTM::~ModuleSTM()
 {
 
 }
-
-void ModuleSTM::setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state)
-{
-    addModuleCmd(ModuleCommands::SET_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
-}
-
-void ModuleSTM::setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state)
-{
-    addModuleCmd(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
-}
-
-//ModuleCommands::PowerState ModuleSTM::getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel)
-//{
-//    return mPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
-//}
-
-//ModuleCommands::PowerState ModuleSTM::getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel)
-//{
-//    return mMKOPowerSupplyRelayStates.value(channel, ModuleCommands::POWER_OFF);
-//}
 
 void ModuleSTM::processCustomCommand()
 {
@@ -63,9 +32,7 @@ void ModuleSTM::processCustomCommand()
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            addModuleCmd(ModuleCommands::SET_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
-
-            //setPowerChannelState(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            addModuleCmd(ModuleCommands::SET_POWER_CHANNEL_STATE, channel, (state != 0) ? 1 : 0);
         }
         break;
 
@@ -74,9 +41,7 @@ void ModuleSTM::processCustomCommand()
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            addModuleCmd(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, channel, (state == ModuleCommands::POWER_ON) ? 1 : 0);
-
-            //setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            addModuleCmd(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, channel, (state != 0) ? 1 : 0);
         }
         break;
 
@@ -165,14 +130,12 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("Power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
-                addResponseParam(SystemState::RELAY_STATE, 0 /*ModuleCommands::POWER_OFF*/);
-                //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
+                addResponseParam(SystemState::RELAY_STATE, 0);
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("Power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
-                addResponseParam(SystemState::RELAY_STATE, 1 /*ModuleCommands::POWER_OFF*/);
-                //mPowerSupplyRelayStates[ModuleCommands::PowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
+                addResponseParam(SystemState::RELAY_STATE, 1);
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
@@ -189,14 +152,12 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             if (state == 0) // TODO move constants to encoder/decoder
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is OFF").arg(e.valueToKey(channel)));
-                addResponseParam(SystemState::RELAY_STATE, 0 /*ModuleCommands::POWER_OFF*/);
-                //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_OFF;
+                addResponseParam(SystemState::RELAY_STATE, 0);
             }
             else if (state == 1)
             {
                 LOG_INFO(QString("MKO power supply channel '%1' state is ON").arg(e.valueToKey(channel)));
-                addResponseParam(SystemState::RELAY_STATE, 1 /*ModuleCommands::POWER_OFF*/);
-                //mMKOPowerSupplyRelayStates[ModuleCommands::MKOPowerSupplyChannelID(channel)] = ModuleCommands::POWER_ON;
+                addResponseParam(SystemState::RELAY_STATE, 1);
             }
             else if (state == 2) //TODO error is possibly be detected earlier
             {
@@ -234,7 +195,7 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            emit powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            emit powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID(channel), state);
         }
         break;
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
@@ -242,7 +203,7 @@ bool ModuleSTM::processCustomResponse(uint32_t operationID, const QByteArray& re
             int channel = mCurrentTransaction.inputParams.value(SystemState::CHANNEL_ID).toInt();
             int state = mCurrentTransaction.inputParams.value(SystemState::POWER_STATE).toInt();
 
-            emit powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID(channel), ModuleCommands::PowerState(state));
+            emit powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID(channel), state);
         }
         break;
 

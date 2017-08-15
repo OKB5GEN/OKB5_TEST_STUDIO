@@ -1061,13 +1061,13 @@ bool ModuleMKO::isPhysicallyActive() const
     return true; // if startMKO() not called, module is physically active to receive startMKO() calls
 }
 
-void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state)
+void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, int state)
 {
     switch (channel)
     {
     case ModuleCommands::BUP_MAIN:
         {
-            mMainKitState.isOnBUPKit = (state == ModuleCommands::POWER_ON);
+            mMainKitState.isOnBUPKit = (state != 0);
 
             if (mTMKOpened && isPhysicallyActive())
             {
@@ -1104,7 +1104,7 @@ void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID ch
         break;
     case ModuleCommands::BUP_RESERVE:
         {
-            mReserveKitState.isOnBUPKit = (state == ModuleCommands::POWER_ON);
+            mReserveKitState.isOnBUPKit = (state != 0);
 
             if (mTMKOpened && isPhysicallyActive())
             {
@@ -1136,8 +1136,8 @@ void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID ch
         break;
     case ModuleCommands::DRIVE_CONTROL:
         {
-            mMainKitState.isOnBUPDrives = (state == ModuleCommands::POWER_ON);
-            mReserveKitState.isOnBUPDrives = (state == ModuleCommands::POWER_ON);
+            mMainKitState.isOnBUPDrives = (state != 0);
+            mReserveKitState.isOnBUPDrives = (state != 0);
             // selecting MKO kits not performs, because these flags affect only to ability to send commands to BUP
         }
         break;
@@ -1196,19 +1196,19 @@ void ModuleMKO::updateMKO(KitState& changedKit, bool isOn, const KitState& other
     }
 }
 
-void ModuleMKO::onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state)
+void ModuleMKO::onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, int state)
 {
     switch (channel)
     {
     case ModuleCommands::MKO_1:
         {
-            updateMKO(mMainKitState, (state == ModuleCommands::POWER_ON), mReserveKitState);
+            updateMKO(mMainKitState, (state != 0), mReserveKitState);
         }
         break;
 
     case ModuleCommands::MKO_2:
         {
-            updateMKO(mReserveKitState, (state == ModuleCommands::POWER_ON), mMainKitState);
+            updateMKO(mReserveKitState, (state != 0), mMainKitState);
         }
         break;
 

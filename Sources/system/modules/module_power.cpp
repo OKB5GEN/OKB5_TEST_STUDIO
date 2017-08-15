@@ -35,7 +35,7 @@ namespace
 
 ModulePower::ModulePower(QObject* parent):
     COMPortModule(parent),
-    mState(ModuleCommands::POWER_OFF),
+    mState(ModulePower::POWER_OFF),
     mVoltage(0),
     mCurrent(0),
     mNominalVoltage(DEFAULT_NOMINAL_VOLTAGE),
@@ -516,14 +516,14 @@ bool ModulePower::processResponse(uint32_t operationID, const QByteArray& reques
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF:
         {
             int TODO; // parse response, to not have errors
-            mState = ModuleCommands::POWER_OFF;
+            mState = ModulePower::POWER_OFF;
         }
         break;
 
     case ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON:
         {
             int TODO; // parse response, to not have errors
-            mState = ModuleCommands::POWER_ON;
+            mState = ModulePower::POWER_ON;
         }
         break;
 

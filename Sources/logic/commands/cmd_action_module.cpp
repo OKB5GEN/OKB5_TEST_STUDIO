@@ -160,7 +160,21 @@ void CmdActionModule::updateText()
 
     mText += moduleNameImpl();
     mText += ": ";
-    mText += commandName(mOperation, mInputParams);
+    mText += commandName(mModule, mOperation, mInputParams);
+
+    // TODO some hack for ON/OFF commands text
+    int state = mInputParams.value(SystemState::POWER_STATE, -1).toInt();
+    if (state != -1)
+    {
+        if (state != 0)
+        {
+            mText += tr(" ON");
+        }
+        else
+        {
+            mText += tr(" OFF");
+        }
+    }
 
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
     {
@@ -212,11 +226,11 @@ QString CmdActionModule::moduleNameImpl() const
         {
             int fuse = mInputParams.value(SystemState::FUSE_ID).toInt();
 
-            if (fuse >= 1 && fuse <= 4)
+            if (fuse >= 1 && fuse <= 4) //TODO magic numbers
             {
                 text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
             }
-            else if (fuse > 4 && fuse <= 8)
+            else if (fuse > 4 && fuse <= 8) // TODO magic numbers
             {
                 text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
             }
@@ -320,7 +334,7 @@ QString CmdActionModule::moduleName(int moduleId, bool isFullName)
     return text;
 }
 
-QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams) const
+QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams)
 {
     // DCU - Drive Control Unit - БУП
     // DAD - Directional Antenna Drive - ПНА
@@ -337,7 +351,6 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QV
     case ModuleCommands::SET_POWER_CHANNEL_STATE:
         {
             int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
-            int state = inputParams.value(SystemState::POWER_STATE).toInt();
 
             switch (channel)
             {
@@ -359,22 +372,12 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QV
             default:
                 break;
             }
-
-            if (state == ModuleCommands::POWER_ON)
-            {
-                text += tr(" ON");
-            }
-            else
-            {
-                text += tr(" OFF");
-            }
         }
         break;
 
     case ModuleCommands::SET_MKO_POWER_CHANNEL_STATE:
         {
             int channel = inputParams.value(SystemState::CHANNEL_ID).toInt();
-            int state = inputParams.value(SystemState::POWER_STATE).toInt();
 
             switch (channel)
             {
@@ -386,15 +389,6 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QV
                 break;
             default:
                 break;
-            }
-
-            if (state == ModuleCommands::POWER_ON)
-            {
-                text += tr(" ON");
-            }
-            else
-            {
-                text += tr(" OFF");
             }
         }
         break;
@@ -411,22 +405,40 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QV
         }
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
-        text += tr("Temperature DS1820 line 1");
+        {
+            text += tr("Temperature DS1820");
+            if (moduleID == ModuleCommands::OTD)
+            {
+                text += QString(" (line 1)");
+            }
+        }
         break;
     case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
-        text += tr("Temperature DS1820 line 2");
+        text += tr("Temperature DS1820 (line 2)");
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_1:
-        text += tr("DS1820 count at line 1");
+        {
+            text += tr("DS1820 count");
+            if (moduleID == ModuleCommands::OTD)
+            {
+                text += QString(" (line 1)");
+            }
+        }
         break;
     case ModuleCommands::GET_DS1820_COUNT_LINE_2:
-        text += tr("DS1820 count at line 2");
+        text += tr("DS1820 count (line 2)");
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_1:
-        text += tr("Start DS1820 measurement at line 1");
+        {
+            text += tr("Start DS1820 measurement");
+            if (moduleID == ModuleCommands::OTD)
+            {
+                text += QString(" (line 1)");
+            }
+        }
         break;
     case ModuleCommands::START_MEASUREMENT_LINE_2:
-        text += tr("Start DS1820 measurement at line 2");
+        text += tr("Start DS1820 measurement (line 2)");
         break;
     case ModuleCommands::SET_VOLTAGE_AND_CURRENT:
         text += tr("Voltage (max power)");
@@ -613,10 +625,16 @@ QString CmdActionModule::commandName(uint32_t commandID, const QMap<uint32_t, QV
         }
         break;
     case ModuleCommands::RESET_LINE_1:
-        text += tr("DS1820 reset line 1");
+        {
+            text += tr("DS1820 reset");
+            if (moduleID == ModuleCommands::OTD)
+            {
+                text += QString(" (line 1)");
+            }
+        }
         break;
     case ModuleCommands::RESET_LINE_2:
-        text += tr("DS1820 reset line 2");
+        text += tr("DS1820 reset (line 2)");
         break;
     case ModuleCommands::GET_STATUS_WORD:
         text += tr("Status word");

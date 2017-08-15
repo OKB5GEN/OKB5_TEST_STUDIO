@@ -448,7 +448,7 @@ void ShapeItem::updateToolTip()
             CmdActionModule* cmd = qobject_cast<CmdActionModule*>(mCommand);
             mToolTip = tr("Module command") + "\n";
             mToolTip += tr("Module: %1").arg(cmd->moduleName(true)) + "\n";
-            mToolTip += tr("Command: %1").arg(cmd->commandName(cmd->operation(), cmd->inputParams()));
+            mToolTip += tr("Command: %1").arg(CmdActionModule::commandName(cmd->module(), cmd->operation(), cmd->inputParams()));
         }
         break;
     case DRAKON::SUBPROGRAM:
@@ -1572,7 +1572,7 @@ void ShapeItem::createValencyPoints(Command* cmd)
                                  DRAKON::DELAY,
                                  DRAKON::CONDITION,
                                  DRAKON::SELECT_STATE,
-                                 DRAKON::CYCLE,
+                                 //DRAKON::CYCLE,
                                  DRAKON::ACTION_MODULE,
                                  DRAKON::SUBPROGRAM,
                                  DRAKON::OUTPUT//,

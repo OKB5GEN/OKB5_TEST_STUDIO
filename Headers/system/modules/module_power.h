@@ -91,6 +91,12 @@ private:
         SEND_DATA       = 0xc0
     };
 
+    enum PowerState
+    {
+        POWER_ON,
+        POWER_OFF
+    };
+
     void getCurVoltageAndCurrent();
     void setVoltageAndCurrent(qreal voltage);
 
@@ -105,7 +111,7 @@ private:
     static uint8_t encodeStartDelimiter(TransmissionType trType, uint8_t dataSize);
     static void addCheckSum(QByteArray& data);
 
-    ModuleCommands::PowerState mState;
+    PowerState mState;
 
     qreal mVoltageThreshold;
     qreal mCurrentThreshold;

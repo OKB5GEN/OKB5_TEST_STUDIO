@@ -59,9 +59,9 @@ void CmdActionModuleEditDialog::setupUI()
 
     mSetCommands = new QListWidget(this);
     mGetCommands = new QListWidget(this);
-    commandsBoxLayout->addWidget(new QLabel(tr("Set module state"), this));
+    commandsBoxLayout->addWidget(new QLabel(tr("Set module param"), this));
     commandsBoxLayout->addWidget(mSetCommands);
-    commandsBoxLayout->addWidget(new QLabel(tr("Get module state"), this));
+    commandsBoxLayout->addWidget(new QLabel(tr("Get module param"), this));
     commandsBoxLayout->addWidget(mGetCommands);
 
     mInParams = new QTableWidget(this);
@@ -139,34 +139,34 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
     mConsoleTextWidget->setCommand(mCommand);
 }
 
-void CmdActionModuleEditDialog::addPowerUnitCommonCommands()
+void CmdActionModuleEditDialog::addPowerUnitCommonCommands(uint32_t moduleID)
 {
     // "getters" (just gathering current device state)
-    addCommand(ModuleCommands::GET_VOLTAGE_AND_CURRENT);
-    addCommand(ModuleCommands::GET_DEVICE_CLASS);
-    addCommand(ModuleCommands::GET_NOMINAL_VOLTAGE);
-    addCommand(ModuleCommands::GET_NOMINAL_CURRENT);
-    addCommand(ModuleCommands::GET_NOMINAL_POWER);
-    addCommand(ModuleCommands::GET_OVP_THRESHOLD);
-    addCommand(ModuleCommands::GET_OCP_THRESHOLD);
+    addCommand(moduleID, ModuleCommands::GET_VOLTAGE_AND_CURRENT);
+    addCommand(moduleID, ModuleCommands::GET_DEVICE_CLASS);
+    addCommand(moduleID, ModuleCommands::GET_NOMINAL_VOLTAGE);
+    addCommand(moduleID, ModuleCommands::GET_NOMINAL_CURRENT);
+    addCommand(moduleID, ModuleCommands::GET_NOMINAL_POWER);
+    addCommand(moduleID, ModuleCommands::GET_OVP_THRESHOLD);
+    addCommand(moduleID, ModuleCommands::GET_OCP_THRESHOLD);
 
     // "setters" (changing current device state)
-    addCommand(ModuleCommands::SET_VOLTAGE_AND_CURRENT);
-    addCommand(ModuleCommands::SET_OVP_THRESHOLD);
-    addCommand(ModuleCommands::SET_OCP_THRESHOLD);
-    addCommand(ModuleCommands::PSC_ACKNOWLEDGE_ALARMS);
-    addCommand(ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL);
-    addCommand(ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL);
-    addCommand(ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON);
-    addCommand(ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF);
+    addCommand(moduleID, ModuleCommands::SET_VOLTAGE_AND_CURRENT);
+    addCommand(moduleID, ModuleCommands::SET_OVP_THRESHOLD);
+    addCommand(moduleID, ModuleCommands::SET_OCP_THRESHOLD);
+    addCommand(moduleID, ModuleCommands::PSC_ACKNOWLEDGE_ALARMS);
+    addCommand(moduleID, ModuleCommands::PSC_SWITCH_TO_REMOTE_CTRL);
+    addCommand(moduleID, ModuleCommands::PSC_SWITCH_TO_MANUAL_CTRL);
+    addCommand(moduleID, ModuleCommands::PSC_SWITCH_POWER_OUTPUT_ON);
+    addCommand(moduleID, ModuleCommands::PSC_SWITCH_POWER_OUTPUT_OFF);
 
     //TODO These two commands are used to separately set output voltage and current (need to be implemented in PowerUnit class Logic)
-    //addCommand(ModuleCommands::SET_SET_VALUE_U);
-    //addCommand(ModuleCommands::SET_SET_VALUE_I);
+    //addCommand(moduleID, ModuleCommands::SET_SET_VALUE_U);
+    //addCommand(moduleID, ModuleCommands::SET_SET_VALUE_I);
 
     //TODO These two commands are applicable only for TRIPLE device class
-    //addCommand(ModuleCommands::PSC_TRACKING_ON);
-    //addCommand(ModuleCommands::PSC_TRACKING_OFF);
+    //addCommand(moduleID, ModuleCommands::PSC_TRACKING_ON);
+    //addCommand(moduleID, ModuleCommands::PSC_TRACKING_OFF);
 }
 
 void CmdActionModuleEditDialog::onModuleChanged(int index)
@@ -175,104 +175,64 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     mSetCommands->clear();
     mGetCommands->clear();
 
-    SystemState* sysState = mCommand->systemState();
+    //SystemState* sysState = mCommand->systemState();
 
     // "Abstract" module commands
-    addCommand(ModuleCommands::GET_MODULE_STATUS);
-    addCommand(ModuleCommands::SET_MODULE_LOGIC_STATUS);
+    addCommand(mModuleID, ModuleCommands::GET_MODULE_STATUS);
+    addCommand(mModuleID, ModuleCommands::SET_MODULE_LOGIC_STATUS);
 
     // module changed -> update command list for this module
-    switch (index)
+    switch (mModuleID)
     {
     case ModuleCommands::POWER_UNIT_BUP:
         {
-            addPowerUnitCommonCommands();
+            addPowerUnitCommonCommands(mModuleID);
 
             // hack for power supply commands moving from STM to Power Unit >>>
             QMap<uint32_t, QVariant> implicitParams;
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
-            addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_MAIN));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::BUP_RESERVE));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            addCommand(ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 1, 2, 3, 4 only?
+            addCommand(mModuleID, ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 1, 2, 3, 4 only?
         }
         break;
 
     case ModuleCommands::POWER_UNIT_PNA:
         {
-            addPowerUnitCommonCommands();
+            addPowerUnitCommonCommands(mModuleID);
 
             // hack for power supply commands mofin from STM to Power Unit >>>
             QMap<uint32_t, QVariant> implicitParams;
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            addCommand(ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
 
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_1));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::HEATER_LINE_2));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::DRIVE_CONTROL));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE, implicitParams);
-
-            addCommand(ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 5, 6, 7, 8 only?
+            addCommand(mModuleID, ModuleCommands::GET_FUSE_STATE); // TODO for fuse id 5, 6, 7, 8 only?
         }
         break;
 
@@ -288,64 +248,52 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             implicitParamsAngleSensorMain[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::PS_FROM_MAIN_KIT));
             implicitParamsAngleSensorReserve[SystemState::SUBADDRESS] = QVariant(int(ModuleMKO::PS_FROM_RESERVE_KIT));
 
-            addCommand(ModuleCommands::START_MKO);
-            addCommand(ModuleCommands::STOP_MKO);
+            addCommand(mModuleID, ModuleCommands::START_MKO);
+            addCommand(mModuleID, ModuleCommands::STOP_MKO);
 
-            addCommand(ModuleCommands::RECEIVE_COMMAND_ARRAY);
-            addCommand(ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(ModuleCommands::RECEIVE_TEST_ARRAY);
-            addCommand(ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_COMMAND_ARRAY);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_TEST_ARRAY);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(mModuleID, ModuleCommands::RECEIVE_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
-            addCommand(ModuleCommands::SEND_COMMAND_ARRAY);
-            addCommand(ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
-            addCommand(ModuleCommands::SEND_TEST_ARRAY);
-            addCommand(ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
-            addCommand(ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(mModuleID, ModuleCommands::SEND_COMMAND_ARRAY);
+            addCommand(mModuleID, ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(mModuleID, ModuleCommands::SEND_COMMAND_ARRAY_FOR_CHANNEL, implicitParamsNu);
+            addCommand(mModuleID, ModuleCommands::SEND_TEST_ARRAY);
+            addCommand(mModuleID, ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsPsy);
+            addCommand(mModuleID, ModuleCommands::SEND_TEST_ARRAY_FOR_CHANNEL, implicitParamsNu);
 
-            addCommand(ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorMain);
-            addCommand(ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorReserve);
+            addCommand(mModuleID, ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorMain);
+            addCommand(mModuleID, ModuleCommands::SEND_TO_ANGLE_SENSOR, implicitParamsAngleSensorReserve);
 
             // hack for power supply commands mofin from STM to MKO >>>
             QMap<uint32_t, QVariant> implicitParams;
 
             implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
-            addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
-            addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
 
             implicitParams.clear();
             implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_ON));
-            addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_1));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
-
-            implicitParams.clear();
-            implicitParams[SystemState::CHANNEL_ID] = QVariant(int(ModuleCommands::MKO_2));
-            implicitParams[SystemState::POWER_STATE] = QVariant(int(ModuleCommands::POWER_OFF));
-            addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
+            addCommand(mModuleID, ModuleCommands::SET_MKO_POWER_CHANNEL_STATE, implicitParams);
         }
         break;
 
     case ModuleCommands::STM:
         {
-            addOKBCommonCommands();
+            addOKBCommonCommands(mModuleID);
 
-            addCommand(ModuleCommands::GET_CHANNEL_TELEMETRY);
+            addCommand(mModuleID, ModuleCommands::GET_CHANNEL_TELEMETRY);
         }
         break;
 
@@ -356,18 +304,18 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
             implicitParams1[SystemState::SENSOR_NUMBER] = QVariant(int(1));
             implicitParams2[SystemState::SENSOR_NUMBER] = QVariant(int(2));
 
-            addOKBCommonCommands();
+            addOKBCommonCommands(mModuleID);
 
-            addCommand(ModuleCommands::RESET_LINE_1);
-            addCommand(ModuleCommands::RESET_LINE_2);
-            addCommand(ModuleCommands::GET_DS1820_COUNT_LINE_1);
-            addCommand(ModuleCommands::GET_DS1820_COUNT_LINE_2);
-            addCommand(ModuleCommands::START_MEASUREMENT_LINE_1);
-            addCommand(ModuleCommands::START_MEASUREMENT_LINE_2);
-            addCommand(ModuleCommands::GET_TEMPERATURE_PT100, implicitParams1);
-            addCommand(ModuleCommands::GET_TEMPERATURE_PT100, implicitParams2);
-            addCommand(ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
-            addCommand(ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
+            addCommand(mModuleID, ModuleCommands::RESET_LINE_1);
+            addCommand(mModuleID, ModuleCommands::RESET_LINE_2);
+            addCommand(mModuleID, ModuleCommands::GET_DS1820_COUNT_LINE_1);
+            addCommand(mModuleID, ModuleCommands::GET_DS1820_COUNT_LINE_2);
+            addCommand(mModuleID, ModuleCommands::START_MEASUREMENT_LINE_1);
+            addCommand(mModuleID, ModuleCommands::START_MEASUREMENT_LINE_2);
+            addCommand(mModuleID, ModuleCommands::GET_TEMPERATURE_PT100, implicitParams1);
+            addCommand(mModuleID, ModuleCommands::GET_TEMPERATURE_PT100, implicitParams2);
+            addCommand(mModuleID, ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(mModuleID, ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2);
 
             //3. Чтение адресов на линии 1 (ОТД) //TODO
             //4. Чтение адресов на линии 2 (ОТД) //TODO
@@ -376,12 +324,12 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::DRIVE_SIMULATOR:
         {
-            addOKBCommonCommands();
+            addOKBCommonCommands(mModuleID);
 
-            addCommand(ModuleCommands::RESET_LINE_1);
-            addCommand(ModuleCommands::GET_DS1820_COUNT_LINE_1);
-            addCommand(ModuleCommands::START_MEASUREMENT_LINE_1);
-            addCommand(ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
+            addCommand(mModuleID, ModuleCommands::RESET_LINE_1);
+            addCommand(mModuleID, ModuleCommands::GET_DS1820_COUNT_LINE_1);
+            addCommand(mModuleID, ModuleCommands::START_MEASUREMENT_LINE_1);
+            addCommand(mModuleID, ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1);
 
             //10. Чтение адресов на линии (ИП) //TODO
         }
@@ -389,7 +337,7 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
 
     case ModuleCommands::TECH:
         {
-            addOKBCommonCommands();
+            addOKBCommonCommands(mModuleID);
         }
         break;
 
@@ -453,19 +401,18 @@ void CmdActionModuleEditDialog::onModuleChanged(int index)
     }
 }
 
-void CmdActionModuleEditDialog::addOKBCommonCommands()
+void CmdActionModuleEditDialog::addOKBCommonCommands(uint32_t moduleID)
 {
     QMap<uint32_t, QVariant> implicitParams;
 
     implicitParams[SystemState::MODULE_ADDRESS] = QVariant(int(ModuleCommands::CURRENT));
-    addCommand(ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
+    addCommand(moduleID, ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
 
-    implicitParams.clear();
     implicitParams[SystemState::MODULE_ADDRESS] = QVariant(int(ModuleCommands::DEFAULT));
-    addCommand(ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
+    addCommand(moduleID, ModuleCommands::GET_MODULE_ADDRESS, implicitParams);
 
-    addCommand(ModuleCommands::GET_STATUS_WORD);
-    addCommand(ModuleCommands::RESET_ERROR);
+    addCommand(moduleID, ModuleCommands::GET_STATUS_WORD);
+    addCommand(moduleID, ModuleCommands::RESET_ERROR);
 
     //TODO
     //1. Soft reset
@@ -473,9 +420,9 @@ void CmdActionModuleEditDialog::addOKBCommonCommands()
     //3. Echo
 }
 
-void CmdActionModuleEditDialog::addCommand(int commandID, const QMap<uint32_t, QVariant>& implicitInputParams)
+void CmdActionModuleEditDialog::addCommand(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& implicitInputParams)
 {
-    QString fullText = mCommand->commandName(commandID, implicitInputParams);
+    QString fullText = CmdActionModule::commandName(moduleID, commandID, implicitInputParams);
 
     QListWidgetItem* item = new QListWidgetItem();
     item->setText(fullText);
@@ -553,12 +500,6 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         mInParams->setItem(i, 0, item);
 
-        // param name
-//        QLabel* text = new QLabel(mInParams);
-//        text->setTextInteractionFlags(Qt::NoTextInteraction);
-//        text->setText(name);
-//        mInParams->setCellWidget(i, 0, text);
-
         // "use variable input" button
         QCheckBox* varSelectBtn = new QCheckBox(mInParams);
         mInParams->setCellWidget(i, 1, varSelectBtn);
@@ -607,24 +548,22 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
-            const QMap<uint32_t, QVariant>& inputParams = mCommand->inputParams();
-            QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
-            uint32_t id = params.keyToValue(qPrintable(name));
-            auto it = inputParams.find(id);
-            if (it != inputParams.end() && !system->isImplicit(SystemState::ParamID(id)))
+            const QMap<uint32_t, QVariant>& commandInputParams = mCommand->inputParams();
+            auto iter = commandInputParams.find(*it);
+            if (iter != commandInputParams.end() && !system->isImplicit(SystemState::ParamID(*it)))
             {
-                if (it.value().type() == QMetaType::QString)
+                if (iter.value().type() == QMetaType::QString)
                 {
-                    int index = comboBox->findText(it.value().toString());
+                    int index = comboBox->findText(iter.value().toString());
                     if (index != -1)
                     {
                         comboBox->setCurrentIndex(index);
                         isVariable = true;
                     }
                 }
-                else //if (it.value().type() == QMetaType::Double)
+                else //if (iter.value().type() == QMetaType::Double)
                 {
-                    valueEdit->setText(it.value().toString());
+                    valueEdit->setText(iter.value().toString());
                 }
             }
         }
@@ -643,12 +582,6 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
     i = 0;
     for (auto it = outParams.begin(); it != outParams.end(); ++it)
     {
-//        QString name = system->paramName(mModuleID, mCommandID, i, false);
-//        QLabel* text = new QLabel(mOutParams);
-//        text->setTextInteractionFlags(Qt::NoTextInteraction);
-//        text->setText(name);
-//        mOutParams->setCellWidget(i, 0, text);
-
         QString name = system->paramData(SystemState::ParamID(*it)).name;
 
         QTableWidgetItem* item = new QTableWidgetItem(name);
@@ -666,14 +599,11 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
         if (mModuleID == mCommand->module() && mCommandID == mCommand->operation()) // already set command
         {
-            const QMap<uint32_t, QVariant>& outputParams = mCommand->outputParams();
-            QMetaEnum params = QMetaEnum::fromType<SystemState::ParamID>();
-            uint32_t id = params.keyToValue(qPrintable(name));
-
-            auto it = outputParams.find(id);
-            if (it != outputParams.end() && !system->isImplicit(SystemState::ParamID(id)))
+            const QMap<uint32_t, QVariant>& commandOutputParams = mCommand->outputParams();
+            auto iter = commandOutputParams.find(*it);
+            if (iter != commandOutputParams.end() && !system->isImplicit(SystemState::ParamID(*it)))
             {
-                int index = comboBox->findText(it.value().toString()); // output params are always variables
+                int index = comboBox->findText(iter.value().toString()); // output params are always variables
                 if (index != -1) // add default variable name, corresponding to this paramID
                 {
                     comboBox->setCurrentIndex(index);

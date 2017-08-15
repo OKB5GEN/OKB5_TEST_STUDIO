@@ -32,18 +32,10 @@ protected:
     void createResponse(Transaction& response) override;
 
 signals:
-    void powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState state);
-    void powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState state);
+    void powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID channel, int state);
+    void powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID channel, int state);
 
 private:
-    void setPowerChannelState(ModuleCommands::PowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на БУП и ПНА
-    void setMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel, ModuleCommands::PowerState moduleState); // Подача питания на МКО
-
-//    ModuleCommands::PowerState getPowerChannelState(ModuleCommands::PowerSupplyChannelID channel);
-//    ModuleCommands::PowerState getMKOPowerChannelState(ModuleCommands::MKOPowerSupplyChannelID channel);
-
-    //QMap<ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState> mPowerSupplyRelayStates;
-    //QMap<ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState> mMKOPowerSupplyRelayStates;
 };
 
 #endif // MODULE_STM_H

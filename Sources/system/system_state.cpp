@@ -185,8 +185,8 @@ void SystemState::onApplicationStart()
     connect(this, SIGNAL(sendToSTM(const Transaction&)), mSTM, SLOT(processCommand(const Transaction&)));
     connect(mSTM, SIGNAL(commandResult(const Transaction&)), this, SLOT(processResponse(const Transaction&)));
 
-    connect(mSTM, SIGNAL(powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState)), mMKO, SLOT(onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, ModuleCommands::PowerState)));
-    connect(mSTM, SIGNAL(powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState)), mMKO, SLOT(onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, ModuleCommands::PowerState)));
+    connect(mSTM, SIGNAL(powerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, int)), mMKO, SLOT(onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID, int)));
+    connect(mSTM, SIGNAL(powerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, int)), mMKO, SLOT(onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChannelID, int)));
 
     mTech = new ModuleTech(this);
     mTech->setEmulator(emulatorEnabled);
@@ -276,6 +276,7 @@ void SystemState::createPowerUnitCommandsParams()
     addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE, {},                 {RELAY_STATE},                      &commands);
     addCommand(ModuleCommands::GET_DEVICE_CLASS,            {},                 {DEVICE_CLASS},                     &commands);
     addCommand(ModuleCommands::GET_NOMINAL_POWER,           {},                 {POWER},                            &commands);
+    addCommand(ModuleCommands::SET_POWER_CHANNEL_STATE,     {POWER_STATE},      {},                                 &commands);
 
     mCommands[ModuleCommands::POWER_UNIT_BUP] = commands;
     mCommands[ModuleCommands::POWER_UNIT_PNA] = commands;
@@ -301,6 +302,7 @@ void SystemState::createMKOCommandsParams()
     addCommand(ModuleCommands::RECEIVE_COMMAND_ARRAY_FOR_CHANNEL,   {},                         commandArrayForChannel,             &commands);
     addCommand(ModuleCommands::GET_MODULE_STATUS,                   {},                         {STATUS_PHYSICAL, STATUS_LOGICAL},  &commands);
     addCommand(ModuleCommands::GET_MKO_POWER_CHANNEL_STATE,         {},                         {RELAY_STATE},                      &commands);
+    addCommand(ModuleCommands::SET_MKO_POWER_CHANNEL_STATE,         {POWER_STATE},              {},                                 &commands);
 
     mCommands[ModuleCommands::MKO] = commands;
 }
@@ -691,7 +693,7 @@ bool SystemState::isImplicit(ParamID param) const
     {
     case SUBADDRESS:
     case CHANNEL_ID:
-    case POWER_STATE:
+    //case POWER_STATE:
         return true; //TODO RELAY_STATE?
 
     default:

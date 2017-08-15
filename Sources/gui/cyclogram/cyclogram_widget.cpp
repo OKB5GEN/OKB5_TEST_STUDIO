@@ -429,6 +429,12 @@ void CyclogramWidget::onClickVP(const ValencyPoint* point, const QPoint& pos)
 
     if (mCurrentCommandType != -1)
     {
+        if (!point->canBeInserted(mCurrentCommandType))
+        {
+            QMessageBox::warning(this, tr("Error"), tr("Selected item can not be added here"));
+            return;
+        }
+
         addNewCommand(DRAKON::IconType(mCurrentCommandType), point);
     }
     else

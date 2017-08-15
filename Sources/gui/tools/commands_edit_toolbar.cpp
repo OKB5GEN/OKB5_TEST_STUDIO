@@ -9,7 +9,7 @@ CommandsEditToolbar::CommandsEditToolbar(QWidget* parent):
     QAction* addBranchCmdAction = addCustomAction(":/resources/images/cmd_branch", tr("Add cyclogram branch"), DRAKON::BRANCH_BEGIN);
     QAction* addMathCmdAction = addCustomAction(":/resources/images/cmd_math", tr("Add math command"), DRAKON::ACTION_MATH);
     QAction* addQuestionCmdAction = addCustomAction(":/resources/images/cmd_question", tr("Add question command"), DRAKON::CONDITION);
-    QAction* addCycleCmdAction = addCustomAction(":/resources/images/cmd_cycle", tr("Add cycle command"), DRAKON::CYCLE);
+    //QAction* addCycleCmdAction = addCustomAction(":/resources/images/cmd_cycle", tr("Add cycle command"), DRAKON::CYCLE);
     QAction* addSelectStateCmdAction = addCustomAction(":/resources/images/cmd_select_state", tr("Add select state command"), DRAKON::SELECT_STATE);
     //QAction* addGoToBranchCmdAction = addCustomAction(":/resources/images/cmd_go_to_branch", tr("Add go-to-branch command"), DRAKON::GO_TO_BRANCH);
     QAction* addSubprogramCmdAction = addCustomAction(":/resources/images/cmd_subprogram", tr("Add subprogram command"), DRAKON::SUBPROGRAM);

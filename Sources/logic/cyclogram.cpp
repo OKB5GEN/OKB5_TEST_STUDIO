@@ -476,7 +476,7 @@ Command* Cyclogram::createCommand(DRAKON::IconType type)
     default:
         {
             LOG_ERROR(QString("Command %1 not implemented. 0 ms Delay command created").arg(int(type)));
-            cmd = new CmdDelay(this);
+            cmd = new CmdDelay(this); // TODO create "doing nothing" command
         }
         break;
     }

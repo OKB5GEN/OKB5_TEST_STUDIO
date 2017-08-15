@@ -121,12 +121,6 @@ public:
         CMD_ERROR   = 0x02,
     };
 
-    enum PowerState
-    {
-        POWER_ON,
-        POWER_OFF
-    };
-
     enum PowerSupplyChannelID
     {
         BUP_MAIN         = 1,
