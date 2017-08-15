@@ -81,35 +81,35 @@
         <command type="ACTION_MODULE" id="1493898072313" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="6"/>
-                <param name="POWER_STATE" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493898077601" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="5"/>
-                <param name="POWER_STATE" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493898083671" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="4"/>
-                <param name="POWER_STATE" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493898085504" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="2"/>
-                <param name="POWER_STATE" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1493898087841" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="1"/>
-                <param name="POWER_STATE" type="2" value="1"/>
+                <param name="POWER_STATE" type="2" value="0"/>
             </input_params>
             <output_params/>
         </command>

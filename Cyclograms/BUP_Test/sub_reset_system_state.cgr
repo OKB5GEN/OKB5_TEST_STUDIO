@@ -13,14 +13,14 @@
         <command type="ACTION_MODULE" id="1492076328367" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="6" value="6"/>
-                <param name="POWER_STATE" type="6" value="1"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
         <command type="ACTION_MODULE" id="1492076330202" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="STM" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="6" value="1"/>
-                <param name="POWER_STATE" type="6" value="1"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
