@@ -99,7 +99,8 @@ private:
 
     void saveLastOpenedFile(const QString& fileName);
 
-    // recent files functionality TODO move to separate class (settings dependent? AppSettings?)
+    // recent files functionality TODO move to separate class
+    // (settings dependent? AppSettings? RecentFilesHandler?)
     static bool hasRecentFiles();
     void prependToRecentFiles(const QString &fileName);
     void setRecentFilesVisible(bool visible);
