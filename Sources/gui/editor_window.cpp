@@ -999,8 +999,9 @@ void EditorWindow::updateRecentFileActions()
     {
         if (i < count)
         {
-            const QString fileName = QFileInfo(recentFiles.at(i)).fileName();
-            if (!fileName.isEmpty())
+            QFileInfo info(recentFiles.at(i));
+            const QString fileName = info.fileName();
+            if (!fileName.isEmpty() && info.exists())
             {
                 mRecentFileActs[i]->setText(tr("&%1: %2").arg(i + 1).arg(fileName));
                 mRecentFileActs[i]->setData(recentFiles.at(i));
