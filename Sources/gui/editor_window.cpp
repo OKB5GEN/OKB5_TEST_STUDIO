@@ -33,6 +33,7 @@ namespace
     static const QString SETTING_LAST_SAVE_FILE_DIR = "LastSaveFileDir";
     static const QString LAST_OPENED_FILE_NAME = "LastOpenedFileName";
     static const QString SILENT_SAVE_BEFORE_START_FLAG = "SaveBeforeStart";
+    static const int SKIP_RELOAD_CALLS_ON_SAVE = 2; //TODO Qt bug workaround
 }
 
 static inline QString recentFilesKey() { return QStringLiteral("recentFileList"); }
@@ -67,13 +68,16 @@ static void writeRecentFiles(const QStringList &files, QSettings &settings)
 
 EditorWindow::EditorWindow():
     mScaleFactor(1.0),
-    mCommandsEditToolbar(Q_NULLPTR)
+    mCommandsEditToolbar(Q_NULLPTR),
+    mSkipReloadCalls(0)
 {
+    mFileWatcher = new QFileSystemWatcher(this);
+
     mScrollArea = new QScrollArea(this);
     mSystemState = new SystemState(this);
+
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setMainWindow(this);
-
     mCyclogramWidget->setParentScrollArea(mScrollArea);
 
     mCyclogramConsole = new CyclogramConsole(this);
@@ -217,6 +221,8 @@ void EditorWindow::closeAll(int options)
 
 void EditorWindow::newFile()
 {
+    mSkipReloadCalls = 0;
+
     int ret = 0;
     if (!maybeSave(&ret))
     {
@@ -238,6 +244,8 @@ void EditorWindow::newFile()
 
 void EditorWindow::openFile(const QString& name)
 {
+    mSkipReloadCalls = 0;
+
     int ret = 0;
     if (!maybeSave(&ret))
     {
@@ -657,22 +665,27 @@ bool EditorWindow::saveFile(const QString &fileName)
         return false;
     }
 
+    QString saveName = fileName;
+    setCurrentFile(QString()); //TODO
+
+    mSkipReloadCalls = SKIP_RELOAD_CALLS_ON_SAVE;
 
     FileWriter writer(mCyclogram.lock());
     if (writer.writeFile(&file))
     {
         // save last save dir
         QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-        QString savePath = QFileInfo(fileName).absoluteDir().path();
+        QString savePath = QFileInfo(saveName).absoluteDir().path();
         settings.setValue(SETTING_LAST_SAVE_FILE_DIR, savePath);
-        saveLastOpenedFile(fileName);
+        saveLastOpenedFile(saveName);
 
-        setCurrentFile(fileName);
+        setCurrentFile(saveName);
         statusBar()->showMessage(tr("File saved"), 2000);
         emit documentSaved(true);
         return true;
     }
 
+    mSkipReloadCalls = 0;
     return false;
 }
 
@@ -683,10 +696,22 @@ void EditorWindow::setCurrentFile(const QString &fileName)
     cyclogram->setModified(false, false, false);
     setWindowModified(false);
 
+    if (!mFileWatcher->files().empty())
+    {
+        mFileWatcher->removePaths(mFileWatcher->files());
+    }
+
     QString shownName = mCurFile;
     if (mCurFile.isEmpty())
     {
         shownName = "New file";
+        disconnect(mFileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(reloadCyclogram()));
+    }
+    else
+    {
+        Qt::ConnectionType connection = Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection);
+        connect(mFileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(reloadCyclogram()), connection);
+        mFileWatcher->addPath(fileName);
     }
 
     shownName += "[*]";
@@ -1076,4 +1101,20 @@ bool EditorWindow::hasUnsavedChanges() const
     }
 
     return mSaveAct->isEnabled();
+}
+
+void EditorWindow::reloadCyclogram()
+{
+    if (mSkipReloadCalls > 0)
+    {
+        LOG_WARNING(QString("QFileSystemWatcher bug workaround."));
+        --mSkipReloadCalls;
+        return;
+    }
+
+    if (!mCurFile.isEmpty())
+    {
+        LOG_INFO(QString("File '%1' is modified outside the editor. Reloading file").arg(mCurFile));
+        openFile(mCurFile);
+    }
 }

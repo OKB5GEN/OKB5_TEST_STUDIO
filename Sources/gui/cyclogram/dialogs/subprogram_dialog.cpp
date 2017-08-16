@@ -27,6 +27,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     QDialog(mainWindow),
     mCommand(command)
 {
+    connect(mCommand, SIGNAL(cyclogramChanged()), this, SLOT(reload()));
     mCallingCyclogram = callingCyclogram;
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
@@ -196,8 +197,7 @@ void SubProgramDialog::onSettingsClick()
 
     if (filePathBefore != filePathAfter)
     {
-        mCyclogramWidget->load(mCommand->cyclogram());
-        updateSize();
+        reload();
     }
 }
 
@@ -301,4 +301,10 @@ void SubProgramDialog::save()
     {
         onSaveClick();
     }
+}
+
+void SubProgramDialog::reload()
+{
+    mCyclogramWidget->load(mCommand->cyclogram());
+    updateSize();
 }

@@ -14,6 +14,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QDir>
+#include <QFileSystemWatcher>
 
 namespace
 {
@@ -24,6 +25,8 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
     mLoaded(false)
 {
+    mFileWatcher = new QFileSystemWatcher(this);
+
     mText = DEFAULT_TEXT;
 
     auto cyclogram = CyclogramManager::createCyclogram();
@@ -71,6 +74,15 @@ bool CmdSubProgram::load()
     {
         return false;
     }
+
+    if (!mFileWatcher->files().empty())
+    {
+        mFileWatcher->removePaths(mFileWatcher->files());
+    }
+
+    Qt::ConnectionType connection = Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection);
+    connect(mFileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(reloadCyclogram()), connection);
+    mFileWatcher->addPath(fileName);
 
     if (mText == DEFAULT_TEXT)
     {
@@ -145,6 +157,11 @@ void CmdSubProgram::setFilePath(const QString& filePath, bool reload)
     if (mFilePath == filePath)
     {
         return;
+    }
+
+    if (!mFileWatcher->files().empty())
+    {
+        mFileWatcher->removePaths(mFileWatcher->files());
     }
 
     mFilePath = filePath;
@@ -624,4 +641,24 @@ void CmdSubProgram::saveFileIfNotExist()
     }
 
     updateText();
+}
+
+void CmdSubProgram::reloadCyclogram()
+{
+    LOG_INFO(QString("Subprogram file %1 changed outside the editor").arg(mFilePath));
+
+    QString filePath = mFilePath;
+    setFilePath("", false);
+    setFilePath(filePath);
+
+    auto cyclogram = mCyclogram.lock();
+
+    if (cyclogram->isModified())
+    {
+        //TODO ask to save as or reload?
+    }
+
+    cyclogram->setModified(false, true, false);
+
+    emit cyclogramChanged();
 }

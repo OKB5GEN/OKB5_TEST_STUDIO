@@ -8,6 +8,7 @@ class QAction;
 class QMenu;
 class QSessionManager;
 class QScrollArea;
+class QFileSystemWatcher;
 
 class CyclogramWidget;
 class Cyclogram;
@@ -63,6 +64,8 @@ private slots:
 
     void onSubprogramDestroyed(QObject* object);
     void onSubprogramDialogDestroyed(QObject* object);
+
+    void reloadCyclogram();
 
 signals:
     void documentSaved(bool saved);
@@ -147,5 +150,9 @@ private:
     QAction* mRecentFileActs[MAX_RECENT_FILES];
     QAction* mRecentFileSeparator;
     QAction* mRecentFileSubMenuAct;
+
+    QFileSystemWatcher* mFileWatcher;
+
+    int mSkipReloadCalls; //TODO workaround for twice QFileSystemWatcher::fileChanged() signal emission
 };
 #endif // EDITOR_WINDOW_H

@@ -45,6 +45,7 @@ private slots:
 
     void onCyclogramModified();
     void onCyclogramSelectionChanged(ShapeItem* item);
+    void reload();
 
 private:
     void updateSize();

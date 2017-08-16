@@ -6,6 +6,8 @@
 
 #include "Headers/logic/commands/cmd_action.h"
 
+class QFileSystemWatcher;
+
 class Cyclogram;
 
 class CmdSubProgram: public CmdAction
@@ -52,10 +54,12 @@ private slots:
     void execute();
     void onCyclogramFinished(const QString& error);
     void onCyclogramModified();
+    void reloadCyclogram();
 
 signals:
     void commandStarted(Command* cmd);
     void commandFinished(Command* cmd);
+    void cyclogramChanged();
 
 private:
     bool load();
@@ -72,6 +76,9 @@ private:
 
     QMap<QString, QVariant> mInputParams;
     QMap<QString, QVariant> mOutputParams;
+
+    QFileSystemWatcher* mFileWatcher;
+    int mSkipReloadCalls; //TODO workaround for twice QFileSystemWatcher::fileChanged() signal emission
 };
 
 #endif // CMD_SUB_PROGRAM_H
