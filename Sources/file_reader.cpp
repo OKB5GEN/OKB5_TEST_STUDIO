@@ -16,6 +16,7 @@
 #include <QMetaEnum>
 #include <QMessageBox>
 #include <QFile>
+#include <QCryptographicHash>
 
 FileReader::FileReader(QSharedPointer<Cyclogram> cyclogram)
     : mCyclogram(cyclogram)
@@ -333,4 +334,24 @@ Version FileReader::fileVersion(const QString& fileName, bool* ok)
     }
 
     return Version();
+}
+
+QString FileReader::fileHash(const QString& fileName)
+{
+    QString hash;
+
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        return hash;
+    }
+
+    QCryptographicHash hashCreator(QCryptographicHash::Md5);
+
+    if (hashCreator.addData(&file))
+    {
+        hash = QString::fromStdString(hashCreator.result().toBase64().toStdString());
+    }
+
+    return hash;
 }

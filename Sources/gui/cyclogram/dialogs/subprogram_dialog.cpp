@@ -115,6 +115,8 @@ bool SubProgramDialog::onSaveClick()
         return false;
     }
 
+    mCommand->beforeSave();
+
     FileWriter writer(mCommand->cyclogram());
     if (writer.writeFile(&file))
     {

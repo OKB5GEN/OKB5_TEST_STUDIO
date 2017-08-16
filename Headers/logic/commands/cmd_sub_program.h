@@ -22,6 +22,7 @@ public:
     void restart();
 
     void generateFileName();
+    void beforeSave();
 
 public:
     void setFilePath(const QString& filePath, bool reload = true);
@@ -78,7 +79,8 @@ private:
     QMap<QString, QVariant> mOutputParams;
 
     QFileSystemWatcher* mFileWatcher;
-    int mSkipReloadCalls; //TODO workaround for twice QFileSystemWatcher::fileChanged() signal emission
+    QString mFileHash;
+    bool mNeedHashUpdate;
 };
 
 #endif // CMD_SUB_PROGRAM_H

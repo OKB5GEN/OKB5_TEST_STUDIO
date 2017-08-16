@@ -119,6 +119,7 @@ private:
     SystemState* mSystemState;
 
     QString mCurFile;
+    QString mCurFileHash;
 
     QAction* mRunAct;
     QAction* mStopAct;
@@ -152,7 +153,6 @@ private:
     QAction* mRecentFileSubMenuAct;
 
     QFileSystemWatcher* mFileWatcher;
-
-    int mSkipReloadCalls; //TODO workaround for twice QFileSystemWatcher::fileChanged() signal emission
+    bool mNeedHashUpdate;
 };
 #endif // EDITOR_WINDOW_H

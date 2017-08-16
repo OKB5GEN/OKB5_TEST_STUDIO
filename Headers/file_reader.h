@@ -18,6 +18,7 @@ public:
     QString errorString() const;
 
     static Version fileVersion(const QString& fileName, bool* ok = Q_NULLPTR);
+    static QString fileHash(const QString& fileName);
 
 private:
     void readCyclogram(const Version& fileVersion);

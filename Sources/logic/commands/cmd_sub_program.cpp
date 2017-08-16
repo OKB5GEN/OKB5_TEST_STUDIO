@@ -23,7 +23,8 @@ namespace
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
     CmdAction(DRAKON::SUBPROGRAM, parent),
-    mLoaded(false)
+    mLoaded(false),
+    mNeedHashUpdate(false)
 {
     mFileWatcher = new QFileSystemWatcher(this);
 
@@ -74,6 +75,8 @@ bool CmdSubProgram::load()
     {
         return false;
     }
+
+    mFileHash = FileReader::fileHash(fileName);
 
     if (!mFileWatcher->files().empty())
     {
@@ -643,21 +646,46 @@ void CmdSubProgram::saveFileIfNotExist()
     updateText();
 }
 
+void CmdSubProgram::beforeSave()
+{
+    mNeedHashUpdate = true;
+}
+
 void CmdSubProgram::reloadCyclogram()
 {
-    LOG_INFO(QString("Subprogram file %1 changed outside the editor").arg(mFilePath));
+    QString hash = FileReader::fileHash(Cyclogram::defaultStorePath() + mFilePath);
+
+    if (mNeedHashUpdate)
+    {
+        mFileHash = hash;
+        mNeedHashUpdate = false;
+        return;
+    }
+
+    if (mFileHash == hash)
+    {
+        return;
+    }
+
+    mFileHash = hash;
+
+    LOG_WARNING(QString("Subprogram file '%1' changed outside the editor.").arg(mFilePath));
+
+    auto cyclogram = mCyclogram.lock();
+    if (cyclogram->isModified())
+    {
+        generateFileName();
+        LOG_WARNING(QString("Subprogram has local unsaved modifications. New file name is '%1'").arg(mFilePath));
+        return;
+    }
+
+    LOG_WARNING(QString("Reloading file...").arg(mFilePath));
 
     QString filePath = mFilePath;
     setFilePath("", false);
     setFilePath(filePath);
 
-    auto cyclogram = mCyclogram.lock();
-
-    if (cyclogram->isModified())
-    {
-        //TODO ask to save as or reload?
-    }
-
+    cyclogram = mCyclogram.lock();
     cyclogram->setModified(false, true, false);
 
     emit cyclogramChanged();
