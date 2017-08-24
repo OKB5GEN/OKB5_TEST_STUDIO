@@ -758,11 +758,17 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
 
     QString editText = tr("Edit");
     QString deleteText = tr("Delete");
+    QString showSubprogramText = tr("Show subprogram window");
     QString copyText = (type == DRAKON::BRANCH_BEGIN) ? tr("Copy entire branch") : tr("Copy");
 
     menu.addAction(editText);
     menu.addAction(deleteText);
     menu.addAction(copyText);
+
+    if (type == DRAKON::SUBPROGRAM)
+    {
+        menu.addAction(showSubprogramText);
+    }
 
     bool enableCopyAction = item->command()->canBeCopied();
 
@@ -772,6 +778,7 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
         enableCopyAction = !cyclogram->isCyclogramEndBranch(item->command());
     }
 
+
     QAction* action = menu.exec(pos);
     if (!action)
     {
@@ -779,6 +786,23 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
     }
 
     if (action->text() == editText)
+    {
+        if (type == DRAKON::SUBPROGRAM)
+        {
+            CmdSubProgramEditDialog dialog(Q_NULLPTR);
+            CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(item->command());
+            dialog.setCommand(subprogram, mCyclogram.lock());
+            dialog.exec();
+        }
+        else
+        {
+            showEditDialog(item->command());
+        }
+
+        return;
+    }
+
+    if (action->text() == showSubprogramText)
     {
         showEditDialog(item->command());
         return;
@@ -1107,7 +1131,7 @@ ValencyPoint* CyclogramWidget::valencyPointAt(const QPoint &pos) const
 
 void CyclogramWidget::moveItemTo(const QPoint &pos)
 {
-    QPoint offset = pos - mPreviousPosition;
+    QPoint offset = (pos - mPreviousPosition) / mScale;
     mDraggingShape->setPosition(mDraggingShape->position() + offset);
     mPreviousPosition = pos;
 

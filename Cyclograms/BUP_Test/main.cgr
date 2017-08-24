@@ -84,15 +84,12 @@
         <command type="GO_TO_BRANCH" id="1501569524187" console_text="" console_text_color="ff000000"/>
         <command type="OUTPUT" id="1501569672561" console_text="Программа выполнена успешно" console_text_color="ff006400"/>
         <command type="OUTPUT" id="1501569720218" console_text="Команда завершилась с ошибкой" console_text_color="ffdc143c"/>
-        <command type="OUTPUT" id="1501569839853" console_text="Начат тест при напряжении питания 27В" console_text_color="ff000000"/>
-        <command type="OUTPUT" id="1501571620273" console_text="Начат тест при напряжении питания 25.65В" console_text_color="ff000000"/>
-        <command type="OUTPUT" id="1501571622971" console_text="Начат тест при напряжении питания 28.35В" console_text_color="ff000000"/>
     </commands>
     <tree>
         <item id="1491892365458" down="1491892365459" right="-1" under_arrow="-1"/>
-        <item id="1491892365459" down="1501569839853" right="-1" under_arrow="-1"/>
-        <item id="1501569369304" down="1501571620273" right="-1" under_arrow="-1"/>
-        <item id="1501569371027" down="1501571622971" right="-1" under_arrow="-1"/>
+        <item id="1491892365459" down="1491892387211" right="-1" under_arrow="-1"/>
+        <item id="1501569369304" down="1501569411639" right="-1" under_arrow="-1"/>
+        <item id="1501569371027" down="1501569421259" right="-1" under_arrow="-1"/>
         <item id="1491892365460" down="1501569369304" right="-1" under_arrow="-1"/>
         <item id="1491892365462" down="1491892365463" right="-1" under_arrow="-1"/>
         <item id="1491892365463" down="-1" right="-1" under_arrow="-1"/>
@@ -115,8 +112,5 @@
         <item id="1501569524187" down="1491892429602" right="-1" under_arrow="-1"/>
         <item id="1501569672561" down="1491892427915" right="-1" under_arrow="-1"/>
         <item id="1501569720218" down="1491892429605" right="-1" under_arrow="-1"/>
-        <item id="1501569839853" down="1491892387211" right="-1" under_arrow="-1"/>
-        <item id="1501571620273" down="1501569411639" right="-1" under_arrow="-1"/>
-        <item id="1501571622971" down="1501569421259" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

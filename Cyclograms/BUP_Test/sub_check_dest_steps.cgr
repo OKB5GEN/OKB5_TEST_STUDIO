@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
         <variable name="DestN" value="10" desc=""/>
         <variable name="DestSteps" value="0" desc=""/>
@@ -31,140 +34,142 @@
         <variable name="TSF" value="0" desc="Temperature sensor presense flag"/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1491893392468" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491893392470" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1491893392471"/>
-        <command type="BRANCH_BEGIN" id="1491893392472" name="End"/>
-        <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
-        <command type="BRANCH_BEGIN" id="1492066042375" name="CheckStopped"/>
-        <command type="GO_TO_BRANCH" id="1492066042377"/>
-        <command type="ACTION_MODULE" id="1492066061848" module="MKO" command="RECEIVE_COMMAND_ARRAY">
+        <command type="TERMINATOR" id="1491893392468" console_text="" console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491893392470" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491893392471" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491893392472" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491893392473" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="BRANCH_BEGIN" id="1492066042375" console_text="" console_text_color="ff000000" name="CheckStopped"/>
+        <command type="GO_TO_BRANCH" id="1492066042377" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1492066061848" console_text="" console_text_color="ff000000" module="MKO" command="RECEIVE_COMMAND_ARRAY">
             <input_params>
-                <param name="SUBADDRESS" type="2" value="0"/>
+                <param name="SUBADDRESS" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="ANGLE_NU" type="10" value="NuA"/>
-                <param name="ANGLE_PSY" type="10" value="PsyA"/>
-                <param name="CURRENT_NU" type="10" value="NuI"/>
-                <param name="CURRENT_PSY" type="10" value="PsyI"/>
-                <param name="MODE_NU" type="10" value="NuM"/>
-                <param name="MODE_PSY" type="10" value="PsyM"/>
-                <param name="STEPS_NU" type="10" value="NuS"/>
-                <param name="STEPS_PSY" type="10" value="PsyS"/>
-                <param name="SENSOR_FLAG" type="10" value="TSF"/>
                 <param name="TEMPERATURE" type="10" value="T"/>
-                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="MODE_PSY" type="10" value="PsyM"/>
+                <param name="STEPS_PSY" type="10" value="PsyS"/>
                 <param name="VELOCITY_PSY" type="10" value="PsyV"/>
+                <param name="CURRENT_PSY" type="10" value="PsyI"/>
+                <param name="ANGLE_PSY" type="10" value="PsyA"/>
+                <param name="MODE_NU" type="10" value="NuM"/>
+                <param name="STEPS_NU" type="10" value="NuS"/>
+                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="CURRENT_NU" type="10" value="NuI"/>
+                <param name="ANGLE_NU" type="10" value="NuA"/>
+                <param name="SENSOR_FLAG" type="10" value="TSF"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1492066247981" module="MKO" command="RECEIVE_COMMAND_ARRAY">
+        <command type="ACTION_MODULE" id="1492066247981" console_text="" console_text_color="ff000000" module="MKO" command="RECEIVE_COMMAND_ARRAY">
             <input_params>
-                <param name="SUBADDRESS" type="2" value="0"/>
+                <param name="SUBADDRESS" type="6" value="0"/>
             </input_params>
             <output_params>
-                <param name="ANGLE_NU" type="10" value="NuA"/>
-                <param name="ANGLE_PSY" type="10" value="PsyA"/>
-                <param name="CURRENT_NU" type="10" value="NuI"/>
-                <param name="CURRENT_PSY" type="10" value="PsyI"/>
-                <param name="MODE_NU" type="10" value="NuM"/>
-                <param name="MODE_PSY" type="10" value="PsyM"/>
-                <param name="STEPS_NU" type="10" value="NuS"/>
-                <param name="STEPS_PSY" type="10" value="PsyS"/>
-                <param name="SENSOR_FLAG" type="10" value="TSF"/>
                 <param name="TEMPERATURE" type="10" value="T"/>
-                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="MODE_PSY" type="10" value="PsyM"/>
+                <param name="STEPS_PSY" type="10" value="PsyS"/>
                 <param name="VELOCITY_PSY" type="10" value="PsyV"/>
+                <param name="CURRENT_PSY" type="10" value="PsyI"/>
+                <param name="ANGLE_PSY" type="10" value="PsyA"/>
+                <param name="MODE_NU" type="10" value="NuM"/>
+                <param name="STEPS_NU" type="10" value="NuS"/>
+                <param name="VELOCITY_NU" type="10" value="NuV"/>
+                <param name="CURRENT_NU" type="10" value="NuI"/>
+                <param name="ANGLE_NU" type="10" value="NuA"/>
+                <param name="SENSOR_FLAG" type="10" value="TSF"/>
             </output_params>
         </command>
-        <command type="ACTION_MATH" id="1492066322026" operation="Assign">
+        <command type="ACTION_MATH" id="1492066322026" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsPrev"/>
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066391567" operation="Assign">
+        <command type="ACTION_MATH" id="1492066391567" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="SELECT_STATE" id="1492066416396" operation="Equal" orientation="YesDown">
+        <command type="SELECT_STATE" id="1492066416396" console_text="" console_text_color="ff000000" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="StepsPrev"/>
             <operand id="Right" type="Variable" value="0" variable="StepsCur"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492066416399"/>
-        <command type="ACTION_MATH" id="1492066513810" operation="Add">
+        <command type="GO_TO_BRANCH" id="1492066416399" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1492066513810" console_text="" console_text_color="ff000000" operation="Add">
             <operand id="Result" type="Variable" value="0" variable="Nst"/>
             <operand id="Operand1" type="Variable" value="0" variable="Nst"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
         </command>
-        <command type="SELECT_STATE" id="1492066536488" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1492066536488" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Nst"/>
             <operand id="Right" type="Variable" value="0" variable="NstMax"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492066536492"/>
-        <command type="ACTION_MATH" id="1492066619262" operation="Assign">
+        <command type="GO_TO_BRANCH" id="1492066536492" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1492066619262" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066736294" operation="Assign">
+        <command type="ACTION_MATH" id="1492066736294" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066755188" operation="Assign">
+        <command type="ACTION_MATH" id="1492066755188" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsPrev"/>
             <operand id="Operand1" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066898527" operation="Add">
+        <command type="ACTION_MATH" id="1492066898527" console_text="" console_text_color="ff000000" operation="Add">
             <operand id="Result" type="Variable" value="0" variable="N"/>
             <operand id="Operand1" type="Variable" value="0" variable="N"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
         </command>
-        <command type="SELECT_STATE" id="1492066922923" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1492066922923" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="N"/>
             <operand id="Right" type="Variable" value="0" variable="DestN"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492066922926"/>
-        <command type="ACTION_MATH" id="1492066946109" operation="Assign">
+        <command type="GO_TO_BRANCH" id="1492066922926" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1492066946109" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492070258798" operation="Subtract">
+        <command type="ACTION_MATH" id="1492070258798" console_text="" console_text_color="ff000000" operation="Subtract">
             <operand id="Result" type="Variable" value="0" variable="Diff"/>
             <operand id="Operand1" type="Variable" value="0" variable="DestSteps"/>
             <operand id="Operand2" type="Variable" value="0" variable="StepsCur"/>
         </command>
-        <command type="SELECT_STATE" id="1492070269733" operation="Less" orientation="YesDown">
+        <command type="SELECT_STATE" id="1492070269733" console_text="" console_text_color="ff000000" operation="Less" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Diff"/>
             <operand id="Right" type="Variable" value="0" variable="MaxDelta"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492070269738"/>
-        <command type="ACTION_MATH" id="1492070275607" operation="Assign">
+        <command type="GO_TO_BRANCH" id="1492070269738" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1492070275607" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="CONDITION" id="1492070463420" operation="Less" orientation="YesDown">
+        <command type="CONDITION" id="1492070463420" console_text="" console_text_color="ff000000" operation="Less" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Diff"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492070479244" operation="Multiply">
+        <command type="ACTION_MATH" id="1492070479244" console_text="" console_text_color="ff000000" operation="Multiply">
             <operand id="Result" type="Variable" value="0" variable="Diff"/>
             <operand id="Operand1" type="Number" value="-1" variable=""/>
             <operand id="Operand2" type="Variable" value="0" variable="Diff"/>
         </command>
-        <command type="ACTION_MATH" id="1492070482052" operation="Assign">
+        <command type="ACTION_MATH" id="1492070482052" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="Diff"/>
             <operand id="Operand1" type="Variable" value="0" variable="Diff"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492070633385" operation="Assign">
+        <command type="ACTION_MATH" id="1492070633385" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="N"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
+        <command type="OUTPUT" id="1503568190182" console_text="Превышен максимальный интервал ожидания (%NstMax% циклов)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503568199460" console_text="Результирующее количество шагов (%StepsCur%) не совпадает с заданным (%DestSteps%)" console_text_color="ffdc143c"/>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
@@ -183,7 +188,7 @@
         <item id="1492066513810" down="1492066536488" right="-1" under_arrow="-1"/>
         <item id="1492066536488" down="1492066619262" right="1492066536492" under_arrow="-1"/>
         <item id="1492066536492" down="1492066042375" right="-1" under_arrow="-1"/>
-        <item id="1492066619262" down="1492066416399" right="-1" under_arrow="-1"/>
+        <item id="1492066619262" down="1503568190182" right="-1" under_arrow="-1"/>
         <item id="1492066736294" down="1491893392471" right="-1" under_arrow="-1"/>
         <item id="1492066755188" down="1492066061848" right="-1" under_arrow="-1"/>
         <item id="1492066898527" down="1492066922923" right="-1" under_arrow="-1"/>
@@ -193,10 +198,12 @@
         <item id="1492070258798" down="1492070463420" right="-1" under_arrow="-1"/>
         <item id="1492070269733" down="1492066946109" right="1492070275607" under_arrow="-1"/>
         <item id="1492070269738" down="1491893392472" right="-1" under_arrow="-1"/>
-        <item id="1492070275607" down="1492070269738" right="-1" under_arrow="-1"/>
+        <item id="1492070275607" down="1503568199460" right="-1" under_arrow="-1"/>
         <item id="1492070463420" down="1492070479244" right="1492070482052" under_arrow="1492070269733"/>
         <item id="1492070479244" down="1492070269733" right="-1" under_arrow="-1"/>
         <item id="1492070482052" down="1492070269733" right="-1" under_arrow="-1"/>
         <item id="1492070633385" down="1492066513810" right="-1" under_arrow="-1"/>
+        <item id="1503568190182" down="1492066416399" right="-1" under_arrow="-1"/>
+        <item id="1503568199460" down="1492070269738" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

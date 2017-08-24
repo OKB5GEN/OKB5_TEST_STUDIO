@@ -21,126 +21,94 @@
         <variable name="Vmin" value="20" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1491893392468" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491893392470" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="CheckMax"/>
-        <command type="GO_TO_BRANCH" id="1491893392471" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491893392472" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="End"/>
-        <command type="TERMINATOR" id="1491893392473" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FINISH" cmd_type="END"/>
-        <command type="BRANCH_BEGIN" id="1492067633342" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="CheckMin"/>
-        <command type="GO_TO_BRANCH" id="1492067633344" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1492067755761" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="Send"/>
-        <command type="GO_TO_BRANCH" id="1492067755764" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="ACTION_MODULE" id="1492067766840" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" module="MKO" command="SEND_COMMAND_ARRAY">
+        <command type="TERMINATOR" id="1491893392468" console_text="" console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491893392470" console_text="" console_text_color="ff000000" name="CheckMax"/>
+        <command type="GO_TO_BRANCH" id="1491893392471" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491893392472" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491893392473" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="BRANCH_BEGIN" id="1492067633342" console_text="" console_text_color="ff000000" name="CheckMin"/>
+        <command type="GO_TO_BRANCH" id="1492067633344" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1492067755761" console_text="" console_text_color="ff000000" name="Send"/>
+        <command type="GO_TO_BRANCH" id="1492067755764" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1492067766840" console_text="" console_text_color="ff000000" module="MKO" command="SEND_COMMAND_ARRAY">
             <input_params>
-                <param name="CURRENT_NU" type="10" value="MaxI"/>
+                <param name="MODE_PSY" type="10" value="Mode"/>
+                <param name="STEPS_PSY" type="10" value="Steps"/>
+                <param name="VELOCITY_PSY" type="10" value="MaxV"/>
                 <param name="CURRENT_PSY" type="10" value="MaxI"/>
                 <param name="MODE_NU" type="10" value="Mode"/>
-                <param name="MODE_PSY" type="10" value="Mode"/>
                 <param name="STEPS_NU" type="10" value="Steps"/>
-                <param name="STEPS_PSY" type="10" value="Steps"/>
-                <param name="SUBADDRESS" type="6" value="0"/>
                 <param name="VELOCITY_NU" type="10" value="MaxV"/>
-                <param name="VELOCITY_PSY" type="10" value="MaxV"/>
+                <param name="CURRENT_NU" type="10" value="MaxI"/>
+                <param name="SUBADDRESS" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MATH" id="1492067820352" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1492067820352" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="BRANCH_BEGIN" id="1492067893814" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" name="FAIL"/>
-        <command type="GO_TO_BRANCH" id="1492067893816" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="ACTION_MATH" id="1492067904167" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
+        <command type="BRANCH_BEGIN" id="1492067893814" console_text="" console_text_color="ff000000" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1492067893816" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MATH" id="1492067904167" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="SELECT_STATE" id="1492067932363" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
+        <command type="SELECT_STATE" id="1492067932363" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Variable" value="0" variable="Mmax"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067932367" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067937231" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067932367" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067937231" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Steps"/>
             <operand id="Right" type="Variable" value="0" variable="Smax"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067937234" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067940979" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067937234" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067940979" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxV"/>
             <operand id="Right" type="Variable" value="0" variable="Vmax"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067940983" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067945158" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Greater" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067940983" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067945158" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxI"/>
             <operand id="Right" type="Variable" value="0" variable="Imax"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067945162" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067949657" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067945162" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067949657" console_text="" console_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Variable" value="0" variable="Mmin"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067949659" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067953024" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067949659" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067953024" console_text="" console_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="Steps"/>
             <operand id="Right" type="Variable" value="0" variable="Smin"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067953028" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067956741" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067953028" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067956741" console_text="" console_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxV"/>
             <operand id="Right" type="Variable" value="0" variable="Vmin"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067956745" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="SELECT_STATE" id="1492067961087" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Less" orientation="YesRight">
+        <command type="GO_TO_BRANCH" id="1492067956745" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1492067961087" console_text="" console_text_color="ff000000" operation="Less" orientation="YesRight">
             <operand id="Left" type="Variable" value="0" variable="MaxI"/>
             <operand id="Right" type="Variable" value="0" variable="Imin"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1492067961091" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
-        <command type="ACTION_MATH" id="1492068026640" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="4" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068029493" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="3" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068033519" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="2" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068038310" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="1" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068044091" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="5" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068047135" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="6" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068050118" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="7" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="ACTION_MATH" id="1492068053888" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="Assign">
-            <operand id="Result" type="Variable" value="0" variable="Error"/>
-            <operand id="Operand1" type="Number" value="8" variable=""/>
-            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
-        </command>
-        <command type="SELECT_STATE" id="1499764822269" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000" operation="NotEqual" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1492067961091" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1499764822269" console_text="" console_text_color="ff000000" operation="NotEqual" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="Mode"/>
             <operand id="Right" type="Number" value="5" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1499764822274" on_start_text="" on_finish_text="" on_start_text_color="ff000000" on_finish_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1499764822274" console_text="" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567230568" console_text="Невозможно отправить командный массив: Режим (%Mode%) больше максимума (%Mmax%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567340459" console_text="Невозможно отправить командный массив: Шаги (%Steps%) больше максимума (%Smax%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567342393" console_text="Невозможно отправить командный массив: Скорость (%MaxV%) больше максимума (%Vmax%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567344160" console_text="Невозможно отправить командный массив: Ток (%MaxI%) больше максимума (%Imax%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567377003" console_text="Невозможно отправить командный массив: Режим (%Mode%) меньше минимума (%Mmin%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567380347" console_text="Невозможно отправить командный массив: Шаги (%Steps%) меньше минимума (%Smin%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567386712" console_text="Невозможно отправить командный массив: Скорость (%MaxV%) меньше минимума (%Vmin%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567389467" console_text="Невозможно отправить командный массив: Ток (%MaxI%) меньше минимума (%Imin%)" console_text_color="ffdc143c"/>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
@@ -157,31 +125,31 @@
         <item id="1492067893814" down="1492067904167" right="-1" under_arrow="-1"/>
         <item id="1492067893816" down="1491893392472" right="-1" under_arrow="-1"/>
         <item id="1492067904167" down="1492067893816" right="-1" under_arrow="-1"/>
-        <item id="1492067932363" down="1492067937231" right="1492068038310" under_arrow="-1"/>
+        <item id="1492067932363" down="1492067937231" right="1503567230568" under_arrow="-1"/>
         <item id="1492067932367" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067937231" down="1492067940979" right="1492068033519" under_arrow="-1"/>
+        <item id="1492067937231" down="1492067940979" right="1503567340459" under_arrow="-1"/>
         <item id="1492067937234" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067940979" down="1492067945158" right="1492068029493" under_arrow="-1"/>
+        <item id="1492067940979" down="1492067945158" right="1503567342393" under_arrow="-1"/>
         <item id="1492067940983" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067945158" down="1491893392471" right="1492068026640" under_arrow="-1"/>
+        <item id="1492067945158" down="1491893392471" right="1503567344160" under_arrow="-1"/>
         <item id="1492067945162" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067949657" down="1492067953024" right="1492068044091" under_arrow="-1"/>
+        <item id="1492067949657" down="1492067953024" right="1503567377003" under_arrow="-1"/>
         <item id="1492067949659" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067953024" down="1499764822269" right="1492068047135" under_arrow="-1"/>
+        <item id="1492067953024" down="1499764822269" right="1503567380347" under_arrow="-1"/>
         <item id="1492067953028" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067956741" down="1492067961087" right="1492068050118" under_arrow="-1"/>
+        <item id="1492067956741" down="1492067961087" right="1503567386712" under_arrow="-1"/>
         <item id="1492067956745" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492067961087" down="1492067633344" right="1492068053888" under_arrow="-1"/>
+        <item id="1492067961087" down="1492067633344" right="1503567389467" under_arrow="-1"/>
         <item id="1492067961091" down="1492067893814" right="-1" under_arrow="-1"/>
-        <item id="1492068026640" down="1492067945162" right="-1" under_arrow="-1"/>
-        <item id="1492068029493" down="1492067940983" right="-1" under_arrow="-1"/>
-        <item id="1492068033519" down="1492067937234" right="-1" under_arrow="-1"/>
-        <item id="1492068038310" down="1492067932367" right="-1" under_arrow="-1"/>
-        <item id="1492068044091" down="1492067949659" right="-1" under_arrow="-1"/>
-        <item id="1492068047135" down="1492067953028" right="-1" under_arrow="-1"/>
-        <item id="1492068050118" down="1492067956745" right="-1" under_arrow="-1"/>
-        <item id="1492068053888" down="1492067961091" right="-1" under_arrow="-1"/>
         <item id="1499764822269" down="1492067956741" right="1499764822274" under_arrow="-1"/>
         <item id="1499764822274" down="1492067755761" right="-1" under_arrow="-1"/>
+        <item id="1503567230568" down="1492067932367" right="-1" under_arrow="-1"/>
+        <item id="1503567340459" down="1492067937234" right="-1" under_arrow="-1"/>
+        <item id="1503567342393" down="1492067940983" right="-1" under_arrow="-1"/>
+        <item id="1503567344160" down="1492067945162" right="-1" under_arrow="-1"/>
+        <item id="1503567377003" down="1492067949659" right="-1" under_arrow="-1"/>
+        <item id="1503567380347" down="1492067953028" right="-1" under_arrow="-1"/>
+        <item id="1503567386712" down="1492067956745" right="-1" under_arrow="-1"/>
+        <item id="1503567389467" down="1492067961091" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

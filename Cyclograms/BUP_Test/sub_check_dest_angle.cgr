@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
         <variable name="OK" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1491893392468" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1491893392470" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1491893392471"/>
-        <command type="BRANCH_BEGIN" id="1491893392472" name="End"/>
-        <command type="TERMINATOR" id="1491893392473" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MATH" id="1491998447371" operation="Assign">
+        <command type="TERMINATOR" id="1491893392468" console_text="" console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1491893392470" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1491893392471" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1491893392472" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1491893392473" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MATH" id="1491998447371" console_text="" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
+        <command type="OUTPUT" id="1503566421784" console_text="Тест пропущен (не реализован)" console_text_color="ffff8c00"/>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
-        <item id="1491893392470" down="1491998447371" right="-1" under_arrow="-1"/>
+        <item id="1491893392470" down="1503566421784" right="-1" under_arrow="-1"/>
         <item id="1491893392471" down="1491893392472" right="-1" under_arrow="-1"/>
         <item id="1491893392472" down="1491893392473" right="-1" under_arrow="-1"/>
         <item id="1491893392473" down="-1" right="-1" under_arrow="-1"/>
         <item id="1491998447371" down="1491893392471" right="-1" under_arrow="-1"/>
+        <item id="1503566421784" down="1491998447371" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

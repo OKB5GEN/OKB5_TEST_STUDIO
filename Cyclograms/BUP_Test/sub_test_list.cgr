@@ -7,6 +7,7 @@
     <variables>
         <variable name="OK" value="0" desc=""/>
         <variable name="SubOK" value="0" desc=""/>
+        <variable name="TestNum" value="0" desc=""/>
         <variable name="U" value="0" desc=""/>
     </variables>
     <commands>
@@ -38,16 +39,14 @@
         <command type="GO_TO_BRANCH" id="1491891431796" console_text="" console_text_color="ff000000"/>
         <command type="BRANCH_BEGIN" id="1491891434147" console_text="" console_text_color="ff000000" name="Test6"/>
         <command type="GO_TO_BRANCH" id="1491891434150" console_text="" console_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891448692" console_text="" console_text_color="ff000000" name="OK"/>
         <command type="GO_TO_BRANCH" id="1491891448695" console_text="" console_text_color="ff000000"/>
-        <command type="BRANCH_BEGIN" id="1491891451414" console_text="" console_text_color="ff000000" name="FAIL"/>
         <command type="GO_TO_BRANCH" id="1491891451417" console_text="" console_text_color="ff000000"/>
         <command type="SELECT_STATE" id="1491891548089" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="SubOK"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891548094" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891646132" console_text="" console_text_color="ff000000" name="Send11" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891646132" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -75,7 +74,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891686244" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891705619" console_text="" console_text_color="ff000000" name="Check11" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891705619" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="10000"/>
@@ -108,6 +107,7 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
@@ -116,7 +116,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891736341" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891773395" console_text="" console_text_color="ff000000" name="Send21" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891773395" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -139,13 +139,22 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891777155" console_text="" console_text_color="ff000000" name="Send31" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891777155" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="5000"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="3"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="1e+7"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -153,13 +162,22 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891781150" console_text="" console_text_color="ff000000" name="Send41" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891781150" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="50"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="2"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="1333"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -167,13 +185,22 @@
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891786550" console_text="" console_text_color="ff000000" name="Send51" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891786550" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="500"/>
                 <param name="MaxV" type="6" value="5000"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="3"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="10000"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -191,7 +218,7 @@
             <operand id="Operand1" type="Number" value="0" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="SUBPROGRAM" id="1491891817376" console_text="" console_text_color="ff000000" name="Send61" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491891817376" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -239,7 +266,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891844038" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491891851123" console_text="" console_text_color="ff000000" name="Check21" file="BUP_TEST/sub_check_stopped.cgr">
+        <command type="SUBPROGRAM" id="1491891851123" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="MaxI" type="6" value="0"/>
@@ -269,10 +296,11 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891854276" console_text="" console_text_color="ff000000" name="Check31" file="BUP_TEST/sub_check_stopped.cgr">
+        <command type="SUBPROGRAM" id="1491891854276" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_stopped.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="MaxI" type="6" value="400"/>
@@ -302,10 +330,11 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891860453" console_text="" console_text_color="ff000000" name="Check41" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891860453" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="1333"/>
@@ -338,10 +367,11 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891865958" console_text="" console_text_color="ff000000" name="Check51" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891865958" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="10000"/>
@@ -374,10 +404,11 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491891871062" console_text="" console_text_color="ff000000" name="Check61" file="BUP_TEST/sub_check_dest_steps.cgr">
+        <command type="SUBPROGRAM" id="1491891871062" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_dest_steps.cgr">
             <input_params>
                 <param name="DestN" type="6" value="10"/>
                 <param name="DestSteps" type="6" value="1333"/>
@@ -410,6 +441,7 @@
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
@@ -438,15 +470,18 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491891945660" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491893788257" console_text="" console_text_color="ff000000" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1491893788257" console_text="Питание БУП отключено" console_text_color="ff000000" name="ResetSysState" file="BUP_TEST/sub_reset_system_state.cgr">
+            <input_params>
+                <param name="OK" type="6" value="0"/>
+            </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
-                <param name="SubOK" type="10" value="SubOK"/>
+                <param name="SubOK" type="10" value=""/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
-        <command type="SUBPROGRAM" id="1491991092223" console_text="" console_text_color="ff000000" name="Send12" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491991092223" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -474,7 +509,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991186025" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491991254104" console_text="" console_text_color="ff000000" name="Check12" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491991254104" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -503,7 +538,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491991270540" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491995677225" console_text="" console_text_color="ff000000" name="Send32" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491995677225" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -531,13 +566,22 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491995683239" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996271432" console_text="" console_text_color="ff000000" name="Send22" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491996271432" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="5"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -550,7 +594,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996318489" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996354186" console_text="" console_text_color="ff000000" name="Check22" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491996354186" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -579,13 +623,22 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491996388564" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491996983811" console_text="" console_text_color="ff000000" name="Send42" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491996983811" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="5"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -598,7 +651,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997026359" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997071373" console_text="" console_text_color="ff000000" name="Check32" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491997071373" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -627,7 +680,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997105389" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997137287" console_text="" console_text_color="ff000000" name="Check42" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491997137287" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -656,13 +709,22 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997141677" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997328827" console_text="" console_text_color="ff000000" name="Send52" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491997328827" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
+                <param name="Error" type="6" value="0"/>
+                <param name="Imax" type="6" value="511"/>
+                <param name="Imin" type="6" value="50"/>
                 <param name="MaxI" type="6" value="0"/>
                 <param name="MaxV" type="6" value="0"/>
+                <param name="Mmax" type="6" value="5"/>
+                <param name="Mmin" type="6" value="0"/>
                 <param name="Mode" type="6" value="5"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="Smax" type="6" value="214749000"/>
+                <param name="Smin" type="6" value="-214749000"/>
                 <param name="Steps" type="6" value="0"/>
+                <param name="Vmax" type="6" value="8000"/>
+                <param name="Vmin" type="6" value="20"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
@@ -675,7 +737,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997331970" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997335316" console_text="" console_text_color="ff000000" name="Check52" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491997335316" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -704,7 +766,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997338563" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997514909" console_text="" console_text_color="ff000000" name="Send62" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491997514909" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -732,7 +794,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997517716" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997521906" console_text="" console_text_color="ff000000" name="Check62" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491997521906" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -763,7 +825,9 @@
         <command type="GO_TO_BRANCH" id="1491997525080" console_text="" console_text_color="ff000000"/>
         <command type="BRANCH_BEGIN" id="1491997762659" console_text="" console_text_color="ff000000" name="Test7"/>
         <command type="GO_TO_BRANCH" id="1491997762662" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997801170" console_text="" console_text_color="ff000000" name="Send71" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="BRANCH_BEGIN" id="1491891448692" console_text="" console_text_color="ff000000" name="OK"/>
+        <command type="BRANCH_BEGIN" id="1491891451414" console_text="" console_text_color="ff000000" name="FAIL"/>
+        <command type="SUBPROGRAM" id="1491997801170" console_text="" console_text_color="ff000000" name="Отправить командный массив на БУП" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -791,13 +855,14 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997804982" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997826826" console_text="" console_text_color="ff000000" name="Check71" file="BUP_TEST/sub_check_dest_angle.cgr">
+        <command type="SUBPROGRAM" id="1491997826826" console_text="" console_text_color="ff000000" name="Выполнение теста" file="BUP_TEST/sub_check_dest_angle.cgr">
             <input_params>
                 <param name="OK" type="6" value="0"/>
             </input_params>
             <output_params>
                 <param name="OK" type="10" value=""/>
                 <param name="SubOK" type="10" value="OK"/>
+                <param name="TestNum" type="10" value=""/>
                 <param name="U" type="10" value=""/>
             </output_params>
         </command>
@@ -806,7 +871,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997831248" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997835422" console_text="" console_text_color="ff000000" name="Send72" file="BUP_TEST/sub_send_cmd_array.cgr">
+        <command type="SUBPROGRAM" id="1491997835422" console_text="" console_text_color="ff000000" name="Сброс счетчиков" file="BUP_TEST/sub_send_cmd_array.cgr">
             <input_params>
                 <param name="Error" type="6" value="0"/>
                 <param name="Imax" type="6" value="511"/>
@@ -834,7 +899,7 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997839732" console_text="" console_text_color="ff000000"/>
-        <command type="SUBPROGRAM" id="1491997844543" console_text="" console_text_color="ff000000" name="Check72" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
+        <command type="SUBPROGRAM" id="1491997844543" console_text="" console_text_color="ff000000" name="Проверка счетчиков" file="BUP_TEST/sub_check_cur_steps_and_mode.cgr">
             <input_params>
                 <param name="DestMode" type="6" value="5"/>
                 <param name="DestSteps" type="6" value="0"/>
@@ -863,120 +928,258 @@
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
         <command type="GO_TO_BRANCH" id="1491997848288" console_text="" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1502863398877" console_text="Включение питания БУП (напряжение %U% В)..." console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503564286337" console_text="Не удалось подключить питание. Завешение..." console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503564363808" console_text="Питание БУП включено" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503565544308" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="ACTION_MATH" id="1503565623737" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565943665" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565950413" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565956896" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565961797" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565966539" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503565971092" console_text="" console_text_color="ff000000" operation="Add">
+            <operand id="Result" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand1" type="Variable" value="0" variable="TestNum"/>
+            <operand id="Operand2" type="Number" value="1" variable=""/>
+        </command>
+        <command type="OUTPUT" id="1503566140298" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566145330" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566149756" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566154223" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566159332" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566165751" console_text="Тест %TestNum% провален: не удалось отправить командный массив" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566179480" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566246373" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566251311" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566255926" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566260392" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566266725" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566271500" console_text="Тест %TestNum% провален: итоговый командный массив не совпадает с заданным" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566509799" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566557558" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566563922" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566567147" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566572545" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566575351" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566583187" console_text="Тест %TestNum% провален: не удалось сбросить счетчики" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566603213" console_text="Тесты при напряжении %U%В успешно завершены" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503566644375" console_text="Тесты провалены из-за ошибок теста %TestNum%" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566861872" console_text="Отключение питания БУП..." console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503566925667" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566953656" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503566986329" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503566989550" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503566992414" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503566994811" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567001868" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567004358" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567007462" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503567010761" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503567018598" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567021004" console_text="Тест %TestNum% провален: счетчики не сброшены" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503567024049" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503567027563" console_text="Тест %TestNum% успешно завершен" console_text_color="ff006400"/>
+        <command type="OUTPUT" id="1503567075791" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567080643" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567084717" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567106711" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567112546" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567118546" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503567128967" console_text="Запуск теста %TestNum%" console_text_color="ff000000"/>
     </commands>
     <tree>
         <item id="1491891253282" down="1491891253283" right="-1" under_arrow="-1"/>
-        <item id="1491891253283" down="1491891401632" right="-1" under_arrow="-1"/>
+        <item id="1491891253283" down="1502863398877" right="-1" under_arrow="-1"/>
         <item id="1491891253284" down="1491891404569" right="-1" under_arrow="-1"/>
-        <item id="1491891253285" down="1491893788257" right="-1" under_arrow="-1"/>
+        <item id="1491891253285" down="1503566861872" right="-1" under_arrow="-1"/>
         <item id="1491891253286" down="-1" right="-1" under_arrow="-1"/>
         <item id="1491891401632" down="1491891548089" right="-1" under_arrow="-1"/>
-        <item id="1491891404569" down="1491891646132" right="-1" under_arrow="-1"/>
+        <item id="1491891404569" down="1503565623737" right="-1" under_arrow="-1"/>
         <item id="1491891404572" down="1491891406747" right="-1" under_arrow="-1"/>
-        <item id="1491891406747" down="1491891773395" right="-1" under_arrow="-1"/>
+        <item id="1491891406747" down="1503565943665" right="-1" under_arrow="-1"/>
         <item id="1491891406750" down="1491891419261" right="-1" under_arrow="-1"/>
-        <item id="1491891419261" down="1491891777155" right="-1" under_arrow="-1"/>
+        <item id="1491891419261" down="1503565950413" right="-1" under_arrow="-1"/>
         <item id="1491891419264" down="1491891421567" right="-1" under_arrow="-1"/>
-        <item id="1491891421567" down="1491891781150" right="-1" under_arrow="-1"/>
+        <item id="1491891421567" down="1503565956896" right="-1" under_arrow="-1"/>
         <item id="1491891421569" down="1491891431793" right="-1" under_arrow="-1"/>
-        <item id="1491891431793" down="1491891786550" right="-1" under_arrow="-1"/>
+        <item id="1491891431793" down="1503565961797" right="-1" under_arrow="-1"/>
         <item id="1491891431796" down="1491891434147" right="-1" under_arrow="-1"/>
-        <item id="1491891434147" down="1491891817376" right="-1" under_arrow="-1"/>
+        <item id="1491891434147" down="1503565966539" right="-1" under_arrow="-1"/>
         <item id="1491891434150" down="1491997762659" right="-1" under_arrow="-1"/>
-        <item id="1491891448692" down="1491891810046" right="-1" under_arrow="-1"/>
         <item id="1491891448695" down="1491891253285" right="-1" under_arrow="-1"/>
-        <item id="1491891451414" down="1491891813255" right="-1" under_arrow="-1"/>
         <item id="1491891451417" down="1491891253285" right="-1" under_arrow="-1"/>
-        <item id="1491891548089" down="1491891253284" right="1491891548094" under_arrow="-1"/>
+        <item id="1491891548089" down="1503564363808" right="1503564286337" under_arrow="-1"/>
         <item id="1491891548094" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891646132" down="1491891686240" right="-1" under_arrow="-1"/>
-        <item id="1491891686240" down="1491891705619" right="1491891686244" under_arrow="-1"/>
+        <item id="1491891686240" down="1491891705619" right="1503565544308" under_arrow="-1"/>
         <item id="1491891686244" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891705619" down="1491891736336" right="-1" under_arrow="-1"/>
-        <item id="1491891736336" down="1491991092223" right="1491891736341" under_arrow="-1"/>
+        <item id="1491891736336" down="1491991092223" right="1503566179480" under_arrow="-1"/>
         <item id="1491891736341" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891773395" down="1491891824978" right="-1" under_arrow="-1"/>
         <item id="1491891777155" down="1491891830395" right="-1" under_arrow="-1"/>
         <item id="1491891781150" down="1491891834277" right="-1" under_arrow="-1"/>
         <item id="1491891786550" down="1491891840119" right="-1" under_arrow="-1"/>
-        <item id="1491891810046" down="1491891448695" right="-1" under_arrow="-1"/>
-        <item id="1491891813255" down="1491891451417" right="-1" under_arrow="-1"/>
+        <item id="1491891810046" down="1503566603213" right="-1" under_arrow="-1"/>
+        <item id="1491891813255" down="1503566644375" right="-1" under_arrow="-1"/>
         <item id="1491891817376" down="1491891844034" right="-1" under_arrow="-1"/>
-        <item id="1491891824978" down="1491891851123" right="1491891824982" under_arrow="-1"/>
+        <item id="1491891824978" down="1491891851123" right="1503566140298" under_arrow="-1"/>
         <item id="1491891824982" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891830395" down="1491891854276" right="1491891830399" under_arrow="-1"/>
+        <item id="1491891830395" down="1491891854276" right="1503566145330" under_arrow="-1"/>
         <item id="1491891830399" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891834277" down="1491891860453" right="1491891834281" under_arrow="-1"/>
+        <item id="1491891834277" down="1491891860453" right="1503566149756" under_arrow="-1"/>
         <item id="1491891834281" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891840119" down="1491891865958" right="1491891840122" under_arrow="-1"/>
+        <item id="1491891840119" down="1491891865958" right="1503566154223" under_arrow="-1"/>
         <item id="1491891840122" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891844034" down="1491891871062" right="1491891844038" under_arrow="-1"/>
+        <item id="1491891844034" down="1491891871062" right="1503566159332" under_arrow="-1"/>
         <item id="1491891844038" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491891851123" down="1491891920264" right="-1" under_arrow="-1"/>
         <item id="1491891854276" down="1491891929186" right="-1" under_arrow="-1"/>
         <item id="1491891860453" down="1491891934723" right="-1" under_arrow="-1"/>
         <item id="1491891865958" down="1491891939038" right="-1" under_arrow="-1"/>
         <item id="1491891871062" down="1491891945656" right="-1" under_arrow="-1"/>
-        <item id="1491891920264" down="1491996271432" right="1491891920268" under_arrow="-1"/>
+        <item id="1491891920264" down="1491996271432" right="1503566246373" under_arrow="-1"/>
         <item id="1491891920268" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891929186" down="1491995677225" right="1491891929190" under_arrow="-1"/>
+        <item id="1491891929186" down="1491995677225" right="1503566251311" under_arrow="-1"/>
         <item id="1491891929190" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891934723" down="1491996983811" right="1491891934727" under_arrow="-1"/>
+        <item id="1491891934723" down="1491996983811" right="1503566255926" under_arrow="-1"/>
         <item id="1491891934727" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891939038" down="1491997328827" right="1491891939042" under_arrow="-1"/>
+        <item id="1491891939038" down="1491997328827" right="1503566260392" under_arrow="-1"/>
         <item id="1491891939042" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491891945656" down="1491997514909" right="1491891945660" under_arrow="-1"/>
+        <item id="1491891945656" down="1491997514909" right="1503566266725" under_arrow="-1"/>
         <item id="1491891945660" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491893788257" down="1491891253286" right="-1" under_arrow="-1"/>
         <item id="1491991092223" down="1491991186019" right="-1" under_arrow="-1"/>
-        <item id="1491991186019" down="1491991254104" right="1491991186025" under_arrow="-1"/>
+        <item id="1491991186019" down="1491991254104" right="1503566509799" under_arrow="-1"/>
         <item id="1491991186025" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491991254104" down="1491991270534" right="-1" under_arrow="-1"/>
-        <item id="1491991270534" down="1491891404572" right="1491991270540" under_arrow="-1"/>
+        <item id="1491991270534" down="1503566953656" right="1503566925667" under_arrow="-1"/>
         <item id="1491991270540" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491995677225" down="1491995683235" right="-1" under_arrow="-1"/>
-        <item id="1491995683235" down="1491997071373" right="1491995683239" under_arrow="-1"/>
+        <item id="1491995683235" down="1491997071373" right="1503566563922" under_arrow="-1"/>
         <item id="1491995683239" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491996271432" down="1491996318484" right="-1" under_arrow="-1"/>
-        <item id="1491996318484" down="1491996354186" right="1491996318489" under_arrow="-1"/>
+        <item id="1491996318484" down="1491996354186" right="1503566557558" under_arrow="-1"/>
         <item id="1491996318489" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491996354186" down="1491996388558" right="-1" under_arrow="-1"/>
-        <item id="1491996388558" down="1491891406750" right="1491996388564" under_arrow="-1"/>
+        <item id="1491996388558" down="1503566986329" right="1503566992414" under_arrow="-1"/>
         <item id="1491996388564" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491996983811" down="1491997026353" right="-1" under_arrow="-1"/>
-        <item id="1491997026353" down="1491997137287" right="1491997026359" under_arrow="-1"/>
+        <item id="1491997026353" down="1491997137287" right="1503566567147" under_arrow="-1"/>
         <item id="1491997026359" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997071373" down="1491997105384" right="-1" under_arrow="-1"/>
-        <item id="1491997105384" down="1491891419264" right="1491997105389" under_arrow="-1"/>
+        <item id="1491997105384" down="1503566989550" right="1503566994811" under_arrow="-1"/>
         <item id="1491997105389" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997137287" down="1491997141672" right="-1" under_arrow="-1"/>
-        <item id="1491997141672" down="1491891421569" right="1491997141677" under_arrow="-1"/>
+        <item id="1491997141672" down="1503567007462" right="1503567001868" under_arrow="-1"/>
         <item id="1491997141677" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997328827" down="1491997331965" right="-1" under_arrow="-1"/>
-        <item id="1491997331965" down="1491997335316" right="1491997331970" under_arrow="-1"/>
+        <item id="1491997331965" down="1491997335316" right="1503566572545" under_arrow="-1"/>
         <item id="1491997331970" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997335316" down="1491997338557" right="-1" under_arrow="-1"/>
-        <item id="1491997338557" down="1491891431796" right="1491997338563" under_arrow="-1"/>
+        <item id="1491997338557" down="1503567010761" right="1503567004358" under_arrow="-1"/>
         <item id="1491997338563" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997514909" down="1491997517710" right="-1" under_arrow="-1"/>
-        <item id="1491997517710" down="1491997521906" right="1491997517716" under_arrow="-1"/>
+        <item id="1491997517710" down="1491997521906" right="1503566575351" under_arrow="-1"/>
         <item id="1491997517716" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997521906" down="1491997525074" right="-1" under_arrow="-1"/>
-        <item id="1491997525074" down="1491891434150" right="1491997525080" under_arrow="-1"/>
+        <item id="1491997525074" down="1503567024049" right="1503567018598" under_arrow="-1"/>
         <item id="1491997525080" down="1491891451414" right="-1" under_arrow="-1"/>
-        <item id="1491997762659" down="1491997801170" right="-1" under_arrow="-1"/>
+        <item id="1491997762659" down="1503565971092" right="-1" under_arrow="-1"/>
         <item id="1491997762662" down="1491891448692" right="-1" under_arrow="-1"/>
+        <item id="1491891448692" down="1491891810046" right="-1" under_arrow="-1"/>
+        <item id="1491891451414" down="1491891813255" right="-1" under_arrow="-1"/>
         <item id="1491997801170" down="1491997804977" right="-1" under_arrow="-1"/>
-        <item id="1491997804977" down="1491997826826" right="1491997804982" under_arrow="-1"/>
+        <item id="1491997804977" down="1491997826826" right="1503566165751" under_arrow="-1"/>
         <item id="1491997804982" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997826826" down="1491997831242" right="-1" under_arrow="-1"/>
-        <item id="1491997831242" down="1491997835422" right="1491997831248" under_arrow="-1"/>
+        <item id="1491997831242" down="1491997835422" right="1503566271500" under_arrow="-1"/>
         <item id="1491997831248" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997835422" down="1491997839728" right="-1" under_arrow="-1"/>
-        <item id="1491997839728" down="1491997844543" right="1491997839732" under_arrow="-1"/>
+        <item id="1491997839728" down="1491997844543" right="1503566583187" under_arrow="-1"/>
         <item id="1491997839732" down="1491891451414" right="-1" under_arrow="-1"/>
         <item id="1491997844543" down="1491997848282" right="-1" under_arrow="-1"/>
-        <item id="1491997848282" down="1491997762662" right="1491997848288" under_arrow="-1"/>
+        <item id="1491997848282" down="1503567027563" right="1503567021004" under_arrow="-1"/>
         <item id="1491997848288" down="1491891451414" right="-1" under_arrow="-1"/>
+        <item id="1502863398877" down="1491891401632" right="-1" under_arrow="-1"/>
+        <item id="1503564286337" down="1491891548094" right="-1" under_arrow="-1"/>
+        <item id="1503564363808" down="1491891253284" right="-1" under_arrow="-1"/>
+        <item id="1503565544308" down="1491891686244" right="-1" under_arrow="-1"/>
+        <item id="1503565623737" down="1503567075791" right="-1" under_arrow="-1"/>
+        <item id="1503565943665" down="1503567080643" right="-1" under_arrow="-1"/>
+        <item id="1503565950413" down="1503567084717" right="-1" under_arrow="-1"/>
+        <item id="1503565956896" down="1503567106711" right="-1" under_arrow="-1"/>
+        <item id="1503565961797" down="1503567112546" right="-1" under_arrow="-1"/>
+        <item id="1503565966539" down="1503567118546" right="-1" under_arrow="-1"/>
+        <item id="1503565971092" down="1503567128967" right="-1" under_arrow="-1"/>
+        <item id="1503566140298" down="1491891824982" right="-1" under_arrow="-1"/>
+        <item id="1503566145330" down="1491891830399" right="-1" under_arrow="-1"/>
+        <item id="1503566149756" down="1491891834281" right="-1" under_arrow="-1"/>
+        <item id="1503566154223" down="1491891840122" right="-1" under_arrow="-1"/>
+        <item id="1503566159332" down="1491891844038" right="-1" under_arrow="-1"/>
+        <item id="1503566165751" down="1491997804982" right="-1" under_arrow="-1"/>
+        <item id="1503566179480" down="1491891736341" right="-1" under_arrow="-1"/>
+        <item id="1503566246373" down="1491891920268" right="-1" under_arrow="-1"/>
+        <item id="1503566251311" down="1491891929190" right="-1" under_arrow="-1"/>
+        <item id="1503566255926" down="1491891934727" right="-1" under_arrow="-1"/>
+        <item id="1503566260392" down="1491891939042" right="-1" under_arrow="-1"/>
+        <item id="1503566266725" down="1491891945660" right="-1" under_arrow="-1"/>
+        <item id="1503566271500" down="1491997831248" right="-1" under_arrow="-1"/>
+        <item id="1503566509799" down="1491991186025" right="-1" under_arrow="-1"/>
+        <item id="1503566557558" down="1491996318489" right="-1" under_arrow="-1"/>
+        <item id="1503566563922" down="1491995683239" right="-1" under_arrow="-1"/>
+        <item id="1503566567147" down="1491997026359" right="-1" under_arrow="-1"/>
+        <item id="1503566572545" down="1491997331970" right="-1" under_arrow="-1"/>
+        <item id="1503566575351" down="1491997517716" right="-1" under_arrow="-1"/>
+        <item id="1503566583187" down="1491997839732" right="-1" under_arrow="-1"/>
+        <item id="1503566603213" down="1491891448695" right="-1" under_arrow="-1"/>
+        <item id="1503566644375" down="1491891451417" right="-1" under_arrow="-1"/>
+        <item id="1503566861872" down="1491893788257" right="-1" under_arrow="-1"/>
+        <item id="1503566925667" down="1491991270540" right="-1" under_arrow="-1"/>
+        <item id="1503566953656" down="1491891404572" right="-1" under_arrow="-1"/>
+        <item id="1503566986329" down="1491891406750" right="-1" under_arrow="-1"/>
+        <item id="1503566989550" down="1491891419264" right="-1" under_arrow="-1"/>
+        <item id="1503566992414" down="1491996388564" right="-1" under_arrow="-1"/>
+        <item id="1503566994811" down="1491997105389" right="-1" under_arrow="-1"/>
+        <item id="1503567001868" down="1491997141677" right="-1" under_arrow="-1"/>
+        <item id="1503567004358" down="1491997338563" right="-1" under_arrow="-1"/>
+        <item id="1503567007462" down="1491891421569" right="-1" under_arrow="-1"/>
+        <item id="1503567010761" down="1491891431796" right="-1" under_arrow="-1"/>
+        <item id="1503567018598" down="1491997525080" right="-1" under_arrow="-1"/>
+        <item id="1503567021004" down="1491997848288" right="-1" under_arrow="-1"/>
+        <item id="1503567024049" down="1491891434150" right="-1" under_arrow="-1"/>
+        <item id="1503567027563" down="1491997762662" right="-1" under_arrow="-1"/>
+        <item id="1503567075791" down="1491891646132" right="-1" under_arrow="-1"/>
+        <item id="1503567080643" down="1491891773395" right="-1" under_arrow="-1"/>
+        <item id="1503567084717" down="1491891777155" right="-1" under_arrow="-1"/>
+        <item id="1503567106711" down="1491891781150" right="-1" under_arrow="-1"/>
+        <item id="1503567112546" down="1491891786550" right="-1" under_arrow="-1"/>
+        <item id="1503567118546" down="1491891817376" right="-1" under_arrow="-1"/>
+        <item id="1503567128967" down="1491997801170" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
