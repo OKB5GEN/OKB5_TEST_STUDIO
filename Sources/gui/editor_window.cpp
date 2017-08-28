@@ -765,7 +765,8 @@ void EditorWindow::runCyclogram()
     mCommandsEditToolbar->setEnabled(false);
     mRunAct->setEnabled(false);
     mShowVariablesAct->setEnabled(false);
-    mAddMonitorAct->setEnabled(false);
+    mSettingsAct->setEnabled(false);
+    //mAddMonitorAct->setEnabled(false);
     cyclogram->run();
 #endif
 
@@ -790,7 +791,8 @@ void EditorWindow::stopCyclogram()
     //mRunOneCmdAct->setEnabled(true);
     mRunAct->setEnabled(true);
     mShowVariablesAct->setEnabled(true);
-    mAddMonitorAct->setEnabled(true);
+    mSettingsAct->setEnabled(true);
+    //mAddMonitorAct->setEnabled(true);
     mCommandsEditToolbar->setEnabled(true);
 }
 
