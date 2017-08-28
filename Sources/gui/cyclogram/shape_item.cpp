@@ -37,6 +37,12 @@
 
 namespace
 {
+    static const QColor GREEN_COLOR = QColor::fromRgba(0xff00ff00);
+    static const QColor RED_COLOR = QColor::fromRgba(0xffff0000);
+    static const QColor WHITE_COLOR = QColor::fromRgba(0xffffffff);
+
+    static const QColor RUNNING_COMMAND_COLOR = QColor::fromRgba(0xff7f7f7f);
+    static const QColor CONNECTION_LINES_COLOR = QColor::fromRgba(0x00ffffff);
 }
 
 ShapeItem::ShapeItem(QObject* parent):
@@ -48,8 +54,6 @@ ShapeItem::ShapeItem(QObject* parent):
     mCell(QPoint(0, 0)),
     mRect(QRect(0, 0, 0, 0))
 {
-    mActiveColor = QColor::fromRgba(0xff7f7f7f);
-    mAdditionalColor = QColor::fromRgba(0x00ffffff);
 }
 
 ShapeItem::~ShapeItem()
@@ -87,15 +91,15 @@ QColor ShapeItem::color() const
 {
     if (mActive)
     {
-        return mActiveColor;
+        return RUNNING_COMMAND_COLOR;
     }
 
     return mColor;
 }
 
-QColor ShapeItem::additionalColor() const
+QColor ShapeItem::connectionLinesColor() const
 {
-    return mAdditionalColor;
+    return CONNECTION_LINES_COLOR;
 }
 
 QString ShapeItem::toolTip() const
@@ -830,20 +834,17 @@ void ShapeItem::setSelected(bool selected)
 {
     if (selected)
     {
-        QColor green = QColor::fromRgba(0xff00ff00);
-        setColor(green);
+        setColor(GREEN_COLOR);
     }
     else
     {
         if (mCommand->hasError())
         {
-            QColor red = QColor::fromRgba(0xffff0000);
-            setColor(red);
+            setColor(RED_COLOR);
         }
         else
         {
-            QColor white = QColor::fromRgba(0xffffffff);
-            setColor(white);
+            setColor(WHITE_COLOR);
         }
     }
 }

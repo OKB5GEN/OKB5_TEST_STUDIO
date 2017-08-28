@@ -372,7 +372,7 @@ void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
             drawCommandText(shapeItem, painter);
         }
 
-        painter.setBrush(shapeItem->additionalColor());
+        painter.setBrush(shapeItem->connectionLinesColor());
         painter.drawPath(shapeItem->additionalPath());
         painter.setBrush(QColor::fromRgba(0xff000000));
         painter.drawPath(shapeItem->arrowPath());

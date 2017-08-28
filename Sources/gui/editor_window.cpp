@@ -440,6 +440,7 @@ void EditorWindow::createActions()
     cyclogramToolBar->addAction(mStopAct);
 
     cyclogramMenu->addSeparator();
+    cyclogramToolBar->addSeparator();
 
     QIcon settingsIcon = QIcon(":/resources/images/settings");
     mSettingsAct = new QAction(settingsIcon, tr("Settings"), this);
@@ -761,6 +762,7 @@ void EditorWindow::runCyclogram()
         mCyclogram->resume();
     }
 #else
+    mCommandsEditToolbar->setEnabled(false);
     mRunAct->setEnabled(false);
     mShowVariablesAct->setEnabled(false);
     mAddMonitorAct->setEnabled(false);
@@ -789,6 +791,7 @@ void EditorWindow::stopCyclogram()
     mRunAct->setEnabled(true);
     mShowVariablesAct->setEnabled(true);
     mAddMonitorAct->setEnabled(true);
+    mCommandsEditToolbar->setEnabled(true);
 }
 
 void EditorWindow::showCyclogramSettings()

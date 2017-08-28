@@ -42,7 +42,7 @@ public:
     QPainterPath arrowPath() const;
     QPoint position() const;
     QColor color() const;
-    QColor additionalColor() const;
+    QColor connectionLinesColor() const;
     QString toolTip() const;
     const QStringList& multilineText() const;
     QPoint cell() const;
@@ -97,8 +97,8 @@ private:
     QPoint mCell;                   // cell, occupied by command shape itself
     QRect mRect;                    // bounding rect of the command (need for drawing command connections and QUESTION arrow)
     QColor mColor;                  // color for filling shape background
-    QColor mAdditionalColor;        // color for filling additional path background (hack for connection lines coloring)
-    QColor mActiveColor;            // color for filling shape background in command active state (being executed)
+//    QColor mAdditionalColor;        // color for filling additional path background (hack for connection lines coloring)
+//    QColor mActiveColor;            // color for filling shape background in command active state (being executed)
     QString mToolTip;               // tooltip text for shape
     QList<ValencyPoint*> mValencyPoints; // valency points list for this command
 
