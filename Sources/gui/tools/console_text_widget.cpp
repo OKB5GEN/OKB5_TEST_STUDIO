@@ -8,7 +8,7 @@ ConsoleTextWidget::ConsoleTextWidget(QWidget * parent):
     QGroupBox(parent),
     mCommand(Q_NULLPTR)
 {
-    setTitle(tr("Console text (after command execution)"));
+    setTitle(tr("Console text"));
     QGridLayout* boxLayout = new QGridLayout(this);
 
     mColorBox = new QComboBox(this);
