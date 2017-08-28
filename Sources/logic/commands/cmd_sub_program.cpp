@@ -159,6 +159,12 @@ void CmdSubProgram::setFilePath(const QString& filePath, bool reload)
 {
     if (mFilePath == filePath)
     {
+        if (reload && !loaded())
+        {
+            load();
+            updateText();
+        }
+
         return;
     }
 

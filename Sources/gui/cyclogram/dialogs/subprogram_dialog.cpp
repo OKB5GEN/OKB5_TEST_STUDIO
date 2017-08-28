@@ -106,6 +106,8 @@ bool SubProgramDialog::onSaveClick()
         fileName = Cyclogram::defaultStorePath() + mCommand->filePath();
     }
 
+    bool fileWasNotExist = !QFileInfo::exists(fileName);
+
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly | QFile::Text))
     {
@@ -135,6 +137,11 @@ bool SubProgramDialog::onSaveClick()
             }
 
             mCommand->setFilePath(tokens.at(1), false);
+        }
+
+        if (fileWasNotExist) // by default file reload is not needed, but if file was not exist before save, force its reload
+        {
+            mCommand->setLoaded(true);
         }
     }
     else
