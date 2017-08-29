@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables/>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
-        <command type="SUBPROGRAM" id="1493381028430" name="Stop_Tech" file="on_app_finish_sub/sub_stop_tech.cgr">
+        <command type="TERMINATOR" id="1493186321934" console_text="Завершение работы модулей..." console_text_color="ff0000ff" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="Стоп Тех"/>
+        <command type="BRANCH_BEGIN" id="1503997002202" console_text="" console_text_color="ff000000" name="Стоп ОТД"/>
+        <command type="BRANCH_BEGIN" id="1503997007613" console_text="" console_text_color="ff000000" name="Стоп ИП"/>
+        <command type="BRANCH_BEGIN" id="1503997008693" console_text="" console_text_color="ff000000" name="Стоп МКО"/>
+        <command type="BRANCH_BEGIN" id="1503997140585" console_text="" console_text_color="ff000000" name="Стоп СТМ"/>
+        <command type="BRANCH_BEGIN" id="1503997009670" console_text="" console_text_color="ff000000" name="Стоп БП1"/>
+        <command type="BRANCH_BEGIN" id="1503997010708" console_text="" console_text_color="ff000000" name="Стоп БП2"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="Работа модулей успешно завершена" console_text_color="ff008000" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1493381028430" console_text="" console_text_color="ff000000" name="Стоп Тех" file="on_app_finish_sub/sub_stop_tech.cgr">
             <input_params>
                 <param name="AddrC" type="6" value="0"/>
                 <param name="AddrD" type="6" value="0"/>
@@ -27,7 +36,12 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381032075" name="Stop_OTD" file="on_app_finish_sub/sub_stop_otd.cgr">
+        <command type="GO_TO_BRANCH" id="1503997002203" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503997007614" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503997008694" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503997009671" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503997010709" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1503997083867" console_text="" console_text_color="ff000000" name="Стоп ОТД" file="on_app_finish_sub/sub_stop_otd.cgr">
             <input_params>
                 <param name="AddrC" type="6" value="0"/>
                 <param name="AddrD" type="6" value="0"/>
@@ -46,11 +60,14 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381035921" name="Stop_MKO" file="on_app_finish_sub/sub_stop_mko.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1503997086376" console_text="" console_text_color="ff000000" name="Стоп МКО" file="on_app_finish_sub/sub_stop_mko.cgr">
+            <input_params>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381043352" name="Stop_STM" file="on_app_finish_sub/sub_stop_stm.cgr">
+        <command type="SUBPROGRAM" id="1503997094737" console_text="" console_text_color="ff000000" name="Стоп ИП" file="on_app_finish_sub/sub_stop_ds.cgr">
             <input_params>
                 <param name="AddrC" type="6" value="0"/>
                 <param name="AddrD" type="6" value="0"/>
@@ -69,7 +86,27 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381052574" name="Stop_PNA_PU" file="on_app_finish_sub/sub_stop_bp_pna.cgr">
+        <command type="GO_TO_BRANCH" id="1503997140586" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1503997178372" console_text="" console_text_color="ff000000" name="Стоп СТМ" file="on_app_finish_sub/sub_stop_stm.cgr">
+            <input_params>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1503997183283" console_text="" console_text_color="ff000000" name="Стоп БП2" file="on_app_finish_sub/sub_stop_bp_pna.cgr">
             <input_params>
                 <param name="Class" type="6" value="0"/>
                 <param name="I" type="6" value="0"/>
@@ -85,7 +122,7 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381062843" name="Stop_BUP_PU" file="on_app_finish_sub/sub_stop_bp_bup.cgr">
+        <command type="SUBPROGRAM" id="1503997187360" console_text="" console_text_color="ff000000" name="Стоп БП1" file="on_app_finish_sub/sub_stop_bp_bup.cgr">
             <input_params>
                 <param name="Class" type="6" value="0"/>
                 <param name="I" type="6" value="0"/>
@@ -105,14 +142,27 @@
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
         <item id="1493186321935" down="1493381028430" right="-1" under_arrow="-1"/>
-        <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1503997002202" down="1503997083867" right="-1" under_arrow="-1"/>
+        <item id="1503997007613" down="1503997094737" right="-1" under_arrow="-1"/>
+        <item id="1503997008693" down="1503997086376" right="-1" under_arrow="-1"/>
+        <item id="1503997140585" down="1503997178372" right="-1" under_arrow="-1"/>
+        <item id="1503997009670" down="1503997187360" right="-1" under_arrow="-1"/>
+        <item id="1503997010708" down="1503997183283" right="-1" under_arrow="-1"/>
+        <item id="1493186321936" down="1503997002202" right="-1" under_arrow="-1"/>
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1493381028430" down="1493381032075" right="-1" under_arrow="-1"/>
-        <item id="1493381032075" down="1493381035921" right="-1" under_arrow="-1"/>
-        <item id="1493381035921" down="1493381043352" right="-1" under_arrow="-1"/>
-        <item id="1493381043352" down="1493381052574" right="-1" under_arrow="-1"/>
-        <item id="1493381052574" down="1493381062843" right="-1" under_arrow="-1"/>
-        <item id="1493381062843" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493381028430" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1503997002203" down="1503997007613" right="-1" under_arrow="-1"/>
+        <item id="1503997007614" down="1503997008693" right="-1" under_arrow="-1"/>
+        <item id="1503997008694" down="1503997140585" right="-1" under_arrow="-1"/>
+        <item id="1503997009671" down="1503997010708" right="-1" under_arrow="-1"/>
+        <item id="1503997010709" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1503997083867" down="1503997002203" right="-1" under_arrow="-1"/>
+        <item id="1503997086376" down="1503997008694" right="-1" under_arrow="-1"/>
+        <item id="1503997094737" down="1503997007614" right="-1" under_arrow="-1"/>
+        <item id="1503997140586" down="1503997009670" right="-1" under_arrow="-1"/>
+        <item id="1503997178372" down="1503997140586" right="-1" under_arrow="-1"/>
+        <item id="1503997183283" down="1503997010709" right="-1" under_arrow="-1"/>
+        <item id="1503997187360" down="1503997009671" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

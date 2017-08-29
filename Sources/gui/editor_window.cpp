@@ -70,6 +70,10 @@ EditorWindow::EditorWindow():
     mCommandsEditToolbar(Q_NULLPTR),
     mNeedHashUpdate(false)
 {
+    QString title = tr("New file");
+    title += "[*]";
+    setWindowTitle(title);
+
     mFileWatcher = new QFileSystemWatcher(this);
     connect(mFileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(reloadCyclogram()));
 
@@ -699,7 +703,7 @@ void EditorWindow::setCurrentFile(const QString &fileName)
     if (mCurFile.isEmpty())
     {
         mCurFileHash.clear();
-        shownName = "New file";
+        shownName = tr("New file");
     }
     else
     {
@@ -853,7 +857,7 @@ void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString
     }
 
     ModalCyclogramExecutionDialog dialog(Q_NULLPTR);
-    if (dialog.init(shortFileName, text, mSystemState))
+    if (dialog.init(shortFileName, text, mSystemState, mCyclogramConsole))
     {
         setEnabled(false);
         dialog.exec();

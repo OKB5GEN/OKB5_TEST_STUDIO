@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
         <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
         <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1493803090978" module="MKO" command="STOP_MKO">
+        <command type="TERMINATOR" id="1493186321934" console_text="МКО: Завершение работы..." console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="МКО: ОК" console_text_color="ff32cd32" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493803090978" console_text="" console_text_color="ff32cd32" module="MKO" command="STOP_MKO">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493812396708" module="MKO" command="GET_MODULE_STATUS">
+        <command type="ACTION_MODULE" id="1493812396708" console_text="" console_text_color="ff000000" module="MKO" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
                 <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493812415310" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493812415310" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493812415314"/>
-        <command type="SELECT_STATE" id="1493812421301" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493812415314" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1493812421301" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="LActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493812421304"/>
+        <command type="GO_TO_BRANCH" id="1493812421304" console_text="" console_text_color="ff000000"/>
+        <command type="OUTPUT" id="1503997509075" console_text="МКО: модуль физически неактивен" console_text_color="ffff8c00"/>
+        <command type="OUTPUT" id="1503997511296" console_text="МКО: модуль логически неактивен" console_text_color="ffff8c00"/>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
@@ -41,9 +46,11 @@
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
         <item id="1493803090978" down="1493186321936" right="-1" under_arrow="-1"/>
         <item id="1493812396708" down="1493812415310" right="-1" under_arrow="-1"/>
-        <item id="1493812415310" down="1493812421301" right="1493812415314" under_arrow="-1"/>
+        <item id="1493812415310" down="1493812421301" right="1503997509075" under_arrow="-1"/>
         <item id="1493812415314" down="1493186321945" right="-1" under_arrow="-1"/>
-        <item id="1493812421301" down="1493803090978" right="1493812421304" under_arrow="-1"/>
+        <item id="1493812421301" down="1493803090978" right="1503997511296" under_arrow="-1"/>
         <item id="1493812421304" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1503997509075" down="1493812415314" right="-1" under_arrow="-1"/>
+        <item id="1503997511296" down="1493812421304" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

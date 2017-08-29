@@ -6,8 +6,8 @@
 	<module type="POWER_UNIT_PNA" description="PS 2000 B Series" productId="16" serialNumber="2761250178" vendorId="9006"/>
 	<module type="STM" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000012" vendorId="1155"/>
 	<module type="OTD" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000014" vendorId="1155"/>
+	<module type="TECH" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000013" vendorId="1155"/>
 	<module type="DRIVE_SIMULATOR" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000015" vendorId="1155"/>
-	<module type="TECH" description="STMicroelectronics Virtual COM Port" productId="22336" serialNumber="000000000016" vendorId="1155"/>
     </modules>
     <emulator enabled="0"> <!-- 0 or no attribute - use real hardware -->
     </emulator>

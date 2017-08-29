@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables/>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
-        <command type="SUBPROGRAM" id="1493381028430" name="Init_BUP_PU" file="on_app_start_sub/sub_init_bp_bup.cgr">
+        <command type="TERMINATOR" id="1493186321934" console_text="Старт инициализации модулей" console_text_color="ff0000ff" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="Инициализация БП1"/>
+        <command type="BRANCH_BEGIN" id="1503990054488" console_text="" console_text_color="ff000000" name="Инициализация БП2"/>
+        <command type="BRANCH_BEGIN" id="1503990053734" console_text="" console_text_color="ff000000" name="Инициализация СТМ"/>
+        <command type="BRANCH_BEGIN" id="1503990052933" console_text="" console_text_color="ff000000" name="Инициализация МКО"/>
+        <command type="BRANCH_BEGIN" id="1503990061546" console_text="" console_text_color="ff000000" name="Инициализация ОТД"/>
+        <command type="BRANCH_BEGIN" id="1503994159504" console_text="" console_text_color="ff000000" name="Инициализация ИП"/>
+        <command type="BRANCH_BEGIN" id="1503990063004" console_text="" console_text_color="ff000000" name="Инициализация Технологического модуля"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="Инициализация модулей успешно завершена" console_text_color="ff008000" name="FINISH" cmd_type="END"/>
+        <command type="SUBPROGRAM" id="1493381028430" console_text="" console_text_color="ff000000" name="Инициализация БП1" file="on_app_start_sub/sub_init_bp_bup.cgr">
             <input_params>
                 <param name="Class" type="6" value="0"/>
                 <param name="I" type="6" value="0"/>
                 <param name="Inom" type="6" value="0"/>
                 <param name="Iocp" type="6" value="0"/>
                 <param name="LActive" type="6" value="0"/>
+                <param name="OCPSet" type="6" value="2"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="OVPSet" type="6" value="36"/>
                 <param name="PActive" type="6" value="0"/>
                 <param name="Pnom" type="6" value="0"/>
                 <param name="U" type="6" value="0"/>
@@ -24,14 +35,21 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381032075" name="Init_PNA_PU" file="on_app_start_sub/sub_init_bp_pna.cgr">
+        <command type="GO_TO_BRANCH" id="1503990052934" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503990053735" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503990054489" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503990061547" console_text="" console_text_color="ff000000"/>
+        <command type="GO_TO_BRANCH" id="1503990063005" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1503990148019" console_text="" console_text_color="ff000000" name="Инициализация БП2" file="on_app_start_sub/sub_init_bp_pna.cgr">
             <input_params>
                 <param name="Class" type="6" value="0"/>
                 <param name="I" type="6" value="0"/>
                 <param name="Inom" type="6" value="0"/>
                 <param name="Iocp" type="6" value="0"/>
                 <param name="LActive" type="6" value="0"/>
+                <param name="OCPSet" type="6" value="2"/>
                 <param name="OK" type="6" value="0"/>
+                <param name="OVPSet" type="6" value="36"/>
                 <param name="PActive" type="6" value="0"/>
                 <param name="Pnom" type="6" value="0"/>
                 <param name="U" type="6" value="0"/>
@@ -40,34 +58,98 @@
             </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381035921" name="Init_STM" file="on_app_start_sub/sub_init_stm.cgr">
+        <command type="SUBPROGRAM" id="1503990150192" console_text="" console_text_color="ff000000" name="Инициализация СТМ" file="on_app_start_sub/sub_init_stm.cgr">
+            <input_params>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
+            <output_params/>
+        </command>
+        <command type="SUBPROGRAM" id="1503990152664" console_text="" console_text_color="ff000000" name="Инициализация МКО" file="on_app_start_sub/sub_init_mko.cgr">
             <input_params/>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381043352" name="Init_MKO" file="on_app_start_sub/sub_init_mko.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1503990154866" console_text="" console_text_color="ff000000" name="Инициализация ОТД" file="on_app_start_sub/sub_init_otd.cgr">
+            <input_params>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381052574" name="Init_OTD" file="on_app_start_sub/sub_init_otd.cgr">
-            <input_params/>
+        <command type="SUBPROGRAM" id="1503990157520" console_text="" console_text_color="ff000000" name="Инициализация Технологического модуля" file="on_app_start_sub/sub_init_tech.cgr">
+            <input_params>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
             <output_params/>
         </command>
-        <command type="SUBPROGRAM" id="1493381062843" name="Init_Tech" file="on_app_start_sub/sub_init_tech.cgr">
-            <input_params/>
+        <command type="GO_TO_BRANCH" id="1503994159505" console_text="" console_text_color="ff000000"/>
+        <command type="SUBPROGRAM" id="1503994227719" console_text="" console_text_color="ff000000" name="Инициализация ИП" file="on_app_start_sub/sub_init_ds.cgr">
+            <input_params>
+                <param name="AddrC" type="6" value="0"/>
+                <param name="AddrD" type="6" value="0"/>
+                <param name="HasErr" type="6" value="0"/>
+                <param name="IsOn_BUPM" type="6" value="0"/>
+                <param name="IsOn_BUPR" type="6" value="0"/>
+                <param name="IsOn_H1" type="6" value="0"/>
+                <param name="IsOn_H2" type="6" value="0"/>
+                <param name="IsOn_MKOM" type="6" value="0"/>
+                <param name="IsOn_MKOR" type="6" value="0"/>
+                <param name="IsOn_POW" type="6" value="0"/>
+                <param name="IsReady" type="6" value="0"/>
+                <param name="IsReset" type="6" value="0"/>
+                <param name="LActive" type="6" value="0"/>
+                <param name="PActive" type="6" value="0"/>
+            </input_params>
             <output_params/>
         </command>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
         <item id="1493186321935" down="1493381028430" right="-1" under_arrow="-1"/>
-        <item id="1493186321936" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1503990054488" down="1503990148019" right="-1" under_arrow="-1"/>
+        <item id="1503990053734" down="1503990150192" right="-1" under_arrow="-1"/>
+        <item id="1503990052933" down="1503990152664" right="-1" under_arrow="-1"/>
+        <item id="1503990061546" down="1503990154866" right="-1" under_arrow="-1"/>
+        <item id="1503994159504" down="1503994227719" right="-1" under_arrow="-1"/>
+        <item id="1503990063004" down="1503990157520" right="-1" under_arrow="-1"/>
+        <item id="1493186321936" down="1503990054488" right="-1" under_arrow="-1"/>
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
-        <item id="1493381028430" down="1493381032075" right="-1" under_arrow="-1"/>
-        <item id="1493381032075" down="1493381035921" right="-1" under_arrow="-1"/>
-        <item id="1493381035921" down="1493381043352" right="-1" under_arrow="-1"/>
-        <item id="1493381043352" down="1493381052574" right="-1" under_arrow="-1"/>
-        <item id="1493381052574" down="1493381062843" right="-1" under_arrow="-1"/>
-        <item id="1493381062843" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1493381028430" down="1493186321936" right="-1" under_arrow="-1"/>
+        <item id="1503990052934" down="1503990061546" right="-1" under_arrow="-1"/>
+        <item id="1503990053735" down="1503990052933" right="-1" under_arrow="-1"/>
+        <item id="1503990054489" down="1503990053734" right="-1" under_arrow="-1"/>
+        <item id="1503990061547" down="1503994159504" right="-1" under_arrow="-1"/>
+        <item id="1503990063005" down="1493186321945" right="-1" under_arrow="-1"/>
+        <item id="1503990148019" down="1503990054489" right="-1" under_arrow="-1"/>
+        <item id="1503990150192" down="1503990053735" right="-1" under_arrow="-1"/>
+        <item id="1503990152664" down="1503990052934" right="-1" under_arrow="-1"/>
+        <item id="1503990154866" down="1503990061547" right="-1" under_arrow="-1"/>
+        <item id="1503990157520" down="1503990063005" right="-1" under_arrow="-1"/>
+        <item id="1503994159505" down="1503990063004" right="-1" under_arrow="-1"/>
+        <item id="1503994227719" down="1503994159505" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

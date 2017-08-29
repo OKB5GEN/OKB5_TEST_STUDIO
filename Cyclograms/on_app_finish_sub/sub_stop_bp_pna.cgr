@@ -1,53 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
-        <variable name="Class" value="0" desc="Device Class"/>
-        <variable name="I" value="0" desc="Current, A"/>
-        <variable name="Inom" value="0" desc=""/>
-        <variable name="Iocp" value="0" desc=""/>
         <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
         <variable name="OK" value="0" desc=""/>
         <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
-        <variable name="Pnom" value="0" desc=""/>
-        <variable name="U" value="0" desc="Voltage, V"/>
-        <variable name="Unom" value="0" desc=""/>
-        <variable name="Uovp" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1493369518680" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493369518682" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1493369518684"/>
-        <command type="BRANCH_BEGIN" id="1493369518686" name="End"/>
-        <command type="TERMINATOR" id="1493369518688" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1493369532085" module="POWER_UNIT_PNA" command="GET_MODULE_STATUS">
+        <command type="TERMINATOR" id="1493369518680" console_text="БП2: Завершение работы..." console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493369518682" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1493369518684" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493369518686" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493369518688" console_text="БП2: ОК" console_text_color="ff32cd32" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493369532085" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
                 <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493369544813" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493369544813" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493369544819"/>
-        <command type="BRANCH_BEGIN" id="1493369571688" name="OK"/>
-        <command type="GO_TO_BRANCH" id="1493369571690"/>
-        <command type="BRANCH_BEGIN" id="1493369580658" name="FAIL"/>
-        <command type="GO_TO_BRANCH" id="1493369580660"/>
-        <command type="ACTION_MODULE" id="1493369642029" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+        <command type="GO_TO_BRANCH" id="1493369544819" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493369571688" console_text="" console_text_color="ff000000" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1493369571690" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493369580658" console_text="" console_text_color="ff000000" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1493369580660" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493369642029" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
             <input_params/>
             <output_params/>
         </command>
-        <command type="SELECT_STATE" id="1493812046675" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493812046675" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="LActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493812046679"/>
-        <command type="ACTION_MODULE" id="1493812113824" module="POWER_UNIT_PNA" command="PSC_ACKNOWLEDGE_ALARMS">
+        <command type="GO_TO_BRANCH" id="1493812046679" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493812113824" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="PSC_ACKNOWLEDGE_ALARMS">
             <input_params/>
             <output_params/>
+        </command>
+        <command type="OUTPUT" id="1503997891639" console_text="БП2: модуль физически неактивен" console_text_color="ffff8c00"/>
+        <command type="OUTPUT" id="1503997893387" console_text="БП2: Модуль логически неактивен" console_text_color="ffff8c00"/>
+        <command type="ACTION_MATH" id="1503997965738" console_text="" console_text_color="ff000000" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="1" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
+        </command>
+        <command type="ACTION_MATH" id="1503997969267" console_text="" console_text_color="ff000000" operation="Assign">
+            <operand id="Result" type="Variable" value="0" variable="OK"/>
+            <operand id="Operand1" type="Number" value="0" variable=""/>
+            <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
     </commands>
     <tree>
@@ -57,15 +64,19 @@
         <item id="1493369518686" down="1493369518688" right="-1" under_arrow="-1"/>
         <item id="1493369518688" down="-1" right="-1" under_arrow="-1"/>
         <item id="1493369532085" down="1493369544813" right="-1" under_arrow="-1"/>
-        <item id="1493369544813" down="1493812046675" right="1493369544819" under_arrow="-1"/>
+        <item id="1493369544813" down="1493812046675" right="1503997891639" under_arrow="-1"/>
         <item id="1493369544819" down="1493369580658" right="-1" under_arrow="-1"/>
-        <item id="1493369571688" down="1493369571690" right="-1" under_arrow="-1"/>
+        <item id="1493369571688" down="1503997965738" right="-1" under_arrow="-1"/>
         <item id="1493369571690" down="1493369518686" right="-1" under_arrow="-1"/>
-        <item id="1493369580658" down="1493369580660" right="-1" under_arrow="-1"/>
+        <item id="1493369580658" down="1503997969267" right="-1" under_arrow="-1"/>
         <item id="1493369580660" down="1493369518686" right="-1" under_arrow="-1"/>
         <item id="1493369642029" down="1493369518684" right="-1" under_arrow="-1"/>
-        <item id="1493812046675" down="1493812113824" right="1493812046679" under_arrow="-1"/>
+        <item id="1493812046675" down="1493812113824" right="1503997893387" under_arrow="-1"/>
         <item id="1493812046679" down="1493369580658" right="-1" under_arrow="-1"/>
         <item id="1493812113824" down="1493369642029" right="-1" under_arrow="-1"/>
+        <item id="1503997891639" down="1493369544819" right="-1" under_arrow="-1"/>
+        <item id="1503997893387" down="1493812046679" right="-1" under_arrow="-1"/>
+        <item id="1503997965738" down="1493369571690" right="-1" under_arrow="-1"/>
+        <item id="1503997969267" down="1493369580660" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

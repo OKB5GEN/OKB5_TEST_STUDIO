@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
-    <variables>
-        <variable name="AddrC" value="0" desc=""/>
-        <variable name="AddrD" value="0" desc=""/>
-        <variable name="HasErr" value="0" desc="Module error flag. 1 - module has errors, 0 - module has no errors"/>
-        <variable name="IsOn_BUPM" value="0" desc=""/>
-        <variable name="IsOn_BUPR" value="0" desc=""/>
-        <variable name="IsOn_H1" value="0" desc=""/>
-        <variable name="IsOn_H2" value="0" desc=""/>
-        <variable name="IsOn_MKOM" value="0" desc=""/>
-        <variable name="IsOn_MKOR" value="0" desc=""/>
-        <variable name="IsOn_POW" value="0" desc=""/>
-        <variable name="IsReady" value="0" desc="Module ready flag. 1 - ready, 0 - not ready"/>
-        <variable name="IsReset" value="0" desc="Module is after reset flag. 1 - after reset, 0 - not after reset"/>
-        <variable name="LActive" value="0" desc="Logical module status. 1 - enabled, 0 - disabled"/>
-        <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
-    </variables>
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
+    <variables/>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="Start"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
+        <command type="TERMINATOR" id="1493186321934" console_text="Тех: Завершение работы..." console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="Start"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="Тех: ОК" console_text_color="ff32cd32" name="FINISH" cmd_type="END"/>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>

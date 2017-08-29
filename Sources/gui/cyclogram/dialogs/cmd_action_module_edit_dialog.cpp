@@ -702,8 +702,6 @@ void CmdActionModuleEditDialog::onAccept()
 
             output[id] = variableName;
         }
-
-        ++i;
     }
 
     // add implicit params to command input params

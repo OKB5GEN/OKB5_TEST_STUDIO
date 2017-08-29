@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
         <variable name="AddrC" value="0" desc=""/>
         <variable name="AddrD" value="0" desc=""/>
@@ -11,42 +14,42 @@
         <variable name="PActive" value="0" desc="Pysical module status. 1 - active, 0 - inactive"/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="GetModState"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1493724109576" module="OTD" command="GET_MODULE_STATUS">
+        <command type="TERMINATOR" id="1493186321934" console_text="ОТД: Инициализация..." console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="Получение состояния модуля"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493724109576" console_text="" console_text_color="ff000000" module="OTD" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
                 <param name="STATUS_PHYSICAL" type="10" value="PActive"/>
+                <param name="STATUS_LOGICAL" type="10" value="LActive"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493724128025" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493724128025" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="PActive"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493724128031"/>
-        <command type="BRANCH_BEGIN" id="1493724347720" name="SetModState"/>
-        <command type="GO_TO_BRANCH" id="1493724347722"/>
-        <command type="BRANCH_BEGIN" id="1493724349859" name="OK"/>
-        <command type="GO_TO_BRANCH" id="1493724349862"/>
-        <command type="BRANCH_BEGIN" id="1493724351617" name="FAIL"/>
-        <command type="GO_TO_BRANCH" id="1493724351619"/>
-        <command type="ACTION_MODULE" id="1493724384673" module="OTD" command="SET_MODULE_LOGIC_STATUS">
+        <command type="GO_TO_BRANCH" id="1493724128031" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493724347720" console_text="" console_text_color="ff000000" name="Установка состояния модуля"/>
+        <command type="GO_TO_BRANCH" id="1493724347722" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493724349859" console_text="" console_text_color="ff000000" name="OK"/>
+        <command type="GO_TO_BRANCH" id="1493724349862" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493724351617" console_text="" console_text_color="ff000000" name="FAIL"/>
+        <command type="GO_TO_BRANCH" id="1493724351619" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493724384673" console_text="" console_text_color="ff000000" module="OTD" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
                 <param name="STATUS_LOGICAL" type="6" value="1"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493724432484" module="OTD" command="SET_MODULE_LOGIC_STATUS">
+        <command type="ACTION_MODULE" id="1493724432484" console_text="" console_text_color="ff000000" module="OTD" command="SET_MODULE_LOGIC_STATUS">
             <input_params>
                 <param name="STATUS_LOGICAL" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493796620335" module="OTD" command="GET_MODULE_ADDRESS">
+        <command type="ACTION_MODULE" id="1493796620335" console_text="" console_text_color="ff000000" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
                 <param name="MODULE_ADDRESS" type="6" value="1"/>
             </input_params>
@@ -54,7 +57,7 @@
                 <param name="MODULE_ADDRESS" type="10" value="AddrC"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1493796667143" module="OTD" command="GET_MODULE_ADDRESS">
+        <command type="ACTION_MODULE" id="1493796667143" console_text="" console_text_color="ff000000" module="OTD" command="GET_MODULE_ADDRESS">
             <input_params>
                 <param name="MODULE_ADDRESS" type="6" value="2"/>
             </input_params>
@@ -62,40 +65,45 @@
                 <param name="MODULE_ADDRESS" type="10" value="AddrD"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493796692933" operation="Equal" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493796692933" console_text="" console_text_color="ff000000" operation="Equal" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="AddrC"/>
             <operand id="Right" type="Variable" value="0" variable="AddrD"/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493796692937"/>
-        <command type="ACTION_MODULE" id="1493796727119" module="OTD" command="GET_STATUS_WORD">
+        <command type="GO_TO_BRANCH" id="1493796692937" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493796727119" console_text="" console_text_color="ff000000" module="OTD" command="GET_STATUS_WORD">
             <input_params/>
             <output_params>
+                <param name="MODULE_READY" type="10" value="IsReady"/>
                 <param name="MODULE_AFTER_RESET" type="10" value="IsReset"/>
                 <param name="MODULE_HAS_ERRORS" type="10" value="HasErr"/>
-                <param name="MODULE_READY" type="10" value="IsReady"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493796761760" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493796761760" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="IsReady"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493796761764"/>
-        <command type="CONDITION" id="1493796844900" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493796761764" console_text="" console_text_color="ff000000"/>
+        <command type="CONDITION" id="1493796844900" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="HasErr"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="ACTION_MODULE" id="1493797510008" module="OTD" command="RESET_ERROR">
+        <command type="ACTION_MODULE" id="1493797510008" console_text="ОТД: сброс ошибок" console_text_color="ff9932cc" module="OTD" command="RESET_ERROR">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493802373630" module="OTD" command="RESET_LINE_1">
+        <command type="ACTION_MODULE" id="1493802373630" console_text="ОТД: сброс датчиков на линии 1" console_text_color="ff000000" module="OTD" command="RESET_LINE_1">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493802382143" module="OTD" command="RESET_LINE_2">
+        <command type="ACTION_MODULE" id="1493802382143" console_text="ОТД: сброс датчиков на линии 2" console_text_color="ff000000" module="OTD" command="RESET_LINE_2">
             <input_params/>
             <output_params/>
         </command>
+        <command type="OUTPUT" id="1503993900355" console_text="ОТД: модуль не подключен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503993915892" console_text="ОТД: модуль установлен не в свой слот!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503993934538" console_text="ОТД: модуль не готов к работе!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1503993999547" console_text="ОТД: ОК" console_text_color="ff32cd32"/>
+        <command type="OUTPUT" id="1503994001385" console_text="ОТД: ошибка инициализации!" console_text_color="ffdc143c"/>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
@@ -104,7 +112,7 @@
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
         <item id="1493724109576" down="1493724128025" right="-1" under_arrow="-1"/>
-        <item id="1493724128025" down="1493796620335" right="1493724128031" under_arrow="-1"/>
+        <item id="1493724128025" down="1493796620335" right="1503993900355" under_arrow="-1"/>
         <item id="1493724128031" down="1493724351617" right="-1" under_arrow="-1"/>
         <item id="1493724347720" down="1493802373630" right="-1" under_arrow="-1"/>
         <item id="1493724347722" down="1493724349859" right="-1" under_arrow="-1"/>
@@ -112,18 +120,23 @@
         <item id="1493724349862" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493724351617" down="1493724432484" right="-1" under_arrow="-1"/>
         <item id="1493724351619" down="1493186321945" right="-1" under_arrow="-1"/>
-        <item id="1493724384673" down="1493724349862" right="-1" under_arrow="-1"/>
-        <item id="1493724432484" down="1493724351619" right="-1" under_arrow="-1"/>
+        <item id="1493724384673" down="1503993999547" right="-1" under_arrow="-1"/>
+        <item id="1493724432484" down="1503994001385" right="-1" under_arrow="-1"/>
         <item id="1493796620335" down="1493796667143" right="-1" under_arrow="-1"/>
         <item id="1493796667143" down="1493796692933" right="-1" under_arrow="-1"/>
-        <item id="1493796692933" down="1493796727119" right="1493796692937" under_arrow="-1"/>
+        <item id="1493796692933" down="1493796727119" right="1503993915892" under_arrow="-1"/>
         <item id="1493796692937" down="1493724351617" right="-1" under_arrow="-1"/>
         <item id="1493796727119" down="1493796761760" right="-1" under_arrow="-1"/>
-        <item id="1493796761760" down="1493796844900" right="1493796761764" under_arrow="-1"/>
+        <item id="1493796761760" down="1493796844900" right="1503993934538" under_arrow="-1"/>
         <item id="1493796761764" down="1493724351617" right="-1" under_arrow="-1"/>
         <item id="1493796844900" down="1493797510008" right="1493186321936" under_arrow="1493186321936"/>
         <item id="1493797510008" down="1493186321936" right="-1" under_arrow="-1"/>
         <item id="1493802373630" down="1493802382143" right="-1" under_arrow="-1"/>
         <item id="1493802382143" down="1493724347722" right="-1" under_arrow="-1"/>
+        <item id="1503993900355" down="1493724128031" right="-1" under_arrow="-1"/>
+        <item id="1503993915892" down="1493796692937" right="-1" under_arrow="-1"/>
+        <item id="1503993934538" down="1493796761764" right="-1" under_arrow="-1"/>
+        <item id="1503993999547" down="1493724349862" right="-1" under_arrow="-1"/>
+        <item id="1503994001385" down="1493724351619" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
