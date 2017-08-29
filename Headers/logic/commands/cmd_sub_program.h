@@ -49,13 +49,20 @@ public:
 protected:
     bool loadFromImpl(Command* other) override;
 
-private slots:
+    // methods for processing variable changes in cyclogram, where command is
     void onNameChanged(const QString& newName, const QString& oldName) override;
     void onVariableRemoved(const QString& name) override;
+
+private slots:
     void execute();
     void onCyclogramFinished(const QString& error);
     void onCyclogramModified();
     void reloadCyclogram();
+
+    // methods for processing variable changes in cyclogram, that command contains
+    void onInnerVariableNameChanged(const QString& newName, const QString& oldName);
+    void onInnerVariableRemoved(const QString& name);
+    void onInnerVariableAdded(const QString& name, qreal value);
 
 signals:
     void commandStarted(Command* cmd);
@@ -65,6 +72,7 @@ signals:
 private:
     bool load();
     void saveFileIfNotExist();
+    void setCyclogram(QSharedPointer<Cyclogram> cyclogram);
 
     void updateText() override;
 

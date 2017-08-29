@@ -245,6 +245,7 @@ void Command::setVariableController(VariableController* controller)
     Qt::ConnectionType connection = Qt::ConnectionType(Qt::AutoConnection | Qt::UniqueConnection);
     connect(mVarCtrl, SIGNAL(nameChanged(const QString&,const QString&)), this, SLOT(onNameChanged(const QString&, const QString&)), connection);
     connect(mVarCtrl, SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)), connection);
+    connect(mVarCtrl, SIGNAL(variableAdded(const QString&,qreal)), this, SLOT(onVariableAdded(const QString&,qreal)), connection);
 }
 
 VariableController* Command::variableController() const
@@ -265,12 +266,14 @@ SystemState* Command::systemState() const
 
 void Command::onNameChanged(const QString& newName, const QString& oldName)
 {
-
 }
 
 void Command::onVariableRemoved(const QString& name)
 {
+}
 
+void Command::onVariableAdded(const QString& name, qreal value)
+{
 }
 
 void Command::replaceReferences(Command* oldCmd, Command* newCmd, Command* tree)

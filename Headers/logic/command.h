@@ -95,6 +95,7 @@ signals:
 protected slots:
     virtual void onNameChanged(const QString& newName, const QString& oldName);
     virtual void onVariableRemoved(const QString& name);
+    virtual void onVariableAdded(const QString& name, qreal value);
 
 protected:
     void setErrorStatus(bool status); //true - has error, false - no error/error fixed

@@ -32,12 +32,7 @@ CmdSubProgram::CmdSubProgram(QObject* parent):
 
     auto cyclogram = CyclogramManager::createCyclogram();
 
-    mCyclogram = cyclogram;
-    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
-    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
-    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
-    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
-
+    setCyclogram(cyclogram);
     updateText();
 }
 
@@ -64,12 +59,8 @@ bool CmdSubProgram::load()
     bool ok = false;
     cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
     cyclogram->setSystemState(mSystemState);
-    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
-    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
-    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
-    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
 
-    mCyclogram = cyclogram;
+    setCyclogram(cyclogram);
 
     if (!ok)
     {
@@ -99,6 +90,25 @@ bool CmdSubProgram::load()
 
     setLoaded(true);
     return true;
+}
+
+void CmdSubProgram::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
+{
+    if (mCyclogram.lock())
+    {
+        mCyclogram.data()->disconnect(this);
+    }
+
+    connect(cyclogram.data(), SIGNAL(finished(const QString&)), this, SLOT(onCyclogramFinished(const QString&)));
+    connect(cyclogram.data(), SIGNAL(commandStarted(Command*)), this, SIGNAL(commandStarted(Command*)));
+    connect(cyclogram.data(), SIGNAL(commandFinished(Command*)), this, SIGNAL(commandFinished(Command*)));
+    connect(cyclogram.data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
+
+    connect(cyclogram->variableController(), SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(onInnerVariableAdded(const QString&, qreal)));
+    connect(cyclogram->variableController(), SIGNAL(variableRemoved(const QString&)), this, SLOT(onInnerVariableRemoved(const QString&)));
+    connect(cyclogram->variableController(), SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onInnerVariableNameChanged(const QString&, const QString&)));
+
+    mCyclogram = cyclogram;
 }
 
 QSharedPointer<Cyclogram> CmdSubProgram::cyclogram()
@@ -234,6 +244,62 @@ void CmdSubProgram::updateText()
     {
         cyclogram->setSystemState(mSystemState);
     }
+}
+
+void CmdSubProgram::onInnerVariableNameChanged(const QString& newName, const QString& oldName)
+{
+    // input parameters update
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        if (it.key() == oldName)
+        {
+            mInputParams[newName] = it.value();
+            mInputParams.remove(oldName);
+            break;
+        }
+    }
+
+    // output parameters update
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.value().type() == QVariant::String && it.value().toString() == oldName)
+        {
+            *it = newName;
+        }
+    }
+
+    updateText();
+}
+
+void CmdSubProgram::onInnerVariableRemoved(const QString& name)
+{
+    // input parameters update
+    mInputParams.remove(name);
+
+    // output parameters update
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.value().type() == QVariant::String && it.value().toString() == name)
+        {
+            LOG_WARNING(QString("Subprogram '%1' output link to variable '%2' is corrupted due to '%3' variable deletion. Removing link")
+                        .arg(mText)
+                        .arg(it.key())
+                        .arg(name));
+
+            *it = QVariant();
+        }
+    }
+
+    updateText();
+}
+
+void CmdSubProgram::onInnerVariableAdded(const QString& name, qreal value)
+{
+    // input parameters update
+    mInputParams[name] = value;
+
+    // output parameters update (not needed)
+    updateText();
 }
 
 void CmdSubProgram::onNameChanged(const QString& newName, const QString& oldName)
