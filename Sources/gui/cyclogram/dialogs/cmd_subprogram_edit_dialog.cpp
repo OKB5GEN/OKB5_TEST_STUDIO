@@ -274,34 +274,10 @@ void CmdSubProgramEditDialog::updateUI()
         return;
     }
 
-    QSharedPointer<Cyclogram> cyclogram;
+    QSharedPointer<Cyclogram> cyclogram = mCommand->cyclogram();
     auto callingCyclogram = mCallingCyclogram.lock();
 
-    int TODO; // why not use cyclogram from command without copy creation?
-    if (!mFileNameStr->text().isEmpty()) // some cyclogram file name exist, load cyclogram from file
-    {
-        QString fileName = Cyclogram::defaultStorePath() + mFileNameStr->text();
-        bool ok = false;
-        cyclogram = CyclogramManager::createCyclogram(fileName, &ok);
-
-        if (!ok)
-        {
-            CyclogramManager::removeCyclogram(cyclogram);
-            return;
-        }
-
-        QString commandName = cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString();
-        if (commandName.isEmpty()) // if cyclogram default name not specified, use current command text
-        {
-            commandName = mCommand->text();
-        }
-
-        mSubprogramNameStr->setText(commandName);
-    }
-    else // no cyclogram file set, possibly just batch calling cyclogram variables changing
-    {
-        cyclogram = CyclogramManager::createCyclogram();
-    }
+    mSubprogramNameStr->setText(mCommand->text());
 
     mInParams->clearContents();
     mOutParams->clearContents();
