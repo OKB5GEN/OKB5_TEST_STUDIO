@@ -17,6 +17,7 @@
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/system/system_state.h"
 #include "Headers/logic/cyclogram_manager.h"
+#include "Headers/clipboard.h"
 
 #include "Headers/file_reader.h"
 #include "Headers/file_writer.h"
@@ -74,6 +75,8 @@ EditorWindow::EditorWindow():
     title += "[*]";
     setWindowTitle(title);
 
+    mClipboard.reset(new Clipboard());
+
     mFileWatcher = new QFileSystemWatcher(this);
     connect(mFileWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(reloadCyclogram()));
 
@@ -83,6 +86,7 @@ EditorWindow::EditorWindow():
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setMainWindow(this);
     mCyclogramWidget->setParentScrollArea(mScrollArea);
+    mCyclogramWidget->setClipboard(mClipboard);
 
     mCyclogramConsole = new CyclogramConsole(this);
 

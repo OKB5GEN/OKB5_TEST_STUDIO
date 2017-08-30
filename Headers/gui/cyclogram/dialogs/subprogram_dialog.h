@@ -14,13 +14,14 @@ class CyclogramWidget;
 class Cyclogram;
 class VariablesWindow;
 class ShapeItem;
+class Clipboard;
 
 class SubProgramDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow);
+    SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow, QSharedPointer<Clipboard> clipboard);
     ~SubProgramDialog();
 
     CyclogramWidget* cyclogramWidget() const;

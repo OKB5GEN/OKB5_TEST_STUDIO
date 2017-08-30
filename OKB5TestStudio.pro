@@ -96,7 +96,8 @@ SOURCES += main.cpp\
     Sources/logic/commands/cmd_cycle.cpp \
     Sources/logic/commands/cmd_select_state.cpp \
     Sources/version.cpp \
-    Sources/gui/save_before_run_dialog.cpp
+    Sources/gui/save_before_run_dialog.cpp \
+    Sources/clipboard.cpp
 
 HEADERS  += Headers/shape_types.h \
     Headers/gui/editor_window.h \
@@ -176,7 +177,8 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/commands/cmd_cycle.h \
     Headers/logic/commands/cmd_select_state.h \
     Headers/version.h \
-    Headers/gui/save_before_run_dialog.h
+    Headers/gui/save_before_run_dialog.h \
+    Headers/clipboard.h
 
 TRANSLATIONS += OKB5TestStudio_ru.ts
 

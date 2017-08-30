@@ -17,6 +17,7 @@ class Cyclogram;
 class Command;
 class ShapeItem;
 class CmdSubProgram;
+class Clipboard;
 
 class CyclogramWidget : public QWidget
 {
@@ -29,6 +30,7 @@ public:
     void clear(bool onDestroy = false);
     void setMainWindow(QWidget* widget);
     void setParentScrollArea(QScrollArea* scroll);
+    void setClipboard(QSharedPointer<Clipboard> clipboard);
 
     ShapeItem* selectedItem() const;
 
@@ -89,8 +91,8 @@ private:
 
     const ShapeItem* findBranch(const Command* command) const;
 
-    void copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point);
-    void copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint* point);
+    void copyCommandTo(Command* commandToCopy, const ValencyPoint* point);
+    void copyBranchTo(Command* commandToCopy, const ValencyPoint* point);
     void moveBranchTo(ShapeItem* branchToMove, const ValencyPoint* point);
     ShapeItem* copyBranch(Command* branchCmd, const QPoint& cell);
 
@@ -124,7 +126,6 @@ private:
     ShapeItem * mDraggingShape;
     ShapeItem * mSelectedShape;
     ShapeItem * mPressedShape;
-    ShapeItem * mItemToCopy;
 
     ValencyPoint* mPressedVP;
 
@@ -142,6 +143,8 @@ private:
 
     int mCurrentCommandType;
     QFont mFont;
+
+    QWeakPointer<Clipboard> mClipboard;
 
 signals:
     void selectionChanged(ShapeItem* item);

@@ -34,6 +34,7 @@
 #include "Headers/gui/cyclogram/dialogs/subprogram_dialog.h"
 #include "Headers/gui/tools/cyclogram_chart_dialog.h"
 #include "Headers/gui/editor_window.h"
+#include "Headers/clipboard.h"
 
 #include "Headers/gui/cyclogram/shape_item.h"
 
@@ -55,7 +56,6 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     mSelectedShape(Q_NULLPTR),
     mDraggingShape(Q_NULLPTR),
     mPressedShape(Q_NULLPTR),
-    mItemToCopy(Q_NULLPTR),
     mMouseButtonState(Qt::NoButton),
     mCurrentCommandType(-1),
     mPressedVP(Q_NULLPTR),
@@ -473,7 +473,9 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
 
     menu.addSeparator();
     QAction* pasteAction = menu.addAction(tr("Paste"));
-    pasteAction->setEnabled(mItemToCopy != Q_NULLPTR);
+
+    Command* commandToCopy = mClipboard.lock()->commandToCopy();
+    pasteAction->setEnabled(commandToCopy != Q_NULLPTR);
 
     QAction* action = menu.exec(pos);
     if (!action)
@@ -483,19 +485,19 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
 
     if (action == pasteAction)
     {
-        if (!point->canBeInserted(mItemToCopy->command()->type()))
+        if (!point->canBeInserted(commandToCopy->type()))
         {
             QMessageBox::warning(this, tr("Error"), tr("Selected command can not be copied here"));
             return;
         }
 
-        if (mItemToCopy->command()->type() == DRAKON::BRANCH_BEGIN)
+        if (commandToCopy->type() == DRAKON::BRANCH_BEGIN)
         {
-            copyBranchTo(mItemToCopy, point);
+            copyBranchTo(commandToCopy, point);
         }
         else
         {
-            copyCommandTo(mItemToCopy, point);
+            copyCommandTo(commandToCopy, point);
         }
 
         return;
@@ -505,17 +507,16 @@ void CyclogramWidget::showContextMenuForVP(const ValencyPoint* point, const QPoi
     addNewCommand(DRAKON::IconType(command), point);
 }
 
-void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* point)
+void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* point)
 {
-    Command* commandToCopy = itemToCopy->command();
     DRAKON::IconType typeToCopy = commandToCopy->type();
     bool isBranchRightVP = (point->owner()->command()->type() == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right);
 
     if (isBranchRightVP)
     {
-        if (typeToCopy == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(itemToCopy->command()))
+        if (typeToCopy == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(commandToCopy))
         {
-            copyBranchTo(itemToCopy, point);
+            copyBranchTo(commandToCopy, point);
         }
         else
         {
@@ -565,10 +566,10 @@ void CyclogramWidget::copyCommandTo(ShapeItem* itemToCopy, const ValencyPoint* p
     update();
 }
 
-void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint* point)
+void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* point)
 {
     auto cyclogram = mCyclogram.lock();
-    Command* newBranchCmd = cyclogram->createBranchCopy(itemToCopy->command());
+    Command* newBranchCmd = cyclogram->createBranchCopy(commandToCopy);
 
     if (!newBranchCmd)
     {
@@ -629,7 +630,7 @@ void CyclogramWidget::copyBranchTo(ShapeItem* itemToCopy, const ValencyPoint* po
 
     // set root shape rect
     QRect rect = mRootShape->rect();
-    rect.setRight(rect.right() + itemToCopy->rect().width());
+    rect.setRight(rect.right() + newBranchCopy->rect().width());
     rect.setBottom(maxHeight);
     mRootShape->setRect(rect, false);
 
@@ -778,7 +779,6 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
         enableCopyAction = !cyclogram->isCyclogramEndBranch(item->command());
     }
 
-
     QAction* action = menu.exec(pos);
     if (!action)
     {
@@ -822,7 +822,7 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
             return;
         }
 
-        mItemToCopy = item;
+        mClipboard.lock()->setCommandToCopy(item->command(), mCyclogram.lock());
         return;
     }
 }
@@ -853,7 +853,7 @@ void CyclogramWidget::showSubprogramWidget()
     }
     else
     {
-        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCyclogram.lock(), mMainWindow);
+        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCyclogram.lock(), mMainWindow, mClipboard.lock());
         mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
 
         subProgramDialog->cyclogramWidget()->setCurrentCommandType(mCurrentCommandType);
@@ -983,7 +983,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
                 {
                     if (canBeMoved(mPressedShape, point))
                     {
-                        copyCommandTo(mPressedShape, point);
+                        copyCommandTo(mPressedShape->command(), point);
                         deleteCommand(mPressedShape);
                     }
                     else
@@ -1030,7 +1030,7 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         {
             if (point)
             {
-                copyCommandTo(mPressedShape, point);
+                copyCommandTo(mPressedShape->command(), point);
             }
         }
         else // just usual click, show context menu for "hotspot" object
@@ -1980,11 +1980,6 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
-    if (mItemToCopy == item)
-    {
-        mItemToCopy = 0;
-    }
-
     if (mDraggingShape != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         deleteBranch(item);
@@ -2061,6 +2056,11 @@ void CyclogramWidget::setMainWindow(QWidget* widget)
 void CyclogramWidget::setParentScrollArea(QScrollArea* scroll)
 {
     mParentScrollArea = scroll;
+}
+
+void CyclogramWidget::setClipboard(QSharedPointer<Clipboard> clipboard)
+{
+    mClipboard = clipboard;
 }
 
 void CyclogramWidget::onAppSettingsChanged()

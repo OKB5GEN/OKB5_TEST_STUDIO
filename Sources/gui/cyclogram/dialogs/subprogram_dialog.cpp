@@ -14,6 +14,7 @@
 #include "Headers/gui/cyclogram/variables_window.h"
 #include "Headers/gui/cyclogram/dialogs/cyclogram_settings_dialog.h"
 #include "Headers/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.h"
+#include "Headers/clipboard.h"
 
 
 namespace
@@ -23,7 +24,7 @@ namespace
     static const int DEFAULT_MAX_DIALOG_HEIGHT = 800;
 }
 
-SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow):
+SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow, QSharedPointer<Clipboard> clipboard):
     QDialog(mainWindow),
     mCommand(command)
 {
@@ -37,6 +38,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setMainWindow(mainWindow);
     mCyclogramWidget->setParentScrollArea(mScrollArea);
+    mCyclogramWidget->setClipboard(clipboard);
     mCyclogramWidget->load(mCommand->cyclogram());
 
     mScrollArea->setWidget(mCyclogramWidget);

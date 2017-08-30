@@ -20,6 +20,7 @@ class CyclogramChartDialog;
 class CmdSubProgram;
 class SubProgramDialog;
 class ShapeItem;
+class Clipboard;
 
 class EditorWindow : public QMainWindow
 {
@@ -146,6 +147,8 @@ private:
     int mSnapshotsCouner; // hack for force data snapshot save
 
     QMap<QObject*, QObject*> mOpenedSubprogramDialogs;
+
+    QSharedPointer<Clipboard> mClipboard;
 
     // recent files
     QAction* mRecentFileActs[MAX_RECENT_FILES];
