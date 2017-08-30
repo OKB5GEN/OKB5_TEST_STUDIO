@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE cyclogram>
 <cyclogram version="0.1.0">
+    <settings>
+        <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
+    </settings>
     <variables>
         <variable name="BP1_LA" value="0" desc=""/>
         <variable name="BP1_PA" value="0" desc=""/>
@@ -10,109 +13,115 @@
         <variable name="STM_PA" value="0" desc=""/>
     </variables>
     <commands>
-        <command type="TERMINATOR" id="1493186321934" name="START" cmd_type="BEGIN"/>
-        <command type="BRANCH_BEGIN" id="1493186321935" name="BP1"/>
-        <command type="GO_TO_BRANCH" id="1493186321936"/>
-        <command type="BRANCH_BEGIN" id="1493186321945" name="End"/>
-        <command type="TERMINATOR" id="1493186321946" name="FINISH" cmd_type="END"/>
-        <command type="ACTION_MODULE" id="1493897563313" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
+        <command type="TERMINATOR" id="1493186321934" console_text="" console_text_color="ff000000" name="START" cmd_type="BEGIN"/>
+        <command type="BRANCH_BEGIN" id="1493186321935" console_text="" console_text_color="ff000000" name="BP1"/>
+        <command type="GO_TO_BRANCH" id="1493186321936" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493186321945" console_text="" console_text_color="ff000000" name="End"/>
+        <command type="TERMINATOR" id="1493186321946" console_text="" console_text_color="ff000000" name="FINISH" cmd_type="END"/>
+        <command type="ACTION_MODULE" id="1493897563313" console_text="" console_text_color="ff000000" module="POWER_UNIT_BUP" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="BP1_LA"/>
                 <param name="STATUS_PHYSICAL" type="10" value="BP1_PA"/>
+                <param name="STATUS_LOGICAL" type="10" value="BP1_LA"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493897713569" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493897713569" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP1_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897713575"/>
-        <command type="SELECT_STATE" id="1493897719245" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493897713575" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1493897719245" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP1_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897719248"/>
-        <command type="BRANCH_BEGIN" id="1493897723477" name="BP2"/>
-        <command type="GO_TO_BRANCH" id="1493897723480"/>
-        <command type="BRANCH_BEGIN" id="1493897725960" name="STM"/>
-        <command type="GO_TO_BRANCH" id="1493897725963"/>
-        <command type="ACTION_MODULE" id="1493897741510" module="POWER_UNIT_PNA" command="GET_MODULE_STATUS">
+        <command type="GO_TO_BRANCH" id="1493897719248" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493897723477" console_text="" console_text_color="ff000000" name="BP2"/>
+        <command type="GO_TO_BRANCH" id="1493897723480" console_text="" console_text_color="ff000000"/>
+        <command type="BRANCH_BEGIN" id="1493897725960" console_text="" console_text_color="ff000000" name="STM"/>
+        <command type="GO_TO_BRANCH" id="1493897725963" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493897741510" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="BP2_LA"/>
                 <param name="STATUS_PHYSICAL" type="10" value="BP2_PA"/>
+                <param name="STATUS_LOGICAL" type="10" value="BP2_LA"/>
             </output_params>
         </command>
-        <command type="ACTION_MODULE" id="1493897743669" module="STM" command="GET_MODULE_STATUS">
+        <command type="ACTION_MODULE" id="1493897743669" console_text="" console_text_color="ff000000" module="STM" command="GET_MODULE_STATUS">
             <input_params/>
             <output_params>
-                <param name="STATUS_LOGICAL" type="10" value="STM_LA"/>
                 <param name="STATUS_PHYSICAL" type="10" value="STM_PA"/>
+                <param name="STATUS_LOGICAL" type="10" value="STM_LA"/>
             </output_params>
         </command>
-        <command type="SELECT_STATE" id="1493897746499" operation="Greater" orientation="YesDown">
+        <command type="SELECT_STATE" id="1493897746499" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP2_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897746503"/>
-        <command type="SELECT_STATE" id="1493897751743" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493897746503" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1493897751743" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="BP2_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897751746"/>
-        <command type="SELECT_STATE" id="1493897755741" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493897751746" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1493897755741" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="STM_PA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897755744"/>
-        <command type="SELECT_STATE" id="1493897761903" operation="Greater" orientation="YesDown">
+        <command type="GO_TO_BRANCH" id="1493897755744" console_text="" console_text_color="ff000000"/>
+        <command type="SELECT_STATE" id="1493897761903" console_text="" console_text_color="ff000000" operation="Greater" orientation="YesDown">
             <operand id="Left" type="Variable" value="0" variable="STM_LA"/>
             <operand id="Right" type="Number" value="0" variable=""/>
         </command>
-        <command type="GO_TO_BRANCH" id="1493897761907"/>
-        <command type="ACTION_MODULE" id="1493897772801" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+        <command type="GO_TO_BRANCH" id="1493897761907" console_text="" console_text_color="ff000000"/>
+        <command type="ACTION_MODULE" id="1493897772801" console_text="" console_text_color="ff000000" module="POWER_UNIT_BUP" command="PSC_SWITCH_POWER_OUTPUT_OFF">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493897774821" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
+        <command type="ACTION_MODULE" id="1493897774821" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="PSC_SWITCH_POWER_OUTPUT_OFF">
             <input_params/>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493898072313" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1493898072313" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="6"/>
-                <param name="POWER_STATE" type="2" value="0"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493898077601" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1493898077601" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="5"/>
-                <param name="POWER_STATE" type="2" value="0"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493898083671" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1493898083671" console_text="" console_text_color="ff000000" module="POWER_UNIT_PNA" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="4"/>
-                <param name="POWER_STATE" type="2" value="0"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493898085504" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1493898085504" console_text="" console_text_color="ff000000" module="POWER_UNIT_BUP" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="2"/>
-                <param name="POWER_STATE" type="2" value="0"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
-        <command type="ACTION_MODULE" id="1493898087841" module="STM" command="SET_POWER_CHANNEL_STATE">
+        <command type="ACTION_MODULE" id="1493898087841" console_text="" console_text_color="ff000000" module="POWER_UNIT_BUP" command="SET_POWER_CHANNEL_STATE">
             <input_params>
                 <param name="CHANNEL_ID" type="2" value="1"/>
-                <param name="POWER_STATE" type="2" value="0"/>
+                <param name="POWER_STATE" type="6" value="0"/>
             </input_params>
             <output_params/>
         </command>
+        <command type="OUTPUT" id="1504071942663" console_text="БП1 не подключен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504071944811" console_text="БП1 логически неактивен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504071983836" console_text="БП2 не подключен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504071985780" console_text="БП2 логически неактивен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504072008946" console_text="СТМ не подключен!" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504072011378" console_text="СТМ логически неактивен!" console_text_color="ffdc143c"/>
     </commands>
     <tree>
         <item id="1493186321934" down="1493186321935" right="-1" under_arrow="-1"/>
@@ -121,9 +130,9 @@
         <item id="1493186321945" down="1493186321946" right="-1" under_arrow="-1"/>
         <item id="1493186321946" down="-1" right="-1" under_arrow="-1"/>
         <item id="1493897563313" down="1493897713569" right="-1" under_arrow="-1"/>
-        <item id="1493897713569" down="1493897719245" right="1493897713575" under_arrow="-1"/>
+        <item id="1493897713569" down="1493897719245" right="1504071942663" under_arrow="-1"/>
         <item id="1493897713575" down="1493897723477" right="-1" under_arrow="-1"/>
-        <item id="1493897719245" down="1493897772801" right="1493897719248" under_arrow="-1"/>
+        <item id="1493897719245" down="1493897772801" right="1504071944811" under_arrow="-1"/>
         <item id="1493897719248" down="1493897723477" right="-1" under_arrow="-1"/>
         <item id="1493897723477" down="1493897741510" right="-1" under_arrow="-1"/>
         <item id="1493897723480" down="1493897725960" right="-1" under_arrow="-1"/>
@@ -131,13 +140,13 @@
         <item id="1493897725963" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493897741510" down="1493897746499" right="-1" under_arrow="-1"/>
         <item id="1493897743669" down="1493897755741" right="-1" under_arrow="-1"/>
-        <item id="1493897746499" down="1493897751743" right="1493897746503" under_arrow="-1"/>
+        <item id="1493897746499" down="1493897751743" right="1504071983836" under_arrow="-1"/>
         <item id="1493897746503" down="1493897725960" right="-1" under_arrow="-1"/>
-        <item id="1493897751743" down="1493897774821" right="1493897751746" under_arrow="-1"/>
+        <item id="1493897751743" down="1493897774821" right="1504071985780" under_arrow="-1"/>
         <item id="1493897751746" down="1493897725960" right="-1" under_arrow="-1"/>
-        <item id="1493897755741" down="1493897761903" right="1493897755744" under_arrow="-1"/>
+        <item id="1493897755741" down="1493897761903" right="1504072008946" under_arrow="-1"/>
         <item id="1493897755744" down="1493186321945" right="-1" under_arrow="-1"/>
-        <item id="1493897761903" down="1493898072313" right="1493897761907" under_arrow="-1"/>
+        <item id="1493897761903" down="1493898072313" right="1504072011378" under_arrow="-1"/>
         <item id="1493897761907" down="1493186321945" right="-1" under_arrow="-1"/>
         <item id="1493897772801" down="1493186321936" right="-1" under_arrow="-1"/>
         <item id="1493897774821" down="1493897723480" right="-1" under_arrow="-1"/>
@@ -146,5 +155,11 @@
         <item id="1493898083671" down="1493898085504" right="-1" under_arrow="-1"/>
         <item id="1493898085504" down="1493898087841" right="-1" under_arrow="-1"/>
         <item id="1493898087841" down="1493897725963" right="-1" under_arrow="-1"/>
+        <item id="1504071942663" down="1493897713575" right="-1" under_arrow="-1"/>
+        <item id="1504071944811" down="1493897719248" right="-1" under_arrow="-1"/>
+        <item id="1504071983836" down="1493897746503" right="-1" under_arrow="-1"/>
+        <item id="1504071985780" down="1493897751746" right="-1" under_arrow="-1"/>
+        <item id="1504072008946" down="1493897755744" right="-1" under_arrow="-1"/>
+        <item id="1504072011378" down="1493897761907" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>
