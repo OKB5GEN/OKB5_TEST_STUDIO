@@ -63,6 +63,7 @@ public:
     State state() const;
 
     void deleteCommand(Command* cmd, bool recursive = false);
+    void deleteBranch(Command* cmd);
 
     Command* validate() const; //
 
@@ -96,10 +97,11 @@ private slots:
     void onAppSettingsChanged();
 
 private:
-    void deleteCommandTree(Command* cmd, bool silent);
+    void deleteCommandTree(Command* cmd, bool silent, bool isBranchDeletion);
     void deleteCommandImpl(Command* cmd, bool silent);
     void setState(State state);
     void copyCommandTree(Command* to, Command* from, QMap<Command*, Command*>& alreadyCreatedCommands);
+    Command* copyCommand(Command* to, Command* from, int role, QMap<Command*, Command*>& alreadyCreatedCommands, bool addToMapping);
 
     Command* mFirst;
     Command* mLast;

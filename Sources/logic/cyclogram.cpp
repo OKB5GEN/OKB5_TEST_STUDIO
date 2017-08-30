@@ -330,7 +330,7 @@ void Cyclogram::clear()
     mVarController->clear();
 }
 
-void Cyclogram::deleteCommandTree(Command* cmd, bool silent)
+void Cyclogram::deleteCommandTree(Command* cmd, bool silent, bool isBranchDeletion)
 {
     emit deleted(cmd);
 
@@ -347,20 +347,35 @@ void Cyclogram::deleteCommandTree(Command* cmd, bool silent)
     // recursively delete all child commands
     for (int i = 0, sz = cmd->nextCommands().size(); i < sz; ++i)
     {
-        if (cmd->nextCommands()[i])
+        Command* command = cmd->nextCommands()[i];
+        if (!command)
         {
-            deleteCommandTree(cmd->nextCommands()[i], silent);
+            continue;
+        }
+
+        if (!isBranchDeletion) // real branch deletion
+        {
+            deleteCommandTree(command, silent, isBranchDeletion);
+        }
+        else if (cmd->type() != DRAKON::GO_TO_BRANCH) // branch clipboard copy deletion
+        {
+            deleteCommandTree(command, silent, isBranchDeletion); // delete further command tree only if it is not a GO_TO_BRANCH command
         }
     }
 
     deleteCommandImpl(cmd, silent);
 }
 
+void Cyclogram::deleteBranch(Command *cmd)
+{
+    deleteCommandTree(cmd, true, true);
+}
+
 void Cyclogram::deleteCommand(Command* cmd, bool recursive /*= false*/)
 {
     if (recursive)
     {
-        deleteCommandTree(cmd, false);
+        deleteCommandTree(cmd, false, false);
         return;
     }
 
@@ -761,7 +776,7 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
 
         return;
     }
-    else if (from->type() == DRAKON::CONDITION || from->type() == DRAKON::SELECT_STATE)
+    else if (from->type() == DRAKON::CONDITION)
     {
         Command* down = from->nextCommand(ValencyPoint::Down);
         Command* right = from->nextCommand(ValencyPoint::Right);
@@ -774,22 +789,7 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
             auto it = existingMapping.find(underArrow);
             if (it == existingMapping.end()) // command was not created, create command copy
             {
-                Command* cmd = underArrow;
-                newUnderArrowCmd = createCommand(cmd->type());
-                newUnderArrowCmd->copyFrom(cmd);
-                existingMapping[underArrow] = newUnderArrowCmd;
-
-                to->replaceCommand(newUnderArrowCmd, ValencyPoint::UnderArrow);
-
-                // move creation further to "under arrow" hierarchy
-                if (newUnderArrowCmd->type() != DRAKON::GO_TO_BRANCH)
-                {
-                    copyCommandTree(newUnderArrowCmd, cmd, existingMapping);
-                }
-                else // stop copy on branch end
-                {
-                    newUnderArrowCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
-                }
+                newUnderArrowCmd = copyCommand(to, underArrow, ValencyPoint::UnderArrow, existingMapping, true);
             }
             else
             {
@@ -800,43 +800,45 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
 
             if (down)
             {
-                Command* cmd = down;
-
-                if (cmd == underArrow) // straight line without down command
+                if (down == underArrow) // straight line without down command
                 {
                     to->replaceCommand(newUnderArrowCmd, ValencyPoint::Down); // just replace to the same command
                 }
                 else
                 {
-                    Command* newDownCmd = createCommand(cmd->type());
-                    newDownCmd->copyFrom(cmd);
-                    to->replaceCommand(newDownCmd, ValencyPoint::Down);
-
-                    copyCommandTree(newDownCmd, cmd, existingMapping);
+                    copyCommand(to, down, ValencyPoint::Down, existingMapping, false);
                 }
             }
 
             if (right)
             {
-                Command* cmd = right;
-                if (cmd == underArrow) // straight line without right command
+                if (right == underArrow) // straight line without right command
                 {
                     to->replaceCommand(newUnderArrowCmd, ValencyPoint::Right); // just replace to the same command
                 }
                 else
                 {
-                    Command* newRightCmd = createCommand(cmd->type());
-                    newRightCmd->copyFrom(cmd);
-                    to->replaceCommand(newRightCmd, ValencyPoint::Right);
-
-                    copyCommandTree(newRightCmd, cmd, existingMapping);
+                    copyCommand(to, right, ValencyPoint::Right, existingMapping, false);
                 }
             }
         }
-        else // "switch state"?
+
+        return;
+    }
+    else if (from->type() == DRAKON::SELECT_STATE)
+    {
+        Command* down = from->nextCommand(ValencyPoint::Down);
+        Command* right = from->nextCommand(ValencyPoint::Right);
+
+        // "down" and "right" are always present, "underArrow" is never present
+        if (down)
         {
-            int i = 0;
-            int TODO;
+            copyCommand(to, down, ValencyPoint::Down, existingMapping, false);
+        }
+
+        if (right)
+        {
+            copyCommand(to, right, ValencyPoint::Right, existingMapping, false);
         }
 
         return;
@@ -857,27 +859,38 @@ void Cyclogram::copyCommandTree(Command* to, Command* from, QMap<Command*, Comma
         auto iter = existingMapping.find(cmd);
         if (iter == existingMapping.end())// command was not created, create command copy
         {
-            newNextCmd = createCommand(cmd->type());
-            newNextCmd->copyFrom(cmd);
-
-            to->replaceCommand(newNextCmd, ValencyPoint::Down);
-
-            if (newNextCmd->type() != DRAKON::GO_TO_BRANCH)
-            {
-                copyCommandTree(newNextCmd, cmd, existingMapping);
-            }
-            else // stop copy on branch end
-            {
-                newNextCmd->replaceCommand(cmd->nextCommand(), ValencyPoint::Down);
-            }
+            newNextCmd = copyCommand(to, cmd, ValencyPoint::Down, existingMapping, false);
         }
         else
         {
             newNextCmd = iter.value();
-
             to->replaceCommand(newNextCmd, ValencyPoint::Down);
         }
     }
+}
+
+Command* Cyclogram::copyCommand(Command* to, Command* from, int role, QMap<Command*, Command*>& alreadyCreatedCommands, bool addToMapping)
+{
+    Command* newCmd = createCommand(from->type());
+    newCmd->copyFrom(from);
+    to->replaceCommand(newCmd, ValencyPoint::Role(role));
+
+    if (addToMapping)
+    {
+        alreadyCreatedCommands[from] = newCmd;
+    }
+
+    // if not GO_TO_BRANCH, move copying further
+    if (newCmd->type() != DRAKON::GO_TO_BRANCH)
+    {
+        copyCommandTree(newCmd, from, alreadyCreatedCommands);
+    }
+    else // stop copy on branch end
+    {
+        newCmd->replaceCommand(from->nextCommand(), ValencyPoint::Down);
+    }
+
+    return newCmd;
 }
 
 QString Cyclogram::generateBranchName(const QString& templateName) const

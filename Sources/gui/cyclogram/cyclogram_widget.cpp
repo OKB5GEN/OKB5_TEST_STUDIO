@@ -553,8 +553,16 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
     //DRAKON::BRANCH_BEGIN - this type of command is copied as entire branch
 
     // create command and load it from another
-    Command* newCmd = mCyclogram.lock()->createCommand(typeToCopy);
-    newCmd->copyFrom(commandToCopy);
+    Command* newCmd = Q_NULLPTR;
+    auto clipboard = mClipboard.lock();
+    if (commandToCopy == clipboard->commandToCopy()) // copying with context menu
+    {
+        newCmd = clipboard->createCommandCopy();
+    }
+    else // copying with Drag-And-Drop
+    {
+        newCmd = Clipboard::createCommandCopy(commandToCopy, mCyclogram.lock());
+    }
 
     if (!newCmd)
     {
@@ -562,14 +570,24 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
         return;
     }
 
-    ShapeItem* newShape = addCommand(newCmd, point);
+    /*ShapeItem* newShape = */addCommand(newCmd, point);
     update();
 }
 
 void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* point)
 {
+    Command* newBranchCmd = Q_NULLPTR;
     auto cyclogram = mCyclogram.lock();
-    Command* newBranchCmd = cyclogram->createBranchCopy(commandToCopy);
+    auto clipboard = mClipboard.lock();
+
+    if (commandToCopy == clipboard->commandToCopy()) // copying with context menu
+    {
+        newBranchCmd = clipboard->createBranchCopy();
+    }
+    else // copying with Drag-And-Drop
+    {
+        newBranchCmd = Clipboard::createBranchCopy(commandToCopy, cyclogram);
+    }
 
     if (!newBranchCmd)
     {
@@ -630,7 +648,7 @@ void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* p
 
     // set root shape rect
     QRect rect = mRootShape->rect();
-    rect.setRight(rect.right() + newBranchCopy->rect().width());
+    rect.setRight(rect.right() + 2/*newBranchCopy->rect().width()*/);
     rect.setBottom(maxHeight);
     mRootShape->setRect(rect, false);
 

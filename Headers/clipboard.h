@@ -16,7 +16,12 @@ public:
     ~Clipboard();
 
     Command* commandToCopy() const;
+    Command* createCommandCopy();
+    Command* createBranchCopy();
+
     void setCommandToCopy(Command* command, QSharedPointer<Cyclogram> cyclogram);
+    static Command* createCommandCopy(Command* from, QSharedPointer<Cyclogram> cyclogram);
+    static Command* createBranchCopy(Command* from, QSharedPointer<Cyclogram> cyclogram);
 
 private:
     Command* mCommandToCopy;
