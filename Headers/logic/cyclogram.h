@@ -72,6 +72,7 @@ public:
     SystemState* systemState() const;
 
     static bool isCyclogramEndBranch(Command* cmd);
+    static bool canBeCopied(DRAKON::IconType type);
 
     void clear();
 

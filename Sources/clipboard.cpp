@@ -34,6 +34,13 @@ void Clipboard::setCommandToCopy(Command* command, QSharedPointer<Cyclogram> cyc
         }
     }
 
+    if (!Cyclogram::canBeCopied(command->type()))
+    {
+        mCommandToCopy = 0;
+        mCyclogram.reset();
+        return;
+    }
+
     if (command->type() == DRAKON::BRANCH_BEGIN)
     {
         mCommandToCopy = createBranchCopy(command, cyclogram);

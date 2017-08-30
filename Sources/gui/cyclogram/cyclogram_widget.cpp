@@ -512,6 +512,12 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
     DRAKON::IconType typeToCopy = commandToCopy->type();
     bool isBranchRightVP = (point->owner()->command()->type() == DRAKON::BRANCH_BEGIN && point->role() == ValencyPoint::Right);
 
+    if (!Cyclogram::canBeCopied(typeToCopy))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Selected command can not be copied"));
+        return;
+    }
+
     if (isBranchRightVP)
     {
         if (typeToCopy == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(commandToCopy))

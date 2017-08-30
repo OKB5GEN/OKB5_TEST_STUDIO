@@ -925,3 +925,19 @@ QString Cyclogram::generateBranchName(const QString& templateName) const
 
     return name;
 }
+
+bool Cyclogram::canBeCopied(DRAKON::IconType type)
+{
+    switch (type)
+    {
+    case DRAKON::TERMINATOR:
+    case DRAKON::SELECT_STATE:
+    case DRAKON::GO_TO_BRANCH:
+        return false;
+
+    default:
+        break;
+    }
+
+    return true;
+}
