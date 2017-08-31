@@ -561,13 +561,15 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
     // create command and load it from another
     Command* newCmd = Q_NULLPTR;
     auto clipboard = mClipboard.lock();
+    auto cyclogram = mCyclogram.lock();
+
     if (commandToCopy == clipboard->commandToCopy()) // copying with context menu
     {
-        newCmd = clipboard->createCommandCopy();
+        newCmd = clipboard->createCommandCopy(cyclogram);
     }
     else // copying with Drag-And-Drop
     {
-        newCmd = Clipboard::createCommandCopy(commandToCopy, mCyclogram.lock());
+        newCmd = Clipboard::createCommandCopy(commandToCopy, cyclogram);
     }
 
     if (!newCmd)
@@ -588,7 +590,7 @@ void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* p
 
     if (commandToCopy == clipboard->commandToCopy()) // copying with context menu
     {
-        newBranchCmd = clipboard->createBranchCopy();
+        newBranchCmd = clipboard->createBranchCopy(cyclogram);
     }
     else // copying with Drag-And-Drop
     {

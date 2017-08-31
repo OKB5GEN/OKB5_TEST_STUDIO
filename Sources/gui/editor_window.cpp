@@ -83,6 +83,8 @@ EditorWindow::EditorWindow():
     mScrollArea = new QScrollArea(this);
     mSystemState = new SystemState(this);
 
+    mClipboard->setSystemState(mSystemState);
+
     mCyclogramWidget = new CyclogramWidget(this);
     mCyclogramWidget->setMainWindow(this);
     mCyclogramWidget->setParentScrollArea(mScrollArea);

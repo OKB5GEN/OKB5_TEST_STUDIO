@@ -6,6 +6,7 @@
 
 class Command;
 class Cyclogram;
+class SystemState;
 
 class Clipboard: public QObject
 {
@@ -16,8 +17,10 @@ public:
     ~Clipboard();
 
     Command* commandToCopy() const;
-    Command* createCommandCopy();
-    Command* createBranchCopy();
+    Command* createCommandCopy(QSharedPointer<Cyclogram> cyclogram);
+    Command* createBranchCopy(QSharedPointer<Cyclogram> cyclogram);
+
+    void setSystemState(SystemState* state);
 
     void setCommandToCopy(Command* command, QSharedPointer<Cyclogram> cyclogram);
     static Command* createCommandCopy(Command* from, QSharedPointer<Cyclogram> cyclogram);
@@ -26,5 +29,6 @@ public:
 private:
     Command* mCommandToCopy;
     QSharedPointer<Cyclogram> mCyclogram; // we store shared pointer instead of weak pointer, because we must always have possibility to create a copy
+    SystemState* mSystemState;
 };
 #endif // CLIPBOARD_H

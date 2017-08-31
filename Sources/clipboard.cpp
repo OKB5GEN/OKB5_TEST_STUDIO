@@ -7,7 +7,7 @@ Clipboard::Clipboard():
     QObject(Q_NULLPTR),
     mCommandToCopy(Q_NULLPTR)
 {
-
+    mCyclogram.reset(new Cyclogram(Q_NULLPTR));
 }
 
 Clipboard::~Clipboard()
@@ -22,45 +22,32 @@ Command* Clipboard::commandToCopy() const
 
 void Clipboard::setCommandToCopy(Command* command, QSharedPointer<Cyclogram> cyclogram)
 {
-    if (mCommandToCopy)
-    {
-        if (mCommandToCopy->type() != DRAKON::BRANCH_BEGIN)
-        {
-            mCyclogram->deleteCommand(mCommandToCopy);
-        }
-        else
-        {
-            mCyclogram->deleteBranch(mCommandToCopy);
-        }
-    }
+    mCyclogram->clear();
+    mCommandToCopy = 0;
 
     if (!Cyclogram::canBeCopied(command->type()))
     {
-        mCommandToCopy = 0;
-        mCyclogram.reset();
         return;
     }
 
     if (command->type() == DRAKON::BRANCH_BEGIN)
     {
-        mCommandToCopy = createBranchCopy(command, cyclogram);
+        mCommandToCopy = createBranchCopy(command, mCyclogram);
     }
     else
     {
-        mCommandToCopy = createCommandCopy(command, cyclogram);
+        mCommandToCopy = createCommandCopy(command, mCyclogram);
     }
-
-    mCyclogram = cyclogram;
 }
 
-Command* Clipboard::createCommandCopy()
+Command* Clipboard::createCommandCopy(QSharedPointer<Cyclogram> cyclogram)
 {
-    return createCommandCopy(mCommandToCopy, mCyclogram);
+    return createCommandCopy(mCommandToCopy, cyclogram);
 }
 
-Command* Clipboard::createBranchCopy()
+Command* Clipboard::createBranchCopy(QSharedPointer<Cyclogram> cyclogram)
 {
-    return createBranchCopy(mCommandToCopy, mCyclogram);
+    return createBranchCopy(mCommandToCopy, cyclogram);
 }
 
 Command* Clipboard::createCommandCopy(Command* from, QSharedPointer<Cyclogram> cyclogram)
@@ -90,4 +77,10 @@ Command* Clipboard::createBranchCopy(Command* from, QSharedPointer<Cyclogram> cy
 
     newCmd = cyclogram->createBranchCopy(from);
     return newCmd;
+}
+
+void Clipboard::setSystemState(SystemState* state)
+{
+    mSystemState = state;
+    mCyclogram->setSystemState(mSystemState);
 }
