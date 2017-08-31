@@ -67,6 +67,8 @@ private slots:
     void onAppSettingsChanged();
 
 private:
+    static ShapeItem* createShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape, QObject* parent);
+
     void drawCommandText(ShapeItem* item, QPainter& painter);
     void updateCursor(const QPoint& pos);
     void setSelectedItem(ShapeItem* item);

@@ -340,15 +340,15 @@ void CyclogramWidget::paintEvent(QPaintEvent * /* event */)
     sihlouetteItems.push_back(mSihlouetteLine);
     sihlouetteItems.push_back(mSihlouetteArrow);
 
+    if (mDraggingShape)
+    {
+        QList<ShapeItem*> moving;
+        moving.push_back(mDraggingShape);
+        drawItems(moving, painter);
+    }
+
     drawItems(sihlouetteItems, painter);
     drawItems(mShapes, painter);
-
-//    if (mMovingItem)
-//    {
-//        QList<ShapeItem*> moving;
-//        moving.push_back(mMovingItem);
-//        drawItems(moving, painter);
-//    }
 }
 
 void CyclogramWidget::drawItems(QList<ShapeItem*>& items, QPainter& painter)
@@ -656,7 +656,7 @@ void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* p
 
     // set root shape rect
     QRect rect = mRootShape->rect();
-    rect.setRight(rect.right() + 2/*newBranchCopy->rect().width()*/);
+    rect.setRight(rect.right() + newBranchCopy->rect().width());
     rect.setBottom(maxHeight);
     mRootShape->setRect(rect, false);
 
@@ -960,12 +960,9 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 
     if (mPressedShape && !mDraggingShape)
     {
-        auto cyclogram = mCyclogram.lock();
-        DRAKON::IconType type = mPressedShape->command()->type();
-        Command* commandCopy = cyclogram->createCommand(type);
-        commandCopy->copyFrom(mPressedShape->command());
-
-        mDraggingShape = addShape(commandCopy, mPressedShape->cell(), 0/*mRootShape*/);
+        auto clipboard = mClipboard.lock();
+        Command* commandCopy = clipboard->createCommandCopy(mPressedShape->command(), clipboard->cyclogram());
+        mDraggingShape = CyclogramWidget::createShape(commandCopy, mPressedShape->cell(), 0, 0);
         onDragStart();
     }
 
@@ -1088,8 +1085,6 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
     if (mDraggingShape)
     {
         onDragFinish();
-        deleteCommand(mDraggingShape);
-        mDraggingShape = 0;
     }
 
     mMouseButtonState = Qt::NoButton;
@@ -1206,14 +1201,19 @@ void CyclogramWidget::updateCursor(const QPoint& pos)
     }
 }
 
-ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
+ShapeItem* CyclogramWidget::createShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape, QObject* parent)
 {
-    ShapeItem* shapeItem = new ShapeItem(this);
+    ShapeItem* shapeItem = new ShapeItem(parent);
     shapeItem->setCommand(cmd);
     shapeItem->setCell(cell);
     shapeItem->setParentShape(parentShape);
     shapeItem->setRect(QRect(cell.x(), cell.y(), 1, 1), false); // by initial shape rect matches the occupied cell
+    return shapeItem;
+}
 
+ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
+{
+    ShapeItem* shapeItem = CyclogramWidget::createShape(cmd, cell, parentShape, this);
     //shapeItem->updateCanBeLandedFlag();
 
     mShapes.append(shapeItem);
@@ -2006,7 +2006,7 @@ ShapeItem* CyclogramWidget::addNewBranch(ShapeItem* item)
 
 void CyclogramWidget::deleteCommand(ShapeItem* item)
 {
-    if (mDraggingShape != item && item->command()->type() == DRAKON::BRANCH_BEGIN)
+    if (item->command()->type() == DRAKON::BRANCH_BEGIN)
     {
         deleteBranch(item);
         return;
@@ -2274,6 +2274,14 @@ void CyclogramWidget::onDragFinish()
         {
             valencyPoint->setCurrentCommandType(mCurrentCommandType);
         }
+    }
+
+    if (mDraggingShape)
+    {
+        auto clipboard = mClipboard.lock();
+        clipboard->cyclogram()->deleteCommand(mDraggingShape->command());
+        delete mDraggingShape;
+        mDraggingShape = 0;
     }
 
     update();

@@ -84,3 +84,8 @@ void Clipboard::setSystemState(SystemState* state)
     mSystemState = state;
     mCyclogram->setSystemState(mSystemState);
 }
+
+QSharedPointer<Cyclogram> Clipboard::cyclogram() const
+{
+    return mCyclogram;
+}

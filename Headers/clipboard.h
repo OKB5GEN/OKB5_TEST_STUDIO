@@ -20,6 +20,8 @@ public:
     Command* createCommandCopy(QSharedPointer<Cyclogram> cyclogram);
     Command* createBranchCopy(QSharedPointer<Cyclogram> cyclogram);
 
+    QSharedPointer<Cyclogram> cyclogram() const;
+
     void setSystemState(SystemState* state);
 
     void setCommandToCopy(Command* command, QSharedPointer<Cyclogram> cyclogram);
