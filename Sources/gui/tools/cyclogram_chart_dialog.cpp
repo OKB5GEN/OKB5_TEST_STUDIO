@@ -254,7 +254,7 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
         mPlot->xAxis->setRange(mMinX, mMaxX);//Для оси Ox
         mPlot->yAxis->setRange(mMinY, mMaxY);//Для оси Oy
 
-        const QMap<QString, VariableController::VariableData>& data = vc->variablesData();
+        //const QMap<QString, VariableController::VariableData>& data = vc->variablesData();
 
         int color = Qt::red;
 

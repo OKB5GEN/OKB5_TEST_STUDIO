@@ -1087,6 +1087,11 @@ bool EditorWindow::trySaveBeforeRun()
                 settings.setValue(SILENT_SAVE_BEFORE_START_FLAG, 1);
             }
 
+            if (mSaveAct->isEnabled())
+            {
+                save();
+            }
+
             return true;
         }
 

@@ -534,6 +534,17 @@ Command* Cyclogram::validate() const
 {
     foreach (Command* command, mCommands)
     {
+        if (command->type() == DRAKON::SUBPROGRAM)
+        {
+            CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(command);
+
+            Command* commandWithError = subprogram->cyclogram()->validate();
+            if (commandWithError)
+            {
+                return commandWithError;
+            }
+        }
+
         if (command->hasError())
         {
             return command;
