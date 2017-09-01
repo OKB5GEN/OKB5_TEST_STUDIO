@@ -65,8 +65,11 @@ void CmdActionMathEditDialog::setupUI()
     box1layout->addWidget(mOper1Box, 0, 1);
     box1layout->addWidget(mOper1Num, 1, 1);
 
+    QLabel* equalSign = new QLabel("=", this);
+    layout->addWidget(equalSign, 0, 1);
+
     mOperand1Box->setLayout(box1layout);
-    layout->addWidget(mOperand1Box, 0, 1);
+    layout->addWidget(mOperand1Box, 0, 2);
 
     // Operation box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QGroupBox* operationBox = new QGroupBox(this);
@@ -87,7 +90,7 @@ void CmdActionMathEditDialog::setupUI()
     box3layout->addWidget(mTwoOperandsCheckBox);
 
     operationBox->setLayout(box3layout);
-    layout->addWidget(operationBox, 0, 2);
+    layout->addWidget(operationBox, 0, 3);
 
     // Operand 2 box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mOperand2Box = new QGroupBox(this);
@@ -108,11 +111,11 @@ void CmdActionMathEditDialog::setupUI()
 
     mOperand2Box->setLayout(box2layout);
 
-    layout->addWidget(mOperand2Box, 0, 3);
+    layout->addWidget(mOperand2Box, 0, 4);
 
     // Console text widget >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     mConsoleTextWidget = new ConsoleTextWidget(this);
-    layout->addWidget(mConsoleTextWidget, 1, 0, 1, 4);
+    layout->addWidget(mConsoleTextWidget, 1, 0, 1, 5);
 
     // Dialog button box >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel , Qt::Horizontal, this);
