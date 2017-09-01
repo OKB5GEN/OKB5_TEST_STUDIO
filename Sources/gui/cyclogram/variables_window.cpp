@@ -4,6 +4,7 @@
 #include "Headers/logger/Logger.h"
 
 #include <QtWidgets>
+#include <QRegExpValidator>
 
 namespace
 {
@@ -193,6 +194,12 @@ void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, c
 
 void VariablesWindow::onAccept()
 {
+    // create variable name validator
+    QRegExp rx("[a-z]{1}(\\w+)?"); // at least one latin letter in the beginning followed by alphanumeric or '_' characters
+    rx.setCaseSensitivity(Qt::CaseInsensitive);
+    QRegExpValidator v(rx, 0);
+    int pos = 0;
+
     // Here we need to analyze and apply all user actions from GUI to variable controller:
 
     // 1. Get all existing variables from variable controller
@@ -204,6 +211,14 @@ void VariablesWindow::onAccept()
     {
         QTableWidgetItem* nameItem = mTableWidget->item(row, 0);
         QString varName = nameItem->text();
+
+        if (v.validate(varName, pos) != QValidator::Acceptable)
+        {
+            QMessageBox::warning(this, tr("Invalid variable name"), tr("Invalid '%1' variable name\n"
+                                                                       "Name must start from latin letter and contain only alphanumeric or '_' characters").arg(varName));
+            return;
+        }
+
         QString prevName = nameItem->data(Qt::UserRole).toString();
         if (!prevName.isEmpty() && prevName != varName) // variable existed before, and its name changed
         {
