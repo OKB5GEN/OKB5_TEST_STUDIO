@@ -271,13 +271,17 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
             QCPGraph* graph = mPlot->addGraph();
             graph->setName(variableName);
             graph->setPen(QPen(Qt::GlobalColor(color)));
-            graph->addData(mMinX, vc->currentValue(variableName));
+
+            qreal currentValue = vc->currentValue(variableName);
+            graph->addData(mMinX, currentValue);
             ++color;
 
             if (color > Qt::darkYellow)
             {
                 color = Qt::red; //TODO temporary
             }
+
+            onVariableValueChanged(variableName, currentValue);
         }
 
         mPlot->legend->setVisible(true);
