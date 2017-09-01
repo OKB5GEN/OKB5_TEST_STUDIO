@@ -1705,7 +1705,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
     foreach (ShapeItem* it, branchesShapes)
     {
         QRect rect = it->rect();
-        if (rect.height() < maxHeight)
+        //if (rect.height() < maxHeight) // always try to push
         {
             rect.setBottom(rect.bottom() + maxHeight - rect.height());
             it->setRect(rect, true);
