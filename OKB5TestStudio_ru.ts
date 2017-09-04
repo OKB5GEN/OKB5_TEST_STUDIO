@@ -10,6 +10,236 @@
     </message>
 </context>
 <context>
+    <name>AppSettings</name>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="193"/>
+        <source>Cyclogram widget min scale</source>
+        <translation>Минимальный размер виджета циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="194"/>
+        <source>Cyclogram widget max scale</source>
+        <translation>Максимальный размер виджета циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="195"/>
+        <source>Cyclogram widget default scale</source>
+        <translation>Размер виджета циклограммы по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="196"/>
+        <source>Cyclogram widget scale change step</source>
+        <translation>Шаг изменения размера виджета циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="197"/>
+        <source>Cyclogram widget cell width</source>
+        <translation>Ширина ячейки виджета циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="198"/>
+        <source>Cyclogram widget cell height</source>
+        <translation>Высота ячейки виджета циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="199"/>
+        <source>Command shape width</source>
+        <translation>Ширина картинки команды</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="200"/>
+        <source>Command shape height</source>
+        <translation>Высота картинки команды</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="201"/>
+        <source>Application start cyclogram file</source>
+        <translation>Циклограмма, выполняемая на старте приложения</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="202"/>
+        <source>Application finish cyclogram file</source>
+        <translation>Циклограмма, выполняемая при закрытии приложения</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="203"/>
+        <source>Command execution delay</source>
+        <translation>Задержа перед началом выполнения команды</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="204"/>
+        <source>Soft module response wait time</source>
+        <translation>Время ожидания ответа от программного модуля</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="205"/>
+        <source>Hard module response wait time</source>
+        <translation>Время ожидания ответа от физического модуля</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="206"/>
+        <source>Min send request interval</source>
+        <translation>Минимальный интервал между запросами</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="207"/>
+        <source>Module up after soft reset check timeout</source>
+        <translation>Интервал проверки модуля повле Soft Reset</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="208"/>
+        <source>Max output voltage</source>
+        <translation>Максимальное выходное напряжение</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="209"/>
+        <source>Max output current</source>
+        <translation>Максимальный выходной ток</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="210"/>
+        <source>Max requests repeat count</source>
+        <translation>Максимальное количество перезапросов</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="211"/>
+        <source>Commands text font size</source>
+        <translation>Размер шрифта для текста на картинках команд</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="212"/>
+        <source>Commands text font family</source>
+        <translation>Шрифт текст на картинках команд</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="213"/>
+        <source>Cyclogram horizontal scroll speed</source>
+        <translation>Скорость горизонтального скроллинга</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="215"/>
+        <location filename="Sources/app_settings.cpp" line="216"/>
+        <location filename="Sources/app_settings.cpp" line="217"/>
+        <location filename="Sources/app_settings.cpp" line="218"/>
+        <source>Float. 100% = 1.0</source>
+        <translation>Вещественное. 100% = 1.0</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="219"/>
+        <location filename="Sources/app_settings.cpp" line="220"/>
+        <source>Integer. Pixels count</source>
+        <translation>Целое. Количество пикселей</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="221"/>
+        <source>Integer. Cells width count</source>
+        <translation>Целое. Количество ячеек по ширине</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="222"/>
+        <source>Integer. Cells height count</source>
+        <translation>Целое. Количество ячее по высоте</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="223"/>
+        <source>String. Cyclogram file need to be launched at application START (file path relative to APP_FOLDER/cyclograms/</source>
+        <translation>Строка. Файл циклограммы, запускаемый при старте приложения (путь относительно папки ПАПКА_ПРИЛОЖЕНИЯ/cyclograms)</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="224"/>
+        <source>String. Cyclogram file need to be launched at application FINISH (file path relative to APP_FOLDER/cyclograms/</source>
+        <translation>Строка. Файл циклограммы, запускаемый при завершении приложения (путь относительно папки ПАПКА_ПРИЛОЖЕНИЯ/cyclograms</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="225"/>
+        <source>Integer. Milliseconds. Cyclogram command forced execution delay for visuzalization</source>
+        <translation>Целое. Миллисекунды. Время задержки выполнения команды для визуализации</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="226"/>
+        <source>Integer. Milliseconds. Waiting for cyclogram module command execution timeout value.</source>
+        <translation>Целое. Миллисекунды. Время ожидания выполнения модульной команды.</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="227"/>
+        <source>Integer. Milliseconds. Waiting for COM-port hardware module response timeout</source>
+        <translation>Целое. Миллисекунды. Время ожидания ответа модуля по COM-порту</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="228"/>
+        <source>Integer. Milliseconds. Minimal interval between two requests sent to same COM-port module</source>
+        <translation>Целое. Миллисекунды. Минимальный интервал между командами к одному и тому же модулю по COM-порту</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="229"/>
+        <source>Integer. Milliseconds.</source>
+        <translation>Целое. Миллисекунды.</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="230"/>
+        <source>Float. Volts. Maximal input voltage for Drive Control Unit</source>
+        <translation>Вещественное. Вольты. Максимальное напряжение питания БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="231"/>
+        <source>Float. Ampers. Maximal input current for Drive Control Unit</source>
+        <translation>Вещественное. Амперы. Максимальный ток питания БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="232"/>
+        <source>Interger. Maximum request repeat count if MKO responds with error &apos;Response not ready&apos;</source>
+        <translation>Целое. Максимальное количество перезапросов к БУП, если ответ получен с ошибкой &apos;Ответ не готов&apos;</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="233"/>
+        <source>Integer. Commands text font size</source>
+        <translation>Целое. Размер шрифта для текста на иконках команд</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="234"/>
+        <source>String. Commands text font family</source>
+        <translation>Строка. Семейство шрифтов для текста на иконках команд</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="235"/>
+        <source>Integer. Cyclogram horizontal scroll speed with mouse wheel + shift button. Pixels per step</source>
+        <translation>Целое. Скорость горизонтального сроллинга циклограммы при зажатой клавише Shift. Пиксели на шаг прокрутки</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="240"/>
+        <source>Setting name not found!</source>
+        <translation>Название настройки не найдено!</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="245"/>
+        <source>Setting comment not found!</source>
+        <translation>Комментарий для настройки не найден!</translation>
+    </message>
+</context>
+<context>
+    <name>AppSettingsDialog</name>
+    <message>
+        <location filename="Sources/gui/tools/app_settings_dialog.cpp" line="20"/>
+        <source>Parameter</source>
+        <translation>Параметр</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/app_settings_dialog.cpp" line="21"/>
+        <source>Value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/app_settings_dialog.cpp" line="22"/>
+        <source>Comment</source>
+        <translation>Комментарий</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/app_settings_dialog.cpp" line="58"/>
+        <source>Application Settings</source>
+        <translation>Настройки приложения</translation>
+    </message>
+</context>
+<context>
     <name>CmdActionMath</name>
     <message>
         <location filename="Sources/logic/commands/cmd_action_math.cpp" line="67"/>
@@ -20,7 +250,7 @@
 <context>
     <name>CmdActionMathEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="13"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="15"/>
         <source>Math operation</source>
         <translation>Математическая операция</translation>
     </message>
@@ -30,32 +260,32 @@
         <translation>Результат</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="51"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="53"/>
         <source>Operand 1</source>
         <translation>Операнд 1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="71"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="76"/>
         <source>Operation</source>
         <translation>Операция</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="81"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="87"/>
         <source>Two operands</source>
         <translation>Два операнда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="91"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="97"/>
         <source>Operand 2</source>
         <translation>Операнд 2</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="239"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="261"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="239"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="261"/>
         <source>Division by zero detected!</source>
         <translation>Обнаружено деление на 0!</translation>
     </message>
@@ -68,830 +298,1143 @@
         <translation>Неуспешное выполнение команды &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="90"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="132"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="134"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="190"/>
         <source>Invalid cmd</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="271"/>
-        <source>Модуль питания блока управления приводом</source>
-        <translation>Модуль питания блока управления приводом</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="171"/>
+        <source> ON</source>
+        <translation>ВКЛ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="271"/>
-        <source>БП1</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="175"/>
+        <source> OFF</source>
+        <translation>ВЫКЛ</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
+        <source>DCU power unit module</source>
+        <translation>Модуль питания БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
+        <source>PU1</source>
         <translation>БП1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="274"/>
-        <source>Модуль питания привода направленной антенны</source>
-        <translation>Модуль питания привода направленной антенны</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
+        <source>DAD power unit module</source>
+        <translation>Модуль питания ПНА</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="274"/>
-        <source>БП2</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
+        <source>PU2</source>
         <translation>БП2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="277"/>
-        <source>Модуль мультиплексного канала обмена</source>
-        <translation>Модуль мультиплексного канала обмена</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="316"/>
+        <source>Multiplex channel module</source>
+        <translation>Мультиплексный канал обмена</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="277"/>
-        <source>МКО</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="316"/>
+        <source>MKO</source>
         <translation>МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="280"/>
-        <source>Модуль сигнальной телеметрии</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="319"/>
+        <source>Signalling telemetry module</source>
         <translation>Модуль сигнальной телеметрии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="280"/>
-        <source>СТМ</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="319"/>
+        <source>STM</source>
         <translation>СТМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="283"/>
-        <source>Модуль опроса температурных датчиков</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="322"/>
+        <source>Temperature sensor control unit</source>
         <translation>Модуль опроса температурных датчиков</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="283"/>
-        <source>ОТД</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="322"/>
+        <source>OTD</source>
         <translation>ОТД</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="286"/>
-        <source>Модуль имитатора привода</source>
-        <translation>Модуль имитатора привода</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="325"/>
+        <source>Drive simulator unit</source>
+        <translation>Имитатор привода</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="286"/>
-        <source>ИП</source>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="325"/>
+        <source>DS</source>
         <translation>ИП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="289"/>
-        <source>Модуль технологический</source>
-        <translation>Модуль технологический</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="289"/>
-        <source>ТЕХ</source>
-        <translation>ТЕХ</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
-        <source>ЗАПРОС: статус</source>
-        <translation>ЗАПРОС: статус</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
-        <source>ПолСтат</source>
-        <translation>ПолСтат</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
-        <source>УСТАНОВКА: логический статус</source>
-        <translation>УСТАНОВКА: логический статус</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
-        <source>УстСтат</source>
-        <translation>УстСтат</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="324"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="363"/>
-        <source>ВКЛ: </source>
-        <translation>ВКЛ:</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="324"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="363"/>
-        <source>Вкл</source>
-        <translation>Вкл</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="328"/>
+        <source>Technological module</source>
+        <translation>Технологический модуль</translation>
     </message>
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="328"/>
+        <source>Tech</source>
+        <translation>Тех</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="346"/>
+        <source>Module status</source>
+        <translation>Статус модуля</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="349"/>
+        <source>Logical status</source>
+        <translation>Логический статус</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="358"/>
+        <source>DCU main kit power</source>
+        <translation>Питание осн. компл. БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="361"/>
+        <source>DCU reserve kit power</source>
+        <translation>Питание рез. компл. БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="364"/>
+        <source>DAD heaters line 1 power</source>
+        <translation>Питание нагревателей ПНА на линии 1</translation>
+    </message>
+    <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="367"/>
-        <source>ВЫКЛ: </source>
-        <translation>ВЫКЛ:</translation>
+        <source>DAD heaters line 2 power</source>
+        <translation>Питание нагревателей ПНА на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="328"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="367"/>
-        <source>Выкл</source>
-        <translation>Выкл</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="370"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="599"/>
+        <source>DCU power supply</source>
+        <translation>Силовое питание БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="334"/>
-        <source>основной комплект БУП</source>
-        <translation>основной комплект БУП</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="385"/>
+        <source>MKO main kit power supply</source>
+        <translation>Питание осн.компл.МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="334"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="615"/>
-        <source>БУПОсн</source>
-        <translation>БУПОсн</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="388"/>
+        <source>MKO reserve kit power supply</source>
+        <translation>Питание рез.компл.МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="337"/>
-        <source>резервный комплект БУП</source>
-        <translation>резервный комплект БУП</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="396"/>
+        <source>Fuse state</source>
+        <translation>Состояние предохр</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="337"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="618"/>
-        <source>БУПРез</source>
-        <translation>БУПРез</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="399"/>
+        <source>Channel telemetry</source>
+        <translation>Телеметрия по каналу</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="340"/>
-        <source>нагреватели ПНА на линии 1</source>
-        <translation>нагреватели ПНА на линии 1</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="404"/>
+        <source>Temperature PT-100 #%1</source>
+        <translation>Температура ПТ-100 #%1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="340"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="621"/>
-        <source>Нагр1</source>
-        <translation>Нагр1</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="409"/>
+        <source>Temperature DS1820</source>
+        <translation>Температура DS1820</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="343"/>
-        <source>нагреватели ПНА на линии 2</source>
-        <translation>нагреватели ПНА на линии 2</translation>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="417"/>
+        <source>Temperature DS1820 (line 2)</source>
+        <translation>Температура ВЫ1820 (линия 2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="343"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="421"/>
+        <source>DS1820 count</source>
+        <translation>Количество DS1820</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="429"/>
+        <source>DS1820 count (line 2)</source>
+        <translation>Количество DS1820 (линия 2)</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="433"/>
+        <source>Start DS1820 measurement</source>
+        <translation>Запуск измерений DS1820</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="441"/>
+        <source>Start DS1820 measurement (line 2)</source>
+        <translation>Запуск измерений DS1820 (линия 2)</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="444"/>
+        <source>Voltage (max power)</source>
+        <translation>Напряжение (макс. мощность)</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="447"/>
+        <source>Voltage and current</source>
+        <translation>Напряжение и ток</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="452"/>
+        <source>Test array</source>
+        <translation>Тестовый массив</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="458"/>
+        <source>Command array</source>
+        <translation>Командный массив</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="469"/>
+        <source>Test</source>
+        <translation>Тест</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="473"/>
+        <source>Command</source>
+        <translation>Комманда</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="487"/>
+        <source>%1 array (line %2)</source>
+        <translation>%1 массив (линия %2)</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="496"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="567"/>
+        <source>main</source>
+        <translation>основной</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="500"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="570"/>
+        <source>reserve</source>
+        <translation>резервный</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="503"/>
+        <source>Angle sensor power supply via %1 kit</source>
+        <translation>Подача питания на ДУ через %1 комплект</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="507"/>
+        <source>Enable</source>
+        <translation>Подключить</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="510"/>
+        <source>Disable</source>
+        <translation>Отключить</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="513"/>
+        <source>Device class</source>
+        <translation>Класс устройства</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="516"/>
+        <source>Nominal current</source>
+        <translation>Номинальный ток</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="519"/>
+        <source>Nominal voltage</source>
+        <translation>Номинальное напряжение</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="522"/>
+        <source>Nominal power</source>
+        <translation>Номинальная мощность</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="526"/>
+        <source>OVP threshold</source>
+        <translation>Напряжение отсечки</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="530"/>
+        <source>OCP threshold</source>
+        <translation>Ток отсечки</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="533"/>
+        <source>Voltage</source>
+        <translation>Напряжение</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="536"/>
+        <source>Current</source>
+        <translation>Ток</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="539"/>
+        <source>Power output ON</source>
+        <translation>Включить подачу питания</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="542"/>
+        <source>Power output OFF</source>
+        <translation>Выключить подачу питания</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="545"/>
+        <source>Acknowledge alarms</source>
+        <translation>Сброс ошибок</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="548"/>
+        <source>Remote control ON</source>
+        <translation>Вкл. удаленное управление</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="551"/>
+        <source>Manual control ON</source>
+        <translation>Вкл. ручное управление</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="554"/>
+        <source>Tracking ON</source>
+        <translation>Вкл. трекинг</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="557"/>
+        <source>Tracking OFF</source>
+        <translation>Выкл. трекинг</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="577"/>
+        <source>MKO %1 kit power supply state</source>
+        <translation>МКО состояние питания комплекта:%1</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="587"/>
+        <source>DCU main kit power state</source>
+        <translation>Состояние питания осн. компл. БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="590"/>
+        <source>DCU reserve kit power state</source>
+        <translation>Состояние питания рез. компл. БУП</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="593"/>
+        <source>DAD heaters line 1 power state</source>
+        <translation>Состояние питания нагревателей ПНА на линии 1</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="596"/>
+        <source>DAD heaters line 2 power state</source>
+        <translation>Состояние питания нагревателей ПНА на линии 2</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="614"/>
+        <source>default</source>
+        <translation>по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="617"/>
+        <source>current</source>
+        <translation>текущий</translation>
+    </message>
+    <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="624"/>
+        <source>Module %1 address</source>
+        <translation>Адрес модуля %1</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="629"/>
+        <source>DS1820 reset</source>
+        <translation>Сброс DS1820</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="637"/>
+        <source>DS1820 reset (line 2)</source>
+        <translation>Сброс DS1820 (линия 2)</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="640"/>
+        <source>Status word</source>
+        <translation>Статусное слово</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="643"/>
+        <source>Reset error</source>
+        <translation>Сброс ошибок</translation>
+    </message>
+    <message>
+        <source>Модуль питания блока управления приводом</source>
+        <translation type="vanished">Модуль питания блока управления приводом</translation>
+    </message>
+    <message>
+        <source>БП1</source>
+        <translation type="vanished">БП1</translation>
+    </message>
+    <message>
+        <source>Модуль питания привода направленной антенны</source>
+        <translation type="vanished">Модуль питания привода направленной антенны</translation>
+    </message>
+    <message>
+        <source>БП2</source>
+        <translation type="vanished">БП2</translation>
+    </message>
+    <message>
+        <source>Модуль мультиплексного канала обмена</source>
+        <translation type="vanished">Модуль мультиплексного канала обмена</translation>
+    </message>
+    <message>
+        <source>МКО</source>
+        <translation type="vanished">МКО</translation>
+    </message>
+    <message>
+        <source>Модуль сигнальной телеметрии</source>
+        <translation type="vanished">Модуль сигнальной телеметрии</translation>
+    </message>
+    <message>
+        <source>СТМ</source>
+        <translation type="vanished">СТМ</translation>
+    </message>
+    <message>
+        <source>Модуль опроса температурных датчиков</source>
+        <translation type="vanished">Модуль опроса температурных датчиков</translation>
+    </message>
+    <message>
+        <source>ОТД</source>
+        <translation type="vanished">ОТД</translation>
+    </message>
+    <message>
+        <source>Модуль имитатора привода</source>
+        <translation type="vanished">Модуль имитатора привода</translation>
+    </message>
+    <message>
+        <source>ИП</source>
+        <translation type="vanished">ИП</translation>
+    </message>
+    <message>
+        <source>Модуль технологический</source>
+        <translation type="vanished">Модуль технологический</translation>
+    </message>
+    <message>
+        <source>ТЕХ</source>
+        <translation type="vanished">ТЕХ</translation>
+    </message>
+    <message>
+        <source>ЗАПРОС: статус</source>
+        <translation type="vanished">ЗАПРОС: статус</translation>
+    </message>
+    <message>
+        <source>ПолСтат</source>
+        <translation type="vanished">ПолСтат</translation>
+    </message>
+    <message>
+        <source>УСТАНОВКА: логический статус</source>
+        <translation type="vanished">УСТАНОВКА: логический статус</translation>
+    </message>
+    <message>
+        <source>УстСтат</source>
+        <translation type="vanished">УстСтат</translation>
+    </message>
+    <message>
+        <source>ВКЛ: </source>
+        <translation type="vanished">ВКЛ:</translation>
+    </message>
+    <message>
+        <source>Вкл</source>
+        <translation type="vanished">Вкл</translation>
+    </message>
+    <message>
+        <source>ВЫКЛ: </source>
+        <translation type="vanished">ВЫКЛ:</translation>
+    </message>
+    <message>
+        <source>Выкл</source>
+        <translation type="vanished">Выкл</translation>
+    </message>
+    <message>
+        <source>основной комплект БУП</source>
+        <translation type="vanished">основной комплект БУП</translation>
+    </message>
+    <message>
+        <source>БУПОсн</source>
+        <translation type="vanished">БУПОсн</translation>
+    </message>
+    <message>
+        <source>резервный комплект БУП</source>
+        <translation type="vanished">резервный комплект БУП</translation>
+    </message>
+    <message>
+        <source>БУПРез</source>
+        <translation type="vanished">БУПРез</translation>
+    </message>
+    <message>
+        <source>нагреватели ПНА на линии 1</source>
+        <translation type="vanished">нагреватели ПНА на линии 1</translation>
+    </message>
+    <message>
+        <source>Нагр1</source>
+        <translation type="vanished">Нагр1</translation>
+    </message>
+    <message>
+        <source>нагреватели ПНА на линии 2</source>
+        <translation type="vanished">нагреватели ПНА на линии 2</translation>
+    </message>
+    <message>
         <source>Нагр2</source>
-        <translation>Нагр2</translation>
+        <translation type="vanished">Нагр2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="346"/>
         <source>подачу силового питания</source>
-        <translation>подачу силового питания</translation>
+        <translation type="vanished">подачу силового питания</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="346"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="627"/>
         <source>СилПит</source>
-        <translation>СилПит</translation>
+        <translation type="vanished">СилПит</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="373"/>
         <source>подачу питания на МКО Осн.</source>
-        <translation>подачу питания на МКО Осн.</translation>
+        <translation type="vanished">подачу питания на МКО Осн.</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="373"/>
         <source>MKOОсн</source>
-        <translation>МКООсн</translation>
+        <translation type="vanished">МКООсн</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="376"/>
         <source>подачу питания на МКО Рез.</source>
-        <translation>подачу питания на МКО Рез.</translation>
+        <translation type="vanished">подачу питания на МКО Рез.</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="376"/>
         <source>MKOРез</source>
-        <translation>МКОРез</translation>
+        <translation type="vanished">МКОРез</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="384"/>
         <source>ЗАПРОС: состояние предохранителя</source>
-        <translation>ЗАПРОС: состояние предохранителя</translation>
+        <translation type="vanished">ЗАПРОС: состояние предохранителя</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="384"/>
         <source>ПолСостПр</source>
-        <translation>ПолСостПр</translation>
+        <translation type="vanished">ПолСостПр</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="387"/>
         <source>ЗАПРОС: телеметрия канала</source>
-        <translation>ЗАПРОС: телеметрия канал</translation>
+        <translation type="vanished">ЗАПРОС: телеметрия канал</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="387"/>
         <source>ПолТелем</source>
-        <translation>ПолТелем</translation>
+        <translation type="vanished">ПолТелем</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="390"/>
         <source>ЗАПРОС: температура с датчиков ПТ-100</source>
-        <translation>ЗАПРОС: температура с датчиков ПТ-100</translation>
+        <translation type="vanished">ЗАПРОС: температура с датчиков ПТ-100</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="390"/>
         <source>ПолТемпПТ</source>
-        <translation>ПолТемПТ</translation>
+        <translation type="vanished">ПолТемПТ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="393"/>
         <source>ЗАПРОС: температура с датчика DS1820 линия 1</source>
-        <translation>ЗАПРОС: температура с датчика DS1820 линия 1</translation>
+        <translation type="vanished">ЗАПРОС: температура с датчика DS1820 линия 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="393"/>
         <source>ПолТемпDS1</source>
-        <translation>ПолТемпDS1</translation>
+        <translation type="vanished">ПолТемпDS1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="396"/>
         <source>ЗАПРОС: температура с датчика DS1820 линия 2</source>
-        <translation>ЗАПРОС: температура с датчика DS1820 линия 2</translation>
+        <translation type="vanished">ЗАПРОС: температура с датчика DS1820 линия 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="396"/>
         <source>ПолТемпDS2</source>
-        <translation>ПолТемпDS2</translation>
+        <translation type="vanished">ПолТемпDS2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="399"/>
         <source>ЗАПРОС: количество датчиков DS1820 на линии 1</source>
-        <translation>ЗАПРОС: количество датчиков  DS1820 на линии 1</translation>
+        <translation type="vanished">ЗАПРОС: количество датчиков  DS1820 на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="399"/>
         <source>ПолЧислоDS1</source>
-        <translation>ПолЧислоDS1</translation>
+        <translation type="vanished">ПолЧислоDS1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="402"/>
         <source>ЗАПРОС: количество датчиков DS1820 на линии 2</source>
-        <translation>ЗАПРОС: количество датчиков  DS1820 на линии 2</translation>
+        <translation type="vanished">ЗАПРОС: количество датчиков  DS1820 на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="402"/>
         <source>ПолЧислоDS2</source>
-        <translation>ПолЧислоDS2</translation>
+        <translation type="vanished">ПолЧислоDS2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="405"/>
         <source>ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 1</source>
-        <translation>ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 1</translation>
+        <translation type="vanished">ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="405"/>
         <source>ЗапускИзм1</source>
-        <translation>ЗапускИзм1</translation>
+        <translation type="vanished">ЗапускИзм1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="408"/>
         <source>ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 2</source>
-        <translation>ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 2</translation>
+        <translation type="vanished">ЗАПРОС: запуск измерений температуры датчиками DS1820 на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="408"/>
         <source>ЗапускИзм2</source>
-        <translation>ЗапускИзм2</translation>
+        <translation type="vanished">ЗапускИзм2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="411"/>
         <source>УСТАНОВКА: выходное напряжение (максимальная мощность)</source>
-        <translation>УСТАНОВКА: выходное напряжение (максимальная мощность)</translation>
+        <translation type="vanished">УСТАНОВКА: выходное напряжение (максимальная мощность)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="411"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="552"/>
         <source>УстНапр</source>
-        <translation>УстНапр</translation>
+        <translation type="vanished">УстНапр</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="414"/>
         <source>ЗАПРОС: текущий ток и напряжение</source>
-        <translation>ЗАПРОС: текущий ток и напряжение</translation>
+        <translation type="vanished">ЗАПРОС: текущий ток и напряжение</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="414"/>
         <source>ПолНапрТок</source>
-        <translation>ПолНапрТок</translation>
+        <translation type="vanished">ПолНапрТок</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="417"/>
         <source>ОТПРАВКА: тестовый массив</source>
-        <translation>ОТПРАВКА: тестовый массив</translation>
+        <translation type="vanished">ОТПРАВКА: тестовый массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="417"/>
         <source>ПТМ</source>
-        <translation>ПТМ</translation>
+        <translation type="vanished">ПТМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="420"/>
         <source>ЗАПРОС: тестовый массив</source>
-        <translation>ЗАПРОС: тестовый массив</translation>
+        <translation type="vanished">ЗАПРОС: тестовый массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="420"/>
         <source>ВТМ</source>
-        <translation>ВТМ</translation>
+        <translation type="vanished">ВТМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="423"/>
         <source>ОТПРАВКА: командный массив</source>
-        <translation>ОТПРАВКА: командный массив</translation>
+        <translation type="vanished">ОТПРАВКА: командный массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="423"/>
         <source>ПКМ</source>
-        <translation>ПКМ</translation>
+        <translation type="vanished">ПКМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="426"/>
         <source>ЗАПРОС: командный массив</source>
-        <translation>ЗАПРОС: командный массив</translation>
+        <translation type="vanished">ЗАПРОС: командный массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="426"/>
         <source>ВКМ</source>
-        <translation>ВКМ</translation>
+        <translation type="vanished">ВКМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="430"/>
         <source>ОТПРАВКА: тестовый массив по линии </source>
-        <translation>ОТПРАВКА: тестовый массив по линии</translation>
+        <translation type="vanished">ОТПРАВКА: тестовый массив по линии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="430"/>
         <source>ПТМК</source>
-        <translation>ПТМК</translation>
+        <translation type="vanished">ПТМК</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="451"/>
         <source>ЗАПРОС: тестовый массив по линии </source>
-        <translation>ЗАПРОС: тестовый массив по линии</translation>
+        <translation type="vanished">ЗАПРОС: тестовый массив по линии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="451"/>
         <source>ВТМК</source>
-        <translation>ВТМК</translation>
+        <translation type="vanished">ВТМК</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="470"/>
         <source>ОТПРАВКА: командный массив по линии </source>
-        <translation>ОТПРАВКА: командный массив по линии</translation>
+        <translation type="vanished">ОТПРАВКА: командный массив по линии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="470"/>
         <source>ПКМК</source>
-        <translation>ПКМК</translation>
+        <translation type="vanished">ПКМК</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="489"/>
         <source>ЗАПРОС: командный массив по линии </source>
-        <translation>ЗАПРОС: командный массив по линии</translation>
+        <translation type="vanished">ЗАПРОС: командный массив по линии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="489"/>
         <source>ВКМК</source>
-        <translation>ВКМК</translation>
+        <translation type="vanished">ВКМК</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="513"/>
         <source>ОТПРАВКА: подача питания на ДУ (осн. комплект)</source>
-        <translation>ОТПРАВКА: подача питания на ДУ (осн. комплект)</translation>
+        <translation type="vanished">ОТПРАВКА: подача питания на ДУ (осн. комплект)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="513"/>
         <source>ПитДУОсн</source>
-        <translation>ПитДУОсн</translation>
+        <translation type="vanished">ПитДУОсн</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="517"/>
         <source>ОТПРАВКА: подача питания на ДУ (рез. комплект)</source>
-        <translation>ОТПРАВКА: подача питания на ДУ (рез. комплект)</translation>
+        <translation type="vanished">ОТПРАВКА: подача питания на ДУ (рез. комплект)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="517"/>
         <source>ПитДУРез</source>
-        <translation>ПитДУРез</translation>
+        <translation type="vanished">ПитДУРез</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="522"/>
         <source>СТАРТ модуля</source>
-        <translation>СТАРТ модуля</translation>
+        <translation type="vanished">СТАРТ модуля</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="522"/>
         <source>Старт</source>
-        <translation>Старт</translation>
+        <translation type="vanished">Старт</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="525"/>
         <source>СТОП модуля</source>
-        <translation>СТОП модуля</translation>
+        <translation type="vanished">СТОП модуля</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="525"/>
         <source>Стоп</source>
-        <translation>Стоп</translation>
+        <translation type="vanished">Стоп</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="528"/>
         <source>ЗАПРОС: класс устройства</source>
-        <translation>ЗАПРОС: класс устройства</translation>
+        <translation type="vanished">ЗАПРОС: класс устройства</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="528"/>
         <source>ПолКласс</source>
-        <translation>ПолКласс</translation>
+        <translation type="vanished">ПолКласс</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="531"/>
         <source>ЗАПРОС: номинальный ток</source>
-        <translation>ЗАПРОС: номинальный ток</translation>
+        <translation type="vanished">ЗАПРОС: номинальный ток</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="531"/>
         <source>ПолНомТ</source>
-        <translation>ПолНомТ</translation>
+        <translation type="vanished">ПолНомТ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="534"/>
         <source>ЗАПРОС: номинальное напряжение</source>
-        <translation>ЗАПРОС: номинальное напряжение</translation>
+        <translation type="vanished">ЗАПРОС: номинальное напряжение</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="534"/>
         <source>ПолНомН</source>
-        <translation>ПолНомН</translation>
+        <translation type="vanished">ПолНомН</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="537"/>
         <source>ЗАПРОС: номинальную мощность</source>
-        <translation>ЗАПРОС: номинальную мощность</translation>
+        <translation type="vanished">ЗАПРОС: номинальную мощность</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="537"/>
         <source>ПолНомМ</source>
-        <translation>ПолНомМ</translation>
+        <translation type="vanished">ПолНомМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="540"/>
         <source>ЗАПРОС: напряжение отсечки</source>
-        <translation>ЗАПРОС: напряжение отсечки</translation>
+        <translation type="vanished">ЗАПРОС: напряжение отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="540"/>
         <source>ПолНОтс</source>
-        <translation>ПолНОтс</translation>
+        <translation type="vanished">ПолНОтс</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="543"/>
         <source>ЗАПРОС: ток отсечки</source>
-        <translation>ЗАПРОС: ток отсечки</translation>
+        <translation type="vanished">ЗАПРОС: ток отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="543"/>
         <source>ПолТОтс</source>
-        <translation>ПолТОтс</translation>
+        <translation type="vanished">ПолТОтс</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="546"/>
         <source>УСТАНОВКА: напряжение отсечки</source>
-        <translation>УСТАНОВКА: напряжение отсечки</translation>
+        <translation type="vanished">УСТАНОВКА: напряжение отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="546"/>
         <source>УстНОтс</source>
-        <translation>УстНОтс</translation>
+        <translation type="vanished">УстНОтс</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="549"/>
         <source>УСТАНОВКА: ток отсечки</source>
-        <translation>УСТАНОВКА: ток отсечки</translation>
+        <translation type="vanished">УСТАНОВКА: ток отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="549"/>
         <source>УстТОтс</source>
-        <translation>УстТОтс</translation>
+        <translation type="vanished">УстТОтс</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="552"/>
         <source>УСТАНОВКА: выходное напряжение</source>
-        <translation>УСТАНОВКА: выходное напряжение</translation>
+        <translation type="vanished">УСТАНОВКА: выходное напряжение</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="555"/>
         <source>УСТАНОВКА: выходной ток</source>
-        <translation>УСТАНОВКА: выходной ток</translation>
+        <translation type="vanished">УСТАНОВКА: выходной ток</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="555"/>
         <source>УстТок</source>
-        <translation>УстТок</translation>
+        <translation type="vanished">УстТок</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="558"/>
         <source>ВКЛ: подачу питания на выход</source>
-        <translation>ВКЛ: подачу питания на выход</translation>
+        <translation type="vanished">ВКЛ: подачу питания на выход</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="558"/>
         <source>ВклПит</source>
-        <translation>ВклПит</translation>
+        <translation type="vanished">ВклПит</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="561"/>
         <source>ВЫКЛ: подачу питания на выход</source>
-        <translation>ВЫКЛ: подачу питания на выход</translation>
+        <translation type="vanished">ВЫКЛ: подачу питания на выход</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="561"/>
         <source>ВыклПит</source>
-        <translation>ВыклПит</translation>
+        <translation type="vanished">ВыклПит</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="564"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="669"/>
         <source>СБРОС: ошибки</source>
-        <translation>СБРОС: ошибки</translation>
+        <translation type="vanished">СБРОС: ошибки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="564"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="669"/>
         <source>СбрОш</source>
-        <translation>СбрОш</translation>
+        <translation type="vanished">СбрОш</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="567"/>
         <source>ВКЛ: режим удаленного управления</source>
-        <translation>ВКЛ: режим удаленного управления</translation>
+        <translation type="vanished">ВКЛ: режим удаленного управления</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="567"/>
         <source>ВклУд</source>
-        <translation>ВклУд</translation>
+        <translation type="vanished">ВклУд</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="570"/>
         <source>ВКЛ: режим ручного управления</source>
-        <translation>ВКЛ: режим ручного управления</translation>
+        <translation type="vanished">ВКЛ: режим ручного управления</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="570"/>
         <source>ВклЛок</source>
-        <translation>ВклЛок</translation>
+        <translation type="vanished">ВклЛок</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="573"/>
         <source>ВКЛ: трекинг</source>
-        <translation>ВКЛ: трекинг</translation>
+        <translation type="vanished">ВКЛ: трекинг</translation>
+    </message>
+    <message>
+        <source>ВклТр</source>
+        <translation type="vanished">ВклТр</translation>
+    </message>
+    <message>
+        <source>ВЫКЛ: трекинг</source>
+        <translation type="vanished">ВЫКЛ: трекинг</translation>
+    </message>
+    <message>
+        <source>ВыклТр</source>
+        <translation type="vanished">ВыклТр</translation>
+    </message>
+    <message>
+        <source>ПС</source>
+        <translation type="vanished">ПС</translation>
+    </message>
+    <message>
+        <source>ЗАПРОС: состояние питания основного комплекта МКО</source>
+        <translation type="vanished">ЗАПРОС: состояние питания основного комплекта МКО</translation>
+    </message>
+    <message>
+        <source>МКООсн</source>
+        <translation type="vanished">МКООсн</translation>
+    </message>
+    <message>
+        <source>ЗАПРОС: состояние питания резервного комплекта МКО</source>
+        <translation type="vanished">ЗАПРОС: состояние питания резервного омплекта МКО</translation>
+    </message>
+    <message>
+        <source>МКОРез</source>
+        <translation type="vanished">МКОРез</translation>
     </message>
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="573"/>
-        <source>ВклТр</source>
-        <translation>ВклТр</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="576"/>
-        <source>ВЫКЛ: трекинг</source>
-        <translation>ВЫКЛ: трекинг</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="576"/>
-        <source>ВыклТр</source>
-        <translation>ВыклТр</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="585"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="609"/>
-        <source>ПС</source>
-        <translation>ПС</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="591"/>
-        <source>ЗАПРОС: состояние питания основного комплекта МКО</source>
-        <translation>ЗАПРОС: состояние питания основного комплекта МКО</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="591"/>
-        <source>МКООсн</source>
-        <translation>МКООсн</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="594"/>
-        <source>ЗАПРОС: состояние питания резервного комплекта МКО</source>
-        <translation>ЗАПРОС: состояние питания резервного омплекта МКО</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="594"/>
-        <source>МКОРез</source>
-        <translation>МКОРез</translation>
-    </message>
-    <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="597"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="630"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="654"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="673"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="620"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="647"/>
         <source>UNKNOWN</source>
         <translation>НЕИЗВЕСТНО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="615"/>
         <source>ЗАПРОС: состояние питания основного комплекта БУП</source>
-        <translation>ЗАПРОС: состояние питания основного комплекта БУП</translation>
+        <translation type="vanished">ЗАПРОС: состояние питания основного комплекта БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="618"/>
         <source>ЗАПРОС: состояние питания резервного комплекта БУП</source>
-        <translation>ЗАПРОС: состояние питания резервного комплекта БУП</translation>
+        <translation type="vanished">ЗАПРОС: состояние питания резервного комплекта БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="621"/>
         <source>ЗАПРОС: состояние нагревателей ПНА на линии 1</source>
-        <translation>ЗАПРОС: состояние нагревателей ПНА на линии 1</translation>
+        <translation type="vanished">ЗАПРОС: состояние нагревателей ПНА на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="624"/>
         <source>ЗАПРОС: состояние нагревателей ПНА на линии 2</source>
-        <translation>ЗАПРОС: состояние нагревателей ПНА на линии 2</translation>
+        <translation type="vanished">ЗАПРОС: состояние нагревателей ПНА на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="627"/>
         <source>ЗАПРОС: состояние силового питания</source>
-        <translation>ЗАПРОС: состояние силового питания</translation>
+        <translation type="vanished">ЗАПРОС: состояние силового питания</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="642"/>
         <source>ПолАдр</source>
-        <translation>ПолАдр</translation>
+        <translation type="vanished">ПолАдр</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="648"/>
         <source>ЗАПРОС: адрес модуля по умолчанию</source>
-        <translation>ЗАПРОС: адрес модуля по умолчанию</translation>
+        <translation type="vanished">ЗАПРОС: адрес модуля по умолчанию</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="648"/>
         <source>У</source>
-        <translation>У</translation>
+        <translation type="vanished">У</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="651"/>
         <source>ЗАПРОС: текущий адрес модуля</source>
-        <translation>ЗАПРОС: текущий адрес модуля</translation>
+        <translation type="vanished">ЗАПРОС: текущий адрес модуля</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="651"/>
         <source>Т</source>
-        <translation>Т</translation>
+        <translation type="vanished">Т</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="660"/>
         <source>СБРОС: датчиков на линии 1</source>
-        <translation>СБРОС: датчиков на линии 1</translation>
+        <translation type="vanished">СБРОС: датчиков на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="660"/>
         <source>СбрЛин1</source>
-        <translation>СбрЛин1</translation>
+        <translation type="vanished">СбрЛин1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="663"/>
         <source>СБРОС: датчиков на линии 2</source>
-        <translation>СБРОС: датчиков на линии 2</translation>
+        <translation type="vanished">СБРОС: датчиков на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="663"/>
         <source>СбрЛин2</source>
-        <translation>СбрЛин2</translation>
+        <translation type="vanished">СбрЛин2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="666"/>
         <source>ЗАПРОС: статусное слово</source>
-        <translation>ЗАПРОС: статусное слово</translation>
+        <translation type="vanished">ЗАПРОС: статусное слово</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="666"/>
         <source>ПолСС</source>
-        <translation>ПолСС</translation>
+        <translation type="vanished">ПолСС</translation>
     </message>
 </context>
 <context>
     <name>CmdActionModuleEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="16"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="23"/>
         <source>Module operation</source>
         <translation>Модульная команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="35"/>
-        <source>Блок питания БУП</source>
-        <translation>Блок питания БУП</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="36"/>
-        <source>Блок питания ПНА</source>
-        <translation>Блок питания ПНА</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="37"/>
-        <source>МКО</source>
-        <translation>МКО</translation>
-    </message>
-    <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="38"/>
-        <source>СТМ</source>
-        <translation>СТМ</translation>
+        <source>Modules</source>
+        <translation>Модули</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="39"/>
-        <source>ОТД</source>
-        <translation>ОТД</translation>
+        <source>Commands</source>
+        <translation>Команды</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="40"/>
-        <source>Технологический</source>
-        <translation>Технологический</translation>
+        <source>Input parameters</source>
+        <translation>Входные параметры</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="41"/>
-        <source>ИП</source>
-        <translation>ИП</translation>
+        <source>Output parameters</source>
+        <translation>Выходные параметры</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="49"/>
+        <source>Power unit 1</source>
+        <translation>Блок питания 1</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="50"/>
-        <source>Вх.Параметр</source>
-        <translation>Вх.Параметр</translation>
+        <source>Power unit 2</source>
+        <translation>Блок питания 2</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="51"/>
+        <source>MKO</source>
+        <translation>МКО</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="52"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="62"/>
-        <source>Переменная</source>
-        <translation>Переменная</translation>
+        <source>STM</source>
+        <translation>СТМ</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="53"/>
+        <source>OTD</source>
+        <translation>ОТД</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="54"/>
-        <source>Значение</source>
+        <source>Technological</source>
+        <translation>Технологический</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="55"/>
+        <source>DS</source>
+        <translation>ИП</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="62"/>
+        <source>Set module param</source>
+        <translation>Установить параметры</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="64"/>
+        <source>Get module param</source>
+        <translation>Получить параметры</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="69"/>
+        <source>In param</source>
+        <translation>Входной параметр</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="71"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
+        <source>Variable</source>
+        <translation>Переменная</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="73"/>
+        <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="61"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="81"/>
+        <source>Out param</source>
+        <translation>Вызодной параметр</translation>
+    </message>
+    <message>
+        <source>Блок питания БУП</source>
+        <translation type="vanished">Блок питания БУП</translation>
+    </message>
+    <message>
+        <source>Блок питания ПНА</source>
+        <translation type="vanished">Блок питания ПНА</translation>
+    </message>
+    <message>
+        <source>МКО</source>
+        <translation type="vanished">МКО</translation>
+    </message>
+    <message>
+        <source>СТМ</source>
+        <translation type="vanished">СТМ</translation>
+    </message>
+    <message>
+        <source>ОТД</source>
+        <translation type="vanished">ОТД</translation>
+    </message>
+    <message>
+        <source>Технологический</source>
+        <translation type="vanished">Технологический</translation>
+    </message>
+    <message>
+        <source>ИП</source>
+        <translation type="vanished">ИП</translation>
+    </message>
+    <message>
+        <source>Вх.Параметр</source>
+        <translation type="vanished">Вх.Параметр</translation>
+    </message>
+    <message>
+        <source>Переменная</source>
+        <translation type="vanished">Переменная</translation>
+    </message>
+    <message>
+        <source>Значение</source>
+        <translation type="vanished">Значение</translation>
+    </message>
+    <message>
         <source>Вых.Параметр</source>
-        <translation>Вых.Параметр</translation>
+        <translation type="vanished">Вых.Параметр</translation>
     </message>
 </context>
 <context>
     <name>CmdDelay</name>
     <message>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="76"/>
         <source>Wait:</source>
-        <translation>Ждать:</translation>
+        <translation type="vanished">Ждать:</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="80"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="102"/>
         <source>h</source>
         <translation>ч</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="86"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="108"/>
         <source>m</source>
         <translation>м</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="98"/>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="118"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="120"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="140"/>
         <source>s</source>
         <translation>с</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_delay.cpp" line="110"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="132"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="258"/>
         <source>ms</source>
         <translation>мс</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="150"/>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="254"/>
+        <source>Invalid cmd</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_delay.cpp" line="152"/>
+        <source>Wait </source>
+        <translation>Ждать </translation>
     </message>
 </context>
 <context>
     <name>CmdDelayEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="17"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="19"/>
+        <source>Direct value</source>
+        <translation>Прямое значение</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="21"/>
         <source>Hours</source>
         <translation>Часы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="18"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="22"/>
         <source>Minutes</source>
         <translation>Минуты</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="19"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="23"/>
         <source>Seconds</source>
         <translation>Секунды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="20"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="24"/>
         <source>Milliseconds</source>
         <translation>Миллисекунды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="32"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="30"/>
+        <source>Variable</source>
+        <translation>Переменная</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_delay_edit_dialog.cpp" line="48"/>
         <source>Set Delay</source>
         <translation>Установить задержку</translation>
     </message>
@@ -923,32 +1466,32 @@
 <context>
     <name>CmdQuestionEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="13"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="14"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="34"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="35"/>
         <source>Operand 1</source>
         <translation>Операнд 1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="54"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="55"/>
         <source>Operation</source>
         <translation>Операция</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="68"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="69"/>
         <source>Yes down</source>
         <translation>&apos;Да&apos; вниз</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="69"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="70"/>
         <source>Yes right</source>
         <translation>&apos;Да&apos; вправо</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="80"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_question_edit_dialog.cpp" line="81"/>
         <source>Operand 2</source>
         <translation>Операнд 2</translation>
     </message>
@@ -984,7 +1527,7 @@ Try another name</source>
 <context>
     <name>CmdSubProgram</name>
     <message>
-        <location filename="Sources/logic/commands/cmd_sub_program.cpp" line="93"/>
+        <location filename="Sources/logic/commands/cmd_sub_program.cpp" line="135"/>
         <source>Subprogram not loaded</source>
         <translation>Подпрограмма не загружена</translation>
     </message>
@@ -992,22 +1535,22 @@ Try another name</source>
 <context>
     <name>CmdSubProgramEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="17"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="18"/>
         <source>Edit sub program</source>
         <translation>Редактирование команды &apos;Подпрограмма&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="34"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="31"/>
         <source>Sub</source>
         <translation>Подпр</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="38"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="35"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="45"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="44"/>
         <source>Browse</source>
         <translation>Обзор</translation>
     </message>
@@ -1022,46 +1565,101 @@ Try another name</source>
         <translation>Файл:</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="56"/>
-        <source>Input</source>
-        <translation>Вход</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="517"/>
+        <source>Show extended settings</source>
+        <translation>Показать расширенные настройки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="57"/>
-        <source>Output</source>
-        <translation>Выход</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="59"/>
+        <source>Type subprogram description here</source>
+        <translation>Введите описание подпрограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="63"/>
-        <source>Вх.Переменная</source>
-        <translation>Вх.Переменная</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="61"/>
+        <source>Description:</source>
+        <translation>Описание:</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="65"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="76"/>
-        <source>Переменная</source>
-        <translation>Переменная</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="67"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="78"/>
-        <source>Значение</source>
-        <translation>Значение</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="73"/>
+        <source>Input. Set subprogram variables initial values (either from calling cyclogram variable or direct value)</source>
+        <translation>Вход. Задайте начальные значения переменных подпрограммы</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="74"/>
-        <source>Вых.Переменная</source>
-        <translation>Вых.Переменная</translation>
+        <source>Output. Set calling cyclogram variables current values (either from subprogram variable value or direct value)</source>
+        <translation>Выход. Задайте значения переменных вызывающей циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="211"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="80"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="93"/>
+        <source>Subprogram variable</source>
+        <translation>Переменная подпрограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="82"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="91"/>
+        <source>Calling c. variable</source>
+        <translation>Переменная выз. циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="84"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="95"/>
+        <source>Direct value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="152"/>
+        <source>Incorrect input</source>
+        <translation>Неверное имя</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="152"/>
+        <source>Subprogram name must not be empty!</source>
+        <translation>Имя подпрограммы не должно быть пустым!</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="252"/>
+        <source>OKB5 Cyclogram Files (*%1)</source>
+        <translation>OKB5 Cyclogram Files (*%1)</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="517"/>
+        <source>Hide extended settings</source>
+        <translation>Спрятать расширенные настройки</translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="vanished">Вход</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="vanished">Выход</translation>
+    </message>
+    <message>
+        <source>Вх.Переменная</source>
+        <translation type="vanished">Вх.Переменная</translation>
+    </message>
+    <message>
+        <source>Переменная</source>
+        <translation type="vanished">Переменная</translation>
+    </message>
+    <message>
+        <source>Значение</source>
+        <translation type="vanished">Значение</translation>
+    </message>
+    <message>
+        <source>Вых.Переменная</source>
+        <translation type="vanished">Вых.Переменная</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="252"/>
         <source>Open cyclogram file</source>
         <translation>Открыть файл циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="211"/>
         <source>OKB5 Cyclogram Files (*.cgr)</source>
-        <translation>Файлы циклограм (*.cgr)</translation>
+        <translation type="vanished">Файлы циклограм (*.cgr)</translation>
     </message>
 </context>
 <context>
@@ -1099,6 +1697,69 @@ Try another name</source>
     </message>
 </context>
 <context>
+    <name>CommandsEditToolbar</name>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="5"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="7"/>
+        <source>Select</source>
+        <translation>Редактирование</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="8"/>
+        <source>Add module command</source>
+        <translation>Добавить модульную команду</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="9"/>
+        <source>Add cyclogram branch</source>
+        <translation>Добавить ветку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="10"/>
+        <source>Add math command</source>
+        <translation>Добавить математическую команду</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="11"/>
+        <source>Add question command</source>
+        <translation>Добавить вопрос без смены ветки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="13"/>
+        <source>Add select state command</source>
+        <translation>Добавить вопрос со сменой ветки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="15"/>
+        <source>Add subprogram command</source>
+        <translation>Добавить подпрограмму</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="17"/>
+        <source>Add delay command</source>
+        <translation>Добавить задержку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="19"/>
+        <source>Add output command</source>
+        <translation>Добавить сообщение в консоль</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="22"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/commands_edit_toolbar.cpp" line="24"/>
+        <source>Delete selected command</source>
+        <translation>Удылить выделенную команду</translation>
+    </message>
+</context>
+<context>
     <name>ConsoleTextWidget</name>
     <message>
         <location filename="Sources/gui/tools/console_text_widget.cpp" line="11"/>
@@ -1106,30 +1767,28 @@ Try another name</source>
         <translation>Текст (в консоль циклограммы до выполнения команды и после выполнения)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/console_text_widget.cpp" line="22"/>
         <source>Before</source>
-        <translation>До</translation>
+        <translation type="vanished">До</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/console_text_widget.cpp" line="27"/>
         <source>After</source>
-        <translation>После</translation>
+        <translation type="vanished">После</translation>
     </message>
 </context>
 <context>
     <name>Cyclogram</name>
     <message>
-        <location filename="Sources/logic/cyclogram.cpp" line="80"/>
+        <location filename="Sources/logic/cyclogram.cpp" line="95"/>
         <source>Start</source>
         <translation>Первая ветка</translation>
     </message>
     <message>
-        <location filename="Sources/logic/cyclogram.cpp" line="91"/>
+        <location filename="Sources/logic/cyclogram.cpp" line="106"/>
         <source>End</source>
         <translation>Последняя ветка</translation>
     </message>
     <message>
-        <location filename="Sources/logic/cyclogram.cpp" line="225"/>
+        <location filename="Sources/logic/cyclogram.cpp" line="240"/>
         <source>Critical error occured: </source>
         <translation>Произошла критическая ошибка:</translation>
     </message>
@@ -1137,30 +1796,68 @@ Try another name</source>
 <context>
     <name>CyclogramChartDialog</name>
     <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="37"/>
+        <source>Add existing variable</source>
+        <translation>Добавить существующую переменную</translation>
+    </message>
+    <message>
         <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="46"/>
+        <source>Remove selected variables</source>
+        <translation>Удалить выделенные переменные</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="56"/>
+        <source>Move selected variable up</source>
+        <translation>Переместить выделенную переменную выше</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="66"/>
+        <source>Move selected variable down</source>
+        <translation>переместить выделенную переменную ниже</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="77"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="78"/>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="244"/>
+        <source>Value</source>
+        <translation>Значение</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="90"/>
+        <source>Show/hide charts</source>
+        <translation>Показать/скрыть графики</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="100"/>
         <source>Main cyclogram</source>
         <translation>Основная циклограмма</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="262"/>
-        <source>Время, с</source>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="240"/>
+        <source>Time, s</source>
         <translation>Время, с</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="266"/>
-        <source>Значение</source>
-        <translation>Значение</translation>
+        <source>Время, с</source>
+        <translation type="vanished">Время, с</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="285"/>
+        <source>Значение</source>
+        <translation type="vanished">Значение</translation>
+    </message>
+    <message>
         <source>%1</source>
-        <translation>%1</translation>
+        <translation type="vanished">%1</translation>
     </message>
 </context>
 <context>
     <name>CyclogramConsole</name>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_console.cpp" line="14"/>
+        <location filename="Sources/gui/tools/cyclogram_console.cpp" line="18"/>
         <source>Clear</source>
         <translation>Очистить</translation>
     </message>
@@ -1173,118 +1870,304 @@ Try another name</source>
         <translation>ПОТРАЧЕНО</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="25"/>
         <source>Save report as...</source>
-        <translation>Сохранить отчет...</translation>
+        <translation type="vanished">Сохранить отчет...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="32"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="33"/>
         <source>Cyclogram finished</source>
         <translation>Циклограмма завершилась</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="73"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="74"/>
         <source>Save report file</source>
         <translation>Сохранить файл отчета</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="73"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_end_dialog.cpp" line="74"/>
         <source>Excel file (*.xlsx)</source>
         <translation>Файл Excel (*.xlsx)</translation>
     </message>
 </context>
 <context>
+    <name>CyclogramSettingsDialog</name>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="14"/>
+        <source>Cyclogram</source>
+        <translation>Циклограмма</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="16"/>
+        <source>Name:</source>
+        <translation>Имя:</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="23"/>
+        <source>Cleanup cyclogram</source>
+        <translation>Циклограмма по завершении</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="30"/>
+        <source>Browse</source>
+        <translation>Обзор</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="31"/>
+        <source>File:</source>
+        <translation>Файл:</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="39"/>
+        <source>Type subprogram description here</source>
+        <translation>Введите описание циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="41"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="52"/>
+        <source>Cyclogram Settings</source>
+        <translation>Настройки циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="119"/>
+        <source>Open cyclogram file</source>
+        <translation>Открыть файл циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="119"/>
+        <source>OKB5 Cyclogram Files (*%1)</source>
+        <translation>OKB5 Cyclogram Files (*%1)</translation>
+    </message>
+</context>
+<context>
     <name>CyclogramWidget</name>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="111"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="139"/>
         <source>Click to add command</source>
         <translation>Нажмите ЛКМ чтобы добавить команду</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="241"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="261"/>
         <source>Branch deletion</source>
         <translation>Удаление ветки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="241"/>
         <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="261"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="281"/>
         <source>Command deletion</source>
         <translation>Удаление команды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="242"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="262"/>
         <source>Are you sure that you want to delete </source>
         <translation>Вы действительно хотите удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="245"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="265"/>
         <source>entire branch with all its commands?</source>
         <translation>всю ветку и все  входящие в нее команды?</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="249"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="269"/>
         <source>this command?</source>
         <translation>эту команду?</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="261"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="281"/>
         <source>Command can not be deleted!
 Reason: </source>
         <translation>Команда не может быть удалена!
 Причина:</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="290"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="309"/>
         <source>Command editing</source>
         <translation>Редактивароние команды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="290"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="309"/>
         <source>Command is not editable</source>
         <translation>Команда не редактируема</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="429"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="433"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="489"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="516"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="528"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="537"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="551"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="662"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="669"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="838"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1005"/>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="433"/>
+        <source>Selected item can not be added here</source>
+        <translation>Выбранная команда не может быть добавлена в указанное место</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="450"/>
+        <source>Add BRANCH</source>
+        <translation>Добавить ВЕТКУ</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="451"/>
+        <source>Add MATH COMMAND</source>
+        <translation>Добавить МАТЕМАТИЧЕСКУЮ команду</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="452"/>
+        <source>Add DELAY</source>
+        <translation>Добавить ЗАДЕРЖКУ</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="453"/>
+        <source>Add CONDITION</source>
+        <translation>Добавить ВОПРОС БЕЗ СМЕНЫ ветки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="454"/>
+        <source>Add CYCLE</source>
+        <translation>Добавить ЦИКЛ</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="455"/>
+        <source>Add SELECT STATE</source>
+        <translation>Добавить ВОПРОС СО СМЕНОЙ ветки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="456"/>
+        <source>Add MODULE COMMAND</source>
+        <translation>Добавить МОДУЛЬНУЮ команду</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="457"/>
+        <source>Add SUBPROGRAM</source>
+        <translation>Добавить ПОДПРОГРАММУ</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="458"/>
+        <source>Add OUTPUT</source>
+        <translation>Добавить СООБЩЕНИЕ в консоль</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="459"/>
+        <source>Add PARALLEL PROCESS</source>
+        <translation>Добавить ПАРАЛЛЕЛЬНЫЙ ПРОЦЕСС</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="474"/>
+        <source>Paste</source>
+        <translation>Вставить</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="489"/>
+        <source>Selected command can not be copied here</source>
+        <translation>Выбранная команда не может быть скопирована в указанную точку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="516"/>
+        <source>Selected command can not be copied</source>
+        <translation>Выбранная команда не может быть скопирована</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="528"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="537"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="551"/>
+        <source>Selected item can not be copied here</source>
+        <translation>Выбранная команда не может быть скопирована в указанную точку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="662"/>
+        <source>Selected branch can not be moved here</source>
+        <translation>Выбранная команда не может быть перемещена в указанную точку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="669"/>
+        <source>End branch can not be moved anywhere</source>
+        <translation>Конечная ветка не может быть перемещена</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="777"/>
+        <source>Edit</source>
+        <translation>Редактировать</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="778"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="779"/>
+        <source>Show subprogram window</source>
+        <translation>Показать подпрограмму</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="780"/>
+        <source>Copy entire branch</source>
+        <translation>Скопировать ветку</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="780"/>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="838"/>
+        <source>Selected item can not be copied</source>
+        <translation>Выбранная команда не может быть скопирована</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1005"/>
+        <source>Selected command can not be moved here</source>
+        <translation>Выбранная команда не может быть перемещена в указанную точку</translation>
+    </message>
+    <message>
         <source>Show subprogram</source>
-        <translation>Показать подпрограмму в отдельном окне</translation>
+        <translation type="vanished">Показать подпрограмму в отдельном окне</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="430"/>
         <source>Show subprogram chart</source>
-        <translation>Показать графики подпрограммы в отдельном окне</translation>
+        <translation type="vanished">Показать графики подпрограммы в отдельном окне</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="723"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1327"/>
         <source>Command is not deletable</source>
         <translation>Эту команду удалить нельзя</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="730"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1334"/>
         <source>THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!</source>
         <translation>ЭТОТ ТЕКСТ НИКОГДА НЕ ДОЛЖЕН ПОЯВЛЯТЬСЯ НА ЭКРАНЕ! </translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="742"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1346"/>
         <source>Start branch never can be deleted</source>
         <translation>Начальную ветку нельзя удалить </translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="751"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1355"/>
         <source>End branch never can be deleted</source>
         <translation>Конечную ветку нельзя удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="761"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1365"/>
         <source>Current running command can not be deleted</source>
         <translation>Выполняющуюся команды нельзя удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="772"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1376"/>
         <source>Has running command in this branch</source>
         <translation>В данной ветке выполняется команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="872"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1979"/>
         <source>New Branch</source>
         <translation>Новая ветка</translation>
     </message>
@@ -1292,250 +2175,320 @@ Reason: </source>
 <context>
     <name>EditorWindow</name>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="68"/>
+        <location filename="Sources/gui/editor_window.cpp" line="114"/>
         <source>Running application start cyclogram...</source>
         <translation>Выполняется циклограмма запуска приложения...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="78"/>
+        <location filename="Sources/gui/editor_window.cpp" line="129"/>
         <source>Application exit</source>
         <translation>Выход из приложения</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="79"/>
+        <location filename="Sources/gui/editor_window.cpp" line="130"/>
         <source>Cyclogram is running. Would you like to stop it?</source>
         <translation>В данный омент циклограмма выполняется. Желаете ее остановить?</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="98"/>
+        <location filename="Sources/gui/editor_window.cpp" line="151"/>
         <source>Running application finish cyclogram...</source>
         <translation>Выполняется циклограмма завершения приложения...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="134"/>
+        <location filename="Sources/gui/editor_window.cpp" line="276"/>
         <source>Open cyclogram file</source>
         <translation>Открыть файл циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="134"/>
-        <location filename="Sources/gui/editor_window.cpp" line="175"/>
         <source>OKB5 Cyclogram Files (*.cgr)</source>
-        <translation>Файлы циклограм (*.cgr)</translation>
+        <translation type="vanished">Файлы циклограм (*.cgr)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="175"/>
+        <location filename="Sources/gui/editor_window.cpp" line="74"/>
+        <location filename="Sources/gui/editor_window.cpp" line="717"/>
+        <source>New file</source>
+        <translation>Новый файл</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="276"/>
+        <location filename="Sources/gui/editor_window.cpp" line="322"/>
+        <source>OKB5 Cyclogram Files (*%1)</source>
+        <translation>OKB5 Cyclogram Files (*%1)</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="322"/>
         <source>Save cyclogram file</source>
         <translation>Сохранить циклограмму в файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="197"/>
+        <location filename="Sources/gui/editor_window.cpp" line="341"/>
         <source>About Application</source>
         <translation>О приложении</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="198"/>
+        <location filename="Sources/gui/editor_window.cpp" line="342"/>
         <source>The &lt;b&gt;Application&lt;/b&gt; example demonstrates how to write modern GUI applications using Qt, with a menu bar, toolbars, and a status bar.</source>
         <translation>&lt;b&gt;удалить текст&lt;/b&gt;.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="216"/>
+        <location filename="Sources/gui/editor_window.cpp" line="360"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="217"/>
+        <location filename="Sources/gui/editor_window.cpp" line="361"/>
         <source>File</source>
         <translation>Файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="221"/>
+        <location filename="Sources/gui/editor_window.cpp" line="365"/>
         <source>&amp;New</source>
         <translation>&amp;Новый</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="223"/>
+        <location filename="Sources/gui/editor_window.cpp" line="367"/>
         <source>Create a new cyclogram</source>
         <translation>Создать новую циклограмму</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="229"/>
+        <location filename="Sources/gui/editor_window.cpp" line="373"/>
         <source>&amp;Open...</source>
         <translation>&amp;Открыть...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="231"/>
+        <location filename="Sources/gui/editor_window.cpp" line="375"/>
         <source>Open an existing file</source>
         <translation>Открыть существующий файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="237"/>
+        <location filename="Sources/gui/editor_window.cpp" line="381"/>
         <source>&amp;Save</source>
         <translation>&amp;Сохранить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="239"/>
+        <location filename="Sources/gui/editor_window.cpp" line="383"/>
         <source>Save the document to disk</source>
         <translation>Сохранить циклограмму на диск</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="246"/>
+        <location filename="Sources/gui/editor_window.cpp" line="390"/>
         <source>Save &amp;As...</source>
         <translation>Сохранить &amp;как...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="248"/>
-        <source>Save the document under a new name</source>
-        <translation>Сохранить документ под другим именем</translation>
+        <location filename="Sources/gui/editor_window.cpp" line="392"/>
+        <source>Save the document under a new file name</source>
+        <translation>Сохранить циклограмму под другим именем</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="253"/>
+        <location filename="Sources/gui/editor_window.cpp" line="396"/>
+        <source>Recent...</source>
+        <translation>Недавние...</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="429"/>
+        <location filename="Sources/gui/editor_window.cpp" line="430"/>
+        <source>Cyclogram</source>
+        <translation>Циклограмма</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="461"/>
+        <location filename="Sources/gui/editor_window.cpp" line="511"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="462"/>
+        <source>Cyclogram settings</source>
+        <translation>Настройки циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="468"/>
+        <source>Variables</source>
+        <translation>Переменные</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="469"/>
+        <source>Show cyclogram variables</source>
+        <translation>Показать переменные циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="475"/>
+        <source>Add monitor</source>
+        <translation>Добавить окно мониторинга</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="492"/>
+        <source>&amp;Tools</source>
+        <translation>&amp;Инструменты</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="1043"/>
+        <source>&amp;%1: %2</source>
+        <translation>&amp;%1: %2</translation>
+    </message>
+    <message>
+        <source>Save the document under a new name</source>
+        <translation type="vanished">Сохранить документ под другим именем</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="413"/>
         <source>E&amp;xit</source>
         <translation>В&amp;ыход</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="255"/>
+        <location filename="Sources/gui/editor_window.cpp" line="415"/>
         <source>Exit the application</source>
         <translation>Выход из приложения</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="268"/>
         <source>&amp;Run</source>
-        <translation>&amp;Запуск</translation>
+        <translation type="vanished">&amp;Запуск</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="269"/>
-        <location filename="Sources/gui/editor_window.cpp" line="277"/>
-        <location filename="Sources/gui/editor_window.cpp" line="279"/>
+        <location filename="Sources/gui/editor_window.cpp" line="438"/>
+        <location filename="Sources/gui/editor_window.cpp" line="440"/>
         <source>Run</source>
         <translation>Запуск</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="283"/>
-        <location filename="Sources/gui/editor_window.cpp" line="491"/>
-        <location filename="Sources/gui/editor_window.cpp" line="520"/>
-        <location filename="Sources/gui/editor_window.cpp" line="600"/>
+        <location filename="Sources/gui/editor_window.cpp" line="444"/>
+        <location filename="Sources/gui/editor_window.cpp" line="770"/>
+        <location filename="Sources/gui/editor_window.cpp" line="803"/>
+        <location filename="Sources/gui/editor_window.cpp" line="890"/>
         <source>Execute cyclogram</source>
         <translation>Выполнить циклограмму</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="289"/>
+        <location filename="Sources/gui/editor_window.cpp" line="450"/>
         <source>Stop</source>
         <translation>Стоп</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="291"/>
+        <location filename="Sources/gui/editor_window.cpp" line="452"/>
         <source>Stop cyclogram execution</source>
         <translation>Остановить выполнение циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="298"/>
         <source>&amp;Monitor</source>
-        <translation>&amp;Монитор</translation>
+        <translation type="vanished">&amp;Монитор</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="299"/>
         <source>Monitor</source>
-        <translation>Монитор</translation>
+        <translation type="vanished">Монитор</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="303"/>
         <source>Add variable monitor</source>
-        <translation>Добавить окно переменных</translation>
+        <translation type="vanished">Добавить окно переменных</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="304"/>
+        <location filename="Sources/gui/editor_window.cpp" line="476"/>
         <source>Add variables monitor</source>
         <translation>Добавить окно переменных</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="310"/>
         <source>Add manual monitor</source>
-        <translation>Добавить ручной монитор</translation>
+        <translation type="vanished">Добавить ручной монитор</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="311"/>
         <source>Make data snapshot</source>
-        <translation>Сделать метку в данных</translation>
+        <translation type="vanished">Сделать метку в данных</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="317"/>
         <source>Add auto monitor</source>
-        <translation>Добавить авто монитор</translation>
+        <translation type="vanished">Добавить авто монитор</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="318"/>
         <source>Add auto parameter monitor</source>
-        <translation>Добавить автоматический монитор переменных</translation>
+        <translation type="vanished">Добавить автоматический монитор переменных</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="324"/>
+        <location filename="Sources/gui/editor_window.cpp" line="495"/>
         <source>Cyclogram console</source>
         <translation>Консоль циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="331"/>
+        <location filename="Sources/gui/editor_window.cpp" line="502"/>
         <source>Application console</source>
         <translation>Консоль приложения</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="341"/>
+        <location filename="Sources/gui/editor_window.cpp" line="512"/>
+        <source>Application settings</source>
+        <translation>Настройки приложения</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="539"/>
         <source>Ready</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="374"/>
-        <location filename="Sources/gui/editor_window.cpp" line="402"/>
-        <location filename="Sources/gui/editor_window.cpp" line="420"/>
+        <location filename="Sources/gui/editor_window.cpp" line="586"/>
+        <location filename="Sources/gui/editor_window.cpp" line="620"/>
+        <location filename="Sources/gui/editor_window.cpp" line="674"/>
         <source>OKB5 Test Studio</source>
         <translation>OKB5 Test Studio</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="375"/>
+        <location filename="Sources/gui/editor_window.cpp" line="587"/>
         <source>The cyclogram has been modified.
 Do you want to save your changes?</source>
         <translation>Циклограмма изменена.
 Сохранить изменения?</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="403"/>
+        <location filename="Sources/gui/editor_window.cpp" line="621"/>
         <source>File &apos;%1&apos; not loaded.</source>
         <translation>Файл &apos;%1&apos; не загружен.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="409"/>
+        <location filename="Sources/gui/editor_window.cpp" line="628"/>
         <source>File loaded</source>
         <translation>Файл загружен</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="421"/>
+        <location filename="Sources/gui/editor_window.cpp" line="659"/>
+        <source>File version mismatch</source>
+        <translation>Неизвестная версия файла</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="660"/>
+        <source>Existing file version (%1) is newer than application version (%2).
+Some file data will be lost if you save this file.
+Do you still want to save this file?</source>
+        <translation>Текущая версия файла (%1) новее чем версия приложения (%2).
+Некоторые данные могут быть утеряны, если вы сохраните этот файл.
+Продолжить?</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/editor_window.cpp" line="675"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Невозможно записать файл %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="435"/>
+        <location filename="Sources/gui/editor_window.cpp" line="692"/>
         <source>File saved</source>
         <translation>Файл сохранен</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="479"/>
         <source>Running pre-execution cyclogram...</source>
-        <translation>Выполняется предзапусковая циклограмма...</translation>
+        <translation type="vanished">Выполняется предзапусковая циклограмма...</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="485"/>
-        <location filename="Sources/gui/editor_window.cpp" line="497"/>
+        <location filename="Sources/gui/editor_window.cpp" line="764"/>
+        <location filename="Sources/gui/editor_window.cpp" line="776"/>
         <source>Pause cyclogram execution</source>
         <translation>Пауза выполнения циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="572"/>
+        <location filename="Sources/gui/editor_window.cpp" line="857"/>
         <source>Cyclogram execution finished</source>
         <translation>Выполнение циклограммы завершено</translation>
     </message>
     <message>
-        <location filename="Sources/gui/editor_window.cpp" line="606"/>
+        <location filename="Sources/gui/editor_window.cpp" line="902"/>
         <source>Running post-execution cyclogram...</source>
         <translation>Выполняется циклограмма завершения...</translation>
     </message>
@@ -1543,199 +2496,236 @@ Do you want to save your changes?</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="Sources/file_reader.cpp" line="32"/>
         <source>The file is not an cyclogram version 1.0 file.</source>
-        <translation>Неверная версия файла циклограммы.</translation>
+        <translation type="vanished">Неверная версия файла циклограммы.</translation>
     </message>
     <message>
-        <location filename="Sources/file_reader.cpp" line="41"/>
-        <location filename="Sources/system/system_state.cpp" line="118"/>
+        <location filename="Sources/file_reader.cpp" line="62"/>
+        <source>Incompatible cyclogram file version %1. Current application version is %2.</source>
+        <translation>Несовместимые версии. Версия файла %1. Версия циклограммы %2.</translation>
+    </message>
+    <message>
+        <location filename="Sources/file_reader.cpp" line="67"/>
+        <source>The file is not an cyclogram file.</source>
+        <translation>Файл не является файлом циклограммы.</translation>
+    </message>
+    <message>
+        <location filename="Sources/file_reader.cpp" line="76"/>
+        <location filename="Sources/system/system_state.cpp" line="117"/>
         <source>%1
 Line %2, column %3</source>
         <translation>%1
 Строка %2, столбец %3</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="112"/>
+        <location filename="Sources/system/system_state.cpp" line="111"/>
         <source>The file is not an system_config version 1.0 file.</source>
         <translation>Неверная версия файла system_config.</translation>
+    </message>
+    <message>
+        <location filename="Sources/app_settings.cpp" line="140"/>
+        <source>The file is not an application settings version 1.0 file.</source>
+        <translation>Файл не является файлом настроек.</translation>
+    </message>
+</context>
+<context>
+    <name>SaveBeforeRunDialog</name>
+    <message>
+        <location filename="Sources/gui/save_before_run_dialog.cpp" line="10"/>
+        <source>Save cyclograms before run?</source>
+        <translation>Сохранить циклограмму перед запуском?</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/save_before_run_dialog.cpp" line="12"/>
+        <source>Always save before run</source>
+        <translation>Всегда сохранять</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/save_before_run_dialog.cpp" line="21"/>
+        <source>Save cyclograms</source>
+        <translation>Сохранение циклограм</translation>
     </message>
 </context>
 <context>
     <name>ShapeAddDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="22"/>
         <source>Add Command</source>
-        <translation>Добавление команды</translation>
+        <translation type="vanished">Добавление команды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="76"/>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="88"/>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="119"/>
         <source>Switch state</source>
-        <translation>Вопрос (с переходом в ветку)</translation>
+        <translation type="vanished">Вопрос (с переходом в ветку)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="93"/>
         <source>New Branch</source>
-        <translation>Новая ветка</translation>
+        <translation type="vanished">Новая ветка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="111"/>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="140"/>
         <source>Question</source>
-        <translation>Вопрос</translation>
+        <translation type="vanished">Вопрос</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="115"/>
         <source>Cycle</source>
-        <translation>Цикл</translation>
+        <translation type="vanished">Цикл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="137"/>
         <source>Module command</source>
-        <translation>Модульная команда</translation>
+        <translation type="vanished">Модульная команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="138"/>
         <source>Math command</source>
-        <translation>Математическая команда</translation>
+        <translation type="vanished">Математическая команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="139"/>
         <source>Delay</source>
-        <translation>Задержка</translation>
+        <translation type="vanished">Задержка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="141"/>
         <source>Subprogram</source>
-        <translation>Подпрограмма</translation>
+        <translation type="vanished">Подпрограмма</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="142"/>
         <source>Message</source>
-        <translation>Сообщение в консоль</translation>
+        <translation type="vanished">Сообщение в консоль</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_add_dialog.cpp" line="143"/>
         <source>Parallel process</source>
-        <translation>Параллельный процесс</translation>
+        <translation type="vanished">Параллельный процесс</translation>
     </message>
 </context>
 <context>
     <name>ShapeEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/shape_edit_dialog.cpp" line="27"/>
         <source>Default Edit Dialog</source>
-        <translation>ЭТОТ ДИАЛОГ НЕ ДОЛЖЕН ПОЯВЛЯТЬСЯ НА ЭКРАНЕ</translation>
+        <translation type="vanished">ЭТОТ ДИАЛОГ НЕ ДОЛЖЕН ПОЯВЛЯТЬСЯ НА ЭКРАНЕ</translation>
     </message>
 </context>
 <context>
     <name>ShapeItem</name>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="104"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="109"/>
         <source>Invalid command</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="373"/>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="377"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="424"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="428"/>
         <source>No</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="373"/>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="377"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="424"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="428"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="399"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="445"/>
         <source>Cyclogram first command</source>
         <translation>Первая команда циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="400"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="446"/>
         <source>Next command will be the branch below</source>
         <translation>Выполнение циклограммы переходит в ветку ниже этой команды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="404"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="450"/>
         <source>Cyclogram last command</source>
         <translation>Последняя команда цкилограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="411"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="457"/>
         <source>Branch &apos;%1&apos; begin</source>
         <translation>Начало ветки &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="417"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="463"/>
         <source>Go to branch &apos;%1&apos; command.</source>
         <translation>Переход в ветку &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="418"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="464"/>
         <source>Cyclgram furter execution will be moved to &apos;%1&apos; branch</source>
         <translation>Дальнейшее выполнение циклограммы переходит в ветку &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="424"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="470"/>
         <source>Mathematical command</source>
         <translation>Математическая команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="430"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="477"/>
         <source>Time delay (%1 ms).</source>
         <translation>Задержка по времени (%1 мс).</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="436"/>
-        <source>Question (condition check)</source>
-        <translation>Вопрос (проверка некотрого условия)</translation>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="483"/>
+        <source>Condition check without execution moving to another branch</source>
+        <translation>Проверка условия без перехода в другую ветку циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="442"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="489"/>
+        <source>Condition check with possible execution moving to another branch</source>
+        <translation>Проверка условия с возможностью перехода в другую ветку циклограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="495"/>
+        <source>Cycle condition check</source>
+        <translation>Цикл с проверкой условия</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="509"/>
+        <source>Subprogram (embedded another cyclogram call).</source>
+        <translation>Подпрограмма (вложенный вызов другой циклограммы)</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="517"/>
+        <source>Console message:</source>
+        <translation>Консольное сообщение:</translation>
+    </message>
+    <message>
+        <source>Question (condition check)</source>
+        <translation type="vanished">Вопрос (проверка некотрого условия)</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="501"/>
         <source>Module command</source>
         <translation>Модульная команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="443"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="502"/>
         <source>Module: %1</source>
         <translation>Модуль: %1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="444"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="503"/>
         <source>Command: %1</source>
         <translation>Команда: %1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="450"/>
         <source>Subprogram (embedded another cyclogram call.</source>
-        <translation>Подпрограмма (встроенный вызов другой циклограммы).</translation>
+        <translation type="vanished">Подпрограмма (встроенный вызов другой циклограммы).</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="451"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="510"/>
         <source>Description: </source>
         <translation>Описание:</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="458"/>
         <source>Cyclogram console message.</source>
-        <translation>Сообщение в консоль циклограммы.</translation>
+        <translation type="vanished">Сообщение в консоль циклограммы.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="459"/>
         <source>Before execution message: </source>
-        <translation>Сообщение до начала выполнения команды: </translation>
+        <translation type="vanished">Сообщение до начала выполнения команды: </translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="460"/>
         <source>After execution message: </source>
-        <translation>Сообщение после выполнения команды:</translation>
+        <translation type="vanished">Сообщение после выполнения команды:</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="466"/>
+        <location filename="Sources/gui/cyclogram/shape_item.cpp" line="524"/>
         <source>Parallel process</source>
         <translation>Параллельный процесс</translation>
     </message>
@@ -1743,242 +2733,482 @@ Line %2, column %3</source>
 <context>
     <name>SubProgramDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="33"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="50"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="34"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="51"/>
         <source>Variables</source>
         <translation>Переменные</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="35"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="52"/>
         <source>Chart</source>
         <translation>График</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="36"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="53"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="74"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="54"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="99"/>
+        <source>Save cyclogram file</source>
+        <translation>Сохранить циклограмму в файл</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="99"/>
+        <source>OKB5 Cyclogram Files (*%1)</source>
+        <translation>OKB5 Cyclogram Files (*%1)</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="116"/>
         <source>OKB5 Test Studio</source>
         <translation>OKB5 Test Studio</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="75"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="117"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Невозможна запись в файл %1:
 %2.</translation>
     </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="283"/>
+        <source>Subprogram window close</source>
+        <translation>Закрытие окна подпрограммы</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="284"/>
+        <source>The cyclogram has been modified.
+Do you want to save your changes?</source>
+        <translation>Циклограмма изменена.
+Сохранить изменения?</translation>
+    </message>
 </context>
 <context>
     <name>SystemState</name>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="211"/>
+        <location filename="Sources/system/system_state.cpp" line="827"/>
         <source>Voltage, V</source>
         <translation>Напряжение, В </translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="212"/>
+        <location filename="Sources/system/system_state.cpp" line="828"/>
         <source>Current, A</source>
         <translation>Ток, А</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="213"/>
+        <location filename="Sources/system/system_state.cpp" line="829"/>
         <source>Temperature, °C</source>
         <translation>Температура , °C</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="214"/>
+        <location filename="Sources/system/system_state.cpp" line="830"/>
         <source>Mode</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="215"/>
+        <location filename="Sources/system/system_state.cpp" line="831"/>
         <source>Steps</source>
         <translation>Шаги</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="216"/>
+        <location filename="Sources/system/system_state.cpp" line="832"/>
         <source>Velocity</source>
         <translation>Скорость</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="217"/>
         <source>Mode (Psy)</source>
-        <translation>Режим (ψ)</translation>
+        <translation type="vanished">Режим (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="218"/>
         <source>Steps (Psy)</source>
-        <translation>Шаги (ψ)</translation>
+        <translation type="vanished">Шаги (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="219"/>
         <source>Velocity (Psy)</source>
-        <translation>Скорость (ψ)</translation>
+        <translation type="vanished">Скорость (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="220"/>
         <source>Max current (Psy)</source>
-        <translation>Макс. ток (ψ)</translation>
+        <translation type="vanished">Макс. ток (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="221"/>
         <source>Angle (Psy)</source>
-        <translation>Угол (ψ)</translation>
+        <translation type="vanished">Угол (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="222"/>
         <source>Mode (Nu)</source>
-        <translation>Режим (υ) </translation>
+        <translation type="vanished">Режим (υ) </translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="223"/>
         <source>Steps (Nu)</source>
-        <translation>Шаги (υ)</translation>
+        <translation type="vanished">Шаги (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="224"/>
         <source>Velocity (Nu)</source>
-        <translation>Скорость (υ)</translation>
+        <translation type="vanished">Скорость (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="225"/>
         <source>Max current (Nu)</source>
-        <translation>Макс. ток (υ)</translation>
+        <translation type="vanished">Макс. ток (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="226"/>
         <source>Angle (Nu)</source>
-        <translation>Угол (υ)</translation>
+        <translation type="vanished">Угол (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="231"/>
+        <location filename="Sources/system/system_state.cpp" line="845"/>
         <source>Power, W</source>
         <translation>Мощность, Вт</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="233"/>
+        <location filename="Sources/system/system_state.cpp" line="852"/>
         <source>Module address</source>
         <translation>Адрес модуля</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="227"/>
+        <location filename="Sources/system/system_state.cpp" line="843"/>
         <source>Temperature sensor presense flag</source>
         <translation>Флаг наличия температурного датчика</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="228"/>
+        <location filename="Sources/system/system_state.cpp" line="846"/>
         <source>Pysical module status. 1 - active, 0 - inactive</source>
         <translation>Физический статус модуля. 1 - активен, 0 - неактивен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="229"/>
+        <location filename="Sources/system/system_state.cpp" line="847"/>
         <source>Logical module status. 1 - enabled, 0 - disabled</source>
         <translation>Логический статус модуля. 1 - активен, 0 - неактивен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="230"/>
+        <location filename="Sources/system/system_state.cpp" line="844"/>
         <source>Device Class</source>
         <translation>Класс устройства</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="232"/>
+        <location filename="Sources/system/system_state.cpp" line="833"/>
+        <source>Mode (ψ)</source>
+        <translation>Режим (ψ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="834"/>
+        <source>Steps (ψ)</source>
+        <translation>Шаги (ψ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="835"/>
+        <source>Velocity (ψ)</source>
+        <translation>Макс.скорость (ψ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="836"/>
+        <source>Max current (ψ)</source>
+        <translation>Макс.ток (ψ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="837"/>
+        <source>Angle (ψ)</source>
+        <translation>Угол (ψ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="838"/>
+        <source>Mode (υ)</source>
+        <translation>Режим (υ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="839"/>
+        <source>Steps (υ)</source>
+        <translation>Шаги (υ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="840"/>
+        <source>Velocity (υ)</source>
+        <translation>Макс.скорость (υ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="841"/>
+        <source>Max current (υ)</source>
+        <translation>Макс.ток (υ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="842"/>
+        <source>Angle (υ)</source>
+        <translation>Угол (υ)</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="843"/>
+        <source>Temp.Sensor Flag</source>
+        <translation>Флаг темп.сенсора</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="844"/>
+        <source>Device class</source>
+        <translation>Класс устройства</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="846"/>
+        <source>Phys.status</source>
+        <translation>Физ.статус</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="847"/>
+        <source>Logic.status</source>
+        <translation>Лог.статус</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="848"/>
+        <source>Subaddress</source>
+        <translation>Подадрес</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="849"/>
+        <source>Power State</source>
+        <translation>Состояние питания</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="849"/>
+        <source>Power state</source>
+        <translation>Состояние питания</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="850"/>
+        <source>Channel</source>
+        <translation>Канал</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="851"/>
         <source>Relay state. 1 - on, 0 - off</source>
         <translation>Состояние реле. 1 - замкнуто, 0 - разомкнуто</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="234"/>
+        <location filename="Sources/system/system_state.cpp" line="851"/>
+        <source>Relay state</source>
+        <translation>Состояние реле</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="853"/>
         <source>Module ready flag. 1 - ready, 0 - not ready</source>
         <translation>Флаг готовности модуля к работе. 1 - готов, 0 - не готов</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="235"/>
+        <location filename="Sources/system/system_state.cpp" line="853"/>
+        <source>Module ready flag</source>
+        <translation>Флаг &apos;Готов к работе&apos;</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="854"/>
         <source>Module is after reset flag. 1 - after reset, 0 - not after reset</source>
         <translation>Флаг состояние &quot;после перезагрузки&quot;. 1 - модуль после перезагрузки, 0 - модуль не после перезагрузки</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="236"/>
+        <location filename="Sources/system/system_state.cpp" line="854"/>
+        <source>Module after reset flag</source>
+        <translation>Флаг &apos;после сброса&apos;</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="855"/>
         <source>Module error flag. 1 - module has errors, 0 - module has no errors</source>
         <translation>Флаг наличия ошибок в модуле. 1 - есть ошибки, 0 - нет ошибок</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="237"/>
+        <location filename="Sources/system/system_state.cpp" line="855"/>
+        <source>Module has errors flag</source>
+        <translation>Флаг &apos;ошибки&apos;</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="856"/>
         <source>Fuse index</source>
         <translation>Порядковый номер предохранителя</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="238"/>
+        <location filename="Sources/system/system_state.cpp" line="856"/>
+        <source>Fuse id</source>
+        <translation>ID предохранителя</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="857"/>
         <source>Fuse state: 0 - fuse OK, 1 - fuse malfunction</source>
         <translation>Состояние предохранителя: 0 - исправен, 1 - неисправен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="239"/>
+        <location filename="Sources/system/system_state.cpp" line="859"/>
+        <source>Sensors count</source>
+        <translation>Количество датчиков</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="850"/>
         <source>Telemetry channel index</source>
         <translation>Номер канала телеметрии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="240"/>
+        <location filename="Sources/system/system_state.cpp" line="857"/>
+        <source>Fuse state</source>
+        <translation>Состояние предохранителя</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="858"/>
         <source>DS1820 sensor number in the line</source>
         <translation>Порядковый номер датчика DS1820 на линии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="241"/>
+        <location filename="Sources/system/system_state.cpp" line="858"/>
+        <source>Sensor number</source>
+        <translation>Номер датчика</translation>
+    </message>
+    <message>
+        <location filename="Sources/system/system_state.cpp" line="859"/>
         <source>DS1820 sensors count at the line</source>
         <translation>Количество датчиков DS1820 на линии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="255"/>
+        <location filename="Sources/system/system_state.cpp" line="157"/>
         <source>EMULATOR</source>
         <translation>ЭМУЛЯТОР КПА</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="255"/>
+        <location filename="Sources/system/system_state.cpp" line="157"/>
         <source>DEVICE</source>
         <translation>КПА</translation>
     </message>
 </context>
 <context>
-    <name>VariablesWindow</name>
+    <name>TextEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="20"/>
-        <source>Name</source>
-        <translation>Имя</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="26"/>
+        <source>Default Shape Edit Dialog</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="21"/>
-        <source>Initial</source>
-        <translation>Начальное значение</translation>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="36"/>
+        <source>Add new variable</source>
+        <translation>Добавить новую переменную</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="22"/>
-        <source>Current</source>
-        <translation>Текущее значение</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="23"/>
-        <source>Description</source>
-        <translation>Описание</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="62"/>
-        <source>Variables</source>
-        <translation>Переменные</translation>
-    </message>
-    <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="170"/>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="79"/>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="85"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="170"/>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="79"/>
+        <source>Variable name must not be empty!</source>
+        <translation>Имя переменной не должно быть пустым!</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="85"/>
+        <source>Variable with such name already exist. Try another name</source>
+        <translation>Переменная с таким именем уже создана. Введите другое имя</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/text_edit_dialog.cpp" line="95"/>
+        <source>Add new</source>
+        <translation>Добавить новую</translation>
+    </message>
+</context>
+<context>
+    <name>VariablesSelectWindow</name>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_select_window.cpp" line="24"/>
+        <source>Select/deselect all</source>
+        <translation>Выбрать/сбросить все</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_select_window.cpp" line="37"/>
+        <source>Select variables to show</source>
+        <translation>Выберите переменные для отображения</translation>
+    </message>
+</context>
+<context>
+    <name>VariablesWindow</name>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="66"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Initial</source>
+        <translation type="vanished">Начальное значение</translation>
+    </message>
+    <message>
+        <source>Current</source>
+        <translation type="vanished">Текущее значение</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="27"/>
+        <source>Add new variable</source>
+        <translation>Добавить новую переменную</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="36"/>
+        <source>Remove selected variables</source>
+        <translation>Удалить выбранные переменные</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="46"/>
+        <source>Move selected variable up</source>
+        <translation>Переместить выделенную перменную выше</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="56"/>
+        <source>Move selected variable down</source>
+        <translation>Переместить выделенную переменную ниже</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="67"/>
+        <source>Default value</source>
+        <translation>Значение по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="68"/>
+        <source>Description</source>
+        <translation>Описание</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="83"/>
+        <source>Select/deselect all</source>
+        <translation>Выбрать/сбросить все</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="96"/>
+        <source>Variables</source>
+        <translation>Переменные</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="217"/>
+        <source>Invalid variable name</source>
+        <translation>Неправильное имя переменной</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="217"/>
+        <source>Invalid &apos;%1&apos; variable name
+Name must start from latin letter and contain only alphanumeric or &apos;_&apos; characters</source>
+        <translation>Неверное имя переменной &apos;%1&apos;
+Имя должно начинаться с латинской буквы и может содержать только буквенно-цифровые символы или знаки &apos;_&apos;</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="368"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="380"/>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="368"/>
         <source>Variable &apos;%1&apos; already exist</source>
         <translation>Переменная &apos;%1&apos; уже существует</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="380"/>
+        <source>Incorrect variable value</source>
+        <translation>Неправильное значение переменной</translation>
     </message>
 </context>
 </TS>
