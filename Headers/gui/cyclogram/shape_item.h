@@ -33,6 +33,8 @@ public:
     void removeChildShape(ShapeItem* item);
     void replaceChildShape(ShapeItem* newItem, ShapeItem* oldItem);
 
+    void updateInsertionRules();
+
     void remove();
     void adjust();
 
@@ -48,7 +50,10 @@ public:
     QPoint cell() const;
     Command* command() const;
     const QList<ValencyPoint*>& valencyPoints() const;
+
     ValencyPoint* valencyPoint(int role) const;
+    ValencyPoint* valencyPoint(Command * command) const;
+
     QRect rect() const;
     ShapeItem* parentShape() const;
     ShapeItem* childShape(int index) const;

@@ -257,7 +257,7 @@ void CyclogramWidget::deleteSelectedItem()
     QString errorDesc;
     if (canBeDeleted(mSelectedShape, errorDesc))
     {
-        bool isBranch = mSelectedShape->command()->type() == DRAKON::BRANCH_BEGIN;
+        bool isBranch = (mSelectedShape->command()->type() == DRAKON::BRANCH_BEGIN);
         QString title = isBranch ? tr("Branch deletion") : tr("Command deletion");
         QString text = tr("Are you sure that you want to delete ");
         if (isBranch)
@@ -543,8 +543,6 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
 
     if (typeToCopy == DRAKON::GO_TO_BRANCH)
     {
-        //point->canBeLanded();
-        int TODO; // can be pasted only to points that can be landed
         canBePasted = false;
     }
 
@@ -553,9 +551,6 @@ void CyclogramWidget::copyCommandTo(Command* commandToCopy, const ValencyPoint* 
         QMessageBox::warning(this, tr("Error"), tr("Selected item can not be copied here"));
         return;
     }
-
-    //DRAKON::TERMINATOR - this type of command can not be copied
-    //DRAKON::BRANCH_BEGIN - this type of command is copied as entire branch
 
     // create command and load it from another
     Command* newCmd = Q_NULLPTR;
@@ -1213,8 +1208,6 @@ ShapeItem* CyclogramWidget::createShape(Command* cmd, const QPoint& cell, ShapeI
 ShapeItem* CyclogramWidget::addShape(Command* cmd, const QPoint& cell, ShapeItem* parentShape)
 {
     ShapeItem* shapeItem = CyclogramWidget::createShape(cmd, cell, parentShape, this);
-    //shapeItem->updateCanBeLandedFlag();
-
     mShapes.append(shapeItem);
     connect(shapeItem, SIGNAL(changed()), this, SLOT(onNeedUpdate()));
     connect(shapeItem, SIGNAL(needToDelete(ShapeItem*)), this, SLOT(onNeedToDelete(ShapeItem*)));
@@ -1711,6 +1704,7 @@ void CyclogramWidget::drawCyclogram(ShapeItem* item)
         }
 
         item->addChildShape(it);
+        it->updateInsertionRules();
     }
 
     QRect rect;

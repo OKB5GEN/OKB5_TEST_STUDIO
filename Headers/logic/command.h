@@ -122,7 +122,8 @@ protected:
     QList<Command*> mNextCommands;
 
 // TODO remove >>>
-    ValencyPoint::Role mRole; // TODO role belongs to valency point not the command
+    ValencyPoint::Role mRole; // TODO role belongs to valency point not the command, need to remove
+    // correct solution - find command among child shapes commands
 
 private slots:
     void onNextCmdTextChanged(const QString& text);

@@ -194,6 +194,23 @@ ValencyPoint* ShapeItem::valencyPoint(int role) const
     return Q_NULLPTR;
 }
 
+ValencyPoint* ShapeItem::valencyPoint(Command* command) const
+{
+    int i = 0;
+    foreach (ShapeItem* item, mChildShapes)
+    {
+        if (!item || item->command() != command)
+        {
+            ++i;
+            continue;
+        }
+
+        return valencyPoint(i);
+    }
+
+    return Q_NULLPTR;
+}
+
 void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
 {
     if (!pushToChildren)
@@ -1263,6 +1280,9 @@ void ShapeItem::updateCyclogramRect(ShapeItem* changedBranch)
         }
     }
 
+    // update insertion rules for changed branch
+    changedBranch->updateInsertionRules();
+
     adjust();
 
     if (before != mRect)
@@ -1626,7 +1646,6 @@ void ShapeItem::createValencyPoints(Command* cmd)
         vPoint->setColor(ValencyPoint::allowedColor());
         vPoint->setRole(ValencyPoint::Role(role));
         vPoint->setOwner(this);
-        //vPoint->setCanBeLanded(false); // false by default
         vPoint->setInsertableCommands(defaultInsertable);
 
         return vPoint;
@@ -1651,7 +1670,6 @@ void ShapeItem::createValencyPoints(Command* cmd)
     case DRAKON::PARALLEL_PROCESS:
         {
             ValencyPoint* point = createValencyPoint(QPointF(W / 2, H - h / 2), ValencyPoint::Down);
-
             mValencyPoints.push_back(point);
 
             if (type == DRAKON::BRANCH_BEGIN && !Cyclogram::isCyclogramEndBranch(cmd))
@@ -1701,62 +1719,94 @@ void ShapeItem::createValencyPoints(Command* cmd)
     }
 }
 
-//void ShapeItem::updateCanBeLandedFlag()
-//{
-//    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
-//    {
-//        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
-//        if (down)
-//        {
-//            down->setCanBeLanded(!Cyclogram::isCyclogramEndBranch(mCommand));
-//        }
+void ShapeItem::updateInsertionRules()
+{
+    if (mCommand->type() == DRAKON::BRANCH_BEGIN)
+    {
+        ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+        if (down && Cyclogram::isCyclogramEndBranch(mCommand)) // no branch can be changed from cyclogram end branch
+        {
+            down->removeInsertableCommand(DRAKON::SELECT_STATE);
+        }
 
-//        return;
-//    }
+        // recursively update child commands valency points
+        foreach (ShapeItem* child, mChildShapes)
+        {
+            if (!child)
+            {
+                continue;
+            }
 
-//    if (!mParentShape || mValencyPoints.empty())
-//    {
-//        return;
-//    }
+            child->updateInsertionRules();
+        }
 
-//    ValencyPoint::Role role = mCommand->role();
-//    ValencyPoint* parentPoint = mParentShape->valencyPoint(role);
+        return;
+    }
 
-//    if (mCommand->type() == DRAKON::QUESTION)
-//    {
-//        CmdQuestion* question = qobject_cast<CmdQuestion*>(mCommand);
-//        if (question->questionType() == CmdQuestion::CYCLE)
-//        {
-//            int TODO;
-//        }
-//        else if (question->questionType() == CmdQuestion::IF)
-//        {
-//            foreach (ValencyPoint* point, mValencyPoints)
-//            {
-//                ValencyPoint::Role pointRole = point->role();
-//                if (pointRole == ValencyPoint::Down || pointRole == ValencyPoint::Right)
-//                {
-//                    point->setCanBeLanded(false);
-//                }
-//                else if (pointRole == ValencyPoint::UnderArrow)
-//                {
-//                    point->setCanBeLanded(parentPoint->canBeLanded());
-//                }
-//            }
-//        }
-//        else if (question->questionType() == CmdQuestion::SWITCH_STATE)
-//        {
-//            foreach (ValencyPoint* point, mValencyPoints)
-//            {
-//                point->setCanBeLanded(true);
-//            }
-//        }
-//    }
-//    else
-//    {
-//        mValencyPoints.front()->setCanBeLanded(parentPoint->canBeLanded());
-//    }
-//}
+    // update child valency points rules, according to parent shape data
+    if (!mParentShape || mValencyPoints.empty())
+    {
+        return;
+    }
+
+    ValencyPoint* parentPoint = mParentShape->valencyPoint(mCommand);
+    if (!parentPoint)
+    {
+        return;
+    }
+
+    QSet<int> insertable = parentPoint->insertableCommands();
+
+    switch (mCommand->type())
+    {
+    case DRAKON::CONDITION:
+        {
+            ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+            ValencyPoint* right = valencyPoint(ValencyPoint::Right);
+            ValencyPoint* underArrow = valencyPoint(ValencyPoint::UnderArrow);
+
+            underArrow->setInsertableCommands(insertable);
+
+            // TODO remove Question-type commands from inner branches (temporary)
+            insertable.remove(DRAKON::CONDITION);
+            insertable.remove(DRAKON::SELECT_STATE);
+
+            down->setInsertableCommands(insertable);
+            right->setInsertableCommands(insertable);
+        }
+        break;
+    case DRAKON::SELECT_STATE:
+        {
+            ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+            ValencyPoint* right = valencyPoint(ValencyPoint::Right);
+            down->setInsertableCommands(insertable);
+            right->setInsertableCommands(insertable);
+        }
+        break;
+    case DRAKON::CYCLE:
+        {
+            int TODO;
+        }
+        break;
+    default:
+        {
+            ValencyPoint* down = valencyPoint(ValencyPoint::Down);
+            down->setInsertableCommands(insertable);
+        }
+        break;
+    }
+
+    // recursively update chils commands valency points
+    foreach (ShapeItem* child, mChildShapes)
+    {
+        if (!child)
+        {
+            continue;
+        }
+
+        child->updateInsertionRules();
+    }
+}
 
 const QList<ShapeItem*>& ShapeItem::childShapes() const
 {
