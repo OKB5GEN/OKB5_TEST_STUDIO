@@ -114,7 +114,6 @@ void CyclogramWidget::clear(bool onDestroy)
         mSihlouetteArrow = Q_NULLPTR;
     }
 
-
     if (mSihlouetteLine)
     {
         delete mSihlouetteLine;
