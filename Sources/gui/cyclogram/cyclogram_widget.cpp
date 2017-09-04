@@ -641,11 +641,8 @@ void CyclogramWidget::copyBranchTo(Command* commandToCopy, const ValencyPoint* p
     foreach (ShapeItem* it, branchesShapes)
     {
         QRect rect = it->rect();
-        if (rect.height() < maxHeight)
-        {
-            rect.setBottom(rect.bottom() + maxHeight - rect.height());
-            it->setRect(rect, true);
-        }
+        rect.setBottom(rect.bottom() + maxHeight - rect.height());
+        it->setRect(rect, true);
     }
 
     // set root shape rect
