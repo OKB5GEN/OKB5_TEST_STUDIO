@@ -143,12 +143,17 @@ void EditorWindow::closeEvent(QCloseEvent *event)
         }
     }
 
-    if (maybeSave())
+    int ret = 0;
+    if (maybeSave(&ret))
     {
         writeSettings();
         QString fileName = AppSettings::instance().settingValue(AppSettings::APP_FINISH_CYCLOGRAM_FILE).toString();
         runModalCyclogram(fileName, tr("Running application finish cyclogram..."));
         mSystemState->onApplicationFinish();
+
+        int options = (ret == QMessageBox::Save) ? EditorWindow::Save : 0;
+        closeAll(options);
+
         CyclogramManager::clear();
         event->accept();
     }
