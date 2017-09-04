@@ -220,7 +220,12 @@ void ShapeItem::setRect(const QRect& rect, bool pushToChildren)
         return;
     }
 
-    int xOffset = rect.right() - mRect.right();
+    int xOffset = 0;
+    if (rect.left() != mRect.left())
+    {
+        xOffset = rect.right() - mRect.right();
+    }
+
     QPoint cell = mCell;
     cell.setX(cell.x() + xOffset);
     cell.setY(cell.y() + rect.bottom() - mRect.bottom()); // place own shape to the bottom of its rect by default
