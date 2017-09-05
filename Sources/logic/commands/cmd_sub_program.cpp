@@ -147,6 +147,11 @@ void CmdSubProgram::execute()
         qreal value = 0;
         QVariant valueVariant = mInputParams.value(it.key());
 
+        if (!valueVariant.isValid())
+        {
+            continue;
+        }
+
         if (valueVariant.type() == QVariant::String)
         {
             value = mVarCtrl->currentValue(valueVariant.toString());
