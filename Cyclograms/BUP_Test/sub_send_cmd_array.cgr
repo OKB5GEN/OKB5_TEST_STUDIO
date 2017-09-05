@@ -109,6 +109,7 @@
         <command type="OUTPUT" id="1503567380347" console_text="Невозможно отправить командный массив: Шаги (%Steps%) меньше минимума (%Smin%)" console_text_color="ffdc143c"/>
         <command type="OUTPUT" id="1503567386712" console_text="Невозможно отправить командный массив: Скорость (%MaxV%) меньше минимума (%Vmin%)" console_text_color="ffdc143c"/>
         <command type="OUTPUT" id="1503567389467" console_text="Невозможно отправить командный массив: Ток (%MaxI%) меньше минимума (%Imin%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504607129127" console_text="КМ -&gt; БУП: Режим=%Mode%, Шаги=%Steps%, Ток=%MaxI%, Скорость=%MaxV% " console_text_color="ff000000"/>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
@@ -120,7 +121,7 @@
         <item id="1492067633344" down="1492067755761" right="-1" under_arrow="-1"/>
         <item id="1492067755761" down="1492067766840" right="-1" under_arrow="-1"/>
         <item id="1492067755764" down="1491893392472" right="-1" under_arrow="-1"/>
-        <item id="1492067766840" down="1492067820352" right="-1" under_arrow="-1"/>
+        <item id="1492067766840" down="1504607129127" right="-1" under_arrow="-1"/>
         <item id="1492067820352" down="1492067755764" right="-1" under_arrow="-1"/>
         <item id="1492067893814" down="1492067904167" right="-1" under_arrow="-1"/>
         <item id="1492067893816" down="1491893392472" right="-1" under_arrow="-1"/>
@@ -151,5 +152,6 @@
         <item id="1503567380347" down="1492067953028" right="-1" under_arrow="-1"/>
         <item id="1503567386712" down="1492067956745" right="-1" under_arrow="-1"/>
         <item id="1503567389467" down="1492067961091" right="-1" under_arrow="-1"/>
+        <item id="1504607129127" down="1492067820352" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

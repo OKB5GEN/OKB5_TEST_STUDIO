@@ -84,7 +84,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066391567" console_text="" console_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1492066391567" console_text="Шаги (линия 1): Текущее=%StepsCur%, Требуемое=%DestSteps%" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
@@ -119,7 +119,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066898527" console_text="" console_text_color="ff000000" operation="Add">
+        <command type="ACTION_MATH" id="1492066898527" console_text="Шаги (линия 1): Не изменилось (%N%)" console_text_color="ff000000" operation="Add">
             <operand id="Result" type="Variable" value="0" variable="N"/>
             <operand id="Operand1" type="Variable" value="0" variable="N"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
@@ -170,6 +170,7 @@
         </command>
         <command type="OUTPUT" id="1503568190182" console_text="Превышен максимальный интервал ожидания (%NstMax% циклов)" console_text_color="ffdc143c"/>
         <command type="OUTPUT" id="1503568199460" console_text="Результирующее количество шагов (%StepsCur%) не совпадает с заданным (%DestSteps%)" console_text_color="ffdc143c"/>
+        <command type="OUTPUT" id="1504606962214" console_text="Шаги (линия 1): Текущее=%StepsCur%, Требуемое=%DestSteps%, Погрешность=%MaxDelta%" console_text_color="ff32cd32"/>
     </commands>
     <tree>
         <item id="1491893392468" down="1491893392470" right="-1" under_arrow="-1"/>
@@ -194,7 +195,7 @@
         <item id="1492066898527" down="1492066922923" right="-1" under_arrow="-1"/>
         <item id="1492066922923" down="1492070258798" right="1492066922926" under_arrow="-1"/>
         <item id="1492066922926" down="1492066042375" right="-1" under_arrow="-1"/>
-        <item id="1492066946109" down="1492066042377" right="-1" under_arrow="-1"/>
+        <item id="1492066946109" down="1504606962214" right="-1" under_arrow="-1"/>
         <item id="1492070258798" down="1492070463420" right="-1" under_arrow="-1"/>
         <item id="1492070269733" down="1492066946109" right="1492070275607" under_arrow="-1"/>
         <item id="1492070269738" down="1491893392472" right="-1" under_arrow="-1"/>
@@ -205,5 +206,6 @@
         <item id="1492070633385" down="1492066513810" right="-1" under_arrow="-1"/>
         <item id="1503568190182" down="1492066416399" right="-1" under_arrow="-1"/>
         <item id="1503568199460" down="1492070269738" right="-1" under_arrow="-1"/>
+        <item id="1504606962214" down="1492066042377" right="-1" under_arrow="-1"/>
     </tree>
 </cyclogram>

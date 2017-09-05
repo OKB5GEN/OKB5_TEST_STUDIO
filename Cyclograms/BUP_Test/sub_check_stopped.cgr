@@ -96,7 +96,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066391567" console_text="" console_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1492066391567" console_text="Шаги (линия 1): Текущее=%StepsCur%" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand1" type="Variable" value="0" variable="PsyS"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
@@ -131,7 +131,7 @@
             <operand id="Operand1" type="Variable" value="0" variable="StepsCur"/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
         </command>
-        <command type="ACTION_MATH" id="1492066898527" console_text="" console_text_color="ff000000" operation="Add">
+        <command type="ACTION_MATH" id="1492066898527" console_text="Шаги (линия 1): Не изменилось (%N%)" console_text_color="ff000000" operation="Add">
             <operand id="Result" type="Variable" value="0" variable="N"/>
             <operand id="Operand1" type="Variable" value="0" variable="N"/>
             <operand id="Operand2" type="Number" value="1" variable=""/>
@@ -141,7 +141,7 @@
             <operand id="Right" type="Variable" value="0" variable="DestN"/>
         </command>
         <command type="GO_TO_BRANCH" id="1492066922926" console_text="" console_text_color="ff000000"/>
-        <command type="ACTION_MATH" id="1492066946109" console_text="" console_text_color="ff000000" operation="Assign">
+        <command type="ACTION_MATH" id="1492066946109" console_text="Привод остановлен" console_text_color="ff000000" operation="Assign">
             <operand id="Result" type="Variable" value="0" variable="OK"/>
             <operand id="Operand1" type="Number" value="1" variable=""/>
             <operand id="Operand2" type="OperandNotSet" value="-4.8367e-26" variable=""/>
