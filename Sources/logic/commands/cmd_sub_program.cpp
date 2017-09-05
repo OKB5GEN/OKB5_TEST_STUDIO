@@ -147,11 +147,6 @@ void CmdSubProgram::execute()
         qreal value = 0;
         QVariant valueVariant = mInputParams.value(it.key());
 
-        if (!valueVariant.isValid())
-        {
-            continue;
-        }
-
         if (valueVariant.type() == QVariant::String)
         {
             value = mVarCtrl->currentValue(valueVariant.toString());
@@ -563,6 +558,11 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
     {
         qreal value = 0;
         QVariant valueVariant = mOutputParams.value(it.key());
+
+        if (!valueVariant.isValid())
+        {
+            continue;
+        }
 
         if (valueVariant.type() == QVariant::String)
         {
