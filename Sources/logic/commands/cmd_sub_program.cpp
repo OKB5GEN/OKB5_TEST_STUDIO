@@ -756,7 +756,7 @@ void CmdSubProgram::reloadCyclogram()
         return;
     }
 
-    LOG_WARNING(QString("Reloading file...").arg(mFilePath));
+    LOG_WARNING(QString("Reloading file '%1'").arg(mFilePath));
 
     QString filePath = mFilePath;
     setFilePath("", false);

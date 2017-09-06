@@ -5,7 +5,7 @@
         <setting name="cleanup_cyclogram" value="on_cyclogram_finish.cgr"/>
     </settings>
     <variables>
-        <variable name="DestN" value="10" desc=""/>
+        <variable name="DestN" value="20" desc=""/>
         <variable name="DestSteps" value="0" desc=""/>
         <variable name="Diff" value="0" desc=""/>
         <variable name="MaxDelta" value="10" desc=""/>

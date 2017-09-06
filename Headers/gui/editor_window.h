@@ -115,7 +115,7 @@ private:
     bool hasUnsavedChanges() const;
 
     QWeakPointer<Cyclogram> mCyclogram;
-    CyclogramWidget *mCyclogramWidget;
+    CyclogramWidget* mCyclogramWidget;
 
     SystemState* mSystemState;
 

@@ -125,9 +125,9 @@ private:
 
     QPoint mDragStartPosition;
     QPoint mPreviousPosition;
-    ShapeItem * mDraggingShape;
-    ShapeItem * mSelectedShape;
-    ShapeItem * mPressedShape;
+    ShapeItem* mDraggingShape;
+    ShapeItem* mSelectedShape;
+    ShapeItem* mPressedShape;
 
     ValencyPoint* mPressedVP;
 
