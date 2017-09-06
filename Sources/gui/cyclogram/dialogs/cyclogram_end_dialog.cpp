@@ -65,7 +65,7 @@ void CyclogramEndDialog::saveReportAs()
 
     QString dir = path;
     QString extension = ".xlsx";
-    QString currentTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HH_mm_ss");
+    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH_mm_ss");
 
     dir += "/Report_";
     dir += currentTime;

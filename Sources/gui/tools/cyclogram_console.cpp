@@ -59,7 +59,7 @@ void CyclogramConsole::addMessage(const QColor& color, const QString& message)
 {
     mTextEdit->setTextColor(color);
 
-    QDateTime timeStamp = QDateTime::currentDateTimeUtc();
+    QDateTime timeStamp = QDateTime::currentDateTime();
     QString msg = timeStamp.toString(QLatin1String("HH:mm:ss.zzz"));
     msg += ": ";
     msg += message;

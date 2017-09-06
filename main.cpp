@@ -30,7 +30,7 @@ void initializeLogger()
     Logger::globalInstance()->registerAppender(consoleAppender);
 
     // create file output
-    QString appStartTime = QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HH_mm_ss");
+    QString appStartTime = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH_mm_ss");
     QString fileBaseName = LOGS_DIR + "/OKB5TS_";
     QString fileExtenstion = ".log";
 
