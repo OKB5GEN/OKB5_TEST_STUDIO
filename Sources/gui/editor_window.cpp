@@ -879,9 +879,9 @@ void EditorWindow::runModalCyclogram(const QString& shortFileName, const QString
 void EditorWindow::onCyclogramStateChanged(int state)
 {
     auto cyclogram = mCyclogram.lock();
-    mOpenAct->setEnabled(state == Cyclogram::STOPPED);
-    mNewAct->setEnabled(state == Cyclogram::STOPPED);
-    mSaveAct->setEnabled(state == Cyclogram::STOPPED && cyclogram->isModified());
+    mOpenAct->setEnabled(state == Cyclogram::IDLE);
+    mNewAct->setEnabled(state == Cyclogram::IDLE);
+    mSaveAct->setEnabled(state == Cyclogram::IDLE && cyclogram->isModified());
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
     if (state == Cyclogram::PAUSED)
@@ -891,7 +891,7 @@ void EditorWindow::onCyclogramStateChanged(int state)
     }
 #endif
 
-    if (state == Cyclogram::STOPPED)
+    if (state == Cyclogram::IDLE)
     {
         QString fileName = cyclogram->setting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM).toString();
         if (fileName.isEmpty())

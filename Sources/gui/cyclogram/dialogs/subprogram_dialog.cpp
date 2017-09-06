@@ -29,6 +29,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     mCommand(command)
 {
     connect(mCommand, SIGNAL(cyclogramChanged()), this, SLOT(reload()));
+
     mCallingCyclogram = callingCyclogram;
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
@@ -60,6 +61,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     connect(mSettingsBtn, SIGNAL(clicked(bool)), this, SLOT(onSettingsClick()));
 
     connect(mCommand->cyclogram().data(), SIGNAL(modified()), this, SLOT(onCyclogramModified()));
+    connect(mCommand->cyclogram().data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
 
     buttonLayout->addWidget(mSaveBtn);
@@ -83,6 +85,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
 
     onCyclogramModified();
     onCyclogramSelectionChanged(mCyclogramWidget->selectedItem());
+    onCyclogramStateChanged(mCommand->cyclogram()->state());
 }
 
 SubProgramDialog::~SubProgramDialog()
@@ -318,4 +321,13 @@ void SubProgramDialog::reload()
 {
     mCyclogramWidget->load(mCommand->cyclogram());
     updateSize();
+}
+
+void SubProgramDialog::onCyclogramStateChanged(int state)
+{
+    //mSaveBtn;
+    //mChartBtn;
+    mVariablesBtn->setEnabled(state == Cyclogram::IDLE);
+    mDeleteBtn->setEnabled(state == Cyclogram::IDLE);
+    mSettingsBtn->setEnabled(state == Cyclogram::IDLE);
 }

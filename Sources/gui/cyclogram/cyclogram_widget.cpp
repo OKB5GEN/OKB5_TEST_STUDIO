@@ -398,12 +398,6 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
     mMouseButtonState = event->button();
     mDragStartPosition = event->pos();
 
-    // no interaction while cyclogram running
-    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
-    {
-        return;
-    }
-
     if (event->button() == Qt::LeftButton || event->button() == Qt::RightButton)
     {
         ShapeItem* item = shapeAt(event->pos());
@@ -779,20 +773,28 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
     QString showSubprogramText = tr("Show subprogram window");
     QString copyText = (type == DRAKON::BRANCH_BEGIN) ? tr("Copy entire branch") : tr("Copy");
 
-    menu.addAction(editText);
-    menu.addAction(deleteText);
-    menu.addAction(copyText);
+    auto cyclogram = mCyclogram.lock();
+    if (cyclogram->state() == Cyclogram::IDLE)
+    {
+        menu.addAction(editText);
+        menu.addAction(deleteText);
+        menu.addAction(copyText);
+    }
 
     if (type == DRAKON::SUBPROGRAM)
     {
         menu.addAction(showSubprogramText);
     }
 
+    if (menu.actions().empty())
+    {
+        return;
+    }
+
     bool enableCopyAction = item->command()->canBeCopied();
 
     if (type == DRAKON::BRANCH_BEGIN)
     {
-        auto cyclogram = mCyclogram.lock();
         enableCopyAction = !cyclogram->isCyclogramEndBranch(item->command());
     }
 
@@ -919,23 +921,33 @@ void CyclogramWidget::mouseDoubleClickEvent(QMouseEvent *event)
     //remember that mousePressEvent will be called first!
     if (event->button() == Qt::LeftButton)
     {
-        if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
-        {
-            return; // to not edit cyclogram while it is executed
-        }
-
         ShapeItem* item = shapeAt(event->pos());
         if (!item)
         {
             return;
         }
 
-        showEditDialog(item->command());
+        auto cyclogram = mCyclogram.lock();
+
+        if (cyclogram->state() == Cyclogram::IDLE)
+        {
+            showEditDialog(item->command());
+        }
+        else if (item->command()->type() == DRAKON::SUBPROGRAM)
+        {
+            showEditDialog(item->command());
+        }
     }
 }
 
 void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    auto cyclogram = mCyclogram.lock();
+    if (cyclogram->state() == Cyclogram::RUNNING || cyclogram->state() == Cyclogram::PENDING_FOR_START)
+    {
+        return; // no Drag-And-Drop while main cyclogram execution
+    }
+
     bool isRightBtnPressed = ((event->buttons() & Qt::RightButton) > 0);
     bool isLeftBtnPressed = ((event->buttons() & Qt::LeftButton) > 0);
 
@@ -965,10 +977,7 @@ void CyclogramWidget::mouseMoveEvent(QMouseEvent *event)
 
 void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
-    {
-        return; // no cyclogram mouse interaction available during cyclogram running
-    }
+    auto cyclogram = mCyclogram.lock();
 
     bool isRightBtnPressed = ((mMouseButtonState & Qt::RightButton) > 0);
     bool isLeftBtnPressed = ((mMouseButtonState & Qt::LeftButton) > 0);
@@ -1009,6 +1018,11 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
         }
         else // just usual click
         {
+            if (cyclogram->state() == Cyclogram::RUNNING || cyclogram->state() == Cyclogram::PENDING_FOR_START)
+            {
+                return;
+            }
+
             if (point)
             {
                 onClickVP(point, mapToGlobal(event->pos()));
@@ -1053,6 +1067,11 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
 
             if (point)
             {
+                if (cyclogram->state() == Cyclogram::RUNNING || cyclogram->state() == Cyclogram::PENDING_FOR_START)
+                {
+                    return;
+                }
+
                 showContextMenuForVP(point, mapToGlobal(event->pos()));
             }
             else // if no valency point click, check command shape click
@@ -1063,9 +1082,12 @@ void CyclogramWidget::mouseReleaseEvent(QMouseEvent *event)
                     return;
                 }
 
-                clearSelection(false);
-                setSelectedItem(clickedItem);
-                update();
+                if (cyclogram->state() == Cyclogram::IDLE)
+                {
+                    clearSelection(false);
+                    setSelectedItem(clickedItem);
+                    update();
+                }
 
                 showContextMenuForCommand(clickedItem, mapToGlobal(event->pos()));
             }
@@ -1325,13 +1347,6 @@ bool CyclogramWidget::canBeDeleted(ShapeItem* item, QString& error) const
     if ((item->command()->flags() & Command::Deletable) == 0)
     {
         error = tr("Command is not deletable");
-        return false;
-    }
-
-    // nothing can be deleted in running cyclogram
-    if (mCyclogram.lock()->state() == Cyclogram::RUNNING)
-    {
-        error = tr("THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!");
         return false;
     }
 

@@ -45,6 +45,7 @@ private slots:
     void updateTitle(const QString& newTitle);
 
     void onCyclogramModified();
+    void onCyclogramStateChanged(int state);
     void onCyclogramSelectionChanged(ShapeItem* item);
     void reload();
 

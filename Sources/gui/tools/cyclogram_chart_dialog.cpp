@@ -289,7 +289,7 @@ void CyclogramChartDialog::onCyclogramStateChanged(int state)
 
         connect(vc, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
     }
-    else if (state == Cyclogram::STOPPED)
+    else if (state == Cyclogram::IDLE || state == Cyclogram::PENDING_FOR_START)
     {
         //TODO some hacks with subprogram charts
     }

@@ -648,6 +648,8 @@ void CmdSubProgram::restart()
     mVarCtrl->restart();
 
     auto cyclogram = mCyclogram.lock();
+    cyclogram->setState(Cyclogram::PENDING_FOR_START);
+
     // clear all subprograms variables data
     for (auto it = cyclogram->commands().begin(); it != cyclogram->commands().end(); ++it)
     {

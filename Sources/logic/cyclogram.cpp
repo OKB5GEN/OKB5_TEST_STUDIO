@@ -25,6 +25,7 @@
 #include "Headers/system/system_state.h"
 #include "Headers/file_reader.h"
 
+
 const QString Cyclogram::SETTING_DESCRIPTION = "description";
 const QString Cyclogram::SETTING_CLEANUP_CYCLOGRAM = "cleanup_cyclogram";
 const QString Cyclogram::SETTING_DEFAULT_NAME = "default_name";
@@ -54,7 +55,7 @@ Cyclogram::Cyclogram(QObject * parent):
     mFirst(Q_NULLPTR),
     mLast(Q_NULLPTR),
     mCurrent(Q_NULLPTR),
-    mState(STOPPED),
+    mState(IDLE),
     mVarController(Q_NULLPTR),
     mSystemState(Q_NULLPTR),
     mIsMainCyclogram(false),
@@ -139,7 +140,7 @@ void Cyclogram::run()
 
     LOG_INFO(QString("=================================="));
 
-    if (mState == STOPPED && mFirst != Q_NULLPTR)
+    if ((mState == IDLE || mState == PENDING_FOR_START) && mFirst != Q_NULLPTR)
     {
         mCurrent = mFirst;
 
@@ -204,6 +205,7 @@ void Cyclogram::onCommandFinished(Command* cmd)
         {
             LOG_INFO(QString("Subprogram finished"));
         }
+
         LOG_INFO(QString("=================================="));
 
         stop();
@@ -242,17 +244,19 @@ void Cyclogram::onCriticalError(Command* cmd)
 
 void Cyclogram::runCurrentCommand()
 {
-    if (mCurrent)
+    if (!mCurrent)
     {
-        connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
-        connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
-
-        LogCmd(mCurrent, "started");
-
-        emit commandStarted(mCurrent);
-        mCurrent->setActive(true);
-        mCurrent->run();
+        return;
     }
+
+    connect(mCurrent, SIGNAL(finished(Command*)), this, SLOT(onCommandFinished(Command*)));
+    connect(mCurrent, SIGNAL(criticalError(Command*)), this, SLOT(onCriticalError(Command*)));
+
+    LogCmd(mCurrent, "started");
+
+    emit commandStarted(mCurrent);
+    mCurrent->setActive(true);
+    mCurrent->run();
 }
 
 void Cyclogram::stop()
@@ -272,7 +276,7 @@ void Cyclogram::stop()
     }
 
     mCurrent = mFirst;
-    setState(STOPPED);
+    setState(mIsMainCyclogram ? IDLE : PENDING_FOR_START);
 }
 
 #ifdef ENABLE_CYCLOGRAM_PAUSE
@@ -525,6 +529,18 @@ void Cyclogram::setState(State state)
     QString text(metaEnum.valueToKey(state));
 
     LOG_DEBUG(QString("Cyclogram state changed to %1").arg(text));
+
+    if (state == IDLE)
+    {
+        foreach (Command* command, mCommands)
+        {
+            if (command->type() == DRAKON::SUBPROGRAM)
+            {
+                CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(command);
+                subprogram->cyclogram()->setState(IDLE);
+            }
+        }
+    }
 
     mState = state;
     emit stateChanged(mState);

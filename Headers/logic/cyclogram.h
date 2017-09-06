@@ -21,8 +21,9 @@ public:
 
     enum State
     {
-        STOPPED,
+        IDLE,
         RUNNING,
+        PENDING_FOR_START,
 #ifdef ENABLE_CYCLOGRAM_PAUSE
         PAUSED
 #endif
@@ -84,8 +85,9 @@ public:
     // cyclogram settings
     QVariant setting(const QString& name) const;
     void setSetting(const QString& key, const QVariant& value, bool sendSignal = true);
-
     const QMap<QString, QVariant>& settings() const;
+
+    void setState(State state);
 
 private slots:
     void onCommandFinished(Command* cmd);
@@ -100,7 +102,6 @@ private slots:
 private:
     void deleteCommandTree(Command* cmd, bool silent, bool isBranchDeletion);
     void deleteCommandImpl(Command* cmd, bool silent);
-    void setState(State state);
     void copyCommandTree(Command* to, Command* from, QMap<Command*, Command*>& alreadyCreatedCommands);
     Command* copyCommand(Command* to, Command* from, int role, QMap<Command*, Command*>& alreadyCreatedCommands, bool addToMapping);
 
