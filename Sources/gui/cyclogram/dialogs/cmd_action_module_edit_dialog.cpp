@@ -13,6 +13,7 @@
 namespace
 {
     static const QString SETTING_LAST_OPENED_MODULE = "LastOpenedModule";
+    static const char* PREV_INDEX = "PrevIndex";
 }
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
@@ -607,6 +608,7 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
                 if (index != -1) // add default variable name, corresponding to this paramID
                 {
                     comboBox->setCurrentIndex(index);
+                    comboBox->setProperty(PREV_INDEX, index);
                 }
             }
 
@@ -794,8 +796,20 @@ bool CmdActionModuleEditDialog::eventFilter(QObject *obj, QEvent *event)
 
 void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
 {
+    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
+    if (!comboBox)
+    {
+        return;
+    }
+
     if (text != TextEditDialog::addVarText())
     {
+        int index = comboBox->findText(text);
+        if (index != -1)
+        {
+            comboBox->setProperty(PREV_INDEX, index);
+        }
+
         return;
     }
 
@@ -806,15 +820,18 @@ void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
 
     QString newVariable = dialog.text();
 
-    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
-    if (!comboBox)
-    {
-        return;
-    }
-
     if (result != QDialog::Accepted)
     {
-        comboBox->setCurrentIndex(0); // TODO revert to previous variable
+        QVariant prevIndex = comboBox->property(PREV_INDEX);
+        if (prevIndex.isValid())
+        {
+            comboBox->setCurrentIndex(prevIndex.toInt()); // revert to previous variable
+        }
+        else
+        {
+            comboBox->setCurrentIndex(0);
+        }
+
         return;
     }
 
@@ -822,5 +839,6 @@ void CmdActionModuleEditDialog::onOutVarChanged(const QString& text)
     int index = comboBox->count() - 1;
     comboBox->insertItem(index, newVariable, dialog.value());
     comboBox->setCurrentIndex(index);
+    comboBox->setProperty(PREV_INDEX, index);
     comboBox->blockSignals(false);
 }

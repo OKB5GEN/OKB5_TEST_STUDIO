@@ -7,6 +7,11 @@
 
 #include <QtWidgets>
 
+namespace
+{
+    static const char* PREV_INDEX = "PrevIndex";
+}
+
 CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
     QDialog(parent),
     mCommand(Q_NULLPTR)
@@ -214,6 +219,7 @@ void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLine
             if (index != -1)
             {
                 box->setCurrentIndex(index);
+                box->setProperty(PREV_INDEX, index);
             }
         }
     }
@@ -242,6 +248,7 @@ void CmdActionMathEditDialog::onAccept()
     {
         return;
     }
+
     if (mTwoOperandsCheckBox->isChecked())
     {
         CmdActionMath::Operation operation = CmdActionMath::Operation(mOperationBox->currentData().toInt());
@@ -350,8 +357,20 @@ void CmdActionMathEditDialog::onOper2NumBtnStateChanged(bool toggled)
 
 void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
 {
+    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
+    if (!comboBox)
+    {
+        return;
+    }
+
     if (text != TextEditDialog::addVarText())
     {
+        int index = comboBox->findText(text);
+        if (index != -1)
+        {
+            comboBox->setProperty(PREV_INDEX, index);
+        }
+
         return;
     }
 
@@ -362,15 +381,18 @@ void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
 
     QString newVariable = dialog.text();
 
-    QComboBox* comboBox = qobject_cast<QComboBox*>(QObject::sender());
-    if (!comboBox)
-    {
-        return;
-    }
-
     if (result != QDialog::Accepted)
     {
-        comboBox->setCurrentIndex(0);
+        QVariant prevIndex = comboBox->property(PREV_INDEX);
+        if (prevIndex.isValid())
+        {
+            comboBox->setCurrentIndex(prevIndex.toInt()); // revert to previous variable
+        }
+        else
+        {
+            comboBox->setCurrentIndex(0);
+        }
+
         return;
     }
 
@@ -378,6 +400,7 @@ void CmdActionMathEditDialog::onResultVarChanged(const QString& text)
     int index = comboBox->count() - 1;
     comboBox->insertItem(index, newVariable);
     comboBox->setCurrentIndex(index);
+    comboBox->setProperty(PREV_INDEX, index);
     comboBox->blockSignals(false);
 
     comboBox->update();
