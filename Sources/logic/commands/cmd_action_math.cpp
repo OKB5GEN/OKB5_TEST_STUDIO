@@ -15,7 +15,7 @@ CmdActionMath::OperandData::OperandData()
 ///
 
 CmdActionMath::CmdActionMath(QObject* parent):
-    CmdAction(DRAKON::ACTION_MATH, parent),
+    Command(DRAKON::ACTION_MATH, 1, parent),
     mOperation(Assign)
 {
     updateText();
@@ -81,7 +81,7 @@ void CmdActionMath::execute()
 
     mVarCtrl->makeDataSnapshot(); //TODO
 
-    finish();
+    emit finished(nextCommand()); // command succesfully executed
 }
 
 void CmdActionMath::setOperation(Operation operation)

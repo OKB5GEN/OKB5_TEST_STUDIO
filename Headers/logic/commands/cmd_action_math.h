@@ -1,9 +1,9 @@
 #ifndef CMD_ACTION_MATH_H
 #define CMD_ACTION_MATH_H
 
-#include "Headers/logic/commands/cmd_action.h"
+#include "Headers/logic/command.h"
 
-class CmdActionMath: public CmdAction
+class CmdActionMath: public Command
 {
     Q_OBJECT
 

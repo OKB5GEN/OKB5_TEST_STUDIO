@@ -33,7 +33,6 @@ SOURCES += main.cpp\
     Sources/gui/cyclogram/valency_point.cpp \
     Sources/gui/cyclogram/variables_window.cpp \
     Sources/gui/editor_window.cpp \
-    Sources/logic/commands/cmd_action.cpp \
     Sources/logic/commands/cmd_action_math.cpp \
     Sources/logic/commands/cmd_case.cpp \
     Sources/logic/commands/cmd_delay.cpp \
@@ -115,7 +114,6 @@ HEADERS  += Headers/shape_types.h \
     Headers/logic/command.h \
     Headers/logic/cyclogram.h \
     Headers/logic/variable_controller.h \
-    Headers/logic/commands/cmd_action.h \
     Headers/logic/commands/cmd_action_math.h \
     Headers/logic/commands/cmd_case.h \
     Headers/logic/commands/cmd_delay.h \

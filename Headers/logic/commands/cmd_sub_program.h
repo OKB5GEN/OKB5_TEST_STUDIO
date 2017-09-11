@@ -4,13 +4,13 @@
 #include <QVariant>
 #include <QSharedPointer>
 
-#include "Headers/logic/commands/cmd_action.h"
+#include "Headers/logic/command.h"
 
 class QFileSystemWatcher;
 
 class Cyclogram;
 
-class CmdSubProgram: public CmdAction
+class CmdSubProgram: public Command
 {
     Q_OBJECT
 

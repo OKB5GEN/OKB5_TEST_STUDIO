@@ -3,10 +3,10 @@
 
 #include <QVariant>
 
-#include "Headers/logic/commands/cmd_action.h"
+#include "Headers/logic/command.h"
 #include "Headers/module_commands.h"
 
-class CmdActionModule: public CmdAction
+class CmdActionModule: public Command
 {
     Q_OBJECT
 

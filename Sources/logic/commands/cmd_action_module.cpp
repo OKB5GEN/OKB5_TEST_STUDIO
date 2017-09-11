@@ -14,7 +14,7 @@
 #include <QVariant>
 
 CmdActionModule::CmdActionModule(QObject* parent):
-    CmdAction(DRAKON::ACTION_MODULE, parent),
+    Command(DRAKON::ACTION_MODULE, 1, parent),
     mModule(ModuleCommands::POWER_UNIT_BUP),
     mOperation(ModuleCommands::SET_VOLTAGE_AND_CURRENT)
 {
@@ -45,7 +45,7 @@ void CmdActionModule::onCommandFinished(bool success)
 
     if (success)
     {
-        finish(); // command succesfully executed
+        emit finished(nextCommand()); // command succesfully executed
     }
     else
     {

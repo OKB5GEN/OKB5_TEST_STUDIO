@@ -22,7 +22,7 @@ namespace
 }
 
 CmdSubProgram::CmdSubProgram(QObject* parent):
-    CmdAction(DRAKON::SUBPROGRAM, parent),
+    Command(DRAKON::SUBPROGRAM, 1, parent),
     mLoaded(false),
     mNeedHashUpdate(false)
 {
@@ -586,7 +586,7 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
 
     mVarCtrl->endSubprogram(mText, variables);
 
-    finish();
+    emit finished(nextCommand()); // command succesfully executed
 }
 
 const QMap<QString, QVariant>& CmdSubProgram::inputParams() const
