@@ -1322,7 +1322,7 @@
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
         <source>Out param</source>
-        <translation>Вызодной параметр</translation>
+        <translation>Выходной параметр</translation>
     </message>
     <message>
         <source>Блок питания БУП</source>

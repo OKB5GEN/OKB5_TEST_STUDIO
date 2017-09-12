@@ -74,7 +74,6 @@ void CmdActionModuleEditDialog::setupUI()
     headers.append(tr("Value"));
     mInParams->setColumnCount(headers.size());
     mInParams->setHorizontalHeaderLabels(headers);
-    inputBox->setMaximumWidth(400);
     inputBoxLayout->addWidget(mInParams);
 
     mOutParams = new QTableWidget(this);
@@ -83,7 +82,6 @@ void CmdActionModuleEditDialog::setupUI()
     outHeaders.append(tr("Variable"));
     mOutParams->setColumnCount(outHeaders.size());
     mOutParams->setHorizontalHeaderLabels(outHeaders);
-    outputBox->setMaximumWidth(250);
     outputBoxLayout->addWidget(mOutParams);
 
     modulesBox->setLayout(modulesBoxLayout);
@@ -485,8 +483,12 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
 
     mCommandID = commandsListWidget->item(index)->data(Qt::UserRole).toInt();
     SystemState* system = mCommand->systemState();
-    QSet<uint32_t> inParams = system->inputParams(mModuleID, mCommandID);
-    QSet<uint32_t> outParams = system->outputParams(mModuleID, mCommandID);
+
+    QList<uint32_t> inParams = system->inputParams(mModuleID, mCommandID).toList();
+    QList<uint32_t> outParams = system->outputParams(mModuleID, mCommandID).toList();
+
+    std::sort(inParams.begin(), inParams.end());
+    std::sort(outParams.begin(), outParams.end());
 
     mInParams->setRowCount(inParams.size());
     mOutParams->setRowCount(outParams.size());
@@ -627,8 +629,8 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         ++i;
     }
 
-    mInParams->resizeColumnToContents(1);
-    mInParams->resizeColumnToContents(3);
+    mInParams->resizeColumnsToContents();
+    mOutParams->resizeColumnsToContents();
 }
 
 void CmdActionModuleEditDialog::onAccept()
@@ -643,11 +645,9 @@ void CmdActionModuleEditDialog::onAccept()
     QMap<uint32_t, QVariant> output;
 
     SystemState* system = mCommand->systemState();
-    QSet<uint32_t> inParams = system->inputParams(mModuleID, mCommandID);
-    QSet<uint32_t> outParams = system->outputParams(mModuleID, mCommandID);
 
-    int inCount = inParams.size();
-    int outCount = outParams.size();
+    int inCount = mInParams->rowCount();
+    int outCount = mOutParams->rowCount();
 
     for (int i = 0; i < inCount; ++i)
     {
