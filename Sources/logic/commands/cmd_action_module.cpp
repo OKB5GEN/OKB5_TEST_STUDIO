@@ -409,7 +409,7 @@ QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, cons
             text += tr("Temperature DS1820");
             if (moduleID == ModuleCommands::OTD)
             {
-                text += QString(" (line 1)");
+                text += tr(" (line 1)");
             }
         }
         break;
@@ -421,7 +421,7 @@ QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, cons
             text += tr("DS1820 count");
             if (moduleID == ModuleCommands::OTD)
             {
-                text += QString(" (line 1)");
+                text += tr(" (line 1)");
             }
         }
         break;
@@ -433,7 +433,7 @@ QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, cons
             text += tr("Start DS1820 measurement");
             if (moduleID == ModuleCommands::OTD)
             {
-                text += QString(" (line 1)");
+                text += tr(" (line 1)");
             }
         }
         break;
@@ -629,7 +629,7 @@ QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, cons
             text += tr("DS1820 reset");
             if (moduleID == ModuleCommands::OTD)
             {
-                text += QString(" (line 1)");
+                text += tr(" (line 1)");
             }
         }
         break;

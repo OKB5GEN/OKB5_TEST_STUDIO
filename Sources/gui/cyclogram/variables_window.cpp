@@ -195,7 +195,8 @@ void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, c
 void VariablesWindow::onAccept()
 {
     // create variable name validator
-    QRegExp rx("[a-z]{1}(\\w+)?"); // at least one latin letter in the beginning followed by alphanumeric or '_' characters
+    //QRegExp rx("[a-z]{1}(\\w+)?"); // at least one latin letter in the beginning followed by alphanumeric or '_' characters
+    QRegExp rx("(\\w+)?"); // alphanumeric or '_' characters
     rx.setCaseSensitivity(Qt::CaseInsensitive);
     QRegExpValidator v(rx, 0);
     int pos = 0;

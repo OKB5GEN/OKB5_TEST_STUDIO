@@ -250,42 +250,42 @@
 <context>
     <name>CmdActionMathEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="15"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="20"/>
         <source>Math operation</source>
         <translation>Математическая операция</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="32"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="37"/>
         <source>Result</source>
         <translation>Результат</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="58"/>
         <source>Operand 1</source>
         <translation>Операнд 1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="76"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="81"/>
         <source>Operation</source>
         <translation>Операция</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="87"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="92"/>
         <source>Two operands</source>
         <translation>Два операнда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="97"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="102"/>
         <source>Operand 2</source>
         <translation>Операнд 2</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="261"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="268"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="261"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="268"/>
         <source>Division by zero detected!</source>
         <translation>Обнаружено деление на 0!</translation>
     </message>
@@ -448,6 +448,14 @@
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="409"/>
         <source>Temperature DS1820</source>
         <translation>Температура DS1820</translation>
+    </message>
+    <message>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="412"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="424"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="436"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="632"/>
+        <source> (line 1)</source>
+        <translation> (линия 1)</translation>
     </message>
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="417"/>
@@ -1226,93 +1234,93 @@
 <context>
     <name>CmdActionModuleEditDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="23"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="24"/>
         <source>Module operation</source>
         <translation>Модульная команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="38"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="39"/>
         <source>Modules</source>
         <translation>Модули</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="39"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="40"/>
         <source>Commands</source>
         <translation>Команды</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="40"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="41"/>
         <source>Input parameters</source>
         <translation>Входные параметры</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="41"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="42"/>
         <source>Output parameters</source>
         <translation>Выходные параметры</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="49"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="50"/>
         <source>Power unit 1</source>
         <translation>Блок питания 1</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="50"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="51"/>
         <source>Power unit 2</source>
         <translation>Блок питания 2</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="51"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="52"/>
         <source>MKO</source>
         <translation>МКО</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="52"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="53"/>
         <source>STM</source>
         <translation>СТМ</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="54"/>
         <source>OTD</source>
         <translation>ОТД</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="54"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="55"/>
         <source>Technological</source>
         <translation>Технологический</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="55"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="56"/>
         <source>DS</source>
         <translation>ИП</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="62"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="63"/>
         <source>Set module param</source>
         <translation>Установить параметры</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="64"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="65"/>
         <source>Get module param</source>
         <translation>Получить параметры</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="69"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="70"/>
         <source>In param</source>
         <translation>Входной параметр</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="71"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="72"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="83"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="73"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="74"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="81"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
         <source>Out param</source>
         <translation>Вызодной параметр</translation>
     </message>
@@ -1788,7 +1796,7 @@ Try another name</source>
         <translation>Последняя ветка</translation>
     </message>
     <message>
-        <location filename="Sources/logic/cyclogram.cpp" line="240"/>
+        <location filename="Sources/logic/cyclogram.cpp" line="241"/>
         <source>Critical error occured: </source>
         <translation>Произошла критическая ошибка:</translation>
     </message>
@@ -1993,138 +2001,138 @@ Reason: </source>
         <translation>Команда не редактируема</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="433"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="489"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="516"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="528"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="537"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="551"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="662"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="669"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="838"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1005"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="427"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="483"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="510"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="522"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="531"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="545"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="656"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="663"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="840"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1014"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="433"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="427"/>
         <source>Selected item can not be added here</source>
         <translation>Выбранная команда не может быть добавлена в указанное место</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="450"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="444"/>
         <source>Add BRANCH</source>
         <translation>Добавить ВЕТКУ</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="451"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="445"/>
         <source>Add MATH COMMAND</source>
         <translation>Добавить МАТЕМАТИЧЕСКУЮ команду</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="452"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="446"/>
         <source>Add DELAY</source>
         <translation>Добавить ЗАДЕРЖКУ</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="453"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="447"/>
         <source>Add CONDITION</source>
         <translation>Добавить ВОПРОС БЕЗ СМЕНЫ ветки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="454"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="448"/>
         <source>Add CYCLE</source>
         <translation>Добавить ЦИКЛ</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="455"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="449"/>
         <source>Add SELECT STATE</source>
         <translation>Добавить ВОПРОС СО СМЕНОЙ ветки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="456"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="450"/>
         <source>Add MODULE COMMAND</source>
         <translation>Добавить МОДУЛЬНУЮ команду</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="457"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="451"/>
         <source>Add SUBPROGRAM</source>
         <translation>Добавить ПОДПРОГРАММУ</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="458"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="452"/>
         <source>Add OUTPUT</source>
         <translation>Добавить СООБЩЕНИЕ в консоль</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="459"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="453"/>
         <source>Add PARALLEL PROCESS</source>
         <translation>Добавить ПАРАЛЛЕЛЬНЫЙ ПРОЦЕСС</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="474"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="468"/>
         <source>Paste</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="489"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="483"/>
         <source>Selected command can not be copied here</source>
         <translation>Выбранная команда не может быть скопирована в указанную точку</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="516"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="510"/>
         <source>Selected command can not be copied</source>
         <translation>Выбранная команда не может быть скопирована</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="528"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="537"/>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="551"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="522"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="531"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="545"/>
         <source>Selected item can not be copied here</source>
         <translation>Выбранная команда не может быть скопирована в указанную точку</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="662"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="656"/>
         <source>Selected branch can not be moved here</source>
         <translation>Выбранная команда не может быть перемещена в указанную точку</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="669"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="663"/>
         <source>End branch can not be moved anywhere</source>
         <translation>Конечная ветка не может быть перемещена</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="777"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="771"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="778"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="772"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="779"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="773"/>
         <source>Show subprogram window</source>
         <translation>Показать подпрограмму</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="780"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="774"/>
         <source>Copy entire branch</source>
         <translation>Скопировать ветку</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="780"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="774"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="838"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="840"/>
         <source>Selected item can not be copied</source>
         <translation>Выбранная команда не может быть скопирована</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1005"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1014"/>
         <source>Selected command can not be moved here</source>
         <translation>Выбранная команда не может быть перемещена в указанную точку</translation>
     </message>
@@ -2137,37 +2145,36 @@ Reason: </source>
         <translation type="vanished">Показать графики подпрограммы в отдельном окне</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1327"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1349"/>
         <source>Command is not deletable</source>
         <translation>Эту команду удалить нельзя</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1334"/>
         <source>THIS TEXT SHOULD NEVER APPEAR ON THE SCREEN!</source>
-        <translation>ЭТОТ ТЕКСТ НИКОГДА НЕ ДОЛЖЕН ПОЯВЛЯТЬСЯ НА ЭКРАНЕ! </translation>
+        <translation type="vanished">ЭТОТ ТЕКСТ НИКОГДА НЕ ДОЛЖЕН ПОЯВЛЯТЬСЯ НА ЭКРАНЕ! </translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1346"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1361"/>
         <source>Start branch never can be deleted</source>
         <translation>Начальную ветку нельзя удалить </translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1355"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1370"/>
         <source>End branch never can be deleted</source>
         <translation>Конечную ветку нельзя удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1365"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1380"/>
         <source>Current running command can not be deleted</source>
         <translation>Выполняющуюся команды нельзя удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1376"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1391"/>
         <source>Has running command in this branch</source>
         <translation>В данной ветке выполняется команда</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1979"/>
+        <location filename="Sources/gui/cyclogram/cyclogram_widget.cpp" line="1994"/>
         <source>New Branch</source>
         <translation>Новая ветка</translation>
     </message>
@@ -2677,7 +2684,7 @@ Line %2, column %3</source>
     <message>
         <location filename="Sources/gui/cyclogram/shape_item.cpp" line="509"/>
         <source>Subprogram (embedded another cyclogram call).</source>
-        <translation>Подпрограмма (вложенный вызов другой циклограммы)</translation>
+        <translation>Подпрограмма (вложенный вызов другой циклограммы).</translation>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/shape_item.cpp" line="517"/>
@@ -2733,59 +2740,59 @@ Line %2, column %3</source>
 <context>
     <name>SubProgramDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="50"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="51"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="51"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="52"/>
         <source>Variables</source>
         <translation>Переменные</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="52"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="53"/>
         <source>Chart</source>
         <translation>График</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="54"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="54"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="55"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="99"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="102"/>
         <source>Save cyclogram file</source>
         <translation>Сохранить циклограмму в файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="99"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="102"/>
         <source>OKB5 Cyclogram Files (*%1)</source>
         <translation>OKB5 Cyclogram Files (*%1)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="116"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="119"/>
         <source>OKB5 Test Studio</source>
         <translation>OKB5 Test Studio</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="117"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="120"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Невозможна запись в файл %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="283"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="286"/>
         <source>Subprogram window close</source>
         <translation>Закрытие окна подпрограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="284"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="287"/>
         <source>The cyclogram has been modified.
 Do you want to save your changes?</source>
         <translation>Циклограмма изменена.
