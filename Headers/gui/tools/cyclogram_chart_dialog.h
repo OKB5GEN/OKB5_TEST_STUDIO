@@ -1,7 +1,7 @@
 #ifndef MONITOR_AUTO_H
 #define MONITOR_AUTO_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 #include <QMap>
 
 class QCheckBox;
@@ -11,7 +11,7 @@ class QCPGraph;
 class QToolButton;
 class Cyclogram;
 
-class CyclogramChartDialog : public QDialog
+class CyclogramChartDialog : public RestorableDialog
 {
     Q_OBJECT
 

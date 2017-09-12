@@ -6,7 +6,7 @@
 #include <QtWidgets>
 
 CmdStateStartEditDialog::CmdStateStartEditDialog(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -40,6 +40,8 @@ void CmdStateStartEditDialog::setCommands(CmdStateStart * command, const QList<C
     mCommand = command;
     mLineEdit->setText(command->text());
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdStateStartEditDialog::onAccept()

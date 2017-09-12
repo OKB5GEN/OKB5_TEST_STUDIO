@@ -6,7 +6,7 @@
 #include <QMetaEnum>
 
 AppSettingsDialog::AppSettingsDialog(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -63,6 +63,8 @@ AppSettingsDialog::AppSettingsDialog(QWidget * parent):
     mSettingsTable->resizeColumnsToContents();
 
     resize(800, 400);
+
+    readSettings();
 }
 
 AppSettingsDialog::~AppSettingsDialog()

@@ -1,7 +1,7 @@
 #ifndef CMD_ACTION_MATH_EDIT_DIALOG_H
 #define CMD_ACTION_MATH_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QComboBox;
 class QCheckBox;
@@ -13,7 +13,7 @@ class QDoubleValidator;
 class CmdActionMath;
 class ConsoleTextWidget;
 
-class CmdActionMathEditDialog : public QDialog
+class CmdActionMathEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

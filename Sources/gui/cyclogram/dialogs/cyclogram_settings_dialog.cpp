@@ -7,7 +7,7 @@
 #include <QVariant>
 
 CyclogramSettingsDialog::CyclogramSettingsDialog(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -67,6 +67,8 @@ void CyclogramSettingsDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
 
     mFileNameStr->setText(cyclogram->setting(Cyclogram::SETTING_CLEANUP_CYCLOGRAM).toString());
     mDefaultNameStr->setText(cyclogram->setting(Cyclogram::SETTING_DEFAULT_NAME).toString());
+
+    readSettings();
 }
 
 void CyclogramSettingsDialog::onAccept()

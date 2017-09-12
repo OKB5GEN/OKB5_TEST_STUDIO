@@ -7,7 +7,7 @@
 #include <QtWidgets>
 
 CmdQuestionEditDialog::CmdQuestionEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     setupUI();
@@ -150,6 +150,8 @@ void CmdQuestionEditDialog::setCommand(CmdQuestion* command)
 
         mConsoleTextWidget->setCommand(mCommand);
     }
+
+    readSettings();
 }
 
 void CmdQuestionEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)

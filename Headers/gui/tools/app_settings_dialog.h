@@ -1,12 +1,12 @@
 #ifndef APP_SETTINGS_DIALOG_H
 #define APP_SETTINGS_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QTextEdit;
 class QTableWidget;
 
-class AppSettingsDialog : public QDialog
+class AppSettingsDialog : public RestorableDialog
 {
     Q_OBJECT
 

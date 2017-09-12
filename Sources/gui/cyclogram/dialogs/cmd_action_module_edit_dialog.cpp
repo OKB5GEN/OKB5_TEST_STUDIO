@@ -17,7 +17,7 @@ namespace
 }
 
 CmdActionModuleEditDialog::CmdActionModuleEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     setupUI();
@@ -136,6 +136,8 @@ void CmdActionModuleEditDialog::setCommand(CmdActionModule* command)
 
     mModules->setCurrentRow(index);
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdActionModuleEditDialog::addPowerUnitCommonCommands(uint32_t moduleID)

@@ -10,7 +10,7 @@ namespace
 }
 
 VariablesSelectWindow::VariablesSelectWindow(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 

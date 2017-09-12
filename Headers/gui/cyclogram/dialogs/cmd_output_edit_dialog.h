@@ -1,12 +1,12 @@
 #ifndef CMD_OUTPUT_EDIT_DIALOG_H
 #define CMD_OUTPUT_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class Command;
 class ConsoleTextWidget;
 
-class CmdOutputEditDialog : public QDialog
+class CmdOutputEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

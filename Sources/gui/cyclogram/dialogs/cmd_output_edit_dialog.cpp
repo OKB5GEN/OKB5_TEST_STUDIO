@@ -6,7 +6,7 @@
 #include <QGridLayout>
 
 CmdOutputEditDialog::CmdOutputEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     QGridLayout * layout = new QGridLayout(this);
@@ -33,6 +33,8 @@ void CmdOutputEditDialog::setCommand(Command* command)
 {
     mCommand = command;
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdOutputEditDialog::onAccept()

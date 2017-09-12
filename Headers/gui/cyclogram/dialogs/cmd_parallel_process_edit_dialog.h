@@ -1,11 +1,11 @@
 #ifndef CMD_PARALLEL_PROCESS_EDIT_DIALOG_H
 #define CMD_PARALLEL_PROCESS_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class Command;
 
-class CmdParallelProcessEditDialog : public QDialog
+class CmdParallelProcessEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

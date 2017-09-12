@@ -1,7 +1,7 @@
 #ifndef CMD_DELAY_EDIT_DIALOG_H
 #define CMD_DELAY_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QGridLayout;
 class QSpinBox;
@@ -10,7 +10,7 @@ class QListWidget;
 class CmdDelay;
 class ConsoleTextWidget;
 
-class CmdDelayEditDialog : public QDialog
+class CmdDelayEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

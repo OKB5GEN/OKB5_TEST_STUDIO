@@ -6,7 +6,7 @@
 #include <QtWidgets>
 
 CmdSetStateEditDialog::CmdSetStateEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCurrentIndex(-1),
     mCommand(Q_NULLPTR)
 {
@@ -68,6 +68,8 @@ void CmdSetStateEditDialog::setCommands(CmdSetState * command, const QList<Comma
 
     mBranchesList->setCurrentRow(mCurrentIndex);
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdSetStateEditDialog::onAccept()

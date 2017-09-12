@@ -1,14 +1,14 @@
 #ifndef CYCLOGRAM_SETTINGS_DIALOG_H
 #define CYCLOGRAM_SETTINGS_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QTextEdit;
 class QLineEdit;
 
 class Cyclogram;
 
-class CyclogramSettingsDialog : public QDialog
+class CyclogramSettingsDialog : public RestorableDialog
 {
     Q_OBJECT
 

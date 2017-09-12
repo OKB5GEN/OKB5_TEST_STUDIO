@@ -1,7 +1,7 @@
 #ifndef CMD_QUESTION_EDIT_DIALOG_H
 #define CMD_QUESTION_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QComboBox;
 class QCheckBox;
@@ -13,7 +13,7 @@ class QDoubleValidator;
 class CmdQuestion;
 class ConsoleTextWidget;
 
-class CmdQuestionEditDialog : public QDialog
+class CmdQuestionEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

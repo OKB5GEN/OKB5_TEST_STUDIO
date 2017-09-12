@@ -1,7 +1,7 @@
 #ifndef CMD_SET_STATE_EDIT_DIALOG_H
 #define CMD_SET_STATE_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QListWidget;
 
@@ -9,7 +9,7 @@ class CmdSetState;
 class Command;
 class ConsoleTextWidget;
 
-class CmdSetStateEditDialog : public QDialog
+class CmdSetStateEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

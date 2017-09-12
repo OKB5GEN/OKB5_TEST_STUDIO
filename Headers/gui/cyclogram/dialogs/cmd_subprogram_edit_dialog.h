@@ -1,7 +1,7 @@
 #ifndef CMD_SUBPROGRAM_EDIT_DIALOG_H
 #define CMD_SUBPROGRAM_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 #include <QSharedPointer>
 
 class QLineEdit;
@@ -14,7 +14,7 @@ class CmdSubProgram;
 class Cyclogram;
 class ConsoleTextWidget;
 
-class CmdSubProgramEditDialog : public QDialog
+class CmdSubProgramEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

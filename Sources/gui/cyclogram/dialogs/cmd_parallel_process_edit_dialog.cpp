@@ -7,7 +7,7 @@
 #include <QLineEdit>
 
 CmdParallelProcessEditDialog::CmdParallelProcessEditDialog(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QGridLayout * layout = new QGridLayout(this);
 
@@ -38,4 +38,6 @@ CmdParallelProcessEditDialog::~CmdParallelProcessEditDialog()
 void CmdParallelProcessEditDialog::setCommand(Command* command)
 {
     int TODO; // create GUI for command params editing
+
+    readSettings();
 }

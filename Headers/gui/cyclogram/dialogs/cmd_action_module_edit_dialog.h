@@ -1,7 +1,7 @@
 #ifndef CMD_ACTION_MODULE_EDIT_DIALOG_H
 #define CMD_ACTION_MODULE_EDIT_DIALOG_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 #include <QVariant>
 
 class QListWidget;
@@ -11,7 +11,7 @@ class QDoubleValidator;
 class CmdActionModule;
 class ConsoleTextWidget;
 
-class CmdActionModuleEditDialog : public QDialog
+class CmdActionModuleEditDialog : public RestorableDialog
 {
     Q_OBJECT
 

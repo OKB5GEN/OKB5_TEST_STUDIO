@@ -1,7 +1,7 @@
 #ifndef VARIABLES_SELECT_WINDOW_H
 #define VARIABLES_SELECT_WINDOW_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 #include <QStringList>
 
 class QListWidget;
@@ -9,7 +9,7 @@ class QCheckBox;
 
 class Cyclogram;
 
-class VariablesSelectWindow: public QDialog
+class VariablesSelectWindow: public RestorableDialog
 {
     Q_OBJECT
 

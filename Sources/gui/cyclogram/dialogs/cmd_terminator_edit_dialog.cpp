@@ -9,7 +9,7 @@
 #include <QLineEdit>
 
 CmdTerminatorEditDialog::CmdTerminatorEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     QGridLayout * layout = new QGridLayout(this);
@@ -42,6 +42,8 @@ void CmdTerminatorEditDialog::setCommand(CmdTitle* command)
 {
     mCommand = command;
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdTerminatorEditDialog::onAccept()

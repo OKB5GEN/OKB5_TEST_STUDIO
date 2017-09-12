@@ -18,7 +18,7 @@ namespace
 }
 
 CyclogramChartDialog::CyclogramChartDialog(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     setWindowFlags(windowFlags() | Qt::WindowMinMaxButtonsHint);
 
@@ -141,6 +141,8 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     {
         onCyclogramStateChanged(Cyclogram::RUNNING);
     }
+
+    readSettings();
 }
 
 QCPGraph* CyclogramChartDialog::variableGraph(const QString& name) const
@@ -335,6 +337,7 @@ void CyclogramChartDialog::onAddClicked()
 
     //mVariablesTable->sortByColumn(0);
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
+    mVariablesTable->resizeColumnsToContents();
 }
 
 void CyclogramChartDialog::keyPressEvent(QKeyEvent *event)
@@ -397,6 +400,7 @@ void CyclogramChartDialog::onRemoveClicked()
     }
 
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
+    mVariablesTable->resizeColumnsToContents();
 }
 
 void CyclogramChartDialog::onMoveUpClicked()

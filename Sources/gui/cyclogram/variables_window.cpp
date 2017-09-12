@@ -13,7 +13,7 @@ namespace
 }
 
 VariablesWindow::VariablesWindow(QWidget * parent):
-    QDialog(parent)
+    RestorableDialog(parent)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
@@ -123,6 +123,7 @@ void VariablesWindow::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     }
 
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
+    mTableWidget->resizeColumnsToContents();
 }
 
 void VariablesWindow::onAddClicked()
@@ -139,6 +140,7 @@ void VariablesWindow::onAddClicked()
 
     addRow(mTableWidget->rowCount(), name, 0, "", false);
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
+    mTableWidget->resizeColumnsToContents();
 }
 
 void VariablesWindow::onRemoveClicked()
@@ -168,6 +170,7 @@ void VariablesWindow::onRemoveClicked()
     mSelectAllBox->setEnabled(mTableWidget->rowCount() > 0);
 
     mRemoveBtn->setEnabled(false);
+    mTableWidget->resizeColumnsToContents();
 }
 
 void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, const QString& description, bool existingVariable)

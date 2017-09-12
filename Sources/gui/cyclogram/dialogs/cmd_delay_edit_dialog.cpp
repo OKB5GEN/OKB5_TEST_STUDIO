@@ -7,7 +7,7 @@
 #include <QtWidgets>
 
 CmdDelayEditDialog::CmdDelayEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR),
     mHours(0),
     mMinutes(0),
@@ -95,6 +95,8 @@ void CmdDelayEditDialog::setCommand(CmdDelay* command)
     }
 
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdDelayEditDialog::onHoursChanged(int hours)

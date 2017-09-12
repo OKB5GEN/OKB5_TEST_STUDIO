@@ -1,7 +1,7 @@
 #ifndef VARIABLES_WINDOW_H
 #define VARIABLES_WINDOW_H
 
-#include <QDialog>
+#include "Headers/gui/tools/restorable_dialog.h"
 
 class QTableWidget;
 class QToolButton;
@@ -12,7 +12,7 @@ class QTableWidgetItem;
 
 class Cyclogram;
 
-class VariablesWindow: public QDialog
+class VariablesWindow: public RestorableDialog
 {
     Q_OBJECT
 

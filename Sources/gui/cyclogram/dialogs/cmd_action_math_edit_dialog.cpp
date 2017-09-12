@@ -13,7 +13,7 @@ namespace
 }
 
 CmdActionMathEditDialog::CmdActionMathEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     setupUI();
@@ -198,6 +198,8 @@ void CmdActionMathEditDialog::setCommand(CmdActionMath* command)
     updateComponent(CmdActionMath::Operand2, mOper2Box, mOper2Num, mOper2VarBtn, mOper2NumBtn);
 
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdActionMathEditDialog::updateComponent(int operand, QComboBox* box, QLineEdit* lineEdit, QRadioButton* boxBtn, QRadioButton* lineEditBtn)

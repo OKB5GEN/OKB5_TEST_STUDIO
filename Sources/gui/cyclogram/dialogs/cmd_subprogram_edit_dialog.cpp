@@ -11,7 +11,7 @@
 #include <QtWidgets>
 
 CmdSubProgramEditDialog::CmdSubProgramEditDialog(QWidget * parent):
-    QDialog(parent),
+    RestorableDialog(parent),
     mCommand(Q_NULLPTR)
 {
     setupUI();
@@ -137,6 +137,8 @@ void CmdSubProgramEditDialog::setCommand(CmdSubProgram* command, QSharedPointer<
     updateUI();
 
     mConsoleTextWidget->setCommand(mCommand);
+
+    readSettings();
 }
 
 void CmdSubProgramEditDialog::onAccept()
