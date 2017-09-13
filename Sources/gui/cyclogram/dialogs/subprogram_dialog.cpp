@@ -26,7 +26,8 @@ namespace
 
 SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclogram> callingCyclogram, QWidget* mainWindow, QSharedPointer<Clipboard> clipboard):
     QDialog(mainWindow),
-    mCommand(command)
+    mCommand(command),
+    mForceSaveAs(false)
 {
     connect(mCommand, SIGNAL(cyclogramChanged()), this, SLOT(reload()));
 
@@ -48,12 +49,14 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     QHBoxLayout* buttonLayout = new QHBoxLayout();
     layout->addLayout(buttonLayout);
 
+    QPushButton* saveAsBtn = new QPushButton(QIcon(":/resources/images/save"), tr("Save as..."), this);
     mSaveBtn = new QPushButton(QIcon(":/resources/images/save"), tr("Save"), this);
     mVariablesBtn = new QPushButton(QIcon(":/resources/images/variable"), tr("Variables"), this);
     mChartBtn = new QPushButton(QIcon(":/resources/images/monitor_auto"), tr("Chart"), this);
     mDeleteBtn = new QPushButton(QIcon(":/resources/images/delete_all"), tr("Delete"), this);
     mSettingsBtn = new QPushButton(QIcon(":/resources/images/settings"), tr("Settings"), this);
 
+    connect(saveAsBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveAsClick()));
     connect(mSaveBtn, SIGNAL(clicked(bool)), this, SLOT(onSaveClick()));
     connect(mVariablesBtn, SIGNAL(clicked(bool)), this, SLOT(onVariablesClick()));
     connect(mChartBtn, SIGNAL(clicked(bool)), this, SLOT(onChartClick()));
@@ -65,6 +68,7 @@ SubProgramDialog::SubProgramDialog(CmdSubProgram* command, QSharedPointer<Cyclog
     connect(mCyclogramWidget, SIGNAL(selectionChanged(ShapeItem*)), this, SLOT(onCyclogramSelectionChanged(ShapeItem*)));
 
     buttonLayout->addWidget(mSaveBtn);
+    buttonLayout->addWidget(saveAsBtn);
     buttonLayout->addWidget(mVariablesBtn);
     buttonLayout->addWidget(mChartBtn);
     buttonLayout->addWidget(mDeleteBtn);
@@ -93,11 +97,18 @@ SubProgramDialog::~SubProgramDialog()
 
 }
 
+void SubProgramDialog::onSaveAsClick()
+{
+    mForceSaveAs = true;
+    onSaveClick();
+    mForceSaveAs = false;
+}
+
 bool SubProgramDialog::onSaveClick()
 {
     QString fileName;
 
-    if (mCommand->filePath().isEmpty())
+    if (mCommand->filePath().isEmpty() || mForceSaveAs)
     {
         fileName = QFileDialog::getSaveFileName(this, tr("Save cyclogram file"), Cyclogram::defaultStorePath(), tr("OKB5 Cyclogram Files (*%1)").arg(AppSettings::extension()));
 
@@ -131,7 +142,7 @@ bool SubProgramDialog::onSaveClick()
 
         mCommand->cyclogram()->setModified(false, true, false);
 
-        if (mCommand->filePath().isEmpty())
+        if (mCommand->filePath().isEmpty() || mForceSaveAs)
         {
             QStringList tokens = fileName.split(Cyclogram::defaultStorePath());
 

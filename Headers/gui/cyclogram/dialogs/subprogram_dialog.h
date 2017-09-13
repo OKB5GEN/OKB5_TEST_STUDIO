@@ -37,6 +37,7 @@ protected:
 
 private slots:
     bool onSaveClick();
+    void onSaveAsClick();
     void onVariablesClick();
     void onChartClick();
     void onCyclogramSettingsClick();
@@ -64,6 +65,7 @@ private:
     QPushButton* mSettingsBtn;
 
     QWeakPointer<Cyclogram> mCallingCyclogram;
+    bool mForceSaveAs;
 };
 
 #endif // SUBPROGRAM_DIALOG_H

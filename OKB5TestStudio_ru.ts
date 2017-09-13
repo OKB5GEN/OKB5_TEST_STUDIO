@@ -2740,59 +2740,64 @@ Line %2, column %3</source>
 <context>
     <name>SubProgramDialog</name>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="51"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="52"/>
+        <source>Save as...</source>
+        <translation>Сохранить как...</translation>
+    </message>
+    <message>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="53"/>
         <source>Save</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="52"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="54"/>
         <source>Variables</source>
         <translation>Переменные</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="55"/>
         <source>Chart</source>
         <translation>График</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="54"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="56"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="55"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="57"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="102"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="113"/>
         <source>Save cyclogram file</source>
         <translation>Сохранить циклограмму в файл</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="102"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="113"/>
         <source>OKB5 Cyclogram Files (*%1)</source>
         <translation>OKB5 Cyclogram Files (*%1)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="119"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="130"/>
         <source>OKB5 Test Studio</source>
         <translation>OKB5 Test Studio</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="120"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="131"/>
         <source>Cannot write file %1:
 %2.</source>
         <translation>Невозможна запись в файл %1:
 %2.</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="286"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="297"/>
         <source>Subprogram window close</source>
         <translation>Закрытие окна подпрограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="287"/>
+        <location filename="Sources/gui/cyclogram/dialogs/subprogram_dialog.cpp" line="298"/>
         <source>The cyclogram has been modified.
 Do you want to save your changes?</source>
         <translation>Циклограмма изменена.
