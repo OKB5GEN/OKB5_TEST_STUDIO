@@ -621,7 +621,15 @@ void CmdActionModuleEditDialog::onCommandChanged(int index)
         else
         {
             QString defaultParamName = system->paramData(SystemState::ParamID(*it)).variable;
-            QString defaultVarName = CmdActionModule::moduleName(mModuleID, false) + "_" + defaultParamName;
+            QString prefix = CmdActionModule::moduleName(mModuleID, false) + "_" + defaultParamName;
+            QString defaultVarName = prefix;
+
+            int i = 1;
+            while (mCommand->variableController()->isVariableExist(defaultVarName))
+            {
+                defaultVarName = prefix + QString::number(i);
+                ++i;
+            }
 
             comboBox->addItem(defaultVarName);
             comboBox->addItem(TextEditDialog::addVarText());
