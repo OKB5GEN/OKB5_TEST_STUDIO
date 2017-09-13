@@ -219,7 +219,7 @@ void VariablesWindow::onAccept()
         if (v.validate(varName, pos) != QValidator::Acceptable)
         {
             QMessageBox::warning(this, tr("Invalid variable name"), tr("Invalid '%1' variable name\n"
-                                                                       "Name must start from latin letter and contain only alphanumeric or '_' characters").arg(varName));
+                                                                       "Name must contain only alphanumeric or '_' characters").arg(varName));
             return;
         }
 

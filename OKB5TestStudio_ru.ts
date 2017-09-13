@@ -280,12 +280,12 @@
         <translation>Операнд 2</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="268"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="270"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="268"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_math_edit_dialog.cpp" line="270"/>
         <source>Division by zero detected!</source>
         <translation>Обнаружено деление на 0!</translation>
     </message>
@@ -1310,7 +1310,7 @@
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="72"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="83"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
@@ -1320,7 +1320,7 @@
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="82"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_action_module_edit_dialog.cpp" line="81"/>
         <source>Out param</source>
         <translation>Выходной параметр</translation>
     </message>
@@ -1520,12 +1520,12 @@
         <translation>Редактирование имени ветки</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.cpp" line="55"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.cpp" line="53"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_state_start_edit_dialog.cpp" line="55"/>
         <source>Branch with such name already exist!
 Try another name</source>
         <translation>Ветка с таким именем уже существует!
@@ -1535,7 +1535,7 @@ Try another name</source>
 <context>
     <name>CmdSubProgram</name>
     <message>
-        <location filename="Sources/logic/commands/cmd_sub_program.cpp" line="135"/>
+        <location filename="Sources/logic/commands/cmd_sub_program.cpp" line="134"/>
         <source>Subprogram not loaded</source>
         <translation>Подпрограмма не загружена</translation>
     </message>
@@ -1574,7 +1574,7 @@ Try another name</source>
     </message>
     <message>
         <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="53"/>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="517"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="519"/>
         <source>Show extended settings</source>
         <translation>Показать расширенные настройки</translation>
     </message>
@@ -1617,22 +1617,22 @@ Try another name</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="152"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="154"/>
         <source>Incorrect input</source>
         <translation>Неверное имя</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="152"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="154"/>
         <source>Subprogram name must not be empty!</source>
         <translation>Имя подпрограммы не должно быть пустым!</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="252"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="254"/>
         <source>OKB5 Cyclogram Files (*%1)</source>
         <translation>OKB5 Cyclogram Files (*%1)</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="517"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="519"/>
         <source>Hide extended settings</source>
         <translation>Спрятать расширенные настройки</translation>
     </message>
@@ -1661,7 +1661,7 @@ Try another name</source>
         <translation type="vanished">Вых.Переменная</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="252"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cmd_subprogram_edit_dialog.cpp" line="254"/>
         <source>Open cyclogram file</source>
         <translation>Открыть файл циклограммы</translation>
     </message>
@@ -1830,7 +1830,7 @@ Try another name</source>
     </message>
     <message>
         <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="78"/>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="244"/>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="246"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
@@ -1845,7 +1845,7 @@ Try another name</source>
         <translation>Основная циклограмма</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="240"/>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="242"/>
         <source>Time, s</source>
         <translation>Время, с</translation>
     </message>
@@ -1940,12 +1940,12 @@ Try another name</source>
         <translation>Настройки циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="119"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="121"/>
         <source>Open cyclogram file</source>
         <translation>Открыть файл циклограммы</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="119"/>
+        <location filename="Sources/gui/cyclogram/dialogs/cyclogram_settings_dialog.cpp" line="121"/>
         <source>OKB5 Cyclogram Files (*%1)</source>
         <translation>OKB5 Cyclogram Files (*%1)</translation>
     </message>
@@ -2507,25 +2507,25 @@ Do you still want to save this file?</source>
         <translation type="vanished">Неверная версия файла циклограммы.</translation>
     </message>
     <message>
-        <location filename="Sources/file_reader.cpp" line="62"/>
+        <location filename="Sources/file_reader.cpp" line="56"/>
         <source>Incompatible cyclogram file version %1. Current application version is %2.</source>
         <translation>Несовместимые версии. Версия файла %1. Версия циклограммы %2.</translation>
     </message>
     <message>
-        <location filename="Sources/file_reader.cpp" line="67"/>
+        <location filename="Sources/file_reader.cpp" line="61"/>
         <source>The file is not an cyclogram file.</source>
         <translation>Файл не является файлом циклограммы.</translation>
     </message>
     <message>
-        <location filename="Sources/file_reader.cpp" line="76"/>
-        <location filename="Sources/system/system_state.cpp" line="117"/>
+        <location filename="Sources/file_reader.cpp" line="70"/>
+        <location filename="Sources/system/system_state.cpp" line="116"/>
         <source>%1
 Line %2, column %3</source>
         <translation>%1
 Строка %2, столбец %3</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="111"/>
+        <location filename="Sources/system/system_state.cpp" line="110"/>
         <source>The file is not an system_config version 1.0 file.</source>
         <translation>Неверная версия файла system_config.</translation>
     </message>
@@ -2802,32 +2802,32 @@ Do you want to save your changes?</source>
 <context>
     <name>SystemState</name>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="827"/>
+        <location filename="Sources/system/system_state.cpp" line="826"/>
         <source>Voltage, V</source>
         <translation>Напряжение, В </translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="828"/>
+        <location filename="Sources/system/system_state.cpp" line="827"/>
         <source>Current, A</source>
         <translation>Ток, А</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="829"/>
+        <location filename="Sources/system/system_state.cpp" line="828"/>
         <source>Temperature, °C</source>
         <translation>Температура , °C</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="830"/>
+        <location filename="Sources/system/system_state.cpp" line="829"/>
         <source>Mode</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="831"/>
+        <location filename="Sources/system/system_state.cpp" line="830"/>
         <source>Steps</source>
         <translation>Шаги</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="832"/>
+        <location filename="Sources/system/system_state.cpp" line="831"/>
         <source>Velocity</source>
         <translation>Скорость</translation>
     </message>
@@ -2872,217 +2872,217 @@ Do you want to save your changes?</source>
         <translation type="vanished">Угол (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="845"/>
+        <location filename="Sources/system/system_state.cpp" line="844"/>
         <source>Power, W</source>
         <translation>Мощность, Вт</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="852"/>
+        <location filename="Sources/system/system_state.cpp" line="851"/>
         <source>Module address</source>
         <translation>Адрес модуля</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="843"/>
+        <location filename="Sources/system/system_state.cpp" line="842"/>
         <source>Temperature sensor presense flag</source>
         <translation>Флаг наличия температурного датчика</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="846"/>
+        <location filename="Sources/system/system_state.cpp" line="845"/>
         <source>Pysical module status. 1 - active, 0 - inactive</source>
         <translation>Физический статус модуля. 1 - активен, 0 - неактивен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="847"/>
+        <location filename="Sources/system/system_state.cpp" line="846"/>
         <source>Logical module status. 1 - enabled, 0 - disabled</source>
         <translation>Логический статус модуля. 1 - активен, 0 - неактивен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="844"/>
+        <location filename="Sources/system/system_state.cpp" line="843"/>
         <source>Device Class</source>
         <translation>Класс устройства</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="833"/>
+        <location filename="Sources/system/system_state.cpp" line="832"/>
         <source>Mode (ψ)</source>
         <translation>Режим (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="834"/>
+        <location filename="Sources/system/system_state.cpp" line="833"/>
         <source>Steps (ψ)</source>
         <translation>Шаги (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="835"/>
+        <location filename="Sources/system/system_state.cpp" line="834"/>
         <source>Velocity (ψ)</source>
         <translation>Макс.скорость (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="836"/>
+        <location filename="Sources/system/system_state.cpp" line="835"/>
         <source>Max current (ψ)</source>
         <translation>Макс.ток (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="837"/>
+        <location filename="Sources/system/system_state.cpp" line="836"/>
         <source>Angle (ψ)</source>
         <translation>Угол (ψ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="838"/>
+        <location filename="Sources/system/system_state.cpp" line="837"/>
         <source>Mode (υ)</source>
         <translation>Режим (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="839"/>
+        <location filename="Sources/system/system_state.cpp" line="838"/>
         <source>Steps (υ)</source>
         <translation>Шаги (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="840"/>
+        <location filename="Sources/system/system_state.cpp" line="839"/>
         <source>Velocity (υ)</source>
         <translation>Макс.скорость (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="841"/>
+        <location filename="Sources/system/system_state.cpp" line="840"/>
         <source>Max current (υ)</source>
         <translation>Макс.ток (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="842"/>
+        <location filename="Sources/system/system_state.cpp" line="841"/>
         <source>Angle (υ)</source>
         <translation>Угол (υ)</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="843"/>
+        <location filename="Sources/system/system_state.cpp" line="842"/>
         <source>Temp.Sensor Flag</source>
         <translation>Флаг темп.сенсора</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="844"/>
+        <location filename="Sources/system/system_state.cpp" line="843"/>
         <source>Device class</source>
         <translation>Класс устройства</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="846"/>
+        <location filename="Sources/system/system_state.cpp" line="845"/>
         <source>Phys.status</source>
         <translation>Физ.статус</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="847"/>
+        <location filename="Sources/system/system_state.cpp" line="846"/>
         <source>Logic.status</source>
         <translation>Лог.статус</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="848"/>
+        <location filename="Sources/system/system_state.cpp" line="847"/>
         <source>Subaddress</source>
         <translation>Подадрес</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="849"/>
+        <location filename="Sources/system/system_state.cpp" line="848"/>
         <source>Power State</source>
         <translation>Состояние питания</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="849"/>
+        <location filename="Sources/system/system_state.cpp" line="848"/>
         <source>Power state</source>
         <translation>Состояние питания</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="850"/>
+        <location filename="Sources/system/system_state.cpp" line="849"/>
         <source>Channel</source>
         <translation>Канал</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="851"/>
+        <location filename="Sources/system/system_state.cpp" line="850"/>
         <source>Relay state. 1 - on, 0 - off</source>
         <translation>Состояние реле. 1 - замкнуто, 0 - разомкнуто</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="851"/>
+        <location filename="Sources/system/system_state.cpp" line="850"/>
         <source>Relay state</source>
         <translation>Состояние реле</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="853"/>
+        <location filename="Sources/system/system_state.cpp" line="852"/>
         <source>Module ready flag. 1 - ready, 0 - not ready</source>
         <translation>Флаг готовности модуля к работе. 1 - готов, 0 - не готов</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="853"/>
+        <location filename="Sources/system/system_state.cpp" line="852"/>
         <source>Module ready flag</source>
         <translation>Флаг &apos;Готов к работе&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="854"/>
+        <location filename="Sources/system/system_state.cpp" line="853"/>
         <source>Module is after reset flag. 1 - after reset, 0 - not after reset</source>
         <translation>Флаг состояние &quot;после перезагрузки&quot;. 1 - модуль после перезагрузки, 0 - модуль не после перезагрузки</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="854"/>
+        <location filename="Sources/system/system_state.cpp" line="853"/>
         <source>Module after reset flag</source>
         <translation>Флаг &apos;после сброса&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="855"/>
+        <location filename="Sources/system/system_state.cpp" line="854"/>
         <source>Module error flag. 1 - module has errors, 0 - module has no errors</source>
         <translation>Флаг наличия ошибок в модуле. 1 - есть ошибки, 0 - нет ошибок</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="855"/>
+        <location filename="Sources/system/system_state.cpp" line="854"/>
         <source>Module has errors flag</source>
         <translation>Флаг &apos;ошибки&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="856"/>
+        <location filename="Sources/system/system_state.cpp" line="855"/>
         <source>Fuse index</source>
         <translation>Порядковый номер предохранителя</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="856"/>
+        <location filename="Sources/system/system_state.cpp" line="855"/>
         <source>Fuse id</source>
         <translation>ID предохранителя</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="857"/>
+        <location filename="Sources/system/system_state.cpp" line="856"/>
         <source>Fuse state: 0 - fuse OK, 1 - fuse malfunction</source>
         <translation>Состояние предохранителя: 0 - исправен, 1 - неисправен</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="859"/>
+        <location filename="Sources/system/system_state.cpp" line="858"/>
         <source>Sensors count</source>
         <translation>Количество датчиков</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="850"/>
+        <location filename="Sources/system/system_state.cpp" line="849"/>
         <source>Telemetry channel index</source>
         <translation>Номер канала телеметрии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="857"/>
+        <location filename="Sources/system/system_state.cpp" line="856"/>
         <source>Fuse state</source>
         <translation>Состояние предохранителя</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="858"/>
+        <location filename="Sources/system/system_state.cpp" line="857"/>
         <source>DS1820 sensor number in the line</source>
         <translation>Порядковый номер датчика DS1820 на линии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="858"/>
+        <location filename="Sources/system/system_state.cpp" line="857"/>
         <source>Sensor number</source>
         <translation>Номер датчика</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="859"/>
+        <location filename="Sources/system/system_state.cpp" line="858"/>
         <source>DS1820 sensors count at the line</source>
         <translation>Количество датчиков DS1820 на линии</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="157"/>
+        <location filename="Sources/system/system_state.cpp" line="156"/>
         <source>EMULATOR</source>
         <translation>ЭМУЛЯТОР КПА</translation>
     </message>
     <message>
-        <location filename="Sources/system/system_state.cpp" line="157"/>
+        <location filename="Sources/system/system_state.cpp" line="156"/>
         <source>DEVICE</source>
         <translation>КПА</translation>
     </message>
@@ -3190,30 +3190,36 @@ Do you want to save your changes?</source>
         <translation>Переменные</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="217"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="221"/>
         <source>Invalid variable name</source>
         <translation>Неправильное имя переменной</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="217"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="221"/>
+        <source>Invalid &apos;%1&apos; variable name
+Name must contain only alphanumeric or &apos;_&apos; characters</source>
+        <translation>Невалидное имя переменной &apos;%1&apos;
+Имя переменной может содержать только буквы, цифры и знаки &apos;_&apos;</translation>
+    </message>
+    <message>
         <source>Invalid &apos;%1&apos; variable name
 Name must start from latin letter and contain only alphanumeric or &apos;_&apos; characters</source>
-        <translation>Неверное имя переменной &apos;%1&apos;
+        <translation type="vanished">Неверное имя переменной &apos;%1&apos;
 Имя должно начинаться с латинской буквы и может содержать только буквенно-цифровые символы или знаки &apos;_&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="368"/>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="380"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="372"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="384"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="368"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="372"/>
         <source>Variable &apos;%1&apos; already exist</source>
         <translation>Переменная &apos;%1&apos; уже существует</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="380"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="384"/>
         <source>Incorrect variable value</source>
         <translation>Неправильное значение переменной</translation>
     </message>

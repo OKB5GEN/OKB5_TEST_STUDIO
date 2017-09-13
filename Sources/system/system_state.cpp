@@ -27,7 +27,6 @@ namespace
         if (!file.open(QFile::ReadOnly | QFile::Text))
         {
             LOG_FATAL(QString("No system_config.xml found"));
-            //QMessageBox::warning(this, tr("OKB5 Test Studio"), tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
             return false;
         }
 

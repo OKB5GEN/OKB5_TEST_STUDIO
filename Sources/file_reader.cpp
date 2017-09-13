@@ -14,7 +14,6 @@
 #include "Headers/gui/editor_window.h"
 
 #include <QMetaEnum>
-#include <QMessageBox>
 #include <QFile>
 #include <QCryptographicHash>
 
@@ -45,11 +44,6 @@ bool FileReader::read(QIODevice *device)
                 // If file format change requred for hotfix, minor and/or major versions have to be increased
                 if (appVersion.major() == fileVersion.major() && appVersion.minor() < fileVersion.minor())
                 {
-//                    QMessageBox::warning(EditorWindow::instance(),
-//                                         QObject::tr("File version mismatch"),
-//                                         QObject::tr("Application version (%1) is lower than file version (%2).\n Some file data can be lost if you change and save this file.\n Application update is recommended")
-//                                         .arg(appVersion.toString())
-//                                         .arg(fileVersion.toString()));
                     LOG_WARNING(QString("Application version (%1) is lower than file version (%2).\n Some file data can be lost if you change and save this file.\n Application update is recommended")
                                                                          .arg(appVersion.toString())
                                                                          .arg(fileVersion.toString()));

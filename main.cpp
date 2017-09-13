@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QTranslator>
+#include <QLibraryInfo>
 
 #include "Headers/gui/editor_window.h"
 #include "Headers/app_settings.h"
@@ -96,8 +97,17 @@ int main(int argc, char *argv[])
 
     //TODO localization on (maybe from command line) as "-l ru -f file_name" for example, guess parser.addPositionalArgument() must be used
     QTranslator translator;
-    translator.load("OKB5TestStudio_ru", ":/resources/translations");
-    app.installTranslator(&translator);
+    if (translator.load("OKB5TestStudio_ru", ":/resources/translations"))
+    {
+        app.installTranslator(&translator);
+    }
+
+    // Qt strings localization
+    QTranslator qtBaseTranslator;
+    if (qtBaseTranslator.load("qtbase_ru", QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+    {
+        app.installTranslator(&qtBaseTranslator);
+    }
 
     LOG_INFO(QString("========== APPLICATION STARTED =========="));
 

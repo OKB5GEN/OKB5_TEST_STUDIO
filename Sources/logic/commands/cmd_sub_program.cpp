@@ -12,7 +12,6 @@
 #include <QXmlStreamReader>
 #include <QMetaEnum>
 #include <QFileInfo>
-#include <QMessageBox>
 #include <QDir>
 #include <QFileSystemWatcher>
 
