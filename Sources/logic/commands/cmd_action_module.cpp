@@ -513,13 +513,13 @@ QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, cons
         text += tr("Device class");
         break;
     case ModuleCommands::GET_NOMINAL_CURRENT:
-        text += tr("Nominal current");
+        text += tr("Max output current");
         break;
     case ModuleCommands::GET_NOMINAL_VOLTAGE:
-        text += tr("Nominal voltage");
+        text += tr("Max output voltage");
         break;
     case ModuleCommands::GET_NOMINAL_POWER:
-        text += tr("Nominal power");
+        text += tr("Max output power");
         break;
     case ModuleCommands::SET_OVP_THRESHOLD:
     case ModuleCommands::GET_OVP_THRESHOLD:
