@@ -50,7 +50,6 @@ CyclogramWidget::CyclogramWidget(QWidget* parent):
     QWidget(parent),
     mSihlouetteLine(Q_NULLPTR),
     mSihlouetteArrow(Q_NULLPTR),
-    mCurSubprogram(Q_NULLPTR),
     mMainWindow(Q_NULLPTR),
     mParentScrollArea(Q_NULLPTR),
     mSelectedShape(Q_NULLPTR),
@@ -846,15 +845,15 @@ void CyclogramWidget::showContextMenuForCommand(ShapeItem* item, const QPoint& p
     }
 }
 
-void CyclogramWidget::showSubprogramWidget()
+void CyclogramWidget::showSubprogramWidget(CmdSubProgram* subprogram)
 {
-    if (!mCurSubprogram)
+    if (!subprogram)
     {
         LOG_WARNING(QString("Subprogram not set"));
         return;
     }
 
-    if (!mCurSubprogram->loaded())
+    if (!subprogram->loaded())
     {
         LOG_ERROR(QString("Subprogram corrupted. Possibly its cyclogram file corrupted or not accesiible"));
         return;
@@ -864,7 +863,7 @@ void CyclogramWidget::showSubprogramWidget()
 
     EditorWindow* mainWindow = qobject_cast<EditorWindow*>(mMainWindow);
 
-    SubProgramDialog* subProgramDialog = mainWindow->subprogramDialog(mCurSubprogram);
+    SubProgramDialog* subProgramDialog = mainWindow->subprogramDialog(subprogram);
     if (subProgramDialog)
     {
         subProgramDialog->activateWindow();
@@ -872,31 +871,31 @@ void CyclogramWidget::showSubprogramWidget()
     }
     else
     {
-        subProgramDialog = new SubProgramDialog(mCurSubprogram, mCyclogram.lock(), mMainWindow, mClipboard.lock());
-        mainWindow->addSuprogramDialog(mCurSubprogram, subProgramDialog);
+        subProgramDialog = new SubProgramDialog(subprogram, mCyclogram.lock(), mMainWindow, mClipboard.lock());
+        mainWindow->addSuprogramDialog(subprogram, subProgramDialog);
 
         subProgramDialog->cyclogramWidget()->setCurrentCommandType(mCurrentCommandType);
 
-        QString title = updateWindowTitle(subProgramDialog);
+        QString title = updateWindowTitle(subProgramDialog, subprogram);
         subProgramDialog->cyclogramWidget()->setWindowTitle(title);
         subProgramDialog->show();
 
-        connect(mCurSubprogram, SIGNAL(dataChanged(const QString&)), subProgramDialog, SLOT(onCommandTextChanged(const QString&)));
+        connect(subprogram, SIGNAL(dataChanged(const QString&)), subProgramDialog, SLOT(onCommandTextChanged(const QString&)));
         connect(this, SIGNAL(windowTitleChanged(const QString&)), subProgramDialog, SLOT(onParentWindowTitleChanged(const QString&)));
     }
 }
 
-QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
+QString CyclogramWidget::updateWindowTitle(QWidget* dialog, CmdSubProgram* subprogram)
 {
     QString title;
 
-    if (!mCurSubprogram)
+    if (!subprogram)
     {
         LOG_WARNING(QString("Subprogram not set 2"));
         return title;
     }
 
-    if (!mCurSubprogram->loaded())
+    if (!subprogram->loaded())
     {
         LOG_ERROR(QString("Subprogram configuration error 2"));
         return title;
@@ -909,7 +908,7 @@ QString CyclogramWidget::updateWindowTitle(QWidget* dialog)
         title += CyclogramWidget::delimiter();
     }
 
-    title += mCurSubprogram->text();
+    title += subprogram->text();
     title += "[*]";
     dialog->setWindowTitle(title);
 
@@ -1424,8 +1423,6 @@ const ShapeItem* CyclogramWidget::findBranch(const Command* command) const
 
 void CyclogramWidget::clearSelection(bool needUpdate)
 {
-    mCurSubprogram = Q_NULLPTR;
-
     if (!mSelectedShape)
     {
         return;
@@ -1608,8 +1605,8 @@ void CyclogramWidget::showEditDialog(Command *command)
 
     case DRAKON::SUBPROGRAM:
         {
-            mCurSubprogram = qobject_cast<CmdSubProgram*>(command);
-            showSubprogramWidget();
+            CmdSubProgram* subprogram = qobject_cast<CmdSubProgram*>(command);
+            showSubprogramWidget(subprogram);
         }
         break;
 

@@ -63,7 +63,7 @@ private slots:
     void removeShape(Command* command);
     void onNeedUpdate();
     void onNeedToDelete(ShapeItem* shape);
-    void showSubprogramWidget();
+    void showSubprogramWidget(CmdSubProgram* subprogram);
     void onAppSettingsChanged();
 
 private:
@@ -74,7 +74,7 @@ private:
     void setSelectedItem(ShapeItem* item);
 
     void drawSilhouette();
-    QString updateWindowTitle(QWidget* dialog);
+    QString updateWindowTitle(QWidget* dialog, CmdSubProgram* subprogram);
     void updateScale(const QPoint& cursorPos, int numSteps);
 
     void drawCyclogram(ShapeItem* item);
@@ -134,8 +134,6 @@ private:
     ShapeItem* mRootShape;
 
     QWeakPointer<Cyclogram> mCyclogram;
-
-    CmdSubProgram* mCurSubprogram;
 
     QWidget* mMainWindow;
 

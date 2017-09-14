@@ -3,9 +3,7 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
 class QLabel;
-QT_END_NAMESPACE
 
 class CommandErrorDialog: public QDialog
 {
