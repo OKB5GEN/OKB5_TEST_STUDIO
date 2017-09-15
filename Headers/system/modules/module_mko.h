@@ -52,6 +52,13 @@ private slots:
     void stopMKO(bool onAppFinish);
 
 private:
+
+    enum Kit
+    {
+        MAIN_KIT,
+        RESERVE_KIT
+    };
+
     struct AxisData
     {
         int16_t mode;
@@ -119,6 +126,7 @@ private:
 
     void sendLocalMessage(const QString& error = ""); // send response to cyclogram without sending any data to real device
     void updateMKO(KitState& changedKit, bool isOn, const KitState& otherKit);
+    bool selectKit(Kit kit);
 
     uint16_t mWordsToReceive;
     uint16_t mWordsSent;

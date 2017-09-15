@@ -527,7 +527,7 @@ void Cyclogram::setState(State state)
 
     QString text(metaEnum.valueToKey(state));
 
-    LOG_DEBUG(QString("Cyclogram state changed to %1").arg(text));
+    //LOG_DEBUG(QString("Cyclogram state changed to %1").arg(text));
 
     if (state == IDLE)
     {

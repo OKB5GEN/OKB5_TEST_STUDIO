@@ -147,12 +147,7 @@ void ModuleMKO::readResponse()
             if (mSwitchToMainKitAfterResponse)
             {
                 mSwitchToMainKitAfterResponse = false;
-                if (tmkselect(mMainKitState.tmkID) == 0)
-                {
-                    mMainKitState.isSelected = true;
-                    mReserveKitState.isSelected = false;
-                }
-                else
+                if (!selectKit(MAIN_KIT))
                 {
                     mCurrentTransaction.error = QString("Main MKO kit not selected after angle sensor power on via the reserve kit");
                 }
@@ -440,7 +435,7 @@ void ModuleMKO::startMKO()
     mReserveKitState.isReady = true; // Reserve kit is ready to send and receive messages
 
     // 7. Select main kit as current device
-    if (!mMainKitState.isSelected && tmkselect(mMainKitState.tmkID) != 0)
+    if (!mMainKitState.isSelected && !selectKit(MAIN_KIT))
     {
         sendLocalMessage(QString("TMK main kit device (%1) not selected").arg(mMainKitState.tmkID));
         return;
@@ -747,14 +742,10 @@ QString ModuleMKO::prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerS
             return QString("Trying to send angle sensor power supply command to deenergized main kit");
         }
 
-        if (tmkselect(mMainKitState.tmkID) != 0)
+        if (!selectKit(MAIN_KIT))
         {
             return QString("Could not select main MKO kit");
         }
-
-        // main MKO kit selected, now we can send command
-        mMainKitState.isSelected = true;
-        mReserveKitState.isSelected = false;
     }
     else if (source == PS_FROM_RESERVE_KIT)
     {
@@ -775,14 +766,12 @@ QString ModuleMKO::prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerS
             return QString("Trying to send angle sensor power supply command to deenergized reserve kit");
         }
 
-        if (tmkselect(mReserveKitState.tmkID) != 0)
+        if (!selectKit(RESERVE_KIT))
         {
             return QString("Could not select reserve MKO kit");
         }
 
-        mMainKitState.isSelected = false;
-        mReserveKitState.isSelected = true;
-        mSwitchToMainKitAfterResponse = true; // set flag that we need to switch back to main MKO kit after response receive
+        mSwitchToMainKitAfterResponse = true; // set flag that we need to switch back to main MKO kit after response receive (if it was selected)
     }
     else
     {
@@ -847,22 +836,22 @@ QString ModuleMKO::canSendRequest(const Transaction& request) const
 
     if (mMainKitState.isSelected && !mMainKitState.isOnBUPKit)
     {
-        return QString("MKO internal main kit logic error 1");
+        return QString("MKO internal main kit logic error: kit selected, but BUP kit power supply is OFF");
     }
 
     if (!mMainKitState.isSelected && mMainKitState.isOnBUPKit)
     {
-        return QString("MKO internal main kit logic error 2");
+        return QString("MKO internal main kit logic error: kit not selected, but BUP kit power supply is ON");
     }
 
     if (mReserveKitState.isSelected && !mReserveKitState.isOnBUPKit)
     {
-        return QString("MKO internal reserve kit logic error 1");
+        return QString("MKO internal reserve kit logic error: kit selected, but BUP kit power supply is OFF");
     }
 
     if (!mReserveKitState.isSelected && mReserveKitState.isOnBUPKit)
     {
-        return QString("MKO internal reserve kit logic error 2");
+        return QString("MKO internal reserve kit logic error: kit not selected, but BUP kit power supply is ON");
     }
 
     return "";
@@ -1069,36 +1058,18 @@ void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID ch
         {
             mMainKitState.isOnBUPKit = (state != 0);
 
-            if (mTMKOpened && isPhysicallyActive())
+            if (!mTMKOpened || !isPhysicallyActive())
             {
-                if (mMainKitState.isOnBUPKit) // if main BUP kit become enabled, switch MKO to it
-                {
-                    if (tmkselect(mMainKitState.tmkID) == 0)
-                    {
-                        mMainKitState.isSelected = true;
-                    }
-                    else
-                    {
-                        LOG_ERROR(QString("MKO main kit not selected"));
-                        mMainKitState.isSelected = false;
-                    }
+                return;
+            }
 
-                    mReserveKitState.isSelected = false;
-                }
-                else if (mReserveKitState.isOnBUPKit)  // if main BUP kit become disabled and BUP reserve kit is still enable
-                {
-                    if (tmkselect(mReserveKitState.tmkID) == 0)
-                    {
-                        mReserveKitState.isSelected = true;
-                    }
-                    else
-                    {
-                        LOG_ERROR(QString("MKO reserve kit not selected 1"));
-                        mReserveKitState.isSelected = false;
-                    }
-
-                    mMainKitState.isSelected = false;
-                }
+            if (mMainKitState.isOnBUPKit) // if main BUP kit become enabled, switch MKO to it
+            {
+                selectKit(MAIN_KIT);
+            }
+            else if (mReserveKitState.isOnBUPKit)  // if main BUP kit become disabled and BUP reserve kit is still enable
+            {
+                selectKit(RESERVE_KIT);
             }
         }
         break;
@@ -1106,31 +1077,18 @@ void ModuleMKO::onPowerRelayStateChanged(ModuleCommands::PowerSupplyChannelID ch
         {
             mReserveKitState.isOnBUPKit = (state != 0);
 
-            if (mTMKOpened && isPhysicallyActive())
+            LOG_DEBUG(QString("Reserve kit power is %1").arg(state));
+
+            if (!mTMKOpened || !isPhysicallyActive())
             {
-                if (mReserveKitState.isOnBUPKit) // if reserve BUP kit become enabled
-                {
-                    if (!mMainKitState.isOnBUPKit) // if main BUP kit not enabled, switch MKO to reserve kit
-                    {
-                        if (tmkselect(mReserveKitState.tmkID) == 0)
-                        {
-                            mReserveKitState.isSelected = true;
-                        }
-                        else
-                        {
-                            LOG_ERROR(QString("MKO reserve kit not selected 2"));
-                            mReserveKitState.isSelected = false;
-                        }
-                    }
-                    else
-                    {
-                        mReserveKitState.isSelected = false;
-                    }
-                }
-                else
-                {
-                    mReserveKitState.isSelected = false;
-                }
+                return;
+            }
+
+            mReserveKitState.isSelected = false;
+
+            if (mReserveKitState.isOnBUPKit && !mMainKitState.isOnBUPKit) // if reserve BUP kit become enabled and main BUP kit not enabled, switch MKO to reserve kit
+            {
+                selectKit(RESERVE_KIT);
             }
         }
         break;
@@ -1219,4 +1177,40 @@ void ModuleMKO::onPowerMKORelayStateChanged(ModuleCommands::MKOPowerSupplyChanne
     default:
         break;
     }
+}
+
+bool ModuleMKO::selectKit(ModuleMKO::Kit kit)
+{
+    if (kit == ModuleMKO::MAIN_KIT)
+    {
+        if (tmkselect(mMainKitState.tmkID) == 0)
+        {
+            mReserveKitState.isSelected = false;
+            mMainKitState.isSelected = true;
+            return true;
+        }
+        else
+        {
+            LOG_ERROR(QString("MKO main kit not selected!"));
+        }
+    }
+    else if (kit == ModuleMKO::RESERVE_KIT)
+    {
+        if (tmkselect(mReserveKitState.tmkID) == 0)
+        {
+            mReserveKitState.isSelected = true;
+            mMainKitState.isSelected = false;
+            return true;
+        }
+        else
+        {
+            LOG_ERROR(QString("MKO reserve kit not selected!"));
+        }
+    }
+
+    LOG_ERROR(QString("Tmk select failed!"));
+
+    mReserveKitState.isSelected = false;
+    mMainKitState.isSelected = false;
+    return false;
 }
