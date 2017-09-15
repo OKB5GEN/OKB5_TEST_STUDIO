@@ -28,6 +28,7 @@ private slots:
     void onVariableValueChanged(const QString& name, qreal value);
     void onVariableNameChanged(const QString& newName, const QString& oldName);
     void onVariableRemoved(const QString& name);
+    void onVariableAdded(const QString& name, qreal value);
     void onCyclogramStateChanged(int state);
 
     void onCellDoubleClicked(int row, int column);

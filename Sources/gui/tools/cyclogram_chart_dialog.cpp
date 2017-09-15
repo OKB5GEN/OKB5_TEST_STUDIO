@@ -121,6 +121,7 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
         disconnect(vc, SIGNAL(currentValueChanged(const QString&, qreal)), this, SLOT(onVariableValueChanged(const QString&, qreal)));
         disconnect(vc, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onVariableNameChanged(const QString&, const QString&)));
         disconnect(vc, SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)));
+        disconnect(vc, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(onVariableAdded(const QString&, qreal)));
         disconnect(mCyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
     }
 
@@ -132,10 +133,12 @@ void CyclogramChartDialog::setCyclogram(QSharedPointer<Cyclogram> cyclogram)
     mPlot->legend->setVisible(false);
     mPlot->replot();
 
+    VariableController* vc =  cyclogram->variableController();
     connect(cyclogram.data(), SIGNAL(stateChanged(int)), this, SLOT(onCyclogramStateChanged(int)));
     connect(cyclogram.data(), SIGNAL(destroyed(QObject*)), this, SLOT(close()));
-    connect(cyclogram->variableController(), SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onVariableNameChanged(const QString&, const QString&)));
-    connect(cyclogram->variableController(), SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)));
+    connect(vc, SIGNAL(nameChanged(const QString&, const QString&)), this, SLOT(onVariableNameChanged(const QString&, const QString&)));
+    connect(vc, SIGNAL(variableRemoved(const QString&)), this, SLOT(onVariableRemoved(const QString&)));
+    connect(vc, SIGNAL(variableAdded(const QString&, qreal)), this, SLOT(onVariableAdded(const QString&, qreal)));
 
     if (cyclogram->state() == Cyclogram::RUNNING) //TODO "hot" graphs adding
     {
@@ -337,7 +340,6 @@ void CyclogramChartDialog::onAddClicked()
 
     //mVariablesTable->sortByColumn(0);
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
-    mVariablesTable->resizeColumnsToContents();
 }
 
 void CyclogramChartDialog::keyPressEvent(QKeyEvent *event)
@@ -400,7 +402,6 @@ void CyclogramChartDialog::onRemoveClicked()
     }
 
     mAddBtn->setEnabled(mVariablesTable->rowCount() < vc->variablesData().size());
-    mVariablesTable->resizeColumnsToContents();
 }
 
 void CyclogramChartDialog::onMoveUpClicked()
@@ -500,6 +501,11 @@ void CyclogramChartDialog::onVariableRemoved(const QString& name)
             return;
         }
     }
+}
+
+void CyclogramChartDialog::onVariableAdded(const QString& name, qreal value)
+{
+    mAddBtn->setEnabled(true);
 }
 
 void CyclogramChartDialog::removeVariableGraph(const QString& name)
