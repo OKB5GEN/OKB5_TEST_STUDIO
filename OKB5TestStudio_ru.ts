@@ -298,387 +298,387 @@
         <translation>Неуспешное выполнение команды &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="134"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="190"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="135"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="192"/>
         <source>Invalid cmd</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="171"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="173"/>
         <source> ON</source>
         <translation>ВКЛ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="175"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="177"/>
         <source> OFF</source>
         <translation>ВЫКЛ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="309"/>
         <source>DCU power unit module</source>
         <translation>Модуль питания БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="310"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="309"/>
         <source>PU1</source>
         <translation>БП1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="312"/>
         <source>DAD power unit module</source>
         <translation>Модуль питания ПНА</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="313"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="312"/>
         <source>PU2</source>
         <translation>БП2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="316"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="315"/>
         <source>Multiplex channel module</source>
         <translation>Мультиплексный канал обмена</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="316"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="315"/>
         <source>MKO</source>
         <translation>МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="319"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="318"/>
         <source>Signalling telemetry module</source>
         <translation>Модуль сигнальной телеметрии</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="319"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="318"/>
         <source>STM</source>
         <translation>СТМ</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="322"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="321"/>
         <source>Temperature sensor control unit</source>
         <translation>Модуль опроса температурных датчиков</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="322"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="321"/>
         <source>OTD</source>
         <translation>ОТД</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="325"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="324"/>
         <source>Drive simulator unit</source>
         <translation>Имитатор привода</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="325"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="324"/>
         <source>DS</source>
         <translation>ИП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="328"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="327"/>
         <source>Technological module</source>
         <translation>Технологический модуль</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="328"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="327"/>
         <source>Tech</source>
         <translation>Тех</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="346"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="383"/>
         <source>Module status</source>
         <translation>Статус модуля</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="349"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="386"/>
         <source>Logical status</source>
         <translation>Логический статус</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="358"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="395"/>
         <source>DCU main kit power</source>
         <translation>Питание осн. компл. БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="361"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="398"/>
         <source>DCU reserve kit power</source>
         <translation>Питание рез. компл. БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="364"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="401"/>
         <source>DAD heaters line 1 power</source>
         <translation>Питание нагревателей ПНА на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="367"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="404"/>
         <source>DAD heaters line 2 power</source>
         <translation>Питание нагревателей ПНА на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="370"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="599"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="407"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="636"/>
         <source>DCU power supply</source>
         <translation>Силовое питание БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="385"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="422"/>
         <source>MKO main kit power supply</source>
         <translation>Питание осн.компл.МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="388"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="425"/>
         <source>MKO reserve kit power supply</source>
         <translation>Питание рез.компл.МКО</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="396"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="433"/>
         <source>Fuse state</source>
         <translation>Состояние предохр</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="399"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="436"/>
         <source>Channel telemetry</source>
         <translation>Телеметрия по каналу</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="404"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="441"/>
         <source>Temperature PT-100 #%1</source>
         <translation>Температура ПТ-100 #%1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="409"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="446"/>
         <source>Temperature DS1820</source>
         <translation>Температура DS1820</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="412"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="424"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="436"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="632"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="449"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="461"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="473"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="669"/>
         <source> (line 1)</source>
         <translation> (линия 1)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="417"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="454"/>
         <source>Temperature DS1820 (line 2)</source>
         <translation>Температура DS1820 (линия 2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="421"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="458"/>
         <source>DS1820 count</source>
         <translation>Количество DS1820</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="429"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="466"/>
         <source>DS1820 count (line 2)</source>
         <translation>Количество DS1820 (линия 2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="433"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="470"/>
         <source>Start DS1820 measurement</source>
         <translation>Запуск измерений DS1820</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="441"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="478"/>
         <source>Start DS1820 measurement (line 2)</source>
         <translation>Запуск измерений DS1820 (линия 2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="444"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="481"/>
         <source>Voltage (max power)</source>
         <translation>Напряжение (макс. мощность)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="447"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="484"/>
         <source>Voltage and current</source>
         <translation>Напряжение и ток</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="452"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="489"/>
         <source>Test array</source>
         <translation>Тестовый массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="458"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="495"/>
         <source>Command array</source>
         <translation>Командный массив</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="469"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="506"/>
         <source>Test</source>
         <translation>Тест</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="473"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="510"/>
         <source>Command</source>
         <translation>Комманда</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="487"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="524"/>
         <source>%1 array (line %2)</source>
         <translation>%1 массив (линия %2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="496"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="567"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="533"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="604"/>
         <source>main</source>
         <translation>основной</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="500"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="570"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="537"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="607"/>
         <source>reserve</source>
         <translation>резервный</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="503"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="540"/>
         <source>Angle sensor power supply via %1 kit</source>
         <translation>Подача питания на ДУ через %1 комплект</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="507"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="544"/>
         <source>Enable</source>
         <translation>Подключить</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="510"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="547"/>
         <source>Disable</source>
         <translation>Отключить</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="513"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="550"/>
         <source>Device class</source>
         <translation>Класс устройства</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="516"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="553"/>
         <source>Max output current</source>
         <oldsource>Nominal current</oldsource>
         <translation>Макс. выходной ток</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="519"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="556"/>
         <source>Max output voltage</source>
         <oldsource>Nominal voltage</oldsource>
         <translation>Макс. выходное напряжение</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="522"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="559"/>
         <source>Max output power</source>
         <oldsource>Nominal power</oldsource>
         <translation>Макс. выходная мощность</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="526"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="563"/>
         <source>OVP threshold</source>
         <translation>Напряжение отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="530"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="567"/>
         <source>OCP threshold</source>
         <translation>Ток отсечки</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="533"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="570"/>
         <source>Voltage</source>
         <translation>Напряжение</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="536"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="573"/>
         <source>Current</source>
         <translation>Ток</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="539"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="576"/>
         <source>Power output ON</source>
         <translation>Включить подачу питания</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="542"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="579"/>
         <source>Power output OFF</source>
         <translation>Выключить подачу питания</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="545"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="582"/>
         <source>Acknowledge alarms</source>
         <translation>Сброс ошибок</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="548"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="585"/>
         <source>Remote control ON</source>
         <translation>Вкл. удаленное управление</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="551"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="588"/>
         <source>Manual control ON</source>
         <translation>Вкл. ручное управление</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="554"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="591"/>
         <source>Tracking ON</source>
         <translation>Вкл. трекинг</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="557"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="594"/>
         <source>Tracking OFF</source>
         <translation>Выкл. трекинг</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="577"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="614"/>
         <source>MKO %1 kit power supply state</source>
         <translation>МКО состояние питания комплекта:%1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="587"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="624"/>
         <source>DCU main kit power state</source>
         <translation>Состояние питания осн. компл. БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="590"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="627"/>
         <source>DCU reserve kit power state</source>
         <translation>Состояние питания рез. компл. БУП</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="593"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="630"/>
         <source>DAD heaters line 1 power state</source>
         <translation>Состояние питания нагревателей ПНА на линии 1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="596"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="633"/>
         <source>DAD heaters line 2 power state</source>
         <translation>Состояние питания нагревателей ПНА на линии 2</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="614"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="651"/>
         <source>default</source>
         <translation>по умолчанию</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="617"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="654"/>
         <source>current</source>
         <translation>текущий</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="624"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="661"/>
         <source>Module %1 address</source>
         <translation>Адрес модуля %1</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="629"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="666"/>
         <source>DS1820 reset</source>
         <translation>Сброс DS1820</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="637"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="674"/>
         <source>DS1820 reset (line 2)</source>
         <translation>Сброс DS1820 (линия 2)</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="640"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="677"/>
         <source>Status word</source>
         <translation>Статусное слово</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="643"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="680"/>
         <source>Reset error</source>
         <translation>Сброс ошибок</translation>
     </message>
@@ -1163,9 +1163,9 @@
         <translation type="vanished">МКОРез</translation>
     </message>
     <message>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="573"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="620"/>
-        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="647"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="610"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="657"/>
+        <location filename="Sources/logic/commands/cmd_action_module.cpp" line="684"/>
         <source>UNKNOWN</source>
         <translation>НЕИЗВЕСТНО</translation>
     </message>
@@ -1833,7 +1833,7 @@ Try another name</source>
     </message>
     <message>
         <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="78"/>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="246"/>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="249"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
@@ -1848,7 +1848,7 @@ Try another name</source>
         <translation>Основная циклограмма</translation>
     </message>
     <message>
-        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="242"/>
+        <location filename="Sources/gui/tools/cyclogram_chart_dialog.cpp" line="245"/>
         <source>Time, s</source>
         <translation>Время, с</translation>
     </message>
@@ -3198,15 +3198,21 @@ Do you want to save your changes?</source>
         <translation>Переменные</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="221"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="224"/>
         <source>Invalid variable name</source>
         <translation>Неправильное имя переменной</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="221"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="224"/>
+        <source>Invalid &apos;%1&apos; variable name
+Pattern is &apos;%2&apos;</source>
+        <translation>Некорректное имя переменной &apos;%1&apos;
+Паттерн &apos;%2&apos;</translation>
+    </message>
+    <message>
         <source>Invalid &apos;%1&apos; variable name
 Name must contain only alphanumeric or &apos;_&apos; characters</source>
-        <translation>Невалидное имя переменной &apos;%1&apos;
+        <translation type="vanished">Невалидное имя переменной &apos;%1&apos;
 Имя переменной может содержать только буквы, цифры и знаки &apos;_&apos;</translation>
     </message>
     <message>
@@ -3216,18 +3222,18 @@ Name must start from latin letter and contain only alphanumeric or &apos;_&apos;
 Имя должно начинаться с латинской буквы и может содержать только буквенно-цифровые символы или знаки &apos;_&apos;</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="372"/>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="384"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="375"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="387"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="372"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="375"/>
         <source>Variable &apos;%1&apos; already exist</source>
         <translation>Переменная &apos;%1&apos; уже существует</translation>
     </message>
     <message>
-        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="384"/>
+        <location filename="Sources/gui/cyclogram/variables_window.cpp" line="387"/>
         <source>Incorrect variable value</source>
         <translation>Неправильное значение переменной</translation>
     </message>
