@@ -161,6 +161,7 @@ void CmdActionModule::updateText()
     mText += moduleNameImpl();
     mText += ": ";
     mText += commandName(mModule, mOperation, mInputParams);
+    mText += paramsText(mModule, mOperation, mInputParams);
 
     // TODO some hack for ON/OFF commands text
     int state = mInputParams.value(SystemState::POWER_STATE, -1).toInt();
@@ -226,13 +227,9 @@ QString CmdActionModule::moduleNameImpl() const
         {
             int fuse = mInputParams.value(SystemState::FUSE_ID).toInt();
 
-            if (fuse >= 1 && fuse <= 4) //TODO magic numbers
+            if (fuse >= 1 && fuse <= 8) //TODO magic numbers, [1, 4] PU1, [5, 8] PU2
             {
-                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_BUP, false);
-            }
-            else if (fuse > 4 && fuse <= 8) // TODO magic numbers
-            {
-                text += CmdActionModule::moduleName(ModuleCommands::POWER_UNIT_PNA, false);
+                text += CmdActionModule::moduleName(mModule, false);
             }
             else
             {
@@ -254,6 +251,7 @@ QString CmdActionModule::moduleNameImpl() const
 
     return text;
 }
+
 void CmdActionModule::onNameChanged(const QString& newName, const QString& oldName)
 {
     for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
@@ -332,6 +330,44 @@ QString CmdActionModule::moduleName(int moduleId, bool isFullName)
     }
 
     return text;
+}
+
+QString CmdActionModule::paramsText(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams)
+{
+    int paramID = INT_MAX;
+
+    switch (commandID)
+    {
+    case ModuleCommands::GET_FUSE_STATE:
+        paramID = SystemState::FUSE_ID;
+        break;
+    case ModuleCommands::GET_CHANNEL_TELEMETRY:
+        paramID = SystemState::CHANNEL_ID;
+        break;
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_1:
+    case ModuleCommands::GET_TEMPERATURE_DS1820_LINE_2:
+        paramID = SystemState::SENSOR_NUMBER;
+        break;
+
+    default:
+        return QString();
+        break;
+    }
+
+    QVariant value = inputParams.value(paramID);
+    if (!value.isValid())
+    {
+        return QString();
+    }
+
+    bool ok = false;
+    int valueInt = value.toInt(&ok);
+    if (ok)
+    {
+        return QString(" #%1").arg(valueInt);
+    }
+
+    return QString(" #%1").arg(value.toString());
 }
 
 QString CmdActionModule::commandName(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams)
