@@ -196,8 +196,13 @@ void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, c
 void VariablesWindow::onAccept()
 {
     // create variable name validator
-    //QRegExp rx("[a-z]{1}(\\w+)?"); // at least one latin letter in the beginning followed by alphanumeric or '_' characters
-    QRegExp rx("(\\w+)?"); // alphanumeric or '_' characters
+    QString pattern("([a-zA-Zа-яА-Я0-9._])+");
+    if (pattern.isEmpty())
+    {
+        pattern = ".+";
+    }
+
+    QRegExp rx(pattern);
     rx.setCaseSensitivity(Qt::CaseInsensitive);
     QRegExpValidator v(rx, 0);
     int pos = 0;
@@ -217,7 +222,7 @@ void VariablesWindow::onAccept()
         if (v.validate(varName, pos) != QValidator::Acceptable)
         {
             QMessageBox::warning(this, tr("Invalid variable name"), tr("Invalid '%1' variable name\n"
-                                                                       "Name must contain only alphanumeric or '_' characters").arg(varName));
+                                                                       "Pattern is '%2'").arg(varName).arg(pattern));
             return;
         }
 
