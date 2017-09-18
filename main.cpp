@@ -22,6 +22,19 @@ namespace
     static const QString CYCLOGRAMS_DIR = "cyclograms";
 }
 
+//int mystrcmp(const char* s1, const char* s2)
+//{
+//    while (*s1++ != 0 && *s2++ != 0)
+//    {
+//        if (*s1 != *s2)
+//        {
+//            return (*s1 - *s2);
+//        }
+//    }
+
+//    return (*s1 - *s2);
+//}
+
 void initializeLogger()
 {
     // create console output
@@ -116,6 +129,12 @@ int main(int argc, char *argv[])
 //    {
 //        mainWin.loadFile(parser.positionalArguments().first(), true);
 //    }
+
+//    const char* s1 = "khzgsfdgjhdfkh";
+//    const char* s2 = "khzgsfdgjhdfkh";
+
+//    int res = mystrcmp(s1, s2);
+
 
     mainWin.show();
     mainWin.onApplicationStart();

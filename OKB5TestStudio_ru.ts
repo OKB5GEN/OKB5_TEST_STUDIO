@@ -306,12 +306,12 @@
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="173"/>
         <source> ON</source>
-        <translation>ВКЛ</translation>
+        <translation> ВКЛ</translation>
     </message>
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="177"/>
         <source> OFF</source>
-        <translation>ВЫКЛ</translation>
+        <translation> ВЫКЛ</translation>
     </message>
     <message>
         <location filename="Sources/logic/commands/cmd_action_module.cpp" line="309"/>

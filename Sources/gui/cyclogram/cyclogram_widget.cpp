@@ -406,6 +406,12 @@ void CyclogramWidget::mousePressEvent(QMouseEvent *event)
             mPreviousPosition = event->pos();
         }
 
+        auto cyclogram = mCyclogram.lock();
+        if (cyclogram->state() == Cyclogram::RUNNING || cyclogram->state() == Cyclogram::PENDING_FOR_START)
+        {
+            return;
+        }
+
         mPressedVP = valencyPointAt(event->pos());
         if (mPressedVP)
         {
