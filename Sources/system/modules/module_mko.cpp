@@ -65,8 +65,7 @@ ModuleMKO::ModuleMKO(QObject* parent):
     mWordsToReceive(0),
     mWordsSent(0),
     mRepeatedRequests(0),
-    mTMKOpened(false),
-    mSwitchToMainKitAfterResponse(false)
+    mTMKOpened(false)
 {
     mMainKitState.address = MAIN_KIT_ADDRESS;
     mReserveKitState.address = RESERVE_KIT_ADDRESS;
@@ -144,12 +143,30 @@ void ModuleMKO::readResponse()
         break;
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
-            if (mSwitchToMainKitAfterResponse)
+            if (mMainKitState.isOnBUPKit && mReserveKitState.isOnBUPKit) // both kits are on
             {
-                mSwitchToMainKitAfterResponse = false;
-                if (!selectKit(MAIN_KIT))
+                if (mMainKitState.isSelected) // sending via main kit performed
                 {
-                    mCurrentTransaction.error = QString("Main MKO kit not selected after angle sensor power on via the reserve kit");
+                    LOG_INFO(QString("Both main and reserve kits are on: response from main kit received"));
+                    if (!selectKit(RESERVE_KIT))
+                    {
+                        mCurrentTransaction.error = QString("Reserve MKO kit not selected after angle sensor power on via the main kit");
+                    }
+                    else // send transaction via reserve kit
+                    {
+                        Transaction transaction = mCurrentTransaction;
+                        processCommand(transaction);
+                        return;
+                    }
+                }
+                else if (mReserveKitState.isSelected)
+                {
+                    LOG_INFO(QString("Both main and reserve kits are on: response from reserve kit received"));
+
+                    if (!selectKit(MAIN_KIT))
+                    {
+                        mCurrentTransaction.error = QString("Main MKO kit not selected after angle sensor power on via the reserve kit");
+                    }
                 }
             }
         }
@@ -721,66 +738,6 @@ void ModuleMKO::receiveCommandArrayForChannel(uint16_t address, Subaddress chann
     requestDataFromBUP(address, RECEIVE_SUBADDRESS, mWordsToReceive);
 }
 
-QString ModuleMKO::prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerSupplySource source)
-{
-    if (source == PS_FROM_MAIN_KIT)
-    {
-        address = mMainKitState.address;
-
-        if (mMainKitState.isSelected) // main kit selected, no special preparation needed
-        {
-            return "";
-        }
-
-        if (!mReserveKitState.isSelected)
-        {
-            return QString("No MKO kit selected. Can not send angle sensor power supply command via main MKO kit");
-        }
-
-        if (!mMainKitState.isOnBUPKit)
-        {
-            return QString("Trying to send angle sensor power supply command to deenergized main kit");
-        }
-
-        if (!selectKit(MAIN_KIT))
-        {
-            return QString("Could not select main MKO kit");
-        }
-    }
-    else if (source == PS_FROM_RESERVE_KIT)
-    {
-        address = mReserveKitState.address;
-
-        if (mReserveKitState.isSelected)
-        {
-            return ""; // reserve kit selected, no special preparation needed
-        }
-
-        if (!mMainKitState.isSelected)
-        {
-            return QString("No MKO kit selected. Can not send angle sensor power supply command via reserve MKO kit");
-        }
-
-        if (!mReserveKitState.isOnBUPKit)
-        {
-            return QString("Trying to send angle sensor power supply command to deenergized reserve kit");
-        }
-
-        if (!selectKit(RESERVE_KIT))
-        {
-            return QString("Could not select reserve MKO kit");
-        }
-
-        mSwitchToMainKitAfterResponse = true; // set flag that we need to switch back to main MKO kit after response receive (if it was selected)
-    }
-    else
-    {
-        return QString("Unknow power supply source for angle sensor");
-    }
-
-    return "";
-}
-
 void ModuleMKO::sendAngleSensorData(uint16_t address, AngleSensorPowerSupplySource source)
 {
     uint16_t wordsCount = 2;
@@ -817,6 +774,16 @@ QString ModuleMKO::canSendRequest(const Transaction& request) const
     if (!mTMKOpened)
     {
         return QString("MKO not started");
+    }
+
+    if (mMainKitState.isSelected && mMainKitState.isOnBUPKit)
+    {
+        return "";
+    }
+
+    if (mReserveKitState.isSelected && mReserveKitState.isOnBUPKit)
+    {
+        return "";
     }
 
     if (!mMainKitState.isSelected && !mReserveKitState.isSelected)
@@ -994,17 +961,7 @@ void ModuleMKO::processCommand(const Transaction& request)
     case ModuleCommands::SEND_TO_ANGLE_SENSOR:
         {
             AngleSensorPowerSupplySource source = AngleSensorPowerSupplySource(mCurrentTransaction.inputParams.value(SystemState::SUBADDRESS).toInt());
-
-            QString error = prepareSendToAngleSensor(address, source);
-            if (error.isEmpty())
-            {
-                sendAngleSensorData(address, source);
-            }
-            else
-            {
-                sendLocalMessage(error);
-                return;
-            }
+            sendAngleSensorData(address, source);
         }
         break;
 

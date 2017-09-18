@@ -122,7 +122,6 @@ private:
     void sendAngleSensorData(uint16_t address, AngleSensorPowerSupplySource source);
 
     QString canSendRequest(const Transaction& request) const;
-    QString prepareSendToAngleSensor(uint16_t& address, AngleSensorPowerSupplySource source);
 
     void sendLocalMessage(const QString& error = ""); // send response to cyclogram without sending any data to real device
     void updateMKO(KitState& changedKit, bool isOn, const KitState& otherKit);
@@ -134,8 +133,6 @@ private:
     bool mTMKOpened;
     KitState mMainKitState;
     KitState mReserveKitState;
-
-    bool mSwitchToMainKitAfterResponse;
 };
 
 #endif // MODULE_MKO_H
