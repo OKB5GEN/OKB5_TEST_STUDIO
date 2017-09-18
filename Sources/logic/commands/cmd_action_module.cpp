@@ -863,3 +863,24 @@ bool CmdActionModule::loadFromImpl(Command* other)
 
     return true;
 }
+
+bool CmdActionModule::isVariableUsed(const QString& name) const
+{
+    foreach (QVariant var, mInputParams.values())
+    {
+        if (var.type() == QMetaType::QString && var.toString() == name)
+        {
+            return true;
+        }
+    }
+
+    foreach (QVariant var, mOutputParams.values())
+    {
+        if (var.type() == QMetaType::QString && var.toString() == name)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

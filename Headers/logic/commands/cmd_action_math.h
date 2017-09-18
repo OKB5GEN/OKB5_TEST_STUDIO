@@ -53,6 +53,8 @@ public:
     QString variableName(OperandID operand) const;
     qreal value(OperandID operand) const;
 
+    bool isVariableUsed(const QString& name) const override;
+
 protected:
     bool loadFromImpl(Command* other) override;
 

@@ -931,3 +931,16 @@ bool CmdQuestion::canBeCopied() const
 {
     return false;
 }
+
+bool CmdQuestion::isVariableUsed(const QString& name) const
+{
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        if (mOperands[i].type == Variable && mOperands[i].variable == name)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

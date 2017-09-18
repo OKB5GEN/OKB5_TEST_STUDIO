@@ -46,6 +46,8 @@ public:
     void resume() override;
 #endif
 
+    bool isVariableUsed(const QString& name) const override;
+
 protected:
     bool loadFromImpl(Command* other) override;
 

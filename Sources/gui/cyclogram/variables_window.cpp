@@ -191,6 +191,15 @@ void VariablesWindow::addRow(int row, const QString& name, qreal defaultValue, c
     QTableWidgetItem* descriptionItem = new QTableWidgetItem(description);
     descriptionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
     mTableWidget->setItem(row, 2, descriptionItem);
+
+    auto cyclogram = mCyclogram.lock();
+    if (!cyclogram->isVariableUsed(name))
+    {
+        QColor color("lightgrey");
+        nameItem->setBackgroundColor(color);
+        valueItem->setBackgroundColor(color);
+        descriptionItem->setBackgroundColor(color);
+    }
 }
 
 void VariablesWindow::onAccept()

@@ -967,3 +967,16 @@ bool Cyclogram::canBeCopied(DRAKON::IconType type)
 
     return true;
 }
+
+bool Cyclogram::isVariableUsed(const QString& name) const
+{
+    foreach (Command* command, mCommands)
+    {
+        if (command->isVariableUsed(name))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

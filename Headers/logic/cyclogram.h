@@ -68,6 +68,8 @@ public:
 
     Command* validate() const; //
 
+    bool isVariableUsed(const QString& name) const;
+
     VariableController* variableController() const;
     void setSystemState(SystemState* state);
     SystemState* systemState() const;

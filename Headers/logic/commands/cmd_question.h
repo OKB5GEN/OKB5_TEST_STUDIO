@@ -76,6 +76,8 @@ public:
 
     bool canBeCopied() const override;
 
+    bool isVariableUsed(const QString& name) const override;
+
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;

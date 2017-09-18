@@ -768,3 +768,30 @@ void CmdSubProgram::reloadCyclogram()
 
     emit cyclogramChanged();
 }
+
+bool CmdSubProgram::isVariableUsed(const QString& name) const
+{
+    for (auto it = mInputParams.begin(); it != mInputParams.end(); ++it)
+    {
+        if (it.value().type() == QVariant::String && it.value().toString() == name)
+        {
+            return true;
+        }
+    }
+
+    // output parameters update
+    for (auto it = mOutputParams.begin(); it != mOutputParams.end(); ++it)
+    {
+        if (it.key() == name)
+        {
+            if (it.value().type() == QVariant::String)
+            {
+                return (!it.value().toString().isEmpty());
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}

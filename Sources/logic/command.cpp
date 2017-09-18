@@ -460,3 +460,8 @@ bool Command::canBeCopied() const
 {
     return true;
 }
+
+bool Command::isVariableUsed(const QString& name) const
+{
+    return false;
+}

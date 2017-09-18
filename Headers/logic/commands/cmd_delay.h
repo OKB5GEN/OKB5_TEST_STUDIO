@@ -24,6 +24,8 @@ public:
     int delay() const; // milliseconds
     const QString& variable() const; // milliseconds
 
+    bool isVariableUsed(const QString& name) const override;
+
 protected:
     void writeCustomAttributes(QXmlStreamWriter* writer) override;
     void readCustomAttributes(QXmlStreamReader* reader, const Version& fileVersion) override;

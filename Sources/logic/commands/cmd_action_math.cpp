@@ -381,3 +381,16 @@ bool CmdActionMath::loadFromImpl(Command* other)
 
     return true;
 }
+
+bool CmdActionMath::isVariableUsed(const QString& name) const
+{
+    for (int i = 0; i < OperandsCount; ++i)
+    {
+        if (mOperands[i].type == Variable && mOperands[i].variable == name)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

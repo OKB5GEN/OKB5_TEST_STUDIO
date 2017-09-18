@@ -289,3 +289,8 @@ void CmdDelay::onVariableRemoved(const QString& name)
         setDelay(0);
     }
 }
+
+bool CmdDelay::isVariableUsed(const QString& name) const
+{
+    return (mVariable == name);
+}

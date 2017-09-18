@@ -28,6 +28,8 @@ public:
     static QString commandName(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams = QMap<uint32_t, QVariant>());
     static QString paramsText(uint32_t moduleID, uint32_t commandID, const QMap<uint32_t, QVariant>& inputParams = QMap<uint32_t, QVariant>());
 
+    bool isVariableUsed(const QString& name) const override;
+
 protected:
     bool loadFromImpl(Command* other) override;
 

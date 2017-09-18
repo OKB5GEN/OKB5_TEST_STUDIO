@@ -39,6 +39,8 @@ public:
     virtual void resume();
 #endif
 
+    virtual bool isVariableUsed(const QString& name) const;
+
     qint64 id() const;
 
     void write(QXmlStreamWriter* writer);
