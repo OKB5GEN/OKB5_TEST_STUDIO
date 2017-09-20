@@ -238,7 +238,14 @@ void Cyclogram::onCriticalError(Command* cmd)
     }
 
     stop();
-    emit finished(tr("Critical error occured: ") + cmd->errorDesc());
+
+    QString errorMessage;
+    if (mIsMainCyclogram)
+    {
+        errorMessage += tr("Critical error occured: ");
+    }
+
+    emit finished(errorMessage + cmd->errorDesc());
 }
 
 void Cyclogram::runCurrentCommand()

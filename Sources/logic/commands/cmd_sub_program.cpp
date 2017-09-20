@@ -540,7 +540,7 @@ void CmdSubProgram::onCyclogramFinished(const QString& error)
 {
     if (!error.isEmpty())
     {
-        mErrorText = QString("Subprogram finished with error: %1").arg(error);
+        mErrorText = error;
         emit criticalError(this);
         return;
     }
