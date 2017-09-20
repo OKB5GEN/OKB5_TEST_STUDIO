@@ -1775,7 +1775,7 @@ Try another name</source>
     <message>
         <location filename="Sources/gui/tools/console_text_widget.cpp" line="11"/>
         <source>Console text</source>
-        <translation>Текст (в консоль циклограммы до выполнения команды и после выполнения)</translation>
+        <translation>Консольный текст</translation>
     </message>
     <message>
         <source>Before</source>
